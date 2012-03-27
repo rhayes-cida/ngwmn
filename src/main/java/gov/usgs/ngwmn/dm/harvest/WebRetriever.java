@@ -16,7 +16,8 @@ public class WebRetriever implements DataFetcher {
 	
 	private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
-	private UrlFactory urlFactory = new UrlFactory();
+	protected UrlFactory urlFactory = new UrlFactory();
+	protected Harvester  harvester  = new Harvester();
 	
 	@Override
 	public boolean configureInput(Specifier spec, Pipeline pipe)
@@ -28,8 +29,7 @@ public class WebRetriever implements DataFetcher {
 		String url = urlFactory.makeUrl(spec);
 		
 		logger.info("Fetching data for {} from {}", spec, url);
-		
-		Harvester harvester = new Harvester();
+				
 		int statusCode = harvester.wget(url);
 		
         if (statusCode != HttpStatus.SC_OK) {
