@@ -43,12 +43,12 @@ public class Specifier {
 		return builder.toString();
 	}
 
-	public static void check(Specifier spec) {
-		if ( Strings.isNullOrEmpty(spec.getAgencyID()) ) 
+	public void check() {
+		if ( Strings.isNullOrEmpty(getAgencyID()) ) 
 			throw new InvalidParameterException("Well agency Id is required.");
-		if ( Strings.isNullOrEmpty(spec.getFeatureID()) ) 
+		if ( Strings.isNullOrEmpty(getFeatureID()) ) 
 			throw new InvalidParameterException("Well Feature/Site Id is required.");
-		if ( spec.getTypeID() == null ) 
+		if ( getTypeID() == null ) 
 			throw new InvalidParameterException("Well data type Id is required.");
 	}
 	

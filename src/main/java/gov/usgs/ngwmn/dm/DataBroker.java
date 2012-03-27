@@ -89,7 +89,9 @@ public class DataBroker {
 	void check(Specifier spec) throws Exception {
 		if (retriever == null && harvester == null) 
 			throw new NullPointerException("At least one Data Fetcher is required");
-		Specifier.check(spec);
+		if (spec == null) 
+			throw new NullPointerException("Specifier is required");
+		spec.check();
 	}
 	
 	boolean configureInput(DataFetcher dataFetcher, Specifier spec, Pipeline pipe) throws Exception {

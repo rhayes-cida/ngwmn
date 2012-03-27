@@ -21,7 +21,7 @@ public class WebRetriever implements DataFetcher {
 	@Override
 	public boolean configureInput(Specifier spec, Pipeline pipe)
 			throws Exception {
-		Specifier.check(spec);
+		spec.check();
 		
 		pipe.setInvoker(new CopyInvoker());
 		

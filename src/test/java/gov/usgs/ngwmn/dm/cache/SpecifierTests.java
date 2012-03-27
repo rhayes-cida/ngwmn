@@ -24,7 +24,7 @@ public class SpecifierTests {
 	public void test_check_noEmptyFeatureId() {
 		spec.setFeatureID("");
 		try {
-			Specifier.check(spec);
+			spec.check();
 			assertTrue(false);
 		} catch (NullPointerException e) {
 			assertTrue(false);
@@ -39,7 +39,7 @@ public class SpecifierTests {
 	public void test_check_noEmptyAgencyId() {
 		spec.setAgencyID("");
 		try {
-			Specifier.check(spec);
+			spec.check();
 			assertTrue(false);
 		} catch (NullPointerException e) {
 			assertTrue(false);
@@ -54,7 +54,7 @@ public class SpecifierTests {
 	public void test_check_notNullAgencyId() {
 		spec.setAgencyID(null);
 		try {
-			Specifier.check(spec);
+			spec.check();
 			assertTrue(false);
 		} catch (NullPointerException e) {
 			assertTrue(false);
@@ -69,7 +69,7 @@ public class SpecifierTests {
 	public void test_check_noNullTypeId() {
 		spec.setTypeID(null);
 		try {
-			Specifier.check(spec);
+			spec.check();
 			assertTrue(false);
 		} catch (NullPointerException e) {
 			assertTrue(false);
@@ -84,7 +84,7 @@ public class SpecifierTests {
 	public void test_check_noNullFeatureId() {
 		spec.setFeatureID(null);
 		try {
-			Specifier.check(spec);
+			spec.check();
 			assertTrue(false);
 		} catch (NullPointerException e) {
 			assertTrue(false);
