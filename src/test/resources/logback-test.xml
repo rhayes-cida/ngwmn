@@ -7,7 +7,12 @@
     </layout>
   </appender>
 
-  <root level="debug">
+  <root level="warn">
     <appender-ref ref="STDOUT" />
   </root>
+  
+  <logger level="info" name="httpclient.wire" />
+  <logger level="info" name="org.apache.commons.httpclient" />
+  <logger level="info" name="gov.usgs.ngwmn.dm.DataBroker"/>
+  <logger level="info" name="gov.usgs.ngwmn.dm.DataManagerServlet"/>
 </configuration>
