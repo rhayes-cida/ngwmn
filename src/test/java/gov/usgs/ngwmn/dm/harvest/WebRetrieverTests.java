@@ -16,6 +16,7 @@ import org.junit.Test;
 public class WebRetrieverTests {
 
 	private Map<String,Boolean> checkValues;
+	
 	private WebRetriever web;
 	private Pipeline pipe;
 	private Specifier spec;
