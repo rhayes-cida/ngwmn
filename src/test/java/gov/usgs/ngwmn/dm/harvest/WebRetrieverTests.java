@@ -19,6 +19,7 @@ public class WebRetrieverTests {
 	private WebRetriever web;
 	private Pipeline pipe;
 	private Specifier spec;
+	
 	private final String testUrl = "testUrl";
 	
 	@Before
