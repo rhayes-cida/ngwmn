@@ -14,8 +14,10 @@ public class Harvester {
 	
 	private final Logger logger = LoggerFactory.getLogger(this.getClass());
 	
-	private InputStream is;
-	private int statusCode;
+	private InputStream    is;
+	private int    statusCode;
+	private HttpClient client;
+
 	
 	public InputStream getInputStream() {
 		return is;
@@ -28,7 +30,7 @@ public class Harvester {
 			throws Exception {
 		logger.info("wget from {}",new Object[]{url});
 		
-		HttpClient client = new HttpClient();
+		client = new HttpClient();
 		HttpMethod method = new GetMethod(url);
 		
 		statusCode = client.executeMethod(method);
