@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE generatorConfiguration PUBLIC "-//mybatis.org//DTD MyBatis Generator Configuration 1.0//EN" "http://mybatis.org/dtd/mybatis-generator-config_1_0.dtd" >
+<generatorConfiguration>
+<classPathEntry location="/home/rhayes/Programs/eclipse/plugins/oracle.database.driver.jdk50_11.1.0.7/ojdbc5.jar"/>
+  <context id="GWDP" targetRuntime="Ibatis2Java5">
+    <jdbcConnection driverClass="oracle.jdbc.OracleDriver" 
+    				connectionURL="jdbc:oracle:thin:@//widev.er.usgs.gov:1521/widev.er.usgs.gov" 
+    				userId="gw_data_portal" password="A4lj3_pf" >
+    </jdbcConnection>
+    <javaModelGenerator targetPackage="gov.usgs.ngwmn.dm.dao" targetProject="ngwmn/src/main/java" />
+    <sqlMapGenerator targetPackage="gov.usgs.ngwmn.dm.dao" targetProject="ngwmn/src/main/resources" />
+    <javaClientGenerator targetPackage="gov.usgs.ngwmn.dm.dao" targetProject="ngwmn/src/main/java" type="SPRING" />
+    <table schema="GW_DATA_PORTAL" tableName="WELL_REGISTRY" >
+      <!-- <columnOverride column="???" property="???" /> -->
+    </table>
+  </context>
+</generatorConfiguration>
