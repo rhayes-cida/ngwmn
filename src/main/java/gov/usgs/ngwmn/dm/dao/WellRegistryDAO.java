@@ -21,4 +21,7 @@ public interface WellRegistryDAO {
 	WellRegistry findByKey(String agencyID, String wellID);
 
 	List<WellRegistry> selectAll();
+	
+	List<WellRegistry> selectByAgency(String agencyId);
+
 }

@@ -44,4 +44,10 @@ public class WellRegistryDAOImpl implements WellRegistryDAO {
 		return selectByExample(filter);
 	}
 
+	@Override
+	public List<WellRegistry> selectByAgency(String agencyId) {
+		return mapper.selectByAgency(agencyId);
+	}
+
+	
 }
