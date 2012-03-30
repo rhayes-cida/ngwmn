@@ -23,6 +23,17 @@
     	class="gov.usgs.ngwmn.dm.dao.WellRegistryDAOImpl">
     	<property name="mapper" ref="wellRegistryMapper"/>
    	</bean>
+   	
+   	<bean id="fetchLogMapper" class="org.mybatis.spring.mapper.MapperFactoryBean">
+  		<property name="mapperInterface" value="gov.usgs.ngwmn.dm.dao.FetchLogMapper" />
+  		<property name="sqlSessionFactory" ref="sqlSessionFactory" />
+	</bean>
+	
+	<bean id="FetchLogDAO"
+		class="gov.usgs.ngwmn.dm.dao.FetchLogDAO">
+		<constructor-arg ref="fetchLogMapper"/>
+	</bean>
+		
 </beans>
 
        

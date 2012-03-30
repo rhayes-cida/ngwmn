@@ -28,8 +28,8 @@
     	<columnOverride column="STATE_CD" javaType="java.lang.Integer"/>
     </table>
     <table schema="GW_DATA_PORTAL" tableName="FETCH_LOG">
-    	<columnOverride column="FETCHLOG_ID" javaType="java.lang.Integer" jdbcType="NUMBER"/>
-    	<columnOverride column="CT" javaType="java.lang.Integer" jdbcType="NUMBER" />
+    	<columnOverride column="FETCHLOG_ID" javaType="java.lang.Integer" jdbcType="NUMERIC"/>
+    	<columnOverride column="CT" javaType="java.lang.Integer" jdbcType="NUMERIC" />
     	<columnOverride column="DATA_SOURCE" property="source"/>
     </table>
   </context>
