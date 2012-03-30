@@ -41,6 +41,7 @@ public class WellRegistryDAOImpl implements WellRegistryDAO {
 		WellRegistryExample filter = new WellRegistryExample();
 		// Only look for displayed wells
 		filter.createCriteria().andDisplayFlagEqualTo("1");
+		filter.setOrderByClause("AGENCY_CD, SITE_NO");
 		return selectByExample(filter);
 	}
 
