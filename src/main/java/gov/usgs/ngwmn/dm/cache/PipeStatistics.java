@@ -25,6 +25,8 @@ public class PipeStatistics {
 	private long end = 0;
 	private Class<?> calledBy;
 	private Specifier specifier;
+	private String source;
+	private String digest;
 	
 	public synchronized long getCount() {
 		return count;
@@ -94,6 +96,14 @@ public class PipeStatistics {
 		this.calledBy = calledBy;
 	}
 
+	public Double getElapsedTime() {
+		Long el = getElapsedMSec();
+		if (el == null) {
+			return null;
+		}
+		return Double.valueOf(el / 1000.0);
+	}
+	
 	public synchronized Date getStartDate() {
 		if (start > 0) {
 			return new Date(start);
@@ -119,6 +129,22 @@ public class PipeStatistics {
 
 	public void setSpecifier(Specifier specifier) {
 		this.specifier = specifier;
+	}
+
+	public String getSource() {
+		return source;
+	}
+
+	public void setSource(String source) {
+		this.source = source;
+	}
+
+	public String getDigest() {
+		return digest;
+	}
+
+	public void setDigest(String digest) {
+		this.digest = digest;
 	}
 	
 	
