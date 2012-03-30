@@ -6,16 +6,24 @@ import java.util.List;
 
 import org.junit.After;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
+import org.springframework.mock.jndi.SimpleNamingContextBuilder;
 
 public class WellRegistryDAOTest {
 	private WellRegistryDAO dao;
 	
+	@BeforeClass
+	public static void setupNaming() throws Exception {
+		final SimpleNamingContextBuilder builder = new SimpleNamingContextBuilder();
+		builder.activate();
+	}
+	
 	@Before
 	public void setUp() throws Exception {
-		ApplicationContext ctx = new ClassPathXmlApplicationContext("applicationContext.xml");
+		ApplicationContext ctx = new ClassPathXmlApplicationContext("applicationContextTest.xml");
 		dao = ctx.getBean("WellRegistryDAO", WellRegistryDAO.class);
 	}
 

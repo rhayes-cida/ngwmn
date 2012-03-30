@@ -2,16 +2,14 @@
 <!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" 
 	"http://www.springframework.org/dtd/spring-beans.dtd">
 <beans>
-    <bean id="dataSource"
-        class="oracle.jdbc.pool.OracleDataSource"
-        destroy-method="close">
-        <!--  <property name="driverClassName" value="oracle.jdbc.driver.OracleDriver" /> -->
-		<property name="URL"
-                  value="jdbc:oracle:thin:@//widev.er.usgs.gov:1521/widev.er.usgs.gov" />
-        <property name="user" value="gw_data_portal" />
-        <property name="password" value="A4lj3_pf" />
-    </bean>
-    
+	<bean id="dataSource" 
+      class="org.springframework.jndi.JndiObjectFactoryBean">
+      <property name="jndiName" 
+                  value="java:comp/env/jdbc/GW_DATA_PORTAL"/>    
+      <property name="resourceRef" 
+                  value="true" /> 
+	</bean>
+	
     <bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
   		<property name="dataSource" ref="dataSource" />
 	</bean>
