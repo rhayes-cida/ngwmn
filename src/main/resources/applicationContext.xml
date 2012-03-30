@@ -6,23 +6,24 @@
         class="oracle.jdbc.pool.OracleDataSource"
         destroy-method="close">
         <!--  <property name="driverClassName" value="oracle.jdbc.driver.OracleDriver" /> -->
-	<property name="URL"
-                  value="jdbc:oracle:thin:@127.0.0.1:1521:orcl" />
-        <property name="user" value="scott" />
-        <property name="password" value="tiger" />
+		<property name="URL"
+                  value="jdbc:oracle:thin:@//widev.er.usgs.gov:1521/widev.er.usgs.gov" />
+        <property name="user" value="gw_data_portal" />
+        <property name="password" value="A4lj3_pf" />
     </bean>
-
-    <bean id="sqlMap"
-          class="org.springframework.orm.ibatis.SqlMapClientFactoryBean">
-        <property name="configLocation">
-            <value>classpath:sql-map-config.xml</value>
-        </property>
-        <property name="dataSource" ref="dataSource" />
-    </bean> 
     
+    <bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+  		<property name="dataSource" ref="dataSource" />
+	</bean>
+
+	<bean id="wellRegistryMapper" class="org.mybatis.spring.mapper.MapperFactoryBean">
+  		<property name="mapperInterface" value="gov.usgs.ngwmn.dm.dao.WellRegistryMapper" />
+  		<property name="sqlSessionFactory" ref="sqlSessionFactory" />
+	</bean>
+	
     <bean id="WellRegistryDAO"
     	class="gov.usgs.ngwmn.dm.dao.WellRegistryDAOImpl">
-    	<property name="sqlMapClient" ref="sqlMap"/>
+    	<property name="mapper" ref="wellRegistryMapper"/>
    	</bean>
 </beans>
 

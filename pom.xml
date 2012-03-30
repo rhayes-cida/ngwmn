@@ -87,11 +87,6 @@
 				</exclusion>
 			</exclusions>
 		</dependency>
-		<dependency>
-			<groupId>commons-io</groupId>
-			<artifactId>commons-io</artifactId>
-			<version>2.1</version>
-		</dependency>
 		
 		<!--  Google guava (a replacement for some of Apache Commons) -->
 		<dependency>
@@ -122,21 +117,17 @@
 			<version>${org.springframework.version}</version>
 		</dependency>
 		
-		<!--  Ibatis2 -->
+		<!--  Ibatis (well, MyBatis really) -->
 		<dependency>
-			<groupId>com.ibatis</groupId>
-			<artifactId>ibatis2-dao</artifactId>
-			<version>2.1.7.597</version>
+			<groupId>org.mybatis</groupId>
+			<artifactId>mybatis</artifactId>
+			<version>3.1.0</version>
 		</dependency>
-        <dependency>
-			<groupId>com.ibatis</groupId>
-			<artifactId>ibatis2-common</artifactId>
-			<version>2.1.7.597</version>
-		</dependency>
-        <dependency>
-			<groupId>com.ibatis</groupId>
-			<artifactId>ibatis2-sqlmap</artifactId>
-			<version>2.1.7.597</version>
+		<dependency>
+			<groupId>org.mybatis</groupId>
+			<artifactId>mybatis-spring</artifactId>
+			<!--  Isn't this version skew annoying... -->
+			<version>1.1.0</version>
 		</dependency>
             
 		<!-- Testing dependencies -->
