@@ -33,6 +33,11 @@
 		class="gov.usgs.ngwmn.dm.dao.FetchLogDAO">
 		<constructor-arg ref="fetchLogMapper"/>
 	</bean>
+	
+	<bean id="FetchRecorder"
+		class="gov.usgs.ngwmn.dm.io.FetchRecorder">
+		<property name="dao" ref="FetchLogDAO"/>
+	</bean>
 		
 </beans>
 
