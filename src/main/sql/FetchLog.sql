@@ -2,6 +2,9 @@
 
 create table FETCH_LOG (
 	fetchlog_id integer not null,
+	AGENCY_CD              VARCHAR2(20 BYTE)      NOT NULL,
+    SITE_NO                VARCHAR2(16 BYTE)      NOT NULL,
+
 	data_source varchar2(120),
 	started_at timestamp,
 	status char(4),
@@ -18,12 +21,17 @@ create trigger fetch_log_trigger
 	before insert on FETCH_LOG
 	for each row
 	begin
-		select fetch_log_seq.nextval into :new.fetchlog_id from dual;
+		select coalesce(:new.fetchlog_id,fetch_log_seq.nextval) into :new.fetchlog_id from dual;
 	end;
 
--- insert into fetch_log(status) values ('FAIL');
+ALTER TABLE "GW_DATA_PORTAL"."FETCH_LOG" 
+ADD ( FOREIGN KEY ("AGENCY_CD", "SITE_NO") 
+	REFERENCES "GW_DATA_PORTAL"."WELL_REGISTRY" ("AGENCY_CD", "SITE_NO") VALIDATE )
+
+-- insert into fetch_log(status,agency_cd,site_no) values ('PASS','USGS','009');
 -- select * from fetch_log;
 -- delete from fetch_log;
+
 
 
 

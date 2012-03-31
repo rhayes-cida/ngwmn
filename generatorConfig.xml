@@ -16,6 +16,7 @@
     		enableInsert="false">
     		
     		<property name="immutable" value="true"/>
+    		<property name="constructorBased" value="true"/>
     	<ignoreColumn column="GEOM"/>
     	<ignoreColumn column="GEOM_3785"/>
     	
