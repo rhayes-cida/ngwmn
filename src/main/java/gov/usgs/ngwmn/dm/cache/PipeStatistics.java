@@ -17,6 +17,19 @@ public class PipeStatistics {
 		Status(boolean isDone) {
 			done = isDone;
 		}
+		
+		public String as4Char() {
+			return name().substring(0, 4);
+		}
+		
+		public static Status by4Char(String c4) {
+			for (Status s : values()) {
+				if (c4.equals(s.as4Char())) {
+					return s;
+				}
+			}
+			return null;
+		}
 	}
 
 	private long count;
