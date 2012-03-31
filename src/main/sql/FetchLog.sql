@@ -12,8 +12,10 @@ create table FETCH_LOG (
 	ct integer,
 	elapsed_sec real,
 	specifier varchar2(80),
+	fetcher varchar2(80),
 	primary key(fetchlog_id)
 );
+
 
 create sequence fetch_log_seq;
 
