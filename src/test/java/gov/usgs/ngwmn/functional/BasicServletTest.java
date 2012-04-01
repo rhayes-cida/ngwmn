@@ -9,6 +9,7 @@ import gov.usgs.ngwmn.dm.DataManagerServlet;
 
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.springframework.mock.jndi.SimpleNamingContextBuilder;
 import org.xml.sax.SAXException;
 
 import com.meterware.httpunit.GetMethodWebRequest;
@@ -39,6 +40,20 @@ public class BasicServletTest {
 			}
 		}
 	}
+	
+	@BeforeClass
+	public static void setupNaming() throws Exception {
+		final SimpleNamingContextBuilder builder = new SimpleNamingContextBuilder();
+		String dataSource = "java:comp/env/jdbc/GW_DATA_PORTAL";
+		// TODO Set up data source for servlet.
+		
+		try {
+			builder.activate();
+		} catch (IllegalStateException ise) {
+			// already had a naming provider; ignore
+		}
+	}
+
 	
 	@Test
 	public void testWithData() throws Exception {

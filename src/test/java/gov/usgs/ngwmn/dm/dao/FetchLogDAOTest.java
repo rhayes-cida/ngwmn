@@ -18,7 +18,11 @@ public class FetchLogDAOTest {
 	@BeforeClass
 	public static void setupNaming() throws Exception {
 		final SimpleNamingContextBuilder builder = new SimpleNamingContextBuilder();
-		builder.activate();
+		try {
+			builder.activate();
+		} catch (IllegalStateException ise) {
+			// already had a naming provider; ignore
+		}
 	}
 	
 	@Before

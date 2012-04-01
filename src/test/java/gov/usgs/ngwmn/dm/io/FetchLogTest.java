@@ -19,7 +19,11 @@ public class FetchLogTest {
 	@BeforeClass
 	public static void setupNaming() throws Exception {
 		final SimpleNamingContextBuilder builder = new SimpleNamingContextBuilder();
-		builder.activate();
+		try {
+			builder.activate();
+		} catch (IllegalStateException ise) {
+			// already had a naming provider; ignore
+		}
 	}
 	
 	@Before
@@ -31,23 +35,21 @@ public class FetchLogTest {
 
 	@Test
 	public void testSUCCESS() {
-		PipeStatistics stats = new PipeStatistics();
+		PipeStatistics stats = StatsMaker.makeStats(getClass());
 		
 		victim.notifySuccess(stats);
 		
-		fail("not implemented");
-		// check FetchLogDao for new item
+		// TODO Check dao for fetch log with self as fetcher
 	}
 
 	@Test
 	public void testFAIL() {
-		PipeStatistics stats = new PipeStatistics();
+		PipeStatistics stats = StatsMaker.makeStats(getClass());
 		
 		Exception npe = new NullPointerException();
 		victim.notifyException(stats, npe);
 		
-		fail("not implemented");
-		// check FetchLogDao for new item
+		// TODO check dao for item with recent time, self as fetcher, status fail
 		
 	}
 	

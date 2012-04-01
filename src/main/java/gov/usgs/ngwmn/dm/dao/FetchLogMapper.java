@@ -119,12 +119,12 @@ public interface FetchLogMapper {
 		"SITE_NO, DATA_SOURCE, ",
 		"STARTED_AT, STATUS, ",
 		"PROBLEM, CT, ELAPSED_SEC, ",
-		"SPECIFIER)",
+		"SPECIFIER, FETCHER)",
 		"values (fetch_log_seq.nextval, #{agencyCd,jdbcType=VARCHAR}, ",
 		"#{siteNo,jdbcType=VARCHAR}, #{source,jdbcType=VARCHAR}, ",
 		"#{startedAt,jdbcType=TIMESTAMP}, #{status,jdbcType=CHAR}, ",
 		"#{problem,jdbcType=VARCHAR}, #{ct,jdbcType=NUMERIC}, #{elapsedSec,jdbcType=FLOAT}, ",
-		"#{specifier,jdbcType=VARCHAR})" })
+		"#{specifier,jdbcType=VARCHAR}, #{fetcher,jdbcType=VARCHAR})" })
 	@SelectKey(statement="select fetch_log_seq.CURRVAL from dual", resultType = int.class, before = false, keyProperty = "fetchlogId") 
 	@Options(useGeneratedKeys=true, keyProperty="fetchlogId", keyColumn="FETCHLOG_ID")
 	int insertId(FetchLog record);

@@ -30,6 +30,9 @@ public class Harvester implements DataFetcher {
 		
 		String url = urlFactory.makeUrl(spec);
 		
+		// TODO This should go somewhere else. Too much coupling here.
+		pipe.getStatistics().setSource(url);
+		
 		logger.info("Fetching data for {} from {}", spec, url);
 		
 		HttpClient client = new HttpClient();

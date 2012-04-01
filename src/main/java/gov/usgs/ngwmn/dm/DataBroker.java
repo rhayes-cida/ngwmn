@@ -1,13 +1,20 @@
 package gov.usgs.ngwmn.dm;
 
+import gov.usgs.ngwmn.dm.cache.PipeStatisticsWithProblem;
 import gov.usgs.ngwmn.dm.cache.Specifier;
+import gov.usgs.ngwmn.dm.dao.WellRegistry;
+import gov.usgs.ngwmn.dm.dao.WellRegistryDAO;
+import gov.usgs.ngwmn.dm.dao.WellRegistryKey;
 import gov.usgs.ngwmn.dm.io.Pipeline;
 import gov.usgs.ngwmn.dm.io.TeeOutputStream;
 
+import java.io.IOException;
 import java.io.OutputStream;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.google.common.eventbus.EventBus;
 
 public class DataBroker {
 
@@ -16,12 +23,17 @@ public class DataBroker {
 
 	private DataLoader  loader;
 	
+	private WellRegistryDAO wellDAO;
+	private EventBus fetchEventBus;
+	
 	private Logger logger = LoggerFactory.getLogger(this.getClass());
 	
 	public void fetchWellData(Specifier spec, OutputStream out) throws Exception {
 		Pipeline pipe = new Pipeline();
 
 		check(spec);
+		
+		checkSiteExists(spec);
 		
 		pipe.setOutputStream(out);
 		boolean success = configureInput(retriever, spec, pipe);
@@ -44,15 +56,33 @@ public class DataBroker {
 		if ( ! success) {
 			signalDataNotFoundMsg(spec, pipe);
 		}
-		pipe.invoke();
 		
-		// TODO Temporary measure, in lieu of a more authoritative check per Well_Registry
-		if (pipe.getStatistics().getCount() < 2000) {
-			throw new SiteNotFoundException(spec);
+		try {
+			pipe.getStatistics().setSpecifier(spec);
+			pipe.invoke();
+			fetchEventBus.post(pipe.getStatistics());
+		} catch (IOException oops) {
+			PipeStatisticsWithProblem pswp = new PipeStatisticsWithProblem(pipe.getStatistics(), oops);
+			fetchEventBus.post(pswp);
+			throw oops;
 		}
+		
 		logger.info("Completed operation for {} result {}", spec, pipe.getStatistics());
 	}
 	
+	private void checkSiteExists(Specifier spec) 
+			throws SiteNotFoundException 
+	{
+		WellRegistryKey wk = spec.getWellRegistryKey();
+		WellRegistry well = wellDAO.findByKey(wk.getAgencyCd(),wk.getSiteNo());
+		
+		// TODO Hide the details of the display flag
+		boolean exists = (well != null && "1".equals(well.getDisplayFlag()));
+		if ( ! exists) {
+			throw new SiteNotFoundException(spec);
+		}
+	}
+
 	private boolean configureTestInput(Specifier spec, Pipeline pipe) 
 			throws Exception 
 	{
@@ -105,4 +135,13 @@ public class DataBroker {
 	boolean isEmpty(String string) {
 		return string == null || string.length()==0;
 	}
+
+	public void setWellRegistry(WellRegistryDAO wellDAO) {
+		this.wellDAO = wellDAO;
+	}
+
+	public void setFetchEventBus(EventBus fetchEventBus) {
+		this.fetchEventBus = fetchEventBus;
+	}
+	
 }

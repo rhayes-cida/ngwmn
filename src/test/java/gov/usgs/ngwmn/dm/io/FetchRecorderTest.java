@@ -35,7 +35,12 @@ public class FetchRecorderTest {
 	@BeforeClass
 	public static void setupNaming() throws Exception {
 		final SimpleNamingContextBuilder builder = new SimpleNamingContextBuilder();
-		builder.activate();
+		try {
+			builder.activate();
+		} catch (IllegalStateException ise) {
+			// There was already a naming provider -- ok.
+			// ignore
+		}
 	}
 	
 	@Before
@@ -53,7 +58,7 @@ public class FetchRecorderTest {
 	
 	@Test
 	public void testSUCCESS() {
-		PipeStatistics stats = makeStats();
+		PipeStatistics stats = StatsMaker.makeStats(getClass());
 		stats.markEnd(Status.DONE);
 		
 		int countBefore = getFetchCount(stats.getSpecifier());
@@ -64,22 +69,10 @@ public class FetchRecorderTest {
 		assertEquals("fetch record count", countBefore+1, countAfter);
 	}
 
-	private PipeStatistics makeStats() {
-		Specifier spec = new Specifier();
-		spec.setAgencyID("USGS");
-		spec.setFeatureID("007");
-		spec.setTypeID(WellDataType.ALL);
-		
-		PipeStatistics stats = new PipeStatistics();
-		stats.setCalledBy(getClass());
-		stats.setSpecifier(spec);
-		stats.markStart();
-		return stats;
-	}
 
 	@Test
 	public void testFAIL() {
-		PipeStatistics stats = makeStats();
+		PipeStatistics stats = StatsMaker.makeStats(getClass());
 		
 		int countBefore = getFetchCount(stats.getSpecifier());
 		
@@ -98,7 +91,7 @@ public class FetchRecorderTest {
 		
 		assertNotNull("FetchEventBus", b);
 		
-		PipeStatistics stats = makeStats();
+		PipeStatistics stats = StatsMaker.makeStats(getClass());
 
 		b.post(stats);
 
