@@ -38,6 +38,14 @@
 		class="gov.usgs.ngwmn.dm.io.FetchRecorder">
 		<property name="dao" ref="FetchLogDAO"/>
 	</bean>
+	
+ 	<bean id="FetchEventBus" class="gov.usgs.ngwmn.dm.eventbus.EventBusSpring">
+ 		<property name="subscribers">
+     		<list>
+       			<ref bean="FetchRecorder"/>
+     		</list>
+   		</property>
+ 	</bean>
 		
 </beans>
 

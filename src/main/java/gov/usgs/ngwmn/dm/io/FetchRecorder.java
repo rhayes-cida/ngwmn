@@ -1,6 +1,9 @@
 package gov.usgs.ngwmn.dm.io;
 
+import com.google.common.eventbus.Subscribe;
+
 import gov.usgs.ngwmn.dm.cache.PipeStatistics;
+import gov.usgs.ngwmn.dm.cache.PipeStatisticsWithProblem;
 import gov.usgs.ngwmn.dm.dao.FetchLog;
 import gov.usgs.ngwmn.dm.dao.FetchLogDAO;
 
@@ -8,12 +11,18 @@ public class FetchRecorder implements PipelineFinishListener {
 
 	private FetchLogDAO dao;
 	
+	@Subscribe
 	@Override
 	public void notifySuccess(PipeStatistics stats) {
 		notify(stats, null);
 	}
 
+	@Subscribe
 	@Override
+	public void notifyException(PipeStatisticsWithProblem pswp) {
+		notify(pswp.getStats(), pswp.getProblem());		
+	}
+
 	public void notifyException(PipeStatistics stats, Throwable problem) {
 		notify(stats, problem);
 	}
@@ -39,5 +48,6 @@ public class FetchRecorder implements PipelineFinishListener {
 	public void setDao(FetchLogDAO dao) {
 		this.dao = dao;
 	}
+
 
 }
