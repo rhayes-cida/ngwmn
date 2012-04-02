@@ -1,9 +1,8 @@
 package gov.usgs.ngwmn.dm;
 
 import gov.usgs.ngwmn.dm.cache.Specifier;
-
-import java.io.OutputStream;
+import gov.usgs.ngwmn.dm.io.Pipeline;
 
 public interface DataLoader {
-	OutputStream getOutputStream(Specifier spec);
+	boolean configureOutput(Specifier spec, Pipeline pipe) throws Exception;
 }

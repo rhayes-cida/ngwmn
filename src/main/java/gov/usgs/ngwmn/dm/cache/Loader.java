@@ -1,6 +1,7 @@
 package gov.usgs.ngwmn.dm.cache;
 
 import gov.usgs.ngwmn.dm.DataLoader;
+import gov.usgs.ngwmn.dm.io.Pipeline;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -30,13 +31,16 @@ implements DataLoader {
 	}
 
 	@Override
-	public OutputStream getOutputStream(Specifier spec) {
+	public boolean configureOutput(Specifier spec, Pipeline pipe) throws Exception {
 		try {
-			return destination(spec);
+			pipe.addOutputStream( destination(spec) );
+			// TODO can inject more outputstreams for stats and whatnot
 		} catch (IOException ioe) {
-			logger.error("Problem building output stream for spec " + spec, ioe);
-			throw new RuntimeException(ioe);
+			String message = "Problem building output stream for spec " + spec;
+			logger.error(message, ioe);
+			throw new RuntimeException(message, ioe);
 		}
+		return true;
 	}
 
 }

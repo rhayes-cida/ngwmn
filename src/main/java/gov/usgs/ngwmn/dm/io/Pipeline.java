@@ -27,6 +27,15 @@ public class Pipeline {
 		return os;
 	}
 	
+	public void addOutputStream(OutputStream out) {
+		
+		if (os != null) {
+			out = new TeeOutputStream(out, os);
+		}
+		
+		setOutputStream(out);
+	}
+	
 	public void setInvoker(Invoker invoke) {
 		invoker = invoke;
 	}

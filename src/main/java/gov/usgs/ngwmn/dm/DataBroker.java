@@ -2,7 +2,6 @@ package gov.usgs.ngwmn.dm;
 
 import gov.usgs.ngwmn.dm.cache.Specifier;
 import gov.usgs.ngwmn.dm.io.Pipeline;
-import gov.usgs.ngwmn.dm.io.TeeOutputStream;
 
 import java.io.OutputStream;
 
@@ -31,11 +30,7 @@ public class DataBroker {
 		}
 		
 		if ( ! success) {
-			// TODO Perhaps loader interface should be changed so it gets a Pipeline
-			// onto which it splices its output, so it can record statistics after 
-			// load is finished.
-			out = new TeeOutputStream(out, loader.getOutputStream(spec));
-			pipe.setOutputStream(out);
+			loader.configureOutput(spec, pipe);
 			success = configureInput(harvester, spec, pipe); 
 		}
 		
