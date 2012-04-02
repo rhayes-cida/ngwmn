@@ -9,7 +9,6 @@ import org.junit.Test;
 import org.springframework.mock.jndi.SimpleNamingContextBuilder;
 
 import com.meterware.httpunit.GetMethodWebRequest;
-import com.meterware.httpunit.HttpInternalErrorException;
 import com.meterware.httpunit.HttpNotFoundException;
 import com.meterware.httpunit.WebRequest;
 import com.meterware.httpunit.WebResponse;
