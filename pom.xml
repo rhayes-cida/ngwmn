@@ -148,11 +148,18 @@
 			<version>1.7</version>
 			<scope>test</scope>
 		</dependency>
+		<!--  
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-mock</artifactId>
 			<version>2.0.8</version>
 			<scope>test</scope>
+		</dependency>
+		 -->
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-test</artifactId>
+			<version>${org.springframework.version}</version>
 		</dependency>
             
 
@@ -179,10 +186,15 @@
 				</configuration>
 			</plugin>
 		</plugins>
+		
 		<testResources>
 			<testResource>
 				<directory>src/main/webapp/WEB-INF</directory>
 			</testResource>
+			<testResource>
+				<directory>src/test/resources</directory>
+			</testResource>
 		</testResources>
+		
 	</build>
 </project>

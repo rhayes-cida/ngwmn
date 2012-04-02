@@ -9,40 +9,21 @@ import gov.usgs.ngwmn.dm.cache.PipeStatistics;
 import gov.usgs.ngwmn.dm.cache.PipeStatistics.Status;
 import gov.usgs.ngwmn.dm.cache.PipeStatisticsWithProblem;
 import gov.usgs.ngwmn.dm.cache.Specifier;
+import gov.usgs.ngwmn.dm.dao.ContextualTest;
 import gov.usgs.ngwmn.dm.dao.FetchLog;
 import gov.usgs.ngwmn.dm.dao.FetchLogDAO;
 import gov.usgs.ngwmn.dm.dao.WellRegistryKey;
 
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.support.ClassPathXmlApplicationContext;
-import org.springframework.mock.jndi.SimpleNamingContextBuilder;
 
 import com.google.common.eventbus.EventBus;
 
-public class FetchRecorderTest {
+public class FetchRecorderTest extends ContextualTest {
 	
 	private PipelineFinishListener victim;
 	private FetchLogDAO dao;
-	private ApplicationContext ctx;
 
-	public FetchRecorderTest() {
-		ctx = new ClassPathXmlApplicationContext("applicationContextTest.xml");
-	}
-
-	@BeforeClass
-	public static void setupNaming() throws Exception {
-		final SimpleNamingContextBuilder builder = new SimpleNamingContextBuilder();
-		try {
-			builder.activate();
-		} catch (IllegalStateException ise) {
-			// There was already a naming provider -- ok.
-			// ignore
-		}
-	}
-	
 	@Before
 	public void setUp() throws Exception {
 		victim = ctx.getBean("FetchRecorder", FetchRecorder.class);

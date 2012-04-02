@@ -1,38 +1,26 @@
 package gov.usgs.ngwmn.dm;
 
-import static org.junit.Assert.*;
-
-import java.io.ByteArrayOutputStream;
-
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 import gov.usgs.ngwmn.WellDataType;
 import gov.usgs.ngwmn.dm.cache.Loader;
-import gov.usgs.ngwmn.dm.cache.PipeStatistics;
 import gov.usgs.ngwmn.dm.cache.Retriever;
 import gov.usgs.ngwmn.dm.cache.Specifier;
 import gov.usgs.ngwmn.dm.cache.fs.FileCache;
-import gov.usgs.ngwmn.dm.dao.FetchLogDAO;
+import gov.usgs.ngwmn.dm.dao.ContextualTest;
 import gov.usgs.ngwmn.dm.harvest.Harvester;
 
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.support.ClassPathXmlApplicationContext;
-import org.springframework.mock.jndi.SimpleNamingContextBuilder;
+import java.io.ByteArrayOutputStream;
 
-public class DataBrokerTest {
+import org.junit.Before;
+import org.junit.Test;
+
+public class DataBrokerTest extends ContextualTest {
 
 	private DataBroker victim;
 	
-	@BeforeClass
-	public static void setupNaming() throws Exception {
-		final SimpleNamingContextBuilder builder = new SimpleNamingContextBuilder();
-		builder.activate();
-	}
-	
 	@Before
 	public void setUp() throws Exception {
-		ApplicationContext ctx = new ClassPathXmlApplicationContext("applicationContextTest.xml");
 		victim = ctx.getBean("DataBroker", DataBroker.class);
 		
 		// TODO this should really be done in Spring...

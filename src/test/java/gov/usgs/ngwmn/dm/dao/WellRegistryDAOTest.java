@@ -1,33 +1,22 @@
 package gov.usgs.ngwmn.dm.dao;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 import java.util.List;
 
 import org.junit.After;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.support.ClassPathXmlApplicationContext;
-import org.springframework.mock.jndi.SimpleNamingContextBuilder;
 
-public class WellRegistryDAOTest {
+public class WellRegistryDAOTest extends ContextualTest {
 	private WellRegistryDAO dao;
-	
-	@BeforeClass
-	public static void setupNaming() throws Exception {
-		final SimpleNamingContextBuilder builder = new SimpleNamingContextBuilder();
-		try {
-			builder.activate();
-		} catch (IllegalStateException ise) {
-			// already had a naming provider; ignore
-		}
-	}
-	
+		
 	@Before
 	public void setUp() throws Exception {
-		ApplicationContext ctx = new ClassPathXmlApplicationContext("applicationContextTest.xml");
 		dao = ctx.getBean("WellRegistryDAO", WellRegistryDAO.class);
 	}
 
