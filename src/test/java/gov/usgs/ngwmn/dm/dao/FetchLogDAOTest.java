@@ -15,7 +15,6 @@ public class FetchLogDAOTest extends ContextualTest {
 	
 	@Before
 	public void setUp() throws Exception {
-		// ApplicationContext ctx = new ClassPathXmlApplicationContext("applicationContextTest.xml");
 		dao = ctx.getBean("FetchLogDAO", FetchLogDAO.class);
 	}
 

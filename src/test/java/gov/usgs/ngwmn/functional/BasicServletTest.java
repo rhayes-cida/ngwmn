@@ -3,9 +3,6 @@ package gov.usgs.ngwmn.functional;
 import static org.junit.Assert.*;
 
 import java.io.File;
-import java.io.IOException;
-
-import gov.usgs.ngwmn.dm.DataManagerServlet;
 
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -21,6 +18,9 @@ import com.meterware.servletunit.ServletRunner;
 import com.meterware.servletunit.ServletUnitClient;
 
 public class BasicServletTest {
+
+	private static final String WELL_WITH_DATA = "http://localhost:8080/ngwmn/data?agency_cd=USGS&featureID=383453089545001";
+	private static final String WELL_NO_DATA = "http://localhost:8080/ngwmn/data?agency_cd=USGS&featureID=440713089320801";
 
 	@BeforeClass
 	public static void clearCache() {
@@ -60,7 +60,7 @@ public class BasicServletTest {
 		ServletRunner sr = new ServletRunner(this.getClass().getResourceAsStream("/servlet-test-web.xml"), "/ngwmn");
 		
 		ServletUnitClient sc = sr.newClient();
-		WebRequest req = new GetMethodWebRequest("http://localhost:8080/ngwmn/data?featureID=383453089545001&agency_cd=USGS");
+		WebRequest req = new GetMethodWebRequest(WELL_WITH_DATA);
 		WebResponse resp = sc.getResponse(req);
 		assertNotNull("response", resp);
 		
@@ -78,7 +78,7 @@ public class BasicServletTest {
 		ServletRunner sr = new ServletRunner(this.getClass().getResourceAsStream("/servlet-test-web.xml"), "/ngwmn");
 		
 		ServletUnitClient sc = sr.newClient();
-		WebRequest req = new GetMethodWebRequest("http://localhost:8080/ngwmn/data?featureID=440713089320801&agency_cd=USGS");
+		WebRequest req = new GetMethodWebRequest(WELL_NO_DATA);
 		WebResponse resp = sc.getResponse(req);
 		assertNotNull("response", resp);
 		
