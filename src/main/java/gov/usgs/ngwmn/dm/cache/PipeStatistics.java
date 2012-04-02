@@ -78,6 +78,10 @@ public class PipeStatistics {
 	}
 	
 	public synchronized void markStart() {
+		if (status == Status.STARTED) {
+			// may have been pre-started, let it ride.
+			return;
+		}
 		if (status != Status.OPEN) {
 			throw new RuntimeException("Improper pre-start status");
 		}

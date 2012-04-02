@@ -12,6 +12,7 @@ import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpMethod;
 import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.httpclient.methods.GetMethod;
+import org.apache.commons.httpclient.methods.HeadMethod;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -37,12 +38,15 @@ public class Harvester implements DataFetcher {
 		
 		HttpClient client = new HttpClient();
 		HttpMethod method = new GetMethod(url);
+		// or HeadMethod(url) for pre-flight check
+        pipe.getStatistics().markStart();
 		int statusCode = client.executeMethod(method);
 		
         if (statusCode != HttpStatus.SC_OK) {
         	// TODO pipe status or exception? or
         	return false;
         }
+        
 		InputStream is = method.getResponseBodyAsStream();
 		// it's zero, no help here  logger.info("response stream available {}", is.available());
 		pipe.setInputStream(is);
