@@ -21,6 +21,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
+import org.springframework.web.context.support.WebApplicationContextUtils;
 
 public class DataManagerServlet extends HttpServlet {
 
@@ -36,9 +37,9 @@ public class DataManagerServlet extends HttpServlet {
 			throw new ServletException("config parameter FSCache.basedir is required");
 		}
 		
-		ctx = new ClassPathXmlApplicationContext("applicationContext.xml");
+		ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(config.getServletContext());
 
-		// TODO Move al this configuration to Spring
+		// TODO Move all this configuration to Spring
 		FileCache c = new FileCache();
 		File bd = new File(basedir);
 		try {

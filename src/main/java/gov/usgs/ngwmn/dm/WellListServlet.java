@@ -15,6 +15,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
+import org.springframework.web.context.support.WebApplicationContextUtils;
 
 /**
  * Servlet implementation class WellListServlet
@@ -27,7 +28,7 @@ public class WellListServlet extends HttpServlet {
 	
 	@Override
 	public void init(ServletConfig config) throws ServletException {
-		ctx = new ClassPathXmlApplicationContext("applicationContext.xml");
+		ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(config.getServletContext());
 	}
 
 	/**

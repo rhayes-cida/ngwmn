@@ -44,7 +44,6 @@
   </servlet-mapping>
   
   <!--  Spring integration -->
-  <!--  Disabled to reduce Spring library footprint
   <context-param>
 	<param-name>contextConfigLocation</param-name>
 	<param-value>/WEB-INF/applicationContext.xml</param-value>
@@ -53,5 +52,4 @@
 	<listener>
 		<listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
 	</listener>
-	-->
 </web-app>
