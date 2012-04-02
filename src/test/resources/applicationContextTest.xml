@@ -6,7 +6,7 @@
            
 	<import resource="applicationContext.xml"/>
 	
-	<beans profile="dev">
+	<beans profile="cida">
 	    <bean id="dataSource" 
 	        class="oracle.jdbc.pool.OracleDataSource"
 	        destroy-method="close">

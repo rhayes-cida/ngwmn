@@ -8,11 +8,16 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public class Pipeline {
 	private Invoker invoker;
 	private InputStream is;
 	private OutputStream os;
 	private PipeStatistics statistics = new PipeStatistics();
+	
+	private static Logger logger = LoggerFactory.getLogger(Pipeline.class);
 	
 	// TODO Consider using com.google.common.io.InputSupplier, OutputSupplier instead
 	
@@ -38,8 +43,10 @@ public class Pipeline {
 		try {
 			invoker.invoke(is,os, statistics);
 			statistics.markEnd(Status.DONE);
+			logger.info("Done stats={}", statistics);
 		} catch (IOException ioe) {
 			statistics.markEnd(Status.FAIL);
+			logger.info("Fail stats={}", statistics);
 			throw ioe;
 		}
 	}
