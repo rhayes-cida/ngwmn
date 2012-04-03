@@ -9,6 +9,7 @@ import org.junit.Test;
 import org.springframework.mock.jndi.SimpleNamingContextBuilder;
 
 import com.meterware.httpunit.GetMethodWebRequest;
+import com.meterware.httpunit.HttpInternalErrorException;
 import com.meterware.httpunit.HttpNotFoundException;
 import com.meterware.httpunit.WebRequest;
 import com.meterware.httpunit.WebResponse;
@@ -101,6 +102,19 @@ public class BasicServletTest {
 		assertFalse("expected exception", true);
 	}
 	
+/*	
+    @Test(expected=HttpInternalErrorException.class)
+	public void testIOError() throws Exception {
+		// special test specifier, causes IO exception
+		ServletRunner sr = new ServletRunner(this.getClass().getResourceAsStream("/servlet-test-web.xml"), "/ngwmn");
+		
+		ServletUnitClient sc = sr.newClient();
+		WebRequest req = new GetMethodWebRequest("http://localhost:8080/ngwmn/data?featureID=NOSUCHSITE&agency_cd=TEST_INPUT_ERROR");
+		WebResponse resp = sc.getResponse(req);
+		assertFalse("expected exception", true);
+	}
+*/
+
 	// Now repeat the tests; we expect to get cached results
 	@Test(timeout=1000)
 	public void testWithData_2() throws Exception {
