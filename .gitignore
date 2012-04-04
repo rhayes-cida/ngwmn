@@ -3,5 +3,6 @@
 .metadata
 bin/
 target/
+build/
 /.settings
 /scraps
