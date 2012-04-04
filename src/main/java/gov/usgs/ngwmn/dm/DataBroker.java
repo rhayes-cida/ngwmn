@@ -1,10 +1,8 @@
 package gov.usgs.ngwmn.dm;
 
 import gov.usgs.ngwmn.dm.cache.Specifier;
-import gov.usgs.ngwmn.dm.io.SupplyOutput;
 import gov.usgs.ngwmn.dm.io.Pipeline;
 
-import java.io.IOException;
 import java.io.OutputStream;
 
 import org.slf4j.Logger;
@@ -19,19 +17,17 @@ public class DataBroker {
 	
 	private Logger logger = LoggerFactory.getLogger(this.getClass());
 	
-	public void fetchWellData(Specifier spec, final OutputStream out) throws Exception {
+	public void fetchWellData(Specifier spec, OutputStream out) throws Exception {
 		Pipeline pipe = new Pipeline();
 
 		check(spec);
 		
-		pipe.setOutputSupplier( new SupplyOutput() {
-			@Override
-			public OutputStream get() throws IOException {
-				return out;
-			}
-		});
+		pipe.setOutputStream(out);
 		boolean success = configureInput(retriever, spec, pipe);
 		
+		if (isTestSpecifier(spec)) {
+			success = configureTestInput(spec, pipe);
+		}
 		
 		if ( ! success) {
 			loader.configureOutput(spec, pipe);
@@ -52,6 +48,23 @@ public class DataBroker {
 		logger.info("Completed operation for {} result {}", spec, pipe.getStatistics());
 	}
 	
+	private boolean configureTestInput(Specifier spec, Pipeline pipe) 
+			throws Exception 
+	{
+		if ("TEST_INPUT_ERROR".equals(spec.getAgencyID())) {
+			DataFetcher unFetcher = new ErrorFetcher();
+			configureInput(unFetcher, spec, pipe);
+			return true;
+		}
+		return false;
+	}
+
+	private boolean isTestSpecifier(Specifier spec) {
+		if ("TEST_INPUT_ERROR".equals(spec.getAgencyID())) {
+			return true;
+		}
+		return false;
+	}
 
 	private void signalDataNotFoundMsg(Specifier spec, Pipeline pipe) throws Exception {
 		logger.warn("No data found for {}", spec);

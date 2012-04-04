@@ -1,16 +1,13 @@
 package gov.usgs.ngwmn.dm.harvest;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
+
+import java.util.HashMap;
+import java.util.Map;
+
 import gov.usgs.ngwmn.dm.cache.Specifier;
 import gov.usgs.ngwmn.dm.io.Invoker;
 import gov.usgs.ngwmn.dm.io.Pipeline;
-import gov.usgs.ngwmn.dm.io.Supplier;
-
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.HashMap;
-import java.util.Map;
 
 import org.apache.commons.httpclient.HttpStatus;
 import org.junit.Before;
@@ -41,7 +38,7 @@ public class WebRetrieverTests {
 		};
 		web.harvester    = new Harvester() {
 			@Override
-			public int wget(String url) throws IOException {
+			public int wget(String url) throws Exception {
 				assertEquals(testUrl,url);
 				checkValues.put("wgetCalled",true);
 				return HttpStatus.SC_OK;
@@ -53,8 +50,7 @@ public class WebRetrieverTests {
 			}
 		};
 		pipe = new Pipeline() {
-			@Override
-			public void setInputSupplier(Supplier<InputStream> in) {
+			public void setInputStream(java.io.InputStream in) {
 				checkValues.put("setInputCalled", true);
 			}
 			@Override
@@ -72,19 +68,19 @@ public class WebRetrieverTests {
 		
 		assertTrue(result);
 		assertTrue(checkValues.get("makeUrlCalled"));
-//		assertTrue(checkValues.get("wgetCalled")); // this used to be called but is now deferred
+		assertTrue(checkValues.get("wgetCalled"));
 		assertTrue(checkValues.get("checkSpecCalled"));
 		assertTrue(checkValues.get("setInvokerCalled"));
 		assertTrue(checkValues.get("setInputCalled"));
 	}
 
-/*	this test is more for the pipe invoke now that wget is deferred
+	
 	@Test
 	public void test_callHarvester_withHttpStatusNotOK() throws Exception {
 
 		web.harvester    = new Harvester() {
 			@Override
-			public int wget(String url) throws IOException {
+			public int wget(String url) throws Exception {
 				assertEquals(testUrl,url);
 				checkValues.put("wgetCalled",true);
 				return HttpStatus.SC_BAD_GATEWAY;
@@ -93,7 +89,7 @@ public class WebRetrieverTests {
 		
 		boolean result = web.configureInput(spec, pipe);
 		
-		assertTrue(result);
+		assertFalse(result);
 		
 		assertTrue(checkValues.get("makeUrlCalled"));
 		assertTrue(checkValues.get("wgetCalled"));
@@ -102,5 +98,4 @@ public class WebRetrieverTests {
 		
 		assertNull(checkValues.get("setInputCalled"));
 	}
-*/	
 }

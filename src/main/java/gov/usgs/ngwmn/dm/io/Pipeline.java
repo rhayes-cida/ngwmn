@@ -7,71 +7,44 @@ import gov.usgs.ngwmn.dm.cache.PipeStatistics.Status;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.concurrent.Callable;
 
-
-public class Pipeline implements Callable<Void> {
+public class Pipeline {
 	private Invoker invoker;
-	private Supplier<InputStream>  iss;
-	private Supplier<OutputStream> oss;
+	private InputStream is;
+	private OutputStream os;
 	private PipeStatistics statistics = new PipeStatistics();
-	private IOException    ioe;
 	
+	// TODO Consider using com.google.common.io.InputSupplier, OutputSupplier instead
 	
-	public void setInputSupplier(Supplier<InputStream> supply) {
-		iss = supply;
+	public void setInputStream(InputStream in) {
+		is = in;
 	}
 	
-	public void setOutputSupplier(Supplier<OutputStream> supply) {
-		oss = supply;
+	public void setOutputStream(OutputStream out) {
+		os = out;
 	}
-	public Supplier<OutputStream> getOutputSupplier() {
-		return oss;
+	public OutputStream getOutputStream() {
+		return os;
 	}
 	
-	public void addOutputSupplier(SupplyOutput supply) {
+	public void addOutputStream(OutputStream out) {
 		
-		if (oss != null) {
-			supply = new SupplyTeeOutput(supply, oss);
+		if (os != null) {
+			out = new TeeOutputStream(out, os);
 		}
 		
-		setOutputSupplier(supply);
-	}
-	public void chainOutputSupplier(SupplyChain<OutputStream> supply) {
-		
-		supply.setSupply(oss);
-		setOutputSupplier(supply);
+		setOutputStream(out);
 	}
 	
 	public void setInvoker(Invoker invoke) {
 		invoker = invoke;
 	}
 	
-	public Void call() {
-		
-		try {
-			invoke();
-		} catch (IOException e) {
-			// TODO this is a first attempt at handling - expect a refactor
-			ioe = e;
-		}
-		
-		return null;
-	}
-	
-	public boolean success() {
-		return ioe == null;
-	}
-	
-	public IOException getException() {
-		return ioe;
-	}
+	// TODO consider implementing Runnable or Callable to make it easy to multithread input for multiple site download
 	
 	public void invoke() throws IOException {
 		statistics.markStart();
 		try {
-			InputStream  is = iss.get();
-			OutputStream os = oss.get();
 			invoker.invoke(is,os, statistics);
 			statistics.markEnd(Status.DONE);
 		} catch (IOException ioe) {

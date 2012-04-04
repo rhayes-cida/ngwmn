@@ -1,7 +1,6 @@
 package gov.usgs.ngwmn.dm.harvest;
 
 
-import java.io.IOException;
 import java.io.InputStream;
 
 import org.apache.commons.httpclient.HttpClient;
@@ -28,7 +27,7 @@ public class Harvester {
 	}
 	
 	public int wget(String url)
-			throws IOException {
+			throws Exception {
 		logger.info("wget from {}",new Object[]{url});
 		
 		client = new HttpClient();
