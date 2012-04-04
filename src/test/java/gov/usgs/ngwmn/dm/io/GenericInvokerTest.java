@@ -8,6 +8,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 
 
 import org.junit.Before;
@@ -28,12 +29,22 @@ public class GenericInvokerTest {
 	@Test
 	public void testInvoke() {
 		String sample = "Hello";
-		InputStream is = new ByteArrayInputStream(sample.getBytes());
-		ByteArrayOutputStream os = new ByteArrayOutputStream();
+		final InputStream is = new ByteArrayInputStream(sample.getBytes());
+		final ByteArrayOutputStream os = new ByteArrayOutputStream();
 		
 		Pipeline pl = new Pipeline();
-		pl.setInputStream(is);
-		pl.setOutputStream(os);
+		pl.setInputSupplier(new SupplyInput() {
+			@Override
+			public InputStream get() throws IOException {
+				return is;
+			}
+		});
+		pl.setOutputSupplier(new SupplyOutput() {
+			@Override
+			public OutputStream get() throws IOException {
+				return os;
+			}
+		});
 		pl.setInvoker(victim);
 		try {
 			pl.invoke();
