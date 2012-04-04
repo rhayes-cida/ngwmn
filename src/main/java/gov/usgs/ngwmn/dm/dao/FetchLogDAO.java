@@ -10,14 +10,6 @@ public class FetchLogDAO {
 		this.mapper = mapper;
 	}
 
-	@Deprecated
-	/** use #insertId instead
-	 * @param item
-	 */
-	public void insert(FetchLog item) {
-		mapper.insert(item);
-	}
-	
 	public void insertId(FetchLog item) {
 		mapper.insertId(item);
 	}

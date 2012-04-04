@@ -114,18 +114,18 @@ public interface FetchLogMapper {
 			"where FETCHLOG_ID = #{fetchlogId,jdbcType=NUMERIC}" })
 	int updateByPrimaryKey(FetchLog record);
 
+	@SelectKey(statement="select fetch_log_seq.nextval from dual", resultType = int.class, before = true, keyProperty = "fetchlogId") 
 	@Insert({
 		"insert into GW_DATA_PORTAL.FETCH_LOG (FETCHLOG_ID, AGENCY_CD, ",
 		"SITE_NO, DATA_SOURCE, ",
 		"STARTED_AT, STATUS, ",
 		"PROBLEM, CT, ELAPSED_SEC, ",
 		"SPECIFIER, FETCHER)",
-		"values (fetch_log_seq.nextval, #{agencyCd,jdbcType=VARCHAR}, ",
+		"values (#{fetchlogId, jdbcType=NUMERIC}, #{agencyCd,jdbcType=VARCHAR}, ",
 		"#{siteNo,jdbcType=VARCHAR}, #{source,jdbcType=VARCHAR}, ",
 		"#{startedAt,jdbcType=TIMESTAMP}, #{status,jdbcType=CHAR}, ",
 		"#{problem,jdbcType=VARCHAR}, #{ct,jdbcType=NUMERIC}, #{elapsedSec,jdbcType=FLOAT}, ",
 		"#{specifier,jdbcType=VARCHAR}, #{fetcher,jdbcType=VARCHAR})" })
-	@SelectKey(statement="select fetch_log_seq.CURRVAL from dual", resultType = int.class, before = false, keyProperty = "fetchlogId") 
 	@Options(useGeneratedKeys=true, keyProperty="fetchlogId", keyColumn="FETCHLOG_ID")
 	int insertId(FetchLog record);
 }

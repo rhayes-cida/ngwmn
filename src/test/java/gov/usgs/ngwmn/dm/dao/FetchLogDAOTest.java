@@ -19,16 +19,6 @@ public class FetchLogDAOTest extends ContextualTest {
 	}
 
 	@Test
-	public void testInsert() {
-		FetchLog entry = new FetchLog();
-		
-		entry.setAgencyCd("USGS");
-		entry.setSiteNo("007");
-		dao.insert(entry);
-		assertNull("generated ID not set by this method", entry.getFetchlogId());
-	}
-
-	@Test
 	public void testInsertId() {
 		FetchLog entry = new FetchLog();
 		
