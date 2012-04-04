@@ -38,14 +38,16 @@ public class WebRetriever implements DataFetcher {
 		
 		logger.info("Fetching data for {} from {}", spec, url);
 
+		// TODO set source etc into stats
 		pipe.setInputSupplier( new SupplyInput() {
 			
 			@Override
 			public InputStream get() throws IOException {
+				// TODO mark start
 				int statusCode = harvester.wget(url);
 				
 		        if (statusCode != HttpStatus.SC_OK) {
-		        	// TODO pipe status or exception? or
+		        	// TODO mark fail
 		        	throw new IOException("HTTP status error: " + statusCode);
 		        }
 				return harvester.getInputStream();

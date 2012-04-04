@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" 
+	"http://www.springframework.org/dtd/spring-beans.dtd">
+<beans>
+	<bean id="dataSource" 
+      class="org.springframework.jndi.JndiObjectFactoryBean">
+      <property name="jndiName" 
+                  value="java:comp/env/jdbc/GW_DATA_PORTAL"/>    
+      <property name="resourceRef" 
+                  value="true" /> 
+	</bean>
+	
+    <bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+  		<property name="dataSource" ref="dataSource" />
+	</bean>
+
+	<bean id="wellRegistryMapper" class="org.mybatis.spring.mapper.MapperFactoryBean">
+  		<property name="mapperInterface" value="gov.usgs.ngwmn.dm.dao.WellRegistryMapper" />
+  		<property name="sqlSessionFactory" ref="sqlSessionFactory" />
+	</bean>
+	
+    <bean id="WellRegistryDAO"
+    	class="gov.usgs.ngwmn.dm.dao.WellRegistryDAOImpl">
+    	<property name="mapper" ref="wellRegistryMapper"/>
+   	</bean>
+   	
+   	<bean id="fetchLogMapper" class="org.mybatis.spring.mapper.MapperFactoryBean">
+  		<property name="mapperInterface" value="gov.usgs.ngwmn.dm.dao.FetchLogMapper" />
+  		<property name="sqlSessionFactory" ref="sqlSessionFactory" />
+	</bean>
+	
+	<bean id="FetchLogDAO"
+		class="gov.usgs.ngwmn.dm.dao.FetchLogDAO">
+		<constructor-arg ref="fetchLogMapper"/>
+	</bean>
+	
+	<bean id="FetchRecorder"
+		class="gov.usgs.ngwmn.dm.io.FetchRecorder">
+		<property name="dao" ref="FetchLogDAO"/>
+	</bean>
+	
+ 	<bean id="FetchEventBus" class="gov.usgs.ngwmn.dm.eventbus.EventBusSpring">
+ 		<property name="subscribers">
+     		<list>
+       			<ref bean="FetchRecorder"/>
+     		</list>
+   		</property>
+ 	</bean>
+		
+	<bean id="DataBroker" class="gov.usgs.ngwmn.dm.DataBroker">
+		<property name="fetchEventBus" ref="FetchEventBus"/>
+		<property name="wellRegistry" ref="WellRegistryDAO"/>
+	</bean>
+
+</beans>
+
+       

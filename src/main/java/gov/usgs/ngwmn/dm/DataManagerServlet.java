@@ -19,12 +19,15 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.ApplicationContext;
+import org.springframework.web.context.support.WebApplicationContextUtils;
 
 public class DataManagerServlet extends HttpServlet {
 
 	private static final long serialVersionUID = 2L;
 	private DataBroker db;
 	private Logger logger = LoggerFactory.getLogger(DataManagerServlet.class);
+	private ApplicationContext ctx;
 	
 	@Override
 	public void init(ServletConfig config) throws ServletException {
@@ -33,6 +36,9 @@ public class DataManagerServlet extends HttpServlet {
 			throw new ServletException("config parameter FSCache.basedir is required");
 		}
 		
+		ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(config.getServletContext());
+
+		// TODO Move all this configuration to Spring
 		FileCache c = new FileCache();
 		File bd = new File(basedir);
 		try {
@@ -41,7 +47,8 @@ public class DataManagerServlet extends HttpServlet {
 			throw new ServletException(ioe);
 		}
 		
-		db = new DataBroker();
+		db = ctx.getBean("DataBroker", DataBroker.class);
+		// TODO Move the following configuration to Spring
 		db.setRetriever( new Retriever(c) );
 		db.setLoader(    new Loader(c)    );
 		db.setHarvester( new WebRetriever() );

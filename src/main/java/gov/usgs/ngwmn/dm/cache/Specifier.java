@@ -6,6 +6,7 @@ import java.security.InvalidParameterException;
 import com.google.common.base.Strings;
 
 import gov.usgs.ngwmn.WellDataType;
+import gov.usgs.ngwmn.dm.dao.WellRegistryKey;
 
 public class Specifier {
 	private String agencyID;
@@ -52,4 +53,7 @@ public class Specifier {
 			throw new InvalidParameterException("Well data type Id is required.");
 	}
 	
+	public WellRegistryKey getWellRegistryKey() {
+		return new WellRegistryKey(agencyID, featureID);
+	}
 }

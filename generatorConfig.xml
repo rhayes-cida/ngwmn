@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE generatorConfiguration PUBLIC "-//mybatis.org//DTD MyBatis Generator Configuration 1.0//EN" "http://mybatis.org/dtd/mybatis-generator-config_1_0.dtd" >
+<generatorConfiguration>
+<classPathEntry location="/home/rhayes/Programs/eclipse/plugins/oracle.database.driver.jdk50_11.1.0.7/ojdbc5.jar"/>
+  <context id="GWDP" targetRuntime="MyBatis3">
+    <!--  
+    <jdbcConnection driverClass="oracle.jdbc.OracleDriver" 
+    				connectionURL="jdbc:oracle:thin:@//widev.er.usgs.gov:1521/widev.er.usgs.gov" 
+    				userId="gw_data_portal" password="A4lj3_pf" >
+   	-->
+    <jdbcConnection driverClass="oracle.jdbc.OracleDriver" 
+    				connectionURL="jdbc:oracle:thin:@192.168.56.10:1521:orcl" 
+    				userId="gw_data_portal" password="oracle" >
+    </jdbcConnection>
+    <javaModelGenerator targetPackage="gov.usgs.ngwmn.dm.dao" targetProject="ngwmn/src/main/java" />
+    <sqlMapGenerator targetPackage="gov.usgs.ngwmn.dm.dao" targetProject="ngwmn/src/main/resources" />
+    <javaClientGenerator targetPackage="gov.usgs.ngwmn.dm.dao" targetProject="ngwmn/src/main/java" type="MIXEDMAPPER" />
+    <table schema="GW_DATA_PORTAL" tableName="WELL_REGISTRY" 
+    		enableDeleteByExample="false" enableDeleteByPrimaryKey="false"
+    		enableUpdateByExample="false" enableUpdateByPrimaryKey="false" 
+    		enableInsert="false">
+    		
+    		<property name="immutable" value="true"/>
+    		<property name="constructorBased" value="true"/>
+    	<ignoreColumn column="GEOM"/>
+    	<ignoreColumn column="GEOM_3785"/>
+    	
+    	<columnOverride column="ALT_UNITS" javaType="java.lang.Integer"/>
+    	<columnOverride column="ALT_VA" javaType="java.lang.Double"/>
+    	<columnOverride column="COUNTY_CD" javaType="java.lang.Integer"/>
+    	<columnOverride column="DEC_LAT_VA" javaType="java.lang.Double"/>
+    	<columnOverride column="DEC_LONG_VA" javaType="java.lang.Double"/>
+    	<columnOverride column="WELL_DEPTH" javaType="java.lang.Double"/>
+    	<columnOverride column="STATE_CD" javaType="java.lang.Integer"/>
+    </table>
+    <table schema="GW_DATA_PORTAL" tableName="FETCH_LOG">
+    	<columnOverride column="FETCHLOG_ID" javaType="java.lang.Integer" jdbcType="NUMERIC"/>
+    	<columnOverride column="CT" javaType="java.lang.Integer" jdbcType="NUMERIC" />
+    	<columnOverride column="DATA_SOURCE" property="source"/>
+    </table>
+  </context>
+</generatorConfiguration>

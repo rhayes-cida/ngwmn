@@ -29,9 +29,12 @@ public class Harvester {
 	
 	public int wget(String url)
 			throws IOException {
-		logger.info("wget from {}",new Object[]{url});
+		logger.info("wget from {}",url);
 		
 		client = new HttpClient();
+
+		// pipe.getStatistics().setSource(url);
+		
 		HttpMethod method = new GetMethod(url);
 		
 		statusCode = client.executeMethod(method);

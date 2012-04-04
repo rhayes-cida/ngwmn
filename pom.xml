@@ -19,6 +19,7 @@
 		 -->
 		<cida.maven.url>http://internal.cida.usgs.gov/maven</cida.maven.url>
 		<cida.svn.url>https://cida-svn.er.usgs.gov/repos/dev</cida.svn.url>
+	    <org.springframework.version>3.1.1.RELEASE</org.springframework.version>
 	</properties>
 
 	<issueManagement>
@@ -93,7 +94,47 @@
     		<artifactId>guava</artifactId>
     		<version>10.0.1</version>
 		</dependency>
-
+	
+		<!-- Spring -->
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-beans</artifactId>
+			<version>${org.springframework.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-jdbc</artifactId>
+			<version>${org.springframework.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-context</artifactId>
+			<version>${org.springframework.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-orm</artifactId>
+			<version>${org.springframework.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-web</artifactId>
+			<version>${org.springframework.version}</version>
+		</dependency>
+		
+		<!--  Ibatis (well, MyBatis really) -->
+		<dependency>
+			<groupId>org.mybatis</groupId>
+			<artifactId>mybatis</artifactId>
+			<version>3.1.0</version>
+		</dependency>
+		<dependency>
+			<groupId>org.mybatis</groupId>
+			<artifactId>mybatis-spring</artifactId>
+			<!--  Isn't this version skew annoying... -->
+			<version>1.1.0</version>
+		</dependency>
+            
 		<!-- Testing dependencies -->
 		<dependency>
 			<groupId>junit</groupId>
@@ -105,7 +146,22 @@
 			<groupId>httpunit</groupId>
 			<artifactId>httpunit</artifactId>
 			<version>1.7</version>
+			<scope>test</scope>
 		</dependency>
+		<!--  
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-mock</artifactId>
+			<version>2.0.8</version>
+			<scope>test</scope>
+		</dependency>
+		 -->
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-test</artifactId>
+			<version>${org.springframework.version}</version>
+		</dependency>
+            
 
 		<!-- Provided dependencies -->
 		<dependency>
@@ -130,5 +186,15 @@
 				</configuration>
 			</plugin>
 		</plugins>
+		
+		<testResources>
+			<testResource>
+				<directory>src/main/webapp/WEB-INF</directory>
+			</testResource>
+			<testResource>
+				<directory>src/test/resources</directory>
+			</testResource>
+		</testResources>
+		
 	</build>
 </project>

@@ -50,4 +50,16 @@ public class PipeStatisticsTest {
 		assertTrue("elapsed time is reasonable",et >= 200);
 	}
 
+	@Test
+	public void test4char() {
+		assertEquals("DONE", Status.DONE.as4Char());
+		assertEquals("FAIL", Status.FAIL.as4Char());
+		assertEquals("OPEN", Status.OPEN.as4Char());
+		assertEquals("STAR", Status.STARTED.as4Char());
+		
+		assertEquals(Status.DONE, Status.by4Char("DONE"));
+		assertEquals(Status.FAIL, Status.by4Char("FAIL"));
+		assertEquals(Status.OPEN, Status.by4Char("OPEN"));
+		assertEquals(Status.STARTED, Status.by4Char("STAR"));
+	}
 }

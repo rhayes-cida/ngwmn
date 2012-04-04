@@ -17,6 +17,19 @@ public class PipeStatistics {
 		Status(boolean isDone) {
 			done = isDone;
 		}
+		
+		public String as4Char() {
+			return name().substring(0, 4);
+		}
+		
+		public static Status by4Char(String c4) {
+			for (Status s : values()) {
+				if (c4.equals(s.as4Char())) {
+					return s;
+				}
+			}
+			return null;
+		}
 	}
 
 	private long count;
@@ -25,6 +38,8 @@ public class PipeStatistics {
 	private long end = 0;
 	private Class<?> calledBy;
 	private Specifier specifier;
+	private String source;
+	private String digest;
 	
 	public synchronized long getCount() {
 		return count;
@@ -63,6 +78,10 @@ public class PipeStatistics {
 	}
 	
 	public synchronized void markStart() {
+		if (status == Status.STARTED) {
+			// may have been pre-started, let it ride.
+			return;
+		}
 		if (status != Status.OPEN) {
 			throw new RuntimeException("Improper pre-start status");
 		}
@@ -94,6 +113,14 @@ public class PipeStatistics {
 		this.calledBy = calledBy;
 	}
 
+	public Double getElapsedTime() {
+		Long el = getElapsedMSec();
+		if (el == null) {
+			return null;
+		}
+		return Double.valueOf(el / 1000.0);
+	}
+	
 	public synchronized Date getStartDate() {
 		if (start > 0) {
 			return new Date(start);
@@ -119,6 +146,22 @@ public class PipeStatistics {
 
 	public void setSpecifier(Specifier specifier) {
 		this.specifier = specifier;
+	}
+
+	public String getSource() {
+		return source;
+	}
+
+	public void setSource(String source) {
+		this.source = source;
+	}
+
+	public String getDigest() {
+		return digest;
+	}
+
+	public void setDigest(String digest) {
+		this.digest = digest;
 	}
 	
 	

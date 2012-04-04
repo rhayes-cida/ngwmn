@@ -8,15 +8,18 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.concurrent.Callable;
-
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class Pipeline implements Callable<Void> {
+
 	private Invoker invoker;
 	private Supplier<InputStream>  iss;
 	private Supplier<OutputStream> oss;
 	private PipeStatistics statistics = new PipeStatistics();
 	private IOException    ioe;
 	
+	private static Logger logger = LoggerFactory.getLogger(Pipeline.class);	
 	
 	public void setInputSupplier(Supplier<InputStream> supply) {
 		iss = supply;
@@ -74,8 +77,10 @@ public class Pipeline implements Callable<Void> {
 			OutputStream os = oss.get();
 			invoker.invoke(is,os, statistics);
 			statistics.markEnd(Status.DONE);
+			logger.info("Done stats={}", statistics);
 		} catch (IOException ioe) {
 			statistics.markEnd(Status.FAIL);
+			logger.info("Fail stats={}", statistics);
 			throw ioe;
 		}
 	}
