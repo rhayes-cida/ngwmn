@@ -6,6 +6,7 @@ import gov.usgs.ngwmn.dm.cache.Specifier;
 import gov.usgs.ngwmn.dm.cache.PipeStatistics;
 import gov.usgs.ngwmn.dm.cache.PipeStatistics.Status;
 import gov.usgs.ngwmn.dm.io.FileInputInvoker;
+import gov.usgs.ngwmn.dm.io.SupplyInput;
 import gov.usgs.ngwmn.dm.io.Invoker;
 import gov.usgs.ngwmn.dm.io.Pipeline;
 import gov.usgs.ngwmn.dm.io.TempfileOutputStream;
@@ -96,16 +97,23 @@ public class FileCache implements Cache {
 	 * @see gov.usgs.ngwmn.dm.cache.Cache#get(gov.usgs.ngwmn.dm.cache.Specifier, java.io.OutputStream)
 	 */
 	@Override
-	public boolean fetchWellData(Specifier spec, Pipeline pipe) 
+	public boolean fetchWellData(final Specifier spec, Pipeline pipe) 
 			throws IOException
 	{
-		File f = contentFile(spec);
 		
-		FileInputStream fis = new FileInputStream(f);
-		pipe.setInputStream(fis);
 		pipe.getStatistics().setSpecifier(spec);
 		Invoker i = new FileInputInvoker();
 		pipe.setInvoker(i);
+		
+		pipe.setInputSupplier( new SupplyInput() {
+			
+			@Override
+			public InputStream get() throws IOException {
+				File f = contentFile(spec);
+				FileInputStream fis = new FileInputStream(f);
+				return fis;
+			}
+		});
 		
 		return true;
 	}
@@ -119,14 +127,14 @@ public class FileCache implements Cache {
 		
 		
 		//TODO this var is not used at this time - is it for statistics?
-		int ops = 0;
+		//int ops = 0;
 		while (true) {
 			int ict = is.read(buf);
 			if (ict <= 0) {
 				break;
 			}
 			os.write(buf,0,ict);
-			ops += ict;
+			//ops += ict;
 			stat.incrementCount(ict);
 		}
 		
