@@ -1,11 +1,7 @@
 package gov.usgs.ngwmn.dm.dao;
 
-import gov.usgs.ngwmn.dm.dao.WellRegistry;
-import gov.usgs.ngwmn.dm.dao.WellRegistryExample;
 import java.util.List;
-import org.apache.ibatis.annotations.Insert;
-import org.apache.ibatis.annotations.Param;
-import gov.usgs.ngwmn.dm.dao.WellRegistryKey;
+
 import org.apache.ibatis.annotations.ResultMap;
 import org.apache.ibatis.annotations.Select;
 

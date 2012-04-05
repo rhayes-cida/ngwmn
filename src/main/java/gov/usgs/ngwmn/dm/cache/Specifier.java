@@ -1,12 +1,12 @@
 package gov.usgs.ngwmn.dm.cache;
 
 
+import gov.usgs.ngwmn.WellDataType;
+import gov.usgs.ngwmn.dm.dao.WellRegistryKey;
+
 import java.security.InvalidParameterException;
 
 import com.google.common.base.Strings;
-
-import gov.usgs.ngwmn.WellDataType;
-import gov.usgs.ngwmn.dm.dao.WellRegistryKey;
 
 public class Specifier {
 	private String agencyID;

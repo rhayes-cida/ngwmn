@@ -1,6 +1,7 @@
 package gov.usgs.ngwmn.dm.io;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import gov.usgs.ngwmn.dm.cache.PipeStatistics;
 
 import java.io.ByteArrayInputStream;

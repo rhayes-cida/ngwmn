@@ -1,11 +1,11 @@
 package gov.usgs.ngwmn.dm.io;
 
-import com.google.common.eventbus.Subscribe;
-
 import gov.usgs.ngwmn.dm.cache.PipeStatistics;
 import gov.usgs.ngwmn.dm.cache.PipeStatisticsWithProblem;
 import gov.usgs.ngwmn.dm.dao.FetchLog;
 import gov.usgs.ngwmn.dm.dao.FetchLogDAO;
+
+import com.google.common.eventbus.Subscribe;
 
 public class FetchRecorder {
 

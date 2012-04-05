@@ -1,7 +1,5 @@
 package gov.usgs.ngwmn.dm.dao;
 
-import gov.usgs.ngwmn.dm.dao.WellRegistry;
-import gov.usgs.ngwmn.dm.dao.WellRegistryExample;
 import java.util.List;
 
 public class WellRegistryDAO {
@@ -24,7 +22,6 @@ public class WellRegistryDAO {
 		return count;
 	}
 
-	@SuppressWarnings("unchecked")
 	public List<WellRegistry> selectByExample(WellRegistryExample example) {
 		return mapper.selectByExample(example);
 	}

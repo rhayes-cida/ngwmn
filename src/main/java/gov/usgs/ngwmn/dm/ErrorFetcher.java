@@ -1,13 +1,13 @@
 package gov.usgs.ngwmn.dm;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-
 import gov.usgs.ngwmn.dm.cache.PipeStatistics;
 import gov.usgs.ngwmn.dm.cache.Specifier;
 import gov.usgs.ngwmn.dm.io.Invoker;
 import gov.usgs.ngwmn.dm.io.Pipeline;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 
 public class ErrorFetcher implements DataFetcher {
 

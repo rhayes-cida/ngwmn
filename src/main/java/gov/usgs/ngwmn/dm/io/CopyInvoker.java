@@ -1,5 +1,7 @@
 package gov.usgs.ngwmn.dm.io;
 
+import gov.usgs.ngwmn.dm.cache.PipeStatistics;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -8,8 +10,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.io.ByteStreams;
-
-import gov.usgs.ngwmn.dm.cache.PipeStatistics;
 
 public class CopyInvoker implements Invoker {
 

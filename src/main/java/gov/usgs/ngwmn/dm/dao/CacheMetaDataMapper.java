@@ -1,9 +1,7 @@
 package gov.usgs.ngwmn.dm.dao;
 
-import gov.usgs.ngwmn.dm.dao.CacheMetaData;
-import gov.usgs.ngwmn.dm.dao.CacheMetaDataExample;
-import gov.usgs.ngwmn.dm.dao.CacheMetaDataKey;
 import java.util.List;
+
 import org.apache.ibatis.annotations.Delete;
 import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Param;

@@ -2,13 +2,13 @@ package gov.usgs.ngwmn.dm.cache.fs;
 
 import gov.usgs.ngwmn.dm.cache.Cache;
 import gov.usgs.ngwmn.dm.cache.CacheInfo;
-import gov.usgs.ngwmn.dm.cache.Specifier;
 import gov.usgs.ngwmn.dm.cache.PipeStatistics;
 import gov.usgs.ngwmn.dm.cache.PipeStatistics.Status;
+import gov.usgs.ngwmn.dm.cache.Specifier;
 import gov.usgs.ngwmn.dm.io.FileInputInvoker;
-import gov.usgs.ngwmn.dm.io.SupplyInput;
 import gov.usgs.ngwmn.dm.io.Invoker;
 import gov.usgs.ngwmn.dm.io.Pipeline;
+import gov.usgs.ngwmn.dm.io.SupplyInput;
 import gov.usgs.ngwmn.dm.io.TempfileOutputStream;
 
 import java.io.File;

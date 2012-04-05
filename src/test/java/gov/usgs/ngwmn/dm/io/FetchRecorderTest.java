@@ -1,10 +1,7 @@
 package gov.usgs.ngwmn.dm.io;
 
-import static org.junit.Assert.*;
-
-import java.util.List;
-
-import gov.usgs.ngwmn.WellDataType;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import gov.usgs.ngwmn.dm.cache.PipeStatistics;
 import gov.usgs.ngwmn.dm.cache.PipeStatistics.Status;
 import gov.usgs.ngwmn.dm.cache.PipeStatisticsWithProblem;
@@ -13,6 +10,8 @@ import gov.usgs.ngwmn.dm.dao.ContextualTest;
 import gov.usgs.ngwmn.dm.dao.FetchLog;
 import gov.usgs.ngwmn.dm.dao.FetchLogDAO;
 import gov.usgs.ngwmn.dm.dao.WellRegistryKey;
+
+import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;

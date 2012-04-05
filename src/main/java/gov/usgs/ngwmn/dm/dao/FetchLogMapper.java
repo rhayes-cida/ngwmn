@@ -1,9 +1,7 @@
 package gov.usgs.ngwmn.dm.dao;
 
-import gov.usgs.ngwmn.dm.dao.FetchLog;
-import gov.usgs.ngwmn.dm.dao.FetchLogExample;
-import java.math.BigDecimal;
 import java.util.List;
+
 import org.apache.ibatis.annotations.Delete;
 import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Options;

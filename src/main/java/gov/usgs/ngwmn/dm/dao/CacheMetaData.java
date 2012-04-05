@@ -1,6 +1,5 @@
 package gov.usgs.ngwmn.dm.dao;
 
-import java.math.BigDecimal;
 import java.util.Date;
 
 public class CacheMetaData extends CacheMetaDataKey {

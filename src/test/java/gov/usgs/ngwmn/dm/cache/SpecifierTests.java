@@ -1,6 +1,6 @@
 package gov.usgs.ngwmn.dm.cache;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertTrue;
 import gov.usgs.ngwmn.WellDataType;
 
 import java.security.InvalidParameterException;

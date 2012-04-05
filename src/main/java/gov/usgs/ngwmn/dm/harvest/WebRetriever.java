@@ -4,8 +4,8 @@ package gov.usgs.ngwmn.dm.harvest;
 import gov.usgs.ngwmn.dm.DataFetcher;
 import gov.usgs.ngwmn.dm.cache.Specifier;
 import gov.usgs.ngwmn.dm.io.CopyInvoker;
-import gov.usgs.ngwmn.dm.io.SupplyInput;
 import gov.usgs.ngwmn.dm.io.Pipeline;
+import gov.usgs.ngwmn.dm.io.SupplyInput;
 
 import java.io.IOException;
 import java.io.InputStream;

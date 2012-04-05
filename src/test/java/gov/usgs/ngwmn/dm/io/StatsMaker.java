@@ -6,7 +6,7 @@ import gov.usgs.ngwmn.dm.cache.Specifier;
 
 public class StatsMaker {
 
-	public static PipeStatistics makeStats(Class clazz) {
+	public static PipeStatistics makeStats(Class<?> clazz) {
 		Specifier spec = new Specifier();
 		spec.setAgencyID("USGS");
 		spec.setFeatureID("007");

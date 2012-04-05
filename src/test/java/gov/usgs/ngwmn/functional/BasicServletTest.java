@@ -11,7 +11,6 @@ import org.junit.Test;
 import org.springframework.mock.jndi.SimpleNamingContextBuilder;
 
 import com.meterware.httpunit.GetMethodWebRequest;
-import com.meterware.httpunit.HttpInternalErrorException;
 import com.meterware.httpunit.HttpNotFoundException;
 import com.meterware.httpunit.WebRequest;
 import com.meterware.httpunit.WebResponse;
@@ -45,7 +44,7 @@ public class BasicServletTest {
 	@BeforeClass
 	public static void setupNaming() throws Exception {
 		final SimpleNamingContextBuilder builder = new SimpleNamingContextBuilder();
-		String dataSource = "java:comp/env/jdbc/GW_DATA_PORTAL";
+		//String dataSource = "java:comp/env/jdbc/GW_DATA_PORTAL";
 		// TODO Set up data source for servlet.
 		
 		try {

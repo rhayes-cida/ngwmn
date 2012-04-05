@@ -1,8 +1,8 @@
 package gov.usgs.ngwmn.dm.cache;
 
 import gov.usgs.ngwmn.dm.DataLoader;
-import gov.usgs.ngwmn.dm.io.SupplyOutput;
 import gov.usgs.ngwmn.dm.io.Pipeline;
+import gov.usgs.ngwmn.dm.io.SupplyOutput;
 
 import java.io.IOException;
 import java.io.OutputStream;
