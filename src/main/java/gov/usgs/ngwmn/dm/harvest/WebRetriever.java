@@ -5,7 +5,7 @@ import gov.usgs.ngwmn.dm.DataFetcher;
 import gov.usgs.ngwmn.dm.cache.Specifier;
 import gov.usgs.ngwmn.dm.io.CopyInvoker;
 import gov.usgs.ngwmn.dm.io.Pipeline;
-import gov.usgs.ngwmn.dm.io.SupplyInput;
+import gov.usgs.ngwmn.dm.io.Supplier;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -39,7 +39,7 @@ public class WebRetriever implements DataFetcher {
 		logger.info("Fetching data for {} from {}", spec, url);
 
 		// TODO set source etc into stats
-		pipe.setInputSupplier( new SupplyInput() {
+		pipe.setInputSupplier( new Supplier<InputStream>() {
 			
 			@Override
 			public InputStream get() throws IOException {

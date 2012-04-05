@@ -33,13 +33,13 @@ public class GenericInvokerTest {
 		final ByteArrayOutputStream os = new ByteArrayOutputStream();
 		
 		Pipeline pl = new Pipeline();
-		pl.setInputSupplier(new SupplyInput() {
+		pl.setInputSupplier(new Supplier<InputStream>() {
 			@Override
 			public InputStream get() throws IOException {
 				return is;
 			}
 		});
-		pl.setOutputSupplier(new SupplyOutput() {
+		pl.setOutputSupplier(new Supplier<OutputStream>() {
 			@Override
 			public OutputStream get() throws IOException {
 				return os;

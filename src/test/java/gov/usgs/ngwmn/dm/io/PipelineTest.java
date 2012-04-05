@@ -24,13 +24,13 @@ public class PipelineTest extends Pipeline {
 		Invoker victim = new GenericInvoker();
 		
 		Pipeline pl = new Pipeline();
-		pl.setInputSupplier(new SupplyInput() {
+		pl.setInputSupplier(new Supplier<InputStream>() {
 			@Override
 			public InputStream get() throws IOException {
 				return is;
 			}
 		});
-		pl.setOutputSupplier(new SupplyOutput() {
+		pl.setOutputSupplier(new Supplier<OutputStream>() {
 			@Override
 			public OutputStream get() throws IOException {
 				return cos;
@@ -52,7 +52,7 @@ public class PipelineTest extends Pipeline {
 	@Test
 	public void test_simpleChain()  throws Exception {
 		
-		SupplyOutput outs1 = new SupplyOutput() {
+		Supplier<OutputStream> outs1 = new Supplier<OutputStream>() {
 			ByteArrayOutputStream os = new ByteArrayOutputStream(10);
 			
 			@Override
@@ -61,7 +61,7 @@ public class PipelineTest extends Pipeline {
 			}
 		};
 		
-		SupplyInput ins = new SupplyInput() {
+		Supplier<InputStream> ins = new Supplier<InputStream>() {
 			
 			@Override
 			public InputStream get() throws IOException {
@@ -86,7 +86,7 @@ public class PipelineTest extends Pipeline {
 	@Test
 	public void test_uniTeeChain()  throws Exception {
 		
-		SupplyOutput outs1 = new SupplyOutput() {
+		Supplier<OutputStream> outs1 = new Supplier<OutputStream>() {
 			ByteArrayOutputStream os = new ByteArrayOutputStream(10);
 			
 			@Override
@@ -94,7 +94,7 @@ public class PipelineTest extends Pipeline {
 				return os;
 			}
 		};
-		SupplyOutput outs2 = new SupplyOutput() {
+		Supplier<OutputStream> outs2 = new Supplier<OutputStream>() {
 			ByteArrayOutputStream os = new ByteArrayOutputStream(10);
 			
 			@Override
@@ -103,7 +103,7 @@ public class PipelineTest extends Pipeline {
 			}
 		};
 		
-		SupplyInput ins = new SupplyInput() {
+		Supplier<InputStream> ins = new Supplier<InputStream>() {
 			
 			@Override
 			public InputStream get() throws IOException {
@@ -132,7 +132,7 @@ public class PipelineTest extends Pipeline {
 	@Test
 	public void test_doubleTeeChain()  throws Exception {
 		
-		SupplyOutput outs1 = new SupplyOutput() {
+		Supplier<OutputStream> outs1 = new Supplier<OutputStream>() {
 			ByteArrayOutputStream os = new ByteArrayOutputStream(10);
 			
 			@Override
@@ -140,16 +140,7 @@ public class PipelineTest extends Pipeline {
 				return os;
 			}
 		};
-		SupplyOutput outs2 = new SupplyOutput() {
-			ByteArrayOutputStream os = new ByteArrayOutputStream(10);
-			
-			@Override
-			public OutputStream get() throws IOException {
-				return os;
-			}
-		};
-		
-		SupplyOutput outs3 = new SupplyOutput() {
+		Supplier<OutputStream> outs2 = new Supplier<OutputStream>() {
 			ByteArrayOutputStream os = new ByteArrayOutputStream(10);
 			
 			@Override
@@ -158,7 +149,16 @@ public class PipelineTest extends Pipeline {
 			}
 		};
 		
-		SupplyInput ins = new SupplyInput() {
+		Supplier<OutputStream> outs3 = new Supplier<OutputStream>() {
+			ByteArrayOutputStream os = new ByteArrayOutputStream(10);
+			
+			@Override
+			public OutputStream get() throws IOException {
+				return os;
+			}
+		};
+		
+		Supplier<InputStream> ins = new Supplier<InputStream>() {
 			
 			@Override
 			public InputStream get() throws IOException {
@@ -200,7 +200,7 @@ public class PipelineTest extends Pipeline {
 	@Test
 	public void test_SupplyChain()  throws Exception {
 		
-		SupplyOutput outs1 = new SupplyOutput() {
+		Supplier<OutputStream> outs1 = new Supplier<OutputStream>() {
 			ByteArrayOutputStream os = new ByteArrayOutputStream(10);
 			
 			@Override
@@ -209,7 +209,7 @@ public class PipelineTest extends Pipeline {
 			}
 		};
 		
-		SupplyInput ins = new SupplyInput() {
+		Supplier<InputStream> ins = new Supplier<InputStream>() {
 			
 			@Override
 			public InputStream get() throws IOException {

@@ -2,7 +2,7 @@ package gov.usgs.ngwmn.dm.io;
 
 import java.io.IOException;
 
-public abstract class SupplyChain<T> implements Supplier<T> {
+public abstract class SupplyChain<T> extends Supplier<T> {
 
 	private Supplier<T> link;
 

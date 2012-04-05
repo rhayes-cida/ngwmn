@@ -8,7 +8,7 @@ import gov.usgs.ngwmn.dm.cache.Specifier;
 import gov.usgs.ngwmn.dm.io.FileInputInvoker;
 import gov.usgs.ngwmn.dm.io.Invoker;
 import gov.usgs.ngwmn.dm.io.Pipeline;
-import gov.usgs.ngwmn.dm.io.SupplyInput;
+import gov.usgs.ngwmn.dm.io.Supplier;
 import gov.usgs.ngwmn.dm.io.TempfileOutputStream;
 
 import java.io.File;
@@ -105,7 +105,7 @@ public class FileCache implements Cache {
 		Invoker i = new FileInputInvoker();
 		pipe.setInvoker(i);
 		
-		pipe.setInputSupplier( new SupplyInput() {
+		pipe.setInputSupplier( new Supplier<InputStream>() {
 			
 			@Override
 			public InputStream get() throws IOException {

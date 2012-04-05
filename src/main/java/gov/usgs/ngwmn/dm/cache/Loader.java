@@ -2,7 +2,7 @@ package gov.usgs.ngwmn.dm.cache;
 
 import gov.usgs.ngwmn.dm.DataLoader;
 import gov.usgs.ngwmn.dm.io.Pipeline;
-import gov.usgs.ngwmn.dm.io.SupplyOutput;
+import gov.usgs.ngwmn.dm.io.Supplier;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -34,7 +34,7 @@ implements DataLoader {
 	@Override
 	public boolean configureOutput(final Specifier spec, Pipeline pipe) throws Exception {
 			
-		pipe.addOutputSupplier( new SupplyOutput() {				
+		pipe.addOutputSupplier( new Supplier<OutputStream>() {				
 			
 			@Override
 			public OutputStream get() throws IOException {

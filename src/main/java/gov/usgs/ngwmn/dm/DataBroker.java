@@ -7,7 +7,7 @@ import gov.usgs.ngwmn.dm.dao.WellRegistry;
 import gov.usgs.ngwmn.dm.dao.WellRegistryDAO;
 import gov.usgs.ngwmn.dm.dao.WellRegistryKey;
 import gov.usgs.ngwmn.dm.io.Pipeline;
-import gov.usgs.ngwmn.dm.io.SupplyOutput;
+import gov.usgs.ngwmn.dm.io.Supplier;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -37,7 +37,7 @@ public class DataBroker {
 		
 		checkSiteExists(spec);
 		
-		pipe.setOutputSupplier( new SupplyOutput() {
+		pipe.setOutputSupplier( new Supplier<OutputStream>() {
 			@Override
 			public OutputStream get() throws IOException {
 				return out;
@@ -78,7 +78,7 @@ public class DataBroker {
 		checkSiteExists(spec);
 		
 		// must have initial output because Loader uses addOutputSupplier
-		pipe.setOutputSupplier( new SupplyOutput() {
+		pipe.setOutputSupplier( new Supplier<OutputStream>() {
 			@Override
 			public OutputStream get() throws IOException {
 				return new NullOutputStream();

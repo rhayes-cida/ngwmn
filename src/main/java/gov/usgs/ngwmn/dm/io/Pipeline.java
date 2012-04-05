@@ -33,7 +33,7 @@ public class Pipeline implements Callable<Void> {
 		return oss;
 	}
 	
-	public void addOutputSupplier(SupplyOutput supply) {
+	public void addOutputSupplier(Supplier<OutputStream> supply) {
 		
 		if (oss != null) {
 			supply = new SupplyTeeOutput(supply, oss);

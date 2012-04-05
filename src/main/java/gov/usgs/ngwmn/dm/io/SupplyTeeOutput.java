@@ -4,7 +4,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 
 
-public class SupplyTeeOutput extends SupplyOutput {
+public class SupplyTeeOutput extends Supplier<OutputStream> {
 
 	private Supplier<OutputStream> os1;
 	private Supplier<OutputStream> os2;
