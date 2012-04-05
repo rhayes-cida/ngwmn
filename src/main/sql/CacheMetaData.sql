@@ -1,4 +1,4 @@
--- drop table CACHE_META_DATA;
+drop table CACHE_META_DATA;
 
 create table CACHE_META_DATA (
 	AGENCY_CD              VARCHAR2(20 BYTE)      NOT NULL,
@@ -17,9 +17,7 @@ create table CACHE_META_DATA (
 	REFERENCES GW_DATA_PORTAL.WELL_REGISTRY (AGENCY_CD, SITE_NO) 
 );
 
-set define off;
-
-create or replace procdure UPDATE_CACHE_META_DATA
+create or replace procedure UPDATE_CACHE_META_DATA
 as
 begin
 	
@@ -39,9 +37,6 @@ begin
 	from fetch_log f1);
 
 end UPDATE_CACHE_META_DATA;
-
-/
-
 
 
 
