@@ -4,6 +4,7 @@ import gov.usgs.ngwmn.dm.dao.WellRegistry;
 import gov.usgs.ngwmn.dm.dao.WellRegistryDAO;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.servlet.ServletConfig;
@@ -46,7 +47,20 @@ public class WellListServlet extends HttpServlet {
 		ServletOutputStream sos = response.getOutputStream();
 		try {
 			sos.println("<html><body>");
-			List<WellRegistry> ww = dao.selectAll();
+			List<WellRegistry> ww;
+			
+			String[] state_fips = request.getParameterValues("state_fips");
+			if (state_fips != null) {
+				// user requested by states
+				ww = new ArrayList<WellRegistry>();
+				for (String state_cd : state_fips) {
+					List<WellRegistry> wws = dao.selectByState(Integer.parseInt(state_cd));
+					
+					ww.addAll(wws);
+				}
+			} else {
+				ww = dao.selectAll();
+			}
 			
 			for (WellRegistry w : ww) {
 				sos.print(String.format("<a href=\"data?agency_cd=%s&featureID=%s\">", w.getAgencyCd(), w.getSiteNo()));
