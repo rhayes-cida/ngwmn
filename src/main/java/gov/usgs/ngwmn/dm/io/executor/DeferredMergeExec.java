@@ -19,6 +19,7 @@ public class DeferredMergeExec implements Callable<Void> {
     public DeferredMergeExec(Iterable<Specifier> specs, PipeFactory fac, OutputStream mos) {
     	specifications = specs;
     	factory = fac;
+    	mergedOutputStream = mos;
     }
     
     public Void call() {
