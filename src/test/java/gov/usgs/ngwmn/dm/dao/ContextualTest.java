@@ -11,7 +11,9 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration({"classpath:applicationContextTest.xml"})
-@ActiveProfiles("local")
+// Cannot use this, because it overrides system property spring.profiles.active; use that instead.
+// Or set environment SPRING_PROFILES_ACTIVE or SPRING_PROFILES_DEFAULT
+// @ActiveProfiles("local")
 public abstract class ContextualTest {
 	
 	@Autowired

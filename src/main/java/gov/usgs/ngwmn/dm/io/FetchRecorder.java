@@ -7,18 +7,16 @@ import gov.usgs.ngwmn.dm.cache.PipeStatisticsWithProblem;
 import gov.usgs.ngwmn.dm.dao.FetchLog;
 import gov.usgs.ngwmn.dm.dao.FetchLogDAO;
 
-public class FetchRecorder implements PipelineFinishListener {
+public class FetchRecorder {
 
 	private FetchLogDAO dao;
 	
 	@Subscribe
-	@Override
 	public void notifySuccess(PipeStatistics stats) {
 		notify(stats, null);
 	}
 
 	@Subscribe
-	@Override
 	public void notifyException(PipeStatisticsWithProblem pswp) {
 		notify(pswp.getStats(), pswp.getProblem());		
 	}

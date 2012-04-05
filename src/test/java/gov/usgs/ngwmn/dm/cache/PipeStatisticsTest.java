@@ -12,11 +12,12 @@ public class PipeStatisticsTest {
 	@Before
 	public void setup() {
 		victim = new PipeStatistics();
+		assertEquals("coun beforet",0, victim.getCount());
 	}
 	
 	@Test
 	public void testIncrementCount() {
-		victim.setCount(999);
+		victim.incrementCount(999);
 		victim.incrementCount(21);
 		
 		assertEquals("count",1020, victim.getCount());

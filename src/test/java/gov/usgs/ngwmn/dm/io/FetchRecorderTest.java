@@ -21,7 +21,7 @@ import com.google.common.eventbus.EventBus;
 
 public class FetchRecorderTest extends ContextualTest {
 	
-	private PipelineFinishListener victim;
+	private FetchRecorder victim;
 	private FetchLogDAO dao;
 
 	@Before

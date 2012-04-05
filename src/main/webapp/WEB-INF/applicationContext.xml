@@ -20,7 +20,7 @@
 	</bean>
 	
     <bean id="WellRegistryDAO"
-    	class="gov.usgs.ngwmn.dm.dao.WellRegistryDAOImpl">
+    	class="gov.usgs.ngwmn.dm.dao.WellRegistryDAO">
     	<property name="mapper" ref="wellRegistryMapper"/>
    	</bean>
    	

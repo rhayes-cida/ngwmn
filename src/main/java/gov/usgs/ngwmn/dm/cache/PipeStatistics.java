@@ -1,9 +1,17 @@
 package gov.usgs.ngwmn.dm.cache;
 
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
+import javax.annotation.concurrent.ThreadSafe;
+
+import com.google.common.collect.ImmutableMap;
+
+@ThreadSafe
 public class PipeStatistics {
 	
+	@ThreadSafe
 	public static enum Status {
 		OPEN(false),
 		STARTED(false),
@@ -22,13 +30,21 @@ public class PipeStatistics {
 			return name().substring(0, 4);
 		}
 		
-		public static Status by4Char(String c4) {
+		// invert map for 4-char representation
+		private static Map<String,Status> invert4;
+		static {
+			Map<String,Status> tmp = new HashMap<String, PipeStatistics.Status>(values().length);
 			for (Status s : values()) {
-				if (c4.equals(s.as4Char())) {
-					return s;
+				Status prev = tmp.put(s.as4Char(), s);
+				if (prev != null) {
+					throw new RuntimeException("Conflict on 4char representation " + s.as4Char());
 				}
-			}
-			return null;
+			}	
+			invert4 = ImmutableMap.copyOf(tmp);
+		}
+		
+		public static Status by4Char(String c4) {
+			return invert4.get(c4);
 		}
 	}
 
@@ -45,10 +61,6 @@ public class PipeStatistics {
 		return count;
 	}
 
-	public synchronized void setCount(long count) {
-		this.count = count;
-	}
-	
 	public synchronized void incrementCount(long c) {
 		this.count += c;
 	}
@@ -105,11 +117,11 @@ public class PipeStatistics {
 		return null;
 	}
 
-	public Class<?> getCalledBy() {
+	public synchronized Class<?> getCalledBy() {
 		return calledBy;
 	}
 
-	public void setCalledBy(Class<?> calledBy) {
+	public synchronized void setCalledBy(Class<?> calledBy) {
 		this.calledBy = calledBy;
 	}
 
@@ -140,27 +152,31 @@ public class PipeStatistics {
 				
 	}
 
-	public Specifier getSpecifier() {
+	/** Beware that specifier may be shared betwen threads.
+	 * 
+	 * @return
+	 */
+	public synchronized Specifier getSpecifier() {
 		return specifier;
 	}
 
-	public void setSpecifier(Specifier specifier) {
+	public synchronized void setSpecifier(Specifier specifier) {
 		this.specifier = specifier;
 	}
 
-	public String getSource() {
+	public synchronized String getSource() {
 		return source;
 	}
 
-	public void setSource(String source) {
+	public synchronized void setSource(String source) {
 		this.source = source;
 	}
 
-	public String getDigest() {
+	public synchronized String getDigest() {
 		return digest;
 	}
 
-	public void setDigest(String digest) {
+	public synchronized void setDigest(String digest) {
 		this.digest = digest;
 	}
 	
