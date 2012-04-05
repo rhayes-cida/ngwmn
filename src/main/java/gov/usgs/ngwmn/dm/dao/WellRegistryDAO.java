@@ -46,5 +46,14 @@ public class WellRegistryDAO {
 		return mapper.selectByAgency(agencyId);
 	}
 
+	public List<WellRegistry> selectByState(int fips) {
+		WellRegistryExample filter = new WellRegistryExample();
+		// Only look for displayed wells
+		filter.createCriteria()
+			.andDisplayFlagEqualTo("1")
+			.andStateCdEqualTo(fips);
+		filter.setOrderByClause("AGENCY_CD, SITE_NO");
+		return selectByExample(filter);
+	}
 	
 }
