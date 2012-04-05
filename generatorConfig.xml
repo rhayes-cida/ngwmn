@@ -38,5 +38,9 @@
     	<columnOverride column="CT" javaType="java.lang.Integer" jdbcType="NUMERIC" />
     	<columnOverride column="DATA_SOURCE" property="source"/>
     </table>
+    <table schema="GW_DATA_PORTAL" tableName="CACHE_META_DATA">
+    	<columnOverride column="SUCCESS_CT" javaType="java.lang.Integer"/>
+    	<columnOverride column="FAIL_CT" javaType="java.lang.Integer"/>
+    </table>
   </context>
 </generatorConfiguration>
