@@ -16,3 +16,32 @@ create table CACHE_META_DATA (
 	FOREIGN KEY (AGENCY_CD, SITE_NO) 
 	REFERENCES GW_DATA_PORTAL.WELL_REGISTRY (AGENCY_CD, SITE_NO) 
 );
+
+set define off;
+
+create or replace procdure UPDATE_CACHE_META_DATA
+as
+begin
+	
+	delete from CACHE_META_DATA;
+
+	insert into CACHE_META_DATA(agency_cd, site_no, data_type, success_ct, fail_ct, most_recent_fetch_dt)
+	(select distinct
+		agency_cd, 
+		site_no, 
+		'ALL' datum,
+		(select count(*) from fetch_log f2 
+		 where f2.agency_cd = f1.agency_cd and f2.site_no = f1.site_no and f2.status = 'DONE') success_ct,
+		(select count(*) from fetch_log f2 
+		 where f2.agency_cd = f1.agency_cd and f2.site_no = f1.site_no and f2.status = 'FAIL') fail_ct,
+		(select max(started_at) from fetch_log f2 
+		 where f2.agency_cd = f1.agency_cd and f2.site_no = f1.site_no and f2.status = 'DONE') last_start
+	from fetch_log f1);
+
+end UPDATE_CACHE_META_DATA;
+
+/
+
+
+
+
