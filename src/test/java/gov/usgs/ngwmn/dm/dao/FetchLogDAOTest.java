@@ -21,9 +21,9 @@ public class FetchLogDAOTest extends ContextualTest {
 	@Test
 	public void testInsertId() {
 		FetchLog entry = new FetchLog();
-		
-		entry.setAgencyCd("USGS");
-		entry.setSiteNo("007");
+		// NJGS:2288614
+		entry.setAgencyCd("NJGS");
+		entry.setSiteNo("2288614");
 		dao.insertId(entry);
 		assertNotNull("id after insert", entry.getFetchlogId());
 		
@@ -32,7 +32,7 @@ public class FetchLogDAOTest extends ContextualTest {
 	
 	@Test
 	public void testSelectByWell() {
-		WellRegistryKey key = new WellRegistryKey("USGS", "007");
+		WellRegistryKey key = new WellRegistryKey("NJGS", "2288614");
 		
 		List<FetchLog> ff = dao.byWell(key);
 		assertFalse("empty", ff.isEmpty());

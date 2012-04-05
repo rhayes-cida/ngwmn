@@ -1,5 +1,6 @@
 package gov.usgs.ngwmn.dm;
 
+import gov.usgs.ngwmn.dm.cache.PipeStatistics;
 import gov.usgs.ngwmn.dm.cache.PipeStatisticsWithProblem;
 import gov.usgs.ngwmn.dm.cache.Specifier;
 import gov.usgs.ngwmn.dm.io.SupplyOutput;
@@ -15,6 +16,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.eventbus.EventBus;
+import com.google.common.io.NullOutputStream;
 
 public class DataBroker {
 
@@ -68,6 +70,48 @@ public class DataBroker {
 		logger.info("Completed operation for {} result {}", spec, pipe.getStatistics());
 	}
 	
+	public PipeStatistics prefetchWellData(Specifier spec) throws Exception {
+		Pipeline pipe = new Pipeline();
+
+		check(spec);
+		
+		checkSiteExists(spec);
+		
+		// must have initial output because Loader uses addOutputSupplier
+		pipe.setOutputSupplier( new SupplyOutput() {
+			@Override
+			public OutputStream get() throws IOException {
+				return new NullOutputStream();
+			}
+		});
+		boolean success = false;
+		
+		if ( ! success) {
+			loader.configureOutput(spec, pipe);
+			success = configureInput(harvester, spec, pipe); 
+		}
+		
+		// TODO It's doubtful if we can detect this until we run the pipe.
+		// TODO We need to distinguish "site not found" and "data not found"
+		if ( ! success) {
+			signalDataNotFoundMsg(spec, pipe);
+		}
+		
+		try {
+			pipe.getStatistics().setSpecifier(spec);
+			pipe.invoke();
+			fetchEventBus.post(pipe.getStatistics());
+		} catch (IOException oops) {
+			PipeStatisticsWithProblem pswp = new PipeStatisticsWithProblem(pipe.getStatistics(), oops);
+			fetchEventBus.post(pswp);
+			throw oops;
+		}
+		
+		logger.info("Completed operation for {} result {}", spec, pipe.getStatistics());
+		
+		return pipe.getStatistics();
+	}
+
 	private void checkSiteExists(Specifier spec) 
 			throws SiteNotFoundException 
 	{

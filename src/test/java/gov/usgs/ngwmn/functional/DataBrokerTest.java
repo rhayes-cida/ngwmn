@@ -1,14 +1,17 @@
-package gov.usgs.ngwmn.dm;
+package gov.usgs.ngwmn.functional;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
+
 import gov.usgs.ngwmn.WellDataType;
+import gov.usgs.ngwmn.dm.DataBroker;
+import gov.usgs.ngwmn.dm.SiteNotFoundException;
 import gov.usgs.ngwmn.dm.cache.Loader;
+import gov.usgs.ngwmn.dm.cache.PipeStatistics;
+import gov.usgs.ngwmn.dm.cache.PipeStatistics.Status;
 import gov.usgs.ngwmn.dm.cache.Retriever;
 import gov.usgs.ngwmn.dm.cache.Specifier;
 import gov.usgs.ngwmn.dm.cache.fs.FileCache;
 import gov.usgs.ngwmn.dm.dao.ContextualTest;
-import gov.usgs.ngwmn.dm.harvest.Harvester;
 import gov.usgs.ngwmn.dm.harvest.WebRetriever;
 
 import java.io.ByteArrayOutputStream;
@@ -56,7 +59,7 @@ public class DataBrokerTest extends ContextualTest {
 	@Test
 	public void testSiteFound() throws Exception {
 		
-		Specifier spec = makeSpec("USGS","007");
+		Specifier spec = makeSpec("USGS","402734087033401");
 		ByteArrayOutputStream out = new ByteArrayOutputStream();
 		
 		try {
@@ -66,4 +69,16 @@ public class DataBrokerTest extends ContextualTest {
 		}
 	}
 
+	@Test
+	public void testPrefetch() throws Exception {
+		Specifier spec = makeSpec("USGS","402734087033401");
+
+		PipeStatistics stats = victim.prefetchWellData(spec);
+		
+		assertNotNull("stats", stats);
+		assertEquals("spec", spec, stats.getSpecifier());
+		assertEquals("success", Status.DONE, stats.getStatus());
+		assertTrue("got bytes", stats.getCount() > 100);
+		assertEquals("caller", "WebRetriever", stats.getCalledBy().getSimpleName());
+	}
 }
