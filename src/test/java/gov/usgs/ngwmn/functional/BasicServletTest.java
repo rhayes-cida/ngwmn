@@ -4,7 +4,11 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
+import gov.usgs.ngwmn.dm.cache.fs.FileCache;
+
 import java.io.File;
+
+import javax.naming.InitialContext;
 
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -44,14 +48,16 @@ public class BasicServletTest {
 	@BeforeClass
 	public static void setupNaming() throws Exception {
 		final SimpleNamingContextBuilder builder = new SimpleNamingContextBuilder();
-		//String dataSource = "java:comp/env/jdbc/GW_DATA_PORTAL";
-		// TODO Set up data source for servlet.
+		builder.bind(FileCache.BASEDIR_JNDI_NAME, "/tmp/gwdp-cache");
 		
 		try {
 			builder.activate();
 		} catch (IllegalStateException ise) {
-			// already had a naming provider; ignore
+			// Set the required value into the existing context instead
+			InitialContext ctx = new InitialContext();
+			ctx.bind(FileCache.BASEDIR_JNDI_NAME, "/tmp/gwdp-cache");
 		}
+		
 	}
 
 	

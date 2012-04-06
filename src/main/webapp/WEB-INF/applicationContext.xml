@@ -1,13 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" 
-	"http://www.springframework.org/dtd/spring-beans.dtd">
-<beans>
+<beans xmlns="http://www.springframework.org/schema/beans" 
+		xmlns:jee="http://www.springframework.org/schema/jee"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans 
+           http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+           http://www.springframework.org/schema/jee http://www.springframework.org/schema/jee/spring-jee-2.0.xsd">
+
 	<bean id="dataSource" 
       class="org.springframework.jndi.JndiObjectFactoryBean">
       <property name="jndiName" 
                   value="java:comp/env/jdbc/GW_DATA_PORTAL"/>    
       <property name="resourceRef" 
                   value="true" /> 
+                  
 	</bean>
 	
     <bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
@@ -47,9 +52,11 @@
    		</property>
  	</bean>
 		
+		<jee:jndi-lookup id="FSCache.basedir" jndi-name="java:comp/env/GWDP/FileCache/basedir" />
 		<bean id="FileCache"
 			class="gov.usgs.ngwmn.dm.cache.fs.FileCache">
 			<!-- Leave unset for fail-fast <property name="basedir" value="/tmp/gwdp-cache"/>  -->
+			<property name="basedir" ref="FSCache.basedir"/>
 		</bean>
 		
 		<bean id="Retriever"

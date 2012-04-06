@@ -31,24 +31,8 @@ public class DataManagerServlet extends HttpServlet {
 	
 	@Override
 	public void init(ServletConfig config) throws ServletException {
-		String basedir = config.getInitParameter("FSCache.basedir");
-		if (basedir == null) {
-			basedir = config.getServletContext().getInitParameter("FSCache.basedir");
-		}
-		if (basedir == null) {
-			throw new ServletException("config parameter FSCache.basedir is required");
-		}
 		
 		ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(config.getServletContext());
-
-		// TODO Move this one last configuration item to Spring
-		FileCache c = ctx.getBean("FileCache", FileCache.class);
-		File bd = new File(basedir);
-		try {
-			c.setBasedir(bd);
-		} catch (IOException ioe) {
-			throw new ServletException(ioe);
-		}
 		
 		db = ctx.getBean("DataBroker", DataBroker.class);
 	}
@@ -63,11 +47,8 @@ public class DataManagerServlet extends HttpServlet {
 		String well_name = wellname(spec);
 		
 		try {
-			// resp.setContentType("application/xml");
 			resp.setContentType("application/zip");
 			resp.setHeader("Content-Disposition", "attachment; filename="+well_name+".zip");
-			// resp.setContentType("text/plain");
-			// resp.setCharacterEncoding("utf8");
 			
 			// ensure that buffer size is greater than magic lower limit for
 			// non-extant sites

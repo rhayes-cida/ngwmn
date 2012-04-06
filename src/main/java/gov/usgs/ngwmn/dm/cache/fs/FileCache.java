@@ -26,6 +26,8 @@ public class FileCache implements Cache {
 	private Logger logger = LoggerFactory.getLogger(FileCache.class);
 	
 	private File basedir;
+
+	public static final String BASEDIR_JNDI_NAME = "java:comp/env/GWDP/FileCache/basedir";
 	private String filename(Specifier spec) {
 		// Note that there is no requirement to decode a cache file name; 
 		// having the file name be human-readable is helpful for debugging,

@@ -1,5 +1,9 @@
 package gov.usgs.ngwmn.dm.dao;
 
+import gov.usgs.ngwmn.dm.cache.fs.FileCache;
+
+import javax.naming.InitialContext;
+
 import org.junit.BeforeClass;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,14 +22,24 @@ public abstract class ContextualTest {
 	@Autowired
 	protected ApplicationContext ctx;
 
+	private static String basedir = "/tmp/gwdp-cache";
+
 	@BeforeClass
 	public static void setupNaming() throws Exception {
 		final SimpleNamingContextBuilder builder = new SimpleNamingContextBuilder();
+		builder.bind(FileCache.BASEDIR_JNDI_NAME, basedir);
+
 		try {
 			builder.activate();
 		} catch (IllegalStateException ise) {
-			// already had a naming provider; ignore
+			// Set the required value into the existing context instead
+			InitialContext ctx = new InitialContext();
+			ctx.bind(FileCache.BASEDIR_JNDI_NAME, basedir);
 		}
+	}
+
+	public static void setBasedir(String basedir) {
+		ContextualTest.basedir = basedir;
 	}
 
 }

@@ -22,6 +22,14 @@
   version="3.0"
   metadata-complete="true">
 
+<!--  The ServletTest driver does not process the env-entry element
+	<env-entry>
+		<env-entry-name>GWDP/FileCache/basedir</env-entry-name>
+		<env-entry-type>java.lang.String</env-entry-type>
+		<env-entry-value>/tmp/gwdp-cache</env-entry-value>
+	</env-entry>
+-->
+	
     <description>
       First cut.
     </description>
@@ -30,10 +38,6 @@
     <servlet>
       <servlet-name>DataManager</servlet-name>
       <servlet-class>gov.usgs.ngwmn.dm.DataManagerServlet</servlet-class>
-      <init-param>
-      	<param-name>FSCache.basedir</param-name>
-      	<param-value>/tmp/gwdp-cache</param-value>
-      </init-param>
     </servlet>
 
     <servlet-mapping>

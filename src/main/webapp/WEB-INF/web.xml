@@ -20,12 +20,7 @@
       First cut.
     </description>
   <display-name>GWDP</display-name>
-  
-  <context-param>
-      <param-name>FSCache.basedir</param-name>
-      <param-value>/home/rhayes/var/gwdp-cache</param-value>
-  </context-param>
-  
+    
   <servlet>
     <servlet-name>DataManager</servlet-name>
     <servlet-class>gov.usgs.ngwmn.dm.DataManagerServlet</servlet-class>
