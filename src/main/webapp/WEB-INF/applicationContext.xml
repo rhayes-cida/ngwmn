@@ -47,9 +47,31 @@
    		</property>
  	</bean>
 		
+		<bean id="FileCache"
+			class="gov.usgs.ngwmn.dm.cache.fs.FileCache">
+			<property name="basedir" value="/tmp/gwdp-cache"/>
+		</bean>
+		
+		<bean id="Retriever"
+			class="gov.usgs.ngwmn.dm.cache.Retriever">
+			<constructor-arg ref="FileCache"></constructor-arg>
+		</bean>
+			
+		<bean id="Loader"
+			class="gov.usgs.ngwmn.dm.cache.Loader">
+			<constructor-arg ref="FileCache"></constructor-arg>
+		</bean>
+				
+		<bean id="WebRetriever"
+				class="gov.usgs.ngwmn.dm.harvest.WebRetriever">
+		</bean>
+		
 	<bean id="DataBroker" class="gov.usgs.ngwmn.dm.DataBroker">
 		<property name="fetchEventBus" ref="FetchEventBus"/>
 		<property name="wellRegistry" ref="WellRegistryDAO"/>
+		<property name="retriever" ref="Retriever"/>
+		<property name="loader" ref="Loader"/>
+		<property name="harvester" ref="WebRetriever"/>
 	</bean>
 
 </beans>

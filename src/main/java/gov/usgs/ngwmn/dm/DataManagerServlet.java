@@ -38,8 +38,8 @@ public class DataManagerServlet extends HttpServlet {
 		
 		ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(config.getServletContext());
 
-		// TODO Move all this configuration to Spring
-		FileCache c = new FileCache();
+		// TODO Move this one last configuration item to Spring
+		FileCache c = ctx.getBean("FileCache", FileCache.class);
 		File bd = new File(basedir);
 		try {
 			c.setBasedir(bd);
@@ -48,10 +48,6 @@ public class DataManagerServlet extends HttpServlet {
 		}
 		
 		db = ctx.getBean("DataBroker", DataBroker.class);
-		// TODO Move the following configuration to Spring
-		db.setRetriever( new Retriever(c) );
-		db.setLoader(    new Loader(c)    );
-		db.setHarvester( new WebRetriever() );
 	}
 
 	@Override
