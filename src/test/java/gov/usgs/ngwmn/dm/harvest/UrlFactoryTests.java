@@ -1,7 +1,6 @@
 package gov.usgs.ngwmn.dm.harvest;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 import gov.usgs.ngwmn.WellDataType;
 import gov.usgs.ngwmn.dm.cache.Specifier;
 
@@ -31,6 +30,15 @@ public class UrlFactoryTests {
 		assertTrue(url.contains("export?"));
 	}
 	
+	@Test
+	public void test_makeUrl_forAllData_withSpace() {
+		spec.setTypeID(WellDataType.ALL);
+		spec.setAgencyID("MN DNR");
+		String url = urls.makeUrl(spec);
+		System.out.println(url);
+		assertFalse(url.contains(" "));
+	}
+
 	@Test
 	public void test_makeUrl_forWaterQualityData() {
 		spec.setTypeID(WellDataType.QUALITY);

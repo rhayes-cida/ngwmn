@@ -41,7 +41,14 @@ public class UrlFactory {
 			throw new RuntimeException("UrlFactory failed to construct a url for " + spec);
 		}
 		
-		url = injectParams(url, spec.getAgencyID(), spec.getFeatureID());
+		String agencyID = spec.getAgencyID();
+		String featureID = spec.getFeatureID();
+		
+		// This is what Cocoon expects -- not a standard URL encoding.
+		agencyID = agencyID.replaceAll(" ", "_");
+		featureID = featureID.replaceAll(" ", "_");
+		
+		url = injectParams(url, agencyID, featureID);
 		return url;
 	}
 
