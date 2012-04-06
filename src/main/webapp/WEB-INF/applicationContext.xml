@@ -49,7 +49,7 @@
 		
 		<bean id="FileCache"
 			class="gov.usgs.ngwmn.dm.cache.fs.FileCache">
-			<property name="basedir" value="/tmp/gwdp-cache"/>
+			<!-- Leave unset for fail-fast <property name="basedir" value="/tmp/gwdp-cache"/>  -->
 		</bean>
 		
 		<bean id="Retriever"

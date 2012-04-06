@@ -44,12 +44,21 @@ public class WellListServlet extends HttpServlet {
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		
 		response.setContentType("text/html");
+		
+		String servletPath = Objects.firstNonNull(
+				request.getParameter("servlet"), 
+				"data");
+		
+		if ( ! servletPath.matches("[A-Za-z]+")) {
+			throw new ServletException("disallowed servlet path");
+		}
+		
 		ServletOutputStream sos = response.getOutputStream();
 		try {
 			sos.println("<html><body>");
 			List<WellRegistry> ww;
 			
-			String[] state_fips = request.getParameterValues("state_fips");
+			String[] state_fips = request.getParameterValues("state");
 			if (state_fips != null) {
 				// user requested by states
 				ww = new ArrayList<WellRegistry>();
@@ -63,7 +72,7 @@ public class WellListServlet extends HttpServlet {
 			}
 			
 			for (WellRegistry w : ww) {
-				sos.print(String.format("<a href=\"data?agency_cd=%s&featureID=%s\">", w.getAgencyCd(), w.getSiteNo()));
+				sos.print(String.format("<a href=\"%s?agency_cd=%s&featureID=%s\">", servletPath, w.getAgencyCd(), w.getSiteNo()));
 				sos.print(String.format("%s site %s", Strings.nullToEmpty(w.getAgencyNm()), Objects.firstNonNull(w.getSiteName(), w.getSiteNo())));
 				sos.println("</href><br />\n");
 			}

@@ -20,18 +20,21 @@
       First cut.
     </description>
   <display-name>GWDP</display-name>
+  
+  <context-param>
+      <param-name>FSCache.basedir</param-name>
+      <param-value>/home/rhayes/var/gwdp-cache</param-value>
+  </context-param>
+  
   <servlet>
     <servlet-name>DataManager</servlet-name>
     <servlet-class>gov.usgs.ngwmn.dm.DataManagerServlet</servlet-class>
-    <init-param>
-      <param-name>FSCache.basedir</param-name>
-      <param-value>/home/rhayes/var/gwdp-cache</param-value>
-    </init-param>
   </servlet>
   <servlet-mapping>
     <servlet-name>DataManager</servlet-name>
     <url-pattern>/data</url-pattern>
   </servlet-mapping>
+  
   <servlet>
     <description></description>
     <display-name>WellListServlet</display-name>
@@ -41,6 +44,15 @@
   <servlet-mapping>
     <servlet-name>WellListServlet</servlet-name>
     <url-pattern>/wells</url-pattern>
+  </servlet-mapping>
+
+  <servlet>
+    <servlet-name>PrefetchServlet</servlet-name>
+    <servlet-class>gov.usgs.ngwmn.dm.PrefetchServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>PrefetchServlet</servlet-name>
+    <url-pattern>/prefetch</url-pattern>
   </servlet-mapping>
   
   <!--  Spring integration -->

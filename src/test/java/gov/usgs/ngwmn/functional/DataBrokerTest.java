@@ -27,13 +27,8 @@ public class DataBrokerTest extends ContextualTest {
 	
 	@Before
 	public void setUp() throws Exception {
-		victim = ctx.getBean("DataBroker", DataBroker.class);
-		
-		// TODO this should really be done in Spring...
-		FileCache c = new FileCache();
-		victim.setRetriever( new Retriever(c) );
-		victim.setLoader(    new Loader(c)    );
-		victim.setHarvester( new WebRetriever() );
+		FileCache c = ctx.getBean("FileCache", FileCache.class);
+		victim = ctx.getBean("DataBroker", DataBroker.class);		
 	}
 
 	private Specifier makeSpec(String agency, String site) {

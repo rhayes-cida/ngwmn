@@ -25,13 +25,16 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
 public class DataManagerServlet extends HttpServlet {
 
 	private static final long serialVersionUID = 2L;
-	private DataBroker db;
+	protected DataBroker db;
 	private Logger logger = LoggerFactory.getLogger(DataManagerServlet.class);
-	private ApplicationContext ctx;
+	protected ApplicationContext ctx;
 	
 	@Override
 	public void init(ServletConfig config) throws ServletException {
 		String basedir = config.getInitParameter("FSCache.basedir");
+		if (basedir == null) {
+			basedir = config.getServletContext().getInitParameter("FSCache.basedir");
+		}
 		if (basedir == null) {
 			throw new ServletException("config parameter FSCache.basedir is required");
 		}
@@ -100,7 +103,7 @@ public class DataManagerServlet extends HttpServlet {
 		
 	}
 
-	private String wellname(Specifier spec) {
+	protected String wellname(Specifier spec) {
 		return spec.getAgencyID() + "_" + spec.getFeatureID();
 	}
 
@@ -111,7 +114,7 @@ public class DataManagerServlet extends HttpServlet {
 	 * @param req
 	 * @return
 	 */
-	private Specifier parseSpecifier(HttpServletRequest req) {
+	protected Specifier parseSpecifier(HttpServletRequest req) {
 		String featureID = req.getParameter("featureID");
 		
 		Specifier spec = new Specifier();
@@ -133,7 +136,7 @@ public class DataManagerServlet extends HttpServlet {
 		return spec;
 	}
 
-	private void checkSpec(Specifier spec) throws ServletException {
+	protected void checkSpec(Specifier spec) throws ServletException {
 		if (null == spec.getFeatureID() || spec.getFeatureID().isEmpty()) {
 			throw new ServletException("No feature identified by input");			
 		}
