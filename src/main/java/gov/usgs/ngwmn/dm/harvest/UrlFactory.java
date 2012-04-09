@@ -1,7 +1,7 @@
 package gov.usgs.ngwmn.dm.harvest;
 
 import gov.usgs.ngwmn.WellDataType;
-import gov.usgs.ngwmn.dm.cache.Specifier;
+import gov.usgs.ngwmn.dm.spec.Specifier;
 
 import java.io.IOException;
 import java.util.HashMap;

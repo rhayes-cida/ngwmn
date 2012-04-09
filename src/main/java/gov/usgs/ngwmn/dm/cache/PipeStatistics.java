@@ -1,5 +1,7 @@
 package gov.usgs.ngwmn.dm.cache;
 
+import gov.usgs.ngwmn.dm.spec.Specifier;
+
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;

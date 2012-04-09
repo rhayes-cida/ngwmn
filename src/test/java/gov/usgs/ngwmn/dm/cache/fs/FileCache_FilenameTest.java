@@ -4,7 +4,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import gov.usgs.ngwmn.WellDataType;
-import gov.usgs.ngwmn.dm.cache.Specifier;
+import gov.usgs.ngwmn.dm.spec.Specifier;
 
 import java.io.File;
 import java.io.IOException;

@@ -11,10 +11,10 @@ import gov.usgs.ngwmn.dm.cache.Loader;
 import gov.usgs.ngwmn.dm.cache.PipeStatistics;
 import gov.usgs.ngwmn.dm.cache.PipeStatistics.Status;
 import gov.usgs.ngwmn.dm.cache.Retriever;
-import gov.usgs.ngwmn.dm.cache.Specifier;
 import gov.usgs.ngwmn.dm.cache.fs.FileCache;
 import gov.usgs.ngwmn.dm.dao.ContextualTest;
 import gov.usgs.ngwmn.dm.harvest.WebRetriever;
+import gov.usgs.ngwmn.dm.spec.Specifier;
 
 import org.junit.Before;
 import org.junit.Test;

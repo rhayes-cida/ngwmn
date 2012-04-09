@@ -2,7 +2,7 @@ package gov.usgs.ngwmn.dm;
 
 import static org.junit.Assert.assertTrue;
 import gov.usgs.ngwmn.WellDataType;
-import gov.usgs.ngwmn.dm.cache.Specifier;
+import gov.usgs.ngwmn.dm.spec.Specifier;
 
 import org.junit.Before;
 import org.junit.Test;

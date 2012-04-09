@@ -4,12 +4,12 @@ import gov.usgs.ngwmn.dm.cache.Cache;
 import gov.usgs.ngwmn.dm.cache.CacheInfo;
 import gov.usgs.ngwmn.dm.cache.PipeStatistics;
 import gov.usgs.ngwmn.dm.cache.PipeStatistics.Status;
-import gov.usgs.ngwmn.dm.cache.Specifier;
 import gov.usgs.ngwmn.dm.io.FileInputInvoker;
 import gov.usgs.ngwmn.dm.io.Invoker;
 import gov.usgs.ngwmn.dm.io.Pipeline;
 import gov.usgs.ngwmn.dm.io.Supplier;
 import gov.usgs.ngwmn.dm.io.TempfileOutputStream;
+import gov.usgs.ngwmn.dm.spec.Specifier;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -77,7 +77,7 @@ public class FileCache implements Cache {
 	}
 	
 	/**
-	 * @see gov.usgs.ngwmn.dm.cache.Cache#putter(gov.usgs.ngwmn.dm.cache.Specifier)
+	 * @see gov.usgs.ngwmn.dm.cache.Cache#putter(gov.usgs.ngwmn.dm.spec.Specifier)
 	 */
 	@Override
 	public OutputStream destination(Specifier well)
@@ -96,7 +96,7 @@ public class FileCache implements Cache {
 	}
 	
 	/**
-	 * @see gov.usgs.ngwmn.dm.cache.Cache#get(gov.usgs.ngwmn.dm.cache.Specifier, java.io.OutputStream)
+	 * @see gov.usgs.ngwmn.dm.cache.Cache#get(gov.usgs.ngwmn.dm.spec.Specifier, java.io.OutputStream)
 	 */
 	@Override
 	public boolean fetchWellData(final Specifier spec, Pipeline pipe) 

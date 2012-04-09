@@ -2,7 +2,6 @@ package gov.usgs.ngwmn.dm;
 
 import gov.usgs.ngwmn.dm.cache.PipeStatistics;
 import gov.usgs.ngwmn.dm.cache.PipeStatisticsWithProblem;
-import gov.usgs.ngwmn.dm.cache.Specifier;
 import gov.usgs.ngwmn.dm.dao.WellRegistry;
 import gov.usgs.ngwmn.dm.dao.WellRegistryDAO;
 import gov.usgs.ngwmn.dm.dao.WellRegistryKey;
@@ -10,6 +9,7 @@ import gov.usgs.ngwmn.dm.io.Pipeline;
 import gov.usgs.ngwmn.dm.io.Supplier;
 import gov.usgs.ngwmn.dm.io.executor.Executee;
 import gov.usgs.ngwmn.dm.io.executor.ExecFactory;
+import gov.usgs.ngwmn.dm.spec.Specifier;
 
 import java.io.IOException;
 import java.io.OutputStream;

@@ -1,4 +1,4 @@
-package gov.usgs.ngwmn.dm.cache;
+package gov.usgs.ngwmn.dm.spec;
 
 
 import gov.usgs.ngwmn.WellDataType;

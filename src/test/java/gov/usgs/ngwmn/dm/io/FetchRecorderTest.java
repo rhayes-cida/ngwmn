@@ -5,11 +5,11 @@ import static org.junit.Assert.assertNotNull;
 import gov.usgs.ngwmn.dm.cache.PipeStatistics;
 import gov.usgs.ngwmn.dm.cache.PipeStatistics.Status;
 import gov.usgs.ngwmn.dm.cache.PipeStatisticsWithProblem;
-import gov.usgs.ngwmn.dm.cache.Specifier;
 import gov.usgs.ngwmn.dm.dao.ContextualTest;
 import gov.usgs.ngwmn.dm.dao.FetchLog;
 import gov.usgs.ngwmn.dm.dao.FetchLogDAO;
 import gov.usgs.ngwmn.dm.dao.WellRegistryKey;
+import gov.usgs.ngwmn.dm.spec.Specifier;
 
 import java.util.List;
 

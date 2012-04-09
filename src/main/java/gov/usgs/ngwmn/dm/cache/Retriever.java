@@ -2,6 +2,7 @@ package gov.usgs.ngwmn.dm.cache;
 
 import gov.usgs.ngwmn.dm.DataFetcher;
 import gov.usgs.ngwmn.dm.io.Pipeline;
+import gov.usgs.ngwmn.dm.spec.Specifier;
 
 import java.io.IOException;
 
