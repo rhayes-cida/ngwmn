@@ -5,11 +5,11 @@ import gov.usgs.ngwmn.dm.cache.Specifier;
 import java.io.OutputStream;
 
 public class SequentialExec implements Executee {
-	ExecutorFactory factory;
+	ExecFactory factory;
 	OutputStream    output;
 	Iterable<Specifier> specifiers;
     
-    public SequentialExec(ExecutorFactory fac, Iterable<Specifier> specs, OutputStream out) {
+    public SequentialExec(ExecFactory fac, Iterable<Specifier> specs, OutputStream out) {
     	factory = fac;
     	output  = out;
     	specifiers = specs;

@@ -9,7 +9,7 @@ import gov.usgs.ngwmn.dm.dao.WellRegistryKey;
 import gov.usgs.ngwmn.dm.io.Pipeline;
 import gov.usgs.ngwmn.dm.io.Supplier;
 import gov.usgs.ngwmn.dm.io.executor.Executee;
-import gov.usgs.ngwmn.dm.io.executor.ExecutorFactory;
+import gov.usgs.ngwmn.dm.io.executor.ExecFactory;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -19,7 +19,7 @@ import org.slf4j.LoggerFactory;
 
 import com.google.common.eventbus.EventBus;
 
-public class DataBroker implements ExecutorFactory {
+public class DataBroker implements ExecFactory {
 
 	private DataFetcher harvester;
 	private DataFetcher retriever;

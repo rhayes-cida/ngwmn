@@ -7,9 +7,9 @@ import java.io.OutputStream;
 public class DeferredMergeExec implements Executee {
 	Iterable<Specifier> specifications;
     OutputStream        mergedOutputStream;
-    ExecutorFactory     factory;
+    ExecFactory     factory;
     
-    public DeferredMergeExec(ExecutorFactory fac, Iterable<Specifier> specs, OutputStream out) {
+    public DeferredMergeExec(ExecFactory fac, Iterable<Specifier> specs, OutputStream out) {
     	specifications = specs;
     	factory = fac;
     	mergedOutputStream = out;

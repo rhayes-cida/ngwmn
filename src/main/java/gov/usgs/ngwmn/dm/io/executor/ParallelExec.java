@@ -10,17 +10,17 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
 public class ParallelExec implements Executee {
-	ExecutorFactory factory;
+	ExecFactory factory;
 	OutputStream    output;
 	Iterable<Specifier> specifiers;
 	int parallex = 1;
     
-    public ParallelExec(ExecutorFactory fac, Iterable<Specifier> specs, OutputStream out) {
+    public ParallelExec(ExecFactory fac, Iterable<Specifier> specs, OutputStream out) {
     	factory = fac;
     	output  = out;
     	specifiers = specs;
     }
-    public ParallelExec(ExecutorFactory fac, Iterable<Specifier> specs, OutputStream out, int parallelism) {
+    public ParallelExec(ExecFactory fac, Iterable<Specifier> specs, OutputStream out, int parallelism) {
     	this(fac, specs, out);
     	parallex = parallelism;
     }
