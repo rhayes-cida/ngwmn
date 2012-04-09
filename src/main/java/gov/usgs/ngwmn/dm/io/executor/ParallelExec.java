@@ -10,15 +10,16 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
 public class ParallelExec implements Executee {
-	ExecFactory factory;
-	OutputStream    output;
+	ExecFactory 		factory;
 	Iterable<Specifier> specifiers;
+	OutputStream    	output;
+	
 	int parallex = 1;
     
     public ParallelExec(ExecFactory fac, Iterable<Specifier> specs, OutputStream out) {
-    	factory = fac;
-    	output  = out;
+    	factory    = fac;
     	specifiers = specs;
+    	output     = out;
     }
     public ParallelExec(ExecFactory fac, Iterable<Specifier> specs, OutputStream out, int parallelism) {
     	this(fac, specs, out);
@@ -27,17 +28,17 @@ public class ParallelExec implements Executee {
     
     @Override
     public Void call() throws Exception {
-    	List<Executee> pipes = new LinkedList<Executee>();
+    	List<Executee> execs = new LinkedList<Executee>();
         for (Specifier spec : specifiers) {
-            pipes.add( factory.makeExecutor(spec, output) );
+        	execs.add( factory.makeExecutor(spec, output) );
         }
         
         ExecutorService exec = Executors.newFixedThreadPool(parallex);
         
-        List<Future<Void>> futures = exec.invokeAll(pipes);
+        List<Future<Void>> futures = exec.invokeAll(execs);
         
         for (Future<Void> future : futures) {
-			future.get();
+			future.get(); // Since our current impl is Callable<Void> this just waits for finish
         }
         return null;
     }
