@@ -1,30 +1,25 @@
 package gov.usgs.ngwmn.dm.io.executor;
 
 import gov.usgs.ngwmn.dm.cache.Specifier;
-import gov.usgs.ngwmn.dm.io.PipeFactory;
-import gov.usgs.ngwmn.dm.io.Pipeline;
 
-import java.util.LinkedList;
-import java.util.List;
-import java.util.concurrent.Callable;
+import java.io.OutputStream;
 
-public class SequentialExec implements Callable<Void>{
-    List<Pipeline> pipes;
+public class SequentialExec implements Executee {
+	ExecutorFactory factory;
+	OutputStream    output;
+	Iterable<Specifier> specifiers;
     
-    SequentialExec(Iterable<Specifier> specs, PipeFactory fac) {
-    	
-    	pipes = new LinkedList<Pipeline>();
-    	
-        for (Specifier spec : specs) {
-        	Pipeline pipe = fac.makePipe(spec);
-            pipes.add(pipe);
-        }
+    public SequentialExec(ExecutorFactory fac, Iterable<Specifier> specs, OutputStream out) {
+    	factory = fac;
+    	output  = out;
+    	specifiers = specs;
     }
     
     @Override
-    public Void call() {
-        for (Pipeline pipe : pipes) {
-        	pipe.call();
+    public Void call() throws Exception {
+        for (Specifier spec : specifiers) {
+        	Executee exec = factory.makeExecutor(spec, output);
+        	exec.call();
         }
         return null;
     }

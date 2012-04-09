@@ -22,7 +22,7 @@ public class ErrorFetcher implements DataFetcher {
 
 	@Override
 	public boolean configureInput(Specifier spec, Pipeline pipe)
-			throws Exception {
+			throws IOException {
 		pipe.setInvoker(new ErrorInvoker());
 		return true;
 	}

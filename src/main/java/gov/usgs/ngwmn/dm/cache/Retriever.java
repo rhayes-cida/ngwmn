@@ -3,6 +3,8 @@ package gov.usgs.ngwmn.dm.cache;
 import gov.usgs.ngwmn.dm.DataFetcher;
 import gov.usgs.ngwmn.dm.io.Pipeline;
 
+import java.io.IOException;
+
 public class Retriever implements DataFetcher {
 	private Cache cache;
 	
@@ -12,7 +14,7 @@ public class Retriever implements DataFetcher {
 
 	@Override
 	public boolean configureInput(Specifier spec, Pipeline pipe)
-			throws Exception 
+			throws IOException 
 	{
 		if (cache.contains(spec)) {
 			pipe.getStatistics().setCalledBy(this.getClass());

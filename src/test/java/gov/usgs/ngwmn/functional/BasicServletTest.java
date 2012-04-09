@@ -3,7 +3,6 @@ package gov.usgs.ngwmn.functional;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
-
 import gov.usgs.ngwmn.dm.cache.fs.FileCache;
 
 import java.io.File;
@@ -24,7 +23,7 @@ import com.meterware.servletunit.ServletUnitClient;
 public class BasicServletTest {
 
 	private static final String WELL_WITH_DATA = "http://localhost:8080/ngwmn/data?agency_cd=USGS&featureID=402734087033401";
-	private static final String WELL_NO_DATA = "http://localhost:8080/ngwmn/data?agency_cd=NJGS&featureID=2288614";
+	private static final String WELL_NO_DATA   = "http://localhost:8080/ngwmn/data?agency_cd=NJGS&featureID=2288614";
 
 	@BeforeClass
 	public static void clearCache() {

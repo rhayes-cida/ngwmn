@@ -5,11 +5,13 @@ import gov.usgs.ngwmn.dm.cache.Specifier;
 import gov.usgs.ngwmn.dm.io.FakeInputInvoker;
 import gov.usgs.ngwmn.dm.io.Pipeline;
 
+import java.io.IOException;
+
 public class FakeHarvestor implements DataFetcher {
 
 	@Override
 	public boolean configureInput(Specifier spec, Pipeline pipe)
-			throws Exception {
+			throws IOException {
 		
 		if (spec.getAgencyID().contains("FAIL")) {
 			return false;

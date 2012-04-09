@@ -26,6 +26,10 @@ public class WellRegistryDAO {
 		return mapper.selectByExample(example);
 	}
 
+	public WellRegistry findByKey(WellRegistryKey key) {
+		return mapper.selectByPrimaryKey(key);
+	}
+	
 	public WellRegistry findByKey(String agencyID, String wellID) {
 		WellRegistryKey key = new WellRegistryKey(agencyID, wellID);
 		return mapper.selectByPrimaryKey(key);

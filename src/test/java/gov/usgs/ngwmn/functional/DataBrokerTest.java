@@ -16,19 +16,23 @@ import gov.usgs.ngwmn.dm.cache.fs.FileCache;
 import gov.usgs.ngwmn.dm.dao.ContextualTest;
 import gov.usgs.ngwmn.dm.harvest.WebRetriever;
 
-import java.io.ByteArrayOutputStream;
-
 import org.junit.Before;
 import org.junit.Test;
 
 public class DataBrokerTest extends ContextualTest {
 
-	private DataBroker victim;
+	private DataBroker dataBroker;
 	
 	@Before
 	public void setUp() throws Exception {
-		FileCache c = ctx.getBean("FileCache", FileCache.class);
-		victim = ctx.getBean("DataBroker", DataBroker.class);		
+		FileCache c = ctx.getBean("FileCache",  FileCache.class);
+		dataBroker  = ctx.getBean("DataBroker", DataBroker.class);		
+		
+		// TODO this should really be done in Spring...
+//		FileCache c = new FileCache();
+		dataBroker.setRetriever( new Retriever(c) );
+		dataBroker.setLoader(    new Loader(c)    );
+		dataBroker.setHarvester( new WebRetriever() );
 	}
 
 	private Specifier makeSpec(String agency, String site) {
@@ -44,10 +48,9 @@ public class DataBrokerTest extends ContextualTest {
 	public void testSiteNotFound() throws Exception {
 		
 		Specifier spec = makeSpec("USGS","no-such-site");
-		ByteArrayOutputStream out = new ByteArrayOutputStream();
 		
 		try {
-			victim.fetchWellData(spec, out);
+			dataBroker.checkSiteExists(spec);
 		} catch (SiteNotFoundException ok) {
 			assertTrue("Expected exception", true);
 		}
@@ -57,12 +60,12 @@ public class DataBrokerTest extends ContextualTest {
 	public void testSiteFound() throws Exception {
 		
 		Specifier spec = makeSpec("USGS","402734087033401");
-		ByteArrayOutputStream out = new ByteArrayOutputStream();
 		
 		try {
-			victim.fetchWellData(spec, out);
+			dataBroker.checkSiteExists(spec);
+			assertTrue(true);
 		} catch (SiteNotFoundException ok) {
-			assertFalse("Expected exception", true);
+			assertFalse(true);
 		}
 	}
 
@@ -70,7 +73,7 @@ public class DataBrokerTest extends ContextualTest {
 	public void testPrefetch() throws Exception {
 		Specifier spec = makeSpec("USGS","402734087033401");
 
-		PipeStatistics stats = victim.prefetchWellData(spec);
+		PipeStatistics stats = dataBroker.prefetchWellData(spec);
 		
 		assertNotNull("stats", stats);
 		assertEquals("spec", spec, stats.getSpecifier());

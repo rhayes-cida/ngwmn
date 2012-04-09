@@ -3,16 +3,16 @@ package gov.usgs.ngwmn.dm.io;
 
 import gov.usgs.ngwmn.dm.cache.PipeStatistics;
 import gov.usgs.ngwmn.dm.cache.PipeStatistics.Status;
+import gov.usgs.ngwmn.dm.io.executor.Executee;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.concurrent.Callable;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class Pipeline implements Callable<Void> {
+public class Pipeline implements Executee {
 
 	private Invoker invoker;
 	private Supplier<InputStream>  iss;

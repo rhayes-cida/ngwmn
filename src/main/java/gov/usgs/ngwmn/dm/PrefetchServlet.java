@@ -2,14 +2,8 @@ package gov.usgs.ngwmn.dm;
 
 import gov.usgs.ngwmn.dm.cache.PipeStatistics;
 import gov.usgs.ngwmn.dm.cache.Specifier;
-import gov.usgs.ngwmn.dm.cache.fs.FileCache;
-import gov.usgs.ngwmn.dm.dao.WellRegistry;
-import gov.usgs.ngwmn.dm.dao.WellRegistryDAO;
 
-import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
@@ -20,11 +14,6 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.context.ApplicationContext;
-import org.springframework.web.context.support.WebApplicationContextUtils;
-
-import com.google.common.base.Objects;
-import com.google.common.base.Strings;
 
 /**
  * Servlet implementation class WellListServlet

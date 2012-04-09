@@ -1,40 +1,24 @@
 package gov.usgs.ngwmn.dm.io.executor;
 
 import gov.usgs.ngwmn.dm.cache.Specifier;
-import gov.usgs.ngwmn.dm.io.PipeFactory;
-import gov.usgs.ngwmn.dm.io.Pipeline;
-import gov.usgs.ngwmn.dm.io.Supplier;
 
-import java.io.IOException;
 import java.io.OutputStream;
-import java.util.concurrent.Callable;
 
-public class DeferredMergeExec implements Callable<Void> {
+public class DeferredMergeExec implements Executee {
 	Iterable<Specifier> specifications;
-    OutputStream mergedOutputStream;
-    PipeFactory factory;
+    OutputStream        mergedOutputStream;
+    ExecutorFactory     factory;
     
-    // FlowFactory will not be called until runtime
-    // Might prefer to use an OutputStreamFactory
-    public DeferredMergeExec(Iterable<Specifier> specs, PipeFactory fac, OutputStream mos) {
+    public DeferredMergeExec(ExecutorFactory fac, Iterable<Specifier> specs, OutputStream out) {
     	specifications = specs;
     	factory = fac;
-    	mergedOutputStream = mos;
+    	mergedOutputStream = out;
     }
     
-    public Void call() {
+    public Void call() throws Exception {
         for (Specifier spec : specifications) {
             // Need to handle deferred errors
-            Pipeline pipe = factory.makePipe(spec);
-            pipe.setOutputSupplier( new Supplier<OutputStream>() {
-				
-				@Override
-				public OutputStream get() throws IOException {
-					// TODO Auto-generated method stub
-					return mergedOutputStream;
-				}
-			});
-            
+        	Executee pipe = factory.makeExecutor(spec, mergedOutputStream);
             pipe.call();
         }
         return null;

@@ -32,7 +32,7 @@ implements DataLoader {
 	}
 
 	@Override
-	public boolean configureOutput(final Specifier spec, Pipeline pipe) throws Exception {
+	public boolean configureOutput(final Specifier spec, Pipeline pipe) throws IOException {
 			
 		pipe.addOutputSupplier( new Supplier<OutputStream>() {				
 			

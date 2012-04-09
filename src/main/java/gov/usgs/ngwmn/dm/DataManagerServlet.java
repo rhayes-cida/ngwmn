@@ -1,13 +1,8 @@
 package gov.usgs.ngwmn.dm;
 
 import gov.usgs.ngwmn.WellDataType;
-import gov.usgs.ngwmn.dm.cache.Loader;
-import gov.usgs.ngwmn.dm.cache.Retriever;
 import gov.usgs.ngwmn.dm.cache.Specifier;
-import gov.usgs.ngwmn.dm.cache.fs.FileCache;
-import gov.usgs.ngwmn.dm.harvest.WebRetriever;
 
-import java.io.File;
 import java.io.IOException;
 
 import javax.servlet.ServletConfig;

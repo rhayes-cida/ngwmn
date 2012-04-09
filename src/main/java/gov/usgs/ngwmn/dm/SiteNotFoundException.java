@@ -2,10 +2,7 @@ package gov.usgs.ngwmn.dm;
 
 import gov.usgs.ngwmn.dm.cache.Specifier;
 
-import javax.servlet.ServletException;
-
-// TODO Should this extend ServletException or RuntimeException?
-public class SiteNotFoundException extends ServletException {
+public class SiteNotFoundException extends RuntimeException {
 
 	private static final long serialVersionUID = 1L;
 

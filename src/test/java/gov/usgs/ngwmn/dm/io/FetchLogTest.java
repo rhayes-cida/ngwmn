@@ -2,7 +2,6 @@ package gov.usgs.ngwmn.dm.io;
 
 import gov.usgs.ngwmn.dm.cache.PipeStatistics;
 import gov.usgs.ngwmn.dm.dao.ContextualTest;
-import gov.usgs.ngwmn.dm.dao.FetchLogDAO;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -10,12 +9,12 @@ import org.junit.Test;
 public class FetchLogTest extends ContextualTest {
 	
 	private FetchRecorder victim;
-	private FetchLogDAO dao;
+	//private FetchLogDAO dao;
 
 	@Before
 	public void setUp() throws Exception {
 		victim = ctx.getBean("FetchRecorder", FetchRecorder.class);
-		dao = ctx.getBean("FetchLogDAO", FetchLogDAO.class);
+		//dao = ctx.getBean("FetchLogDAO", FetchLogDAO.class);
 	}
 
 	@Test

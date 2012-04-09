@@ -8,6 +8,8 @@ import gov.usgs.ngwmn.dm.dao.WellRegistryDAO;
 import gov.usgs.ngwmn.dm.dao.WellRegistryKey;
 import gov.usgs.ngwmn.dm.io.Pipeline;
 import gov.usgs.ngwmn.dm.io.Supplier;
+import gov.usgs.ngwmn.dm.io.executor.Executee;
+import gov.usgs.ngwmn.dm.io.executor.ExecutorFactory;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -16,9 +18,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.eventbus.EventBus;
-import com.google.common.io.NullOutputStream;
 
-public class DataBroker {
+public class DataBroker implements ExecutorFactory {
 
 	private DataFetcher harvester;
 	private DataFetcher retriever;
@@ -31,60 +32,47 @@ public class DataBroker {
 	private Logger logger = LoggerFactory.getLogger(this.getClass());
 	
 	public void fetchWellData(Specifier spec, final OutputStream out) throws Exception {
-		Pipeline pipe = new Pipeline();
-
-		check(spec);
-		
-		checkSiteExists(spec);
-		
-		pipe.setOutputSupplier( new Supplier<OutputStream>() {
-			@Override
-			public OutputStream get() throws IOException {
-				return out;
-			}
-		});
-		boolean success = configureInput(retriever, spec, pipe);
-		
-		
-		if ( ! success) {
-			loader.configureOutput(spec, pipe);
-			success = configureInput(harvester, spec, pipe); 
-		}
-		
-		// TODO It's doubtful if we can detect this until we run the pipe.
-		// TODO We need to distinguish "site not found" and "data not found"
-		if ( ! success) {
-			signalDataNotFoundMsg(spec, pipe);
-		}
-		
-		try {
-			pipe.getStatistics().setSpecifier(spec);
-			pipe.invoke();
-			fetchEventBus.post(pipe.getStatistics());
-		} catch (IOException oops) {
-			PipeStatisticsWithProblem pswp = new PipeStatisticsWithProblem(pipe.getStatistics(), oops);
-			fetchEventBus.post(pswp);
-			throw oops;
-		}
-		
-		logger.info("Completed operation for {} result {}", spec, pipe.getStatistics());
+		Pipeline pipe = (Pipeline) makeExecutor(spec, out);
+		invokePipe(pipe);
+		logger.info("Completed request operation for {} result {}", spec, pipe.getStatistics());
 	}
 	
 	public PipeStatistics prefetchWellData(Specifier spec) throws Exception {
-		Pipeline pipe = new Pipeline();
+		Pipeline pipe = (Pipeline) makeExecutor(spec, null);
+		invokePipe(pipe);
+		logger.info("Completed prefetch operation for {} result {}", spec, pipe.getStatistics());
+		return pipe.getStatistics();
+	}
+
+	private void invokePipe(Pipeline pipe) throws IOException {
+		try {
+			pipe.invoke();
+			fetchEventBus.post(pipe.getStatistics());
+		} catch (IOException oops) {
+			PipeStatisticsWithProblem pswp = new PipeStatisticsWithProblem(pipe.getStatistics(), oops);
+			fetchEventBus.post(pswp);
+			throw oops;
+		}
+	}
+	
+	public Executee makeExecutor(Specifier spec, final OutputStream out) throws IOException {	
 
 		check(spec);
-		
 		checkSiteExists(spec);
 		
-		// must have initial output because Loader uses addOutputSupplier
-		pipe.setOutputSupplier( new Supplier<OutputStream>() {
-			@Override
-			public OutputStream get() throws IOException {
-				return new NullOutputStream();
-			}
-		});
-		boolean success = false;
+		Pipeline pipe    = new Pipeline();
+		boolean  success = false;
+		
+		// pre-fetch will send in a null output stream
+		if (out != null) {
+			pipe.setOutputSupplier( new Supplier<OutputStream>() {
+				@Override
+				public OutputStream get() throws IOException {
+					return out;
+				}
+			});
+			success = configureInput(retriever, spec, pipe);
+		}
 		
 		if ( ! success) {
 			loader.configureOutput(spec, pipe);
@@ -96,27 +84,17 @@ public class DataBroker {
 		if ( ! success) {
 			signalDataNotFoundMsg(spec, pipe);
 		}
+		pipe.getStatistics().setSpecifier(spec);
 		
-		try {
-			pipe.getStatistics().setSpecifier(spec);
-			pipe.invoke();
-			fetchEventBus.post(pipe.getStatistics());
-		} catch (IOException oops) {
-			PipeStatisticsWithProblem pswp = new PipeStatisticsWithProblem(pipe.getStatistics(), oops);
-			fetchEventBus.post(pswp);
-			throw oops;
-		}
-		
-		logger.info("Completed operation for {} result {}", spec, pipe.getStatistics());
-		
-		return pipe.getStatistics();
+		return pipe;
 	}
+	
 
-	private void checkSiteExists(Specifier spec) 
+	public void checkSiteExists(Specifier spec) 
 			throws SiteNotFoundException 
 	{
 		WellRegistryKey wk = spec.getWellRegistryKey();
-		WellRegistry well = wellDAO.findByKey(wk.getAgencyCd(),wk.getSiteNo());
+		WellRegistry well = wellDAO.findByKey(wk);
 		
 		// TODO Hide the details of the display flag
 		boolean exists = (well != null && "1".equals(well.getDisplayFlag()));
@@ -125,7 +103,7 @@ public class DataBroker {
 		}
 	}
 
-	private void signalDataNotFoundMsg(Specifier spec, Pipeline pipe) throws Exception {
+	private void signalDataNotFoundMsg(Specifier spec, Pipeline pipe) {
 		logger.warn("No data found for {}", spec);
 		throw new DataNotAvailableException(spec);
 	}
@@ -140,7 +118,7 @@ public class DataBroker {
 		this.loader = loader;
 	}
 	
-	void check(Specifier spec) throws Exception {
+	void check(Specifier spec) {
 		if (retriever == null && harvester == null) 
 			throw new NullPointerException("At least one Data Fetcher is required");
 		if (spec == null) 
@@ -148,7 +126,7 @@ public class DataBroker {
 		spec.check();
 	}
 	
-	boolean configureInput(DataFetcher dataFetcher, Specifier spec, Pipeline pipe) throws Exception {
+	boolean configureInput(DataFetcher dataFetcher, Specifier spec, Pipeline pipe) throws IOException {
 		if (dataFetcher != null) {
 			boolean v = dataFetcher.configureInput(spec, pipe);
 			pipe.getStatistics().setCalledBy(dataFetcher.getClass());
