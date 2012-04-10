@@ -44,6 +44,11 @@
 		<property name="dao" ref="FetchLogDAO"/>
 	</bean>
 	
+	<bean id="LatLongResolver"
+		class="gov.usgs.ngwmn.dm.spec.LatLongResolver">
+		<constructor-arg ref="WellRegistryDAO"></constructor-arg>
+	</bean>	
+	
  	<bean id="FetchEventBus" class="gov.usgs.ngwmn.dm.eventbus.EventBusSpring">
  		<property name="subscribers">
      		<list>
@@ -52,26 +57,26 @@
    		</property>
  	</bean>
 		
-		<jee:jndi-lookup id="FSCache.basedir" jndi-name="java:comp/env/GWDP/FileCache/basedir" />
-		<bean id="FileCache"
-			class="gov.usgs.ngwmn.dm.cache.fs.FileCache">
-			<!-- Leave unset for fail-fast <property name="basedir" value="/tmp/gwdp-cache"/>  -->
-			<property name="basedir" ref="FSCache.basedir"/>
-		</bean>
+	<jee:jndi-lookup id="FSCache.basedir" jndi-name="java:comp/env/GWDP/FileCache/basedir" />
+	<bean id="FileCache"
+		class="gov.usgs.ngwmn.dm.cache.fs.FileCache">
+		<!-- Leave unset for fail-fast <property name="basedir" value="/tmp/gwdp-cache"/>  -->
+		<property name="basedir" ref="FSCache.basedir"/>
+	</bean>
+	
+	<bean id="Retriever"
+		class="gov.usgs.ngwmn.dm.cache.Retriever">
+		<constructor-arg ref="FileCache"></constructor-arg>
+	</bean>
 		
-		<bean id="Retriever"
-			class="gov.usgs.ngwmn.dm.cache.Retriever">
-			<constructor-arg ref="FileCache"></constructor-arg>
-		</bean>
-			
-		<bean id="Loader"
-			class="gov.usgs.ngwmn.dm.cache.Loader">
-			<constructor-arg ref="FileCache"></constructor-arg>
-		</bean>
-				
-		<bean id="WebRetriever"
-				class="gov.usgs.ngwmn.dm.harvest.WebRetriever">
-		</bean>
+	<bean id="Loader"
+		class="gov.usgs.ngwmn.dm.cache.Loader">
+		<constructor-arg ref="FileCache"></constructor-arg>
+	</bean>
+	
+	<bean id="WebRetriever"
+			class="gov.usgs.ngwmn.dm.harvest.WebRetriever">
+	</bean>
 		
 	<bean id="DataBroker" class="gov.usgs.ngwmn.dm.DataBroker">
 		<property name="fetchEventBus" ref="FetchEventBus"/>

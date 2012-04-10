@@ -28,8 +28,7 @@ implements DataLoader {
 	}
 
 	public Loader(Cache c) {
-		super();
-		this.cache = c;
+		cache = c;
 	}
 
 	@Override
