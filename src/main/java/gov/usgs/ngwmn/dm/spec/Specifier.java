@@ -2,6 +2,7 @@ package gov.usgs.ngwmn.dm.spec;
 
 
 import gov.usgs.ngwmn.WellDataType;
+import gov.usgs.ngwmn.dm.dao.WellRegistry;
 import gov.usgs.ngwmn.dm.dao.WellRegistryKey;
 
 import java.security.InvalidParameterException;
@@ -13,6 +14,12 @@ public class Specifier {
 	private String featureID;
 	private WellDataType typeID;
 	
+	public Specifier() {
+	}
+	public Specifier(WellRegistry well) {
+		setAgencyID( well.getAgencyCd() );
+		setFeatureID( well.getSiteNo() );
+	}
 	public String getAgencyID() {
 		return agencyID;
 	}

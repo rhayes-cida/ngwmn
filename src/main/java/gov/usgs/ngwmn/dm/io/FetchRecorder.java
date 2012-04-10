@@ -5,14 +5,11 @@ import gov.usgs.ngwmn.dm.cache.PipeStatisticsWithProblem;
 import gov.usgs.ngwmn.dm.dao.FetchLog;
 import gov.usgs.ngwmn.dm.dao.FetchLogDAO;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.google.common.eventbus.Subscribe;
 
 public class FetchRecorder {
 	
-	private Logger logger = LoggerFactory.getLogger(this.getClass());
+	//private Logger logger = LoggerFactory.getLogger(this.getClass());
 	
 	private FetchLogDAO dao;
 	
@@ -44,9 +41,7 @@ public class FetchRecorder {
 			item.setProblem(problem.toString());
 		}
 		
-		logger.error("asdf 1");
 		dao.insertId(item);
-		logger.error("asdf 2");
 		
 		return item;
 	}
