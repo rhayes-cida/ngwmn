@@ -1,5 +1,8 @@
 package gov.usgs.ngwmn.dm.spec;
 
-public interface SpecResolver extends Iterable<Specifier> {
+
+public interface SpecResolver  {
+	
+	Iterable<Specifier> specIterator(Specification spec);
 	
 }

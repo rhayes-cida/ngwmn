@@ -3,15 +3,12 @@ package gov.usgs.ngwmn.functional;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
-import gov.usgs.ngwmn.dm.cache.fs.FileCache;
+import gov.usgs.ngwmn.dm.dao.ContextualTest;
 
 import java.io.File;
 
-import javax.naming.InitialContext;
-
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.springframework.mock.jndi.SimpleNamingContextBuilder;
 
 import com.meterware.httpunit.GetMethodWebRequest;
 import com.meterware.httpunit.HttpNotFoundException;
@@ -20,7 +17,7 @@ import com.meterware.httpunit.WebResponse;
 import com.meterware.servletunit.ServletRunner;
 import com.meterware.servletunit.ServletUnitClient;
 
-public class BasicServletTest {
+public class BasicServletTest extends ContextualTest {
 
 	private static final String WELL_WITH_DATA = "http://localhost:8080/ngwmn/data?agency_cd=USGS&featureID=402734087033401";
 	private static final String WELL_NO_DATA   = "http://localhost:8080/ngwmn/data?agency_cd=NJGS&featureID=2288614";
@@ -44,21 +41,6 @@ public class BasicServletTest {
 		}
 	}
 	
-	@BeforeClass
-	public static void setupNaming() throws Exception {
-		final SimpleNamingContextBuilder builder = new SimpleNamingContextBuilder();
-		builder.bind(FileCache.BASEDIR_JNDI_NAME, "/tmp/gwdp-cache");
-		
-		try {
-			builder.activate();
-		} catch (IllegalStateException ise) {
-			// Set the required value into the existing context instead
-			InitialContext ctx = new InitialContext();
-			ctx.bind(FileCache.BASEDIR_JNDI_NAME, "/tmp/gwdp-cache");
-		}
-		
-	}
-
 	
 	@Test
 	public void testWithData() throws Exception {
