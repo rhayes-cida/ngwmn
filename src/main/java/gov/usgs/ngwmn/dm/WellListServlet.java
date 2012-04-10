@@ -49,6 +49,10 @@ public class WellListServlet extends HttpServlet {
 				request.getParameter("servlet"), 
 				"data");
 		
+		// allow prefetch of all data types
+		
+		String[] tt = request.getParameterValues("type");
+		
 		if ( ! servletPath.matches("[A-Za-z]+")) {
 			throw new ServletException("disallowed servlet path");
 		}
@@ -72,9 +76,19 @@ public class WellListServlet extends HttpServlet {
 			}
 			
 			for (WellRegistry w : ww) {
-				sos.print(String.format("<a href=\"%s?agency_cd=%s&featureID=%s\">", servletPath, w.getAgencyCd(), w.getSiteNo()));
-				sos.print(String.format("%s site %s", Strings.nullToEmpty(w.getAgencyNm()), Objects.firstNonNull(w.getSiteName(), w.getSiteNo())));
-				sos.println("</href><br />\n");
+				if (tt == null) {
+					sos.print(String.format("<a href=\"%s?agency_cd=%s&featureID=%s\">", servletPath, w.getAgencyCd(), w.getSiteNo()));
+					sos.print(String.format("%s site %s", Strings.nullToEmpty(w.getAgencyNm()), Objects.firstNonNull(w.getSiteName(), w.getSiteNo())));
+					sos.println("</a><br />\n");
+				} else {
+					sos.print(String.format("%s site %s", Strings.nullToEmpty(w.getAgencyNm()), Objects.firstNonNull(w.getSiteName(), w.getSiteNo())));
+					for (String t : tt) {
+						sos.print(String.format(" <a href=\"%s?agency_cd=%s&featureID=%s&type=%s\">", servletPath, w.getAgencyCd(), w.getSiteNo(), t));
+						sos.print(t);
+						sos.println("</a>");
+					}
+					sos.println("<br />");					
+				}
 			}
 			sos.println("</body></html>");
 		} finally {
