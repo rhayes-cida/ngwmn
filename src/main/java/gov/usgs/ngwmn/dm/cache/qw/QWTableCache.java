@@ -1,19 +1,16 @@
 package gov.usgs.ngwmn.dm.cache.qw;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.io.Reader;
-import java.sql.Clob;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-
 import gov.usgs.ngwmn.dm.cache.Cache;
 import gov.usgs.ngwmn.dm.cache.CacheInfo;
 import gov.usgs.ngwmn.dm.dao.WellRegistryKey;
 import gov.usgs.ngwmn.dm.io.Pipeline;
 import gov.usgs.ngwmn.dm.spec.Specifier;
+
+import java.io.IOException;
+import java.io.OutputStream;
+import java.sql.Clob;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
 
 public class QWTableCache implements Cache {
 
@@ -55,43 +52,10 @@ public class QWTableCache implements Cache {
 		return null;
 	}
 
-	public void doInsert(WellRegistryKey key, InputStream data)
-			throws Exception
-	{
-		String SQLTEXT = "INSERT INTO qw(agency_cd,site_no,fetch_date,xml) VALUES (" +
-				"?, ?, ?, XMLType(?))";
-
-		PreparedStatement s = conn.prepareStatement(SQLTEXT);
-		
-		s.setString(1, key.getAgencyCd());
-		s.setString(2, key.getSiteNo());
-		s.setDate(3, new java.sql.Date(System.currentTimeMillis()));
-		Reader reader = new InputStreamReader(data);
-		s.setClob(4, reader);
-				
-		s.execute();		
-	}
-
-	public void doInsert(WellRegistryKey key, Clob data)
-			throws Exception
-	{
-		String SQLTEXT = "INSERT INTO qw(agency_cd,site_no,fetch_date,xml) VALUES (" +
-				"?, ?, ?, XMLType(?))";
-
-		PreparedStatement s = conn.prepareStatement(SQLTEXT);
-		
-		s.setString(1, key.getAgencyCd());
-		s.setString(2, key.getSiteNo());
-		s.setDate(3, new java.sql.Date(System.currentTimeMillis()));
-		s.setClob(4, data);
-				
-		s.execute();		
-	}
-
 	// TODO Is this legit? Can we do the insert before the Clob is filled up?
 	// The alternative would be to create the row with an empty clob, then select 
 	// it for update before writing into the clob.
-	public Clob insert(WellRegistryKey key)
+	private Clob insert(WellRegistryKey key)
 			throws Exception
 	{
 		String SQLTEXT = "INSERT INTO qw(agency_cd,site_no,fetch_date,xml) VALUES (" +
