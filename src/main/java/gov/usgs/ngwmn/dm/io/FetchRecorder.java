@@ -35,6 +35,7 @@ public class FetchRecorder {
 		item.setStartedAt(stats.getStartDate());
 		item.setFetcher(stats.getCalledBy().getSimpleName());
 		item.setSource(stats.getSource());
+		item.setDataStream(stats.getSpecifier().getTypeID().toString());
 		item.setSpecifier(stats.getSpecifier().toString());
 		item.setStatus(stats.getStatus().as4Char());
 		if (problem != null) {

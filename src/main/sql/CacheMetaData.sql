@@ -27,13 +27,13 @@ begin
 	(select distinct
 		agency_cd, 
 		site_no, 
-		'ALL' datum,
+		data_stream,
 		(select count(*) from fetch_log f2 
-		 where f2.agency_cd = f1.agency_cd and f2.site_no = f1.site_no and f2.status = 'DONE') success_ct,
+		 where f2.agency_cd = f1.agency_cd and f2.site_no = f1.site_no and f2.data_stream = f1.data_stream and f2.status = 'DONE') success_ct,
 		(select count(*) from fetch_log f2 
-		 where f2.agency_cd = f1.agency_cd and f2.site_no = f1.site_no and f2.status = 'FAIL') fail_ct,
+		 where f2.agency_cd = f1.agency_cd and f2.site_no = f1.site_no and f2.data_stream = f1.data_stream and f2.status = 'FAIL') fail_ct,
 		(select max(started_at) from fetch_log f2 
-		 where f2.agency_cd = f1.agency_cd and f2.site_no = f1.site_no and f2.status = 'DONE') last_start
+		 where f2.agency_cd = f1.agency_cd and f2.site_no = f1.site_no and f2.data_stream = f1.data_stream and f2.status = 'DONE') last_start
 	from fetch_log f1);
 
 end UPDATE_CACHE_META_DATA;

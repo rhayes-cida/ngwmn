@@ -34,6 +34,8 @@ ADD ( FOREIGN KEY ("AGENCY_CD", "SITE_NO")
 -- select * from fetch_log;
 -- delete from fetch_log;
 
+alter table gw_data_portal.FETCH_LOG
+add DATA_STREAM varchar2(20) ;
 
 
 
