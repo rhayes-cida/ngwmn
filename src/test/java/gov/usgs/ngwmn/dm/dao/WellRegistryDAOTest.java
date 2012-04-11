@@ -58,7 +58,7 @@ public class WellRegistryDAOTest extends ContextualTest {
 		List<WellRegistry> ww = dao.selectByAgency("USGS");
 		assertNotNull("all", ww);
 		assertFalse("empty", ww.isEmpty());
-		assertFalse("too many", ww.size() > 1000);
+		assertFalse("too many", ww.size() > 5000);
 		
 		for (WellRegistry w : ww) {
 			assertEquals("agency cd", "USGS", w.getAgencyCd());
@@ -72,7 +72,7 @@ public class WellRegistryDAOTest extends ContextualTest {
 		List<WellRegistry> ww = dao.selectByState(stateCd);
 		assertNotNull("by state", ww);
 		assertFalse("empty", ww.isEmpty());
-		assertFalse("too many", ww.size() > 1000);
+		assertFalse("too many", ww.size() > 5000);
 				
 		for (WellRegistry w : ww) {
 			assertEquals("State cd", stateCd, w.getStateCd().intValue());
