@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema xmlns="http://www.w3.org/2001/XMLSchema" 
+	targetNamespace="http://cida.usgs.gov/GWDP/qw" 
+	xmlns:tns="http://cida.usgs.gov/GWDP/qw" 
+	elementFormDefault="qualified"
+	xmlns:wqx="http://qwwebservices.usgs.gov/schemas/WQX-Outbound/2_0/"
+	
+	>
+	<import namespace="http://qwwebservices.usgs.gov/schemas/WQX-Outbound/2_0/"
+	schemaLocation="http://qwwebservices.usgs.gov/schemas/WQX-Outbound/2_0/index.xsd"></import>
+	
+    <element name="Results">
+    	<complexType>
+    		<sequence>
+    			<element name="time" type="string"/>
+    			<element name="Result" type="tns:ResultType" minOccurs="0" maxOccurs="unbounded"/>
+    		</sequence>
+    	</complexType>
+    </element>
+
+    <complexType name="ResultType">
+    	<sequence>
+    		<element name="date" type="string"></element>
+    		<element name="time" type="string"></element>
+    		<element name="zone" type="string"></element>
+    		<element ref="wqx:ResultDescription"/>
+    		<element ref="wqx:ResultAnalyticalMethod" minOccurs="0"/>
+    		<element ref="wqx:ResultLabInformation" minOccurs="0"/>
+    	</sequence>
+    </complexType>
+</schema>
