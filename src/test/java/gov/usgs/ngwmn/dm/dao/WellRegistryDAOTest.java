@@ -38,16 +38,16 @@ public class WellRegistryDAOTest extends ContextualTest {
 	// IL EPA, P408223
 	@Test
 	public void testFindOne() {
-		WellRegistry w = dao.findByKey("USGS", "402734087033401");
+		WellRegistry w = dao.findByKey("IL EPA", "P408223");
 		assertNotNull("well",w);
-		assertEquals("agency", "USGS", w.getAgencyCd());
-		assertEquals("site", "402734087033401", w.getSiteNo());
+		assertEquals("agency", "IL EPA", w.getAgencyCd());
+		assertEquals("site", "P408223", w.getSiteNo());
 	}
 
 	@Test
 	public void testFindNone() {
 		WellRegistry w;
-		w = dao.findByKey("no-such-agency", "402734087033401");
+		w = dao.findByKey("no-such-agency", "P408223");
 		assertNull("well",w);
 		w = dao.findByKey("IL EPA", "no-such-well");
 		assertNull("well",w);
@@ -55,30 +55,51 @@ public class WellRegistryDAOTest extends ContextualTest {
 	
 	@Test
 	public void testSelectByAgency() {
-		List<WellRegistry> ww = dao.selectByAgency("USGS");
+		List<WellRegistry> ww = dao.selectByAgency("IL EPA");
 		assertNotNull("all", ww);
 		assertFalse("empty", ww.isEmpty());
 		assertFalse("too many", ww.size() > 100);
 		
+		System.out.printf("IL well count: %d\n", ww.size());
+		
 		for (WellRegistry w : ww) {
-			assertEquals("agency cd", "USGS", w.getAgencyCd());
+			assertEquals("agency cd", "IL EPA", w.getAgencyCd());
 		}
 	}
 	
 	@Test
-	public void testSelectByState_stateCd18() {
-		final int stateCd = 18;
+	public void testSelectByState_Montana() {
+		final int MT = 30;
 		
-		List<WellRegistry> ww = dao.selectByState(stateCd);
+		List<WellRegistry> ww = dao.selectByState(MT);
 		assertNotNull("by state", ww);
 		assertFalse("empty", ww.isEmpty());
 		assertFalse("too many", ww.size() > 1000);
-				
+		
+		System.out.printf("MT well count: %d\n", ww.size());
+		
 		for (WellRegistry w : ww) {
-			assertEquals("State cd", stateCd, w.getStateCd().intValue());
+			assertEquals("State cd", MT, w.getStateCd().intValue());
+			assertTrue("agency name contains state name", w.getAgencyNm().contains("Montana"));
 		}
 	}
 	
+	@Test
+	public void testSelectByState_Minnesota() {
+		final int MN = 27;
+		
+		List<WellRegistry> ww = dao.selectByState(MN);
+		assertNotNull("by state", ww);
+		assertFalse("empty", ww.isEmpty());
+		assertFalse("too many", ww.size() > 1000);
+		
+		System.out.printf("MN well count: %d\n", ww.size());
+		
+		for (WellRegistry w : ww) {
+			assertEquals("State cd", MN, w.getStateCd().intValue());
+			assertTrue("agency name contains state name", w.getAgencyNm().contains("Minnesota"));
+		}
+	}
 	
 	@Test
 	public void testSelectNoneAgency() {
