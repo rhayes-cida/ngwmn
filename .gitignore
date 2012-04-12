@@ -4,6 +4,7 @@
 bin/
 target/
 build/
+tmp/
 /.settings
 /scraps
 *~
