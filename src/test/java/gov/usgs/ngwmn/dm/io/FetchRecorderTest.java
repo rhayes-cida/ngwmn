@@ -1,7 +1,8 @@
 package gov.usgs.ngwmn.dm.io;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.*;
+
+import gov.usgs.ngwmn.WellDataType;
 import gov.usgs.ngwmn.dm.cache.PipeStatistics;
 import gov.usgs.ngwmn.dm.cache.PipeStatistics.Status;
 import gov.usgs.ngwmn.dm.cache.PipeStatisticsWithProblem;
@@ -49,6 +50,29 @@ public class FetchRecorderTest extends ContextualTest {
 		assertEquals("fetch record count", countBefore+1, countAfter);
 	}
 
+	@Test
+	public void testDataType() {
+		PipeStatistics stats = StatsMaker.makeStats(getClass());
+		stats.markEnd(Status.DONE);
+
+		// make sure there's at least one to look at
+		victim.notifySuccess(stats);
+		
+		Specifier specifier = stats.getSpecifier();
+		WellRegistryKey well = specifier.getWellRegistryKey();
+		WellDataType type = specifier.getTypeID();
+		
+		List<FetchLog> wfr = dao.byWell(well);
+
+		int type_ct = 0;
+		for (FetchLog fl : wfr) {
+			if (type.toString().equals(fl.getDataStream())) {
+				type_ct ++;
+			}
+		}
+		
+		assertTrue("found at least one", type_ct > 0);
+	}
 
 	@Test
 	public void testFAIL() {
