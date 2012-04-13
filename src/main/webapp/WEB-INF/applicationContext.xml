@@ -57,7 +57,10 @@
    		</property>
  	</bean>
 		
-	<jee:jndi-lookup id="FSCache.basedir" jndi-name="java:comp/env/GWDP/FileCache/basedir" />
+	<jee:jndi-lookup id="FSCache.basedir" 
+		jndi-name="java:comp/env/GWDP/FileCache/basedir" 
+		default-value="/var/gwdp-cache"/>
+		
 	<bean id="FileCache"
 		class="gov.usgs.ngwmn.dm.cache.fs.FileCache">
 		<!-- Leave unset for fail-fast <property name="basedir" value="/tmp/gwdp-cache"/>  -->
