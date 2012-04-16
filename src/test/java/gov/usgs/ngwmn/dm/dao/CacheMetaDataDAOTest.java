@@ -32,4 +32,10 @@ public class CacheMetaDataDAOTest extends ContextualTest {
 			assertEquals("agency", "USGS", md.getAgencyCd());
 		}
 	}
+	
+	@Test
+	public void testUpdate() throws Exception {
+		dao.updateStatistics();
+		assertTrue("made it", true);
+	}
 }

@@ -40,6 +40,9 @@ Base directory: <%= ctx.getBean("FSCache.basedir") %><br />
 <th>Last Success</th>
 </tr>
 
+<%
+dao.updateStatistics();
+%>
 <c:forEach items="<%= dao.listAll() %>" var="cmd">
 <tr>
 <td>${cmd.agencyCd}</td>

@@ -46,7 +46,7 @@
 	<bean id="CacheMetaDataDAO" 
 			class="gov.usgs.ngwmn.dm.dao.CacheMetaDataDAO">
 		<constructor-arg ref="cacheMetaDataMapper"/>
-	
+		<property name="dataSource" ref="dataSource"/>
 	</bean>
 	
 	<bean id="FetchRecorder"
