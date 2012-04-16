@@ -10,10 +10,12 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-<title>GW Data Cache</title>
+<title>Ground Water Data Cache</title>
 </head>
 <body>
-<h1>Ground Water Data Cache</h1>
+
+<h1>National Ground Water Monitoring Network</h1>
+<h2>Data Cache</h2>
 
 <%
 org.springframework.context.ApplicationContext
@@ -23,9 +25,9 @@ CacheMetaDataDAO
 dao = ctx.getBean("CacheMetaDataDAO", CacheMetaDataDAO.class);
 %>
 
-<h2>File Cache</h2>
 <p>
-Base directory: <%= ctx.getBean("FSCache.basedir") %>
+Storage: FileCache<br />
+Base directory: <%= ctx.getBean("FSCache.basedir") %><br />
 </p>
 
 <table>
