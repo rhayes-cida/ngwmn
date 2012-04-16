@@ -62,6 +62,8 @@ public class DataBroker implements ExecFactory {
 		
 		Pipeline pipe    = new Pipeline();
 		boolean  success = false;
+
+		pipe.getStatistics().setSpecifier(spec);
 		
 		// pre-fetch will send in a null output stream
 		if (out != null) {
@@ -84,7 +86,6 @@ public class DataBroker implements ExecFactory {
 		if ( ! success) {
 			signalDataNotFoundMsg(spec, pipe);
 		}
-		pipe.getStatistics().setSpecifier(spec);
 		
 		return pipe;
 	}

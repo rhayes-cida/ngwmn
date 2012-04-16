@@ -124,12 +124,12 @@ public interface FetchLogMapper {
 		"SITE_NO, DATA_SOURCE, ",
 		"STARTED_AT, STATUS, ",
 		"PROBLEM, CT, ELAPSED_SEC, ",
-		"SPECIFIER, FETCHER)",
+		"SPECIFIER, FETCHER, DATA_STREAM)",
 		"values (#{fetchlogId, jdbcType=NUMERIC}, #{agencyCd,jdbcType=VARCHAR}, ",
 		"#{siteNo,jdbcType=VARCHAR}, #{source,jdbcType=VARCHAR}, ",
 		"#{startedAt,jdbcType=TIMESTAMP}, #{status,jdbcType=CHAR}, ",
 		"#{problem,jdbcType=VARCHAR}, #{ct,jdbcType=NUMERIC}, #{elapsedSec,jdbcType=FLOAT}, ",
-		"#{specifier,jdbcType=VARCHAR}, #{fetcher,jdbcType=VARCHAR})" })
+		"#{specifier,jdbcType=VARCHAR}, #{fetcher,jdbcType=VARCHAR}, #{dataStream,jdbcType=VARCHAR})" })
 	@Options(useGeneratedKeys=true, keyProperty="fetchlogId", keyColumn="FETCHLOG_ID")
 	int insertId(FetchLog record);
 }
