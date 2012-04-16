@@ -39,6 +39,16 @@
 		<constructor-arg ref="fetchLogMapper"/>
 	</bean>
 	
+	<bean id="cacheMetaDataMapper" class="org.mybatis.spring.mapper.MapperFactoryBean">
+  		<property name="mapperInterface" value="gov.usgs.ngwmn.dm.dao.CacheMetaDataMapper" />
+  		<property name="sqlSessionFactory" ref="sqlSessionFactory" />
+	</bean>
+	<bean id="CacheMetaDataDAO" 
+			class="gov.usgs.ngwmn.dm.dao.CacheMetaDataDAO">
+		<constructor-arg ref="cacheMetaDataMapper"/>
+	
+	</bean>
+	
 	<bean id="FetchRecorder"
 		class="gov.usgs.ngwmn.dm.io.FetchRecorder">
 		<property name="dao" ref="FetchLogDAO"/>
