@@ -41,10 +41,14 @@ public class WellListServlet extends HttpServlet {
 	/**
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
 	 */
+	/* (non-Javadoc)
+	 * @see javax.servlet.http.HttpServlet#doGet(javax.servlet.http.HttpServletRequest, javax.servlet.http.HttpServletResponse)
+	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		
 		response.setContentType("text/html");
 		
+		// TODO ServiceParameters.SERVLET_PATH.get(request)
 		String servletPath = Objects.firstNonNull(
 				request.getParameter("servlet"), 
 				"data");

@@ -32,6 +32,13 @@ public class DataManagerServlet extends HttpServlet {
 		db = ctx.getBean("DataBroker", DataBroker.class);
 	}
 
+	/* (non-Javadoc)
+	 * @see javax.servlet.http.HttpServlet#doGet(javax.servlet.http.HttpServletRequest, javax.servlet.http.HttpServletResponse)
+	 * 
+	 * Sample invocations:
+	 * 		http://localhost:8080/ngwmn/data?agency_cd=IL%20EPA&featureID=P405805 gets all the data
+	 * 		http://localhost:8080/ngwmn/data?agency_cd=IL%20EPA&featureID=P405805&type=LOG  gets just the log data
+	 */
 	@Override
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp)
 			throws ServletException, IOException {
@@ -42,8 +49,9 @@ public class DataManagerServlet extends HttpServlet {
 		String well_name = wellname(spec);
 		
 		try {
-			resp.setContentType("application/zip");
-			resp.setHeader("Content-Disposition", "attachment; filename="+well_name+".zip");
+			WellDataType type = spec.getTypeID();
+			resp.setContentType(type.contentType);
+			resp.setHeader("Content-Disposition", "attachment; filename=" + type.makeFilename(well_name));
 			
 			// ensure that buffer size is greater than magic lower limit for
 			// non-extant sites
