@@ -1,8 +1,8 @@
 #!/bin/bash
 
-HOSTPORT=localhost:8080
+HOSTPORT=${HOSTPORT:-localhost:8080}
 
-mkdir -p /tmp/gwdp/prefetch
+mkdir --parents /tmp/gwdp/prefetch
 cd /tmp/gwdp/prefetch
 # all agencies: 'IL+EPA' 'MPCA' 'NJGS' 'ISWS' 'MN+DNR' 'TWDB' 'USGS' 'MBMG'
 # Note that a 20-second delay is too long for USGS wells (there are >1000)
