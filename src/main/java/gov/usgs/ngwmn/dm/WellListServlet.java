@@ -63,6 +63,13 @@ public class WellListServlet extends HttpServlet {
 			List<WellRegistry> ww;
 			
 			String[] state_fips = request.getParameterValues("state");
+			String[] agency_cds = request.getParameterValues("agency_cd");
+			
+			if (state_fips != null && agency_cds != null) {
+				response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Agency and state combination not supported");
+				return;
+			}
+			
 			if (state_fips != null) {
 				// user requested by states
 				ww = new ArrayList<WellRegistry>();
@@ -71,6 +78,15 @@ public class WellListServlet extends HttpServlet {
 					
 					ww.addAll(wws);
 				}
+			} else if (agency_cds != null) {
+				// user requested by states
+				ww = new ArrayList<WellRegistry>();
+				for (String agency_cd: agency_cds) {
+					List<WellRegistry> wws = dao.selectByAgency(agency_cd);
+					
+					ww.addAll(wws);
+				}
+				
 			} else {
 				ww = dao.selectAll();
 			}
