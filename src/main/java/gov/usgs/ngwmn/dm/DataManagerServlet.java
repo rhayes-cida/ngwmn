@@ -115,6 +115,8 @@ public class DataManagerServlet extends HttpServlet {
 		if (agency == null) {
 			agency = "USGS";
 		}
+		// TODO Find a better place for this hack
+		agency = agency.replace("_", " ");
 		spec.setAgencyID(agency);
 		
 		return spec;
