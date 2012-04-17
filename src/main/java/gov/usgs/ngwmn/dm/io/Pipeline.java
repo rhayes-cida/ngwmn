@@ -31,6 +31,12 @@ public class Pipeline implements Executee {
 		statistics = new PipeStatistics();
 	}
 		
+	
+	public Specifier getSpecifier() {
+		return spec;
+	}
+
+
 	public void setInputSupplier(Supplier<InputStream> supply) {
 		iss = supply;
 	}

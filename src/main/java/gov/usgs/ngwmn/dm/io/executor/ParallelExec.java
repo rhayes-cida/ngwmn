@@ -1,5 +1,7 @@
 package gov.usgs.ngwmn.dm.io.executor;
 
+import gov.usgs.ngwmn.dm.io.SimpleSupplier;
+import gov.usgs.ngwmn.dm.io.Supplier;
 import gov.usgs.ngwmn.dm.spec.Specifier;
 
 import java.io.OutputStream;
@@ -10,16 +12,16 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
 public class ParallelExec implements Executee {
-	ExecFactory 		factory;
-	Iterable<Specifier> specifiers;
-	OutputStream    	output;
+	ExecFactory 		   factory;
+	Iterable<Specifier>    specifiers;
+	Supplier<OutputStream> output;
 	
 	int parallex = 1;
     
     public ParallelExec(ExecFactory fac, Iterable<Specifier> specs, OutputStream out) {
     	factory    = fac;
     	specifiers = specs;
-    	output     = out;
+    	output     =  new SimpleSupplier<OutputStream>(out);
     }
     public ParallelExec(ExecFactory fac, Iterable<Specifier> specs, OutputStream out, int parallelism) {
     	this(fac, specs, out);
