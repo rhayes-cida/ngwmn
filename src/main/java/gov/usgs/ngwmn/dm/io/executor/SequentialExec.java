@@ -1,5 +1,7 @@
 package gov.usgs.ngwmn.dm.io.executor;
 
+import gov.usgs.ngwmn.dm.io.SimpleSupplier;
+import gov.usgs.ngwmn.dm.io.Supplier;
 import gov.usgs.ngwmn.dm.spec.Specifier;
 
 import java.io.OutputStream;
@@ -7,12 +9,12 @@ import java.io.OutputStream;
 public class SequentialExec implements Executee {
 	ExecFactory 		factory;
 	Iterable<Specifier> specifiers;
-	OutputStream    	output;
+	Supplier<OutputStream> output;
     
     public SequentialExec(ExecFactory fac, Iterable<Specifier> specs, OutputStream out) {
     	factory    = fac;
     	specifiers = specs;
-    	output     = out;
+    	output     =  new SimpleSupplier<OutputStream>(out);
     }
     
     @Override

@@ -1,0 +1,298 @@
+-- GW tablespace
+CREATE SMALLFILE TABLESPACE "GW_DATA_PORTAL" DATAFILE '/home/oracle/app/oracle/oradata/orcl/gw_data.dbf' 
+SIZE 100M REUSE AUTOEXTEND ON NEXT 10240K MAXSIZE 32767M LOGGING EXTENT MANAGEMENT LOCAL SEGMENT SPACE MANAGEMENT AUTO
+
+-- USER SQL
+CREATE USER GW_DATA_PORTAL IDENTIFIED BY oracle 
+DEFAULT TABLESPACE "GW_DATA_PORTAL"
+TEMPORARY TABLESPACE "TEMP";
+
+-- ROLES
+GRANT "CONNECT" TO GW_DATA_PORTAL ;
+
+-- SYSTEM PRIVILEGES
+GRANT CREATE TABLE TO GW_DATA_PORTAL ;
+GRANT CREATE ANY INDEX TO GW_DATA_PORTAL ;
+GRANT CREATE ANY SEQUENCE TO GW_DATA_PORTAL ;
+GRANT CREATE ANY TRIGGER TO GW_DATA_PORTAL ;
+GRANT CREATE ANY procedure TO GW_DATA_PORTAL ;
+
+
+-- QUOTAS
+ALTER USER GW_DATA_PORTAL QUOTA UNLIMITED ON GW_DATA_PORTAL;
+
+
+DROP TABLE GW_DATA_PORTAL.WELL_REGISTRY CASCADE CONSTRAINTS;
+
+CREATE TABLE GW_DATA_PORTAL.WELL_REGISTRY
+(
+  AGENCY_CD              VARCHAR2(20 BYTE)      NOT NULL,
+  AGENCY_NM              VARCHAR2(200 BYTE),
+  AGENCY_MED             VARCHAR2(200 BYTE),
+  SITE_NO                VARCHAR2(16 BYTE)      NOT NULL,
+  SITE_NAME              VARCHAR2(100 BYTE),
+  DEC_LAT_VA             NUMBER,
+  DEC_LONG_VA            NUMBER,
+  HORZ_DATUM             VARCHAR2(10 BYTE),
+  ALT_VA                 NUMBER,
+  ALT_DATUM_CD           VARCHAR2(10 BYTE),
+  NAT_AQUIFER_CD         VARCHAR2(10 BYTE),
+  NAT_AQFR_DESC          VARCHAR2(100 BYTE),
+  LOCAL_AQUIFER_NAME     VARCHAR2(100 BYTE),
+  QW_SN_FLAG             VARCHAR2(3 BYTE),
+  QW_BASELINE_FLAG       VARCHAR2(3 BYTE),
+  QW_WELL_CHARS          VARCHAR2(3 BYTE),
+  QW_WELL_TYPE           VARCHAR2(15 BYTE),
+  WL_SN_FLAG             VARCHAR2(3 BYTE),
+  WL_BASELINE_FLAG       VARCHAR2(3 BYTE),
+  WL_WELL_CHARS          VARCHAR2(3 BYTE),
+  WL_WELL_TYPE           VARCHAR2(15 BYTE),
+  DATA_PROVIDER          VARCHAR2(30 BYTE),
+  QW_SYS_NAME            VARCHAR2(50 BYTE),
+  WL_SYS_NAME            VARCHAR2(50 BYTE),
+  GEOM                   MDSYS.SDO_GEOMETRY,
+  GEOM_3785              MDSYS.SDO_GEOMETRY,
+  INSERT_DATE            DATE,
+  MY_SITEID              VARCHAR2(37 BYTE) GENERATED ALWAYS AS ("AGENCY_CD"||':'||"SITE_NO"),
+  DISPLAY_FLAG           VARCHAR2(3 BYTE),
+  WL_DATA_PROVIDER       VARCHAR2(20 BYTE),
+  QW_DATA_PROVIDER       VARCHAR2(20 BYTE),
+  LITH_DATA_PROVIDER     VARCHAR2(20 BYTE),
+  CONST_DATA_PROVIDER    VARCHAR2(20 BYTE),
+  WELL_DEPTH             NUMBER,
+  WELL_DEPTH_UNITS       VARCHAR2(50 BYTE),
+  LINK                   VARCHAR2(500 BYTE),
+  WL_WELL_PURPOSE        VARCHAR2(15 BYTE),
+  QW_WELL_PURPOSE        VARCHAR2(15 BYTE),
+  WL_WELL_PURPOSE_NOTES  VARCHAR2(4000 BYTE),
+  QW_WELL_PURPOSE_NOTES  VARCHAR2(4000 BYTE),
+  STATE_CD               NUMBER,
+  COUNTY_CD              NUMBER,
+  UPDATE_DATE            DATE,
+  ALT_UNITS              NUMBER,
+  LOCAL_AQUIFER_CD       VARCHAR2(20 BYTE)
+)
+COLUMN GEOM NOT SUBSTITUTABLE AT ALL LEVELS
+COLUMN GEOM_3785 NOT SUBSTITUTABLE AT ALL LEVELS
+TABLESPACE GW_DATA_PORTAL
+PCTUSED    0
+PCTFREE    10
+INITRANS   1
+MAXTRANS   255
+STORAGE    (
+            INITIAL          64K
+            NEXT             1M
+            MINEXTENTS       1
+            MAXEXTENTS       UNLIMITED
+            PCTINCREASE      0
+            BUFFER_POOL      DEFAULT
+           )
+LOGGING 
+NOCOMPRESS 
+VARRAY "GEOM"."SDO_ELEM_INFO" STORE AS LOB (
+  ENABLE       STORAGE IN ROW
+  CHUNK       8192
+  RETENTION
+  CACHE
+  INDEX       (
+        STORAGE    (
+                    INITIAL          64K
+                    NEXT             1M
+                    MINEXTENTS       1
+                    MAXEXTENTS       UNLIMITED
+                    PCTINCREASE      0
+                    BUFFER_POOL      DEFAULT
+                   ))
+      STORAGE    (
+                  INITIAL          64K
+                  NEXT             1M
+                  MINEXTENTS       1
+                  MAXEXTENTS       UNLIMITED
+                  PCTINCREASE      0
+                  BUFFER_POOL      DEFAULT
+                 ))
+VARRAY "GEOM"."SDO_ORDINATES" STORE AS LOB (
+  ENABLE       STORAGE IN ROW
+  CHUNK       8192
+  RETENTION
+  CACHE
+  INDEX       (
+        STORAGE    (
+                    INITIAL          64K
+                    NEXT             1M
+                    MINEXTENTS       1
+                    MAXEXTENTS       UNLIMITED
+                    PCTINCREASE      0
+                    BUFFER_POOL      DEFAULT
+                   ))
+      STORAGE    (
+                  INITIAL          64K
+                  NEXT             1M
+                  MINEXTENTS       1
+                  MAXEXTENTS       UNLIMITED
+                  PCTINCREASE      0
+                  BUFFER_POOL      DEFAULT
+                 ))
+VARRAY "GEOM_3785"."SDO_ELEM_INFO" STORE AS LOB (
+  ENABLE       STORAGE IN ROW
+  CHUNK       8192
+  RETENTION
+  CACHE
+  INDEX       (
+        STORAGE    (
+                    INITIAL          64K
+                    NEXT             1M
+                    MINEXTENTS       1
+                    MAXEXTENTS       UNLIMITED
+                    PCTINCREASE      0
+                    BUFFER_POOL      DEFAULT
+                   ))
+      STORAGE    (
+                  INITIAL          64K
+                  NEXT             1M
+                  MINEXTENTS       1
+                  MAXEXTENTS       UNLIMITED
+                  PCTINCREASE      0
+                  BUFFER_POOL      DEFAULT
+                 ))
+VARRAY "GEOM_3785"."SDO_ORDINATES" STORE AS LOB (
+  ENABLE       STORAGE IN ROW
+  CHUNK       8192
+  RETENTION
+  CACHE
+  INDEX       (
+        STORAGE    (
+                    INITIAL          64K
+                    NEXT             1M
+                    MINEXTENTS       1
+                    MAXEXTENTS       UNLIMITED
+                    PCTINCREASE      0
+                    BUFFER_POOL      DEFAULT
+                   ))
+      STORAGE    (
+                  INITIAL          64K
+                  NEXT             1M
+                  MINEXTENTS       1
+                  MAXEXTENTS       UNLIMITED
+                  PCTINCREASE      0
+                  BUFFER_POOL      DEFAULT
+                 ))
+NOCACHE
+NOPARALLEL
+MONITORING;
+
+COMMENT ON TABLE GW_DATA_PORTAL.WELL_REGISTRY IS 'This is the production well registry table. 11/22/2011';
+
+
+--CREATE INDEX GW_DATA_PORTAL.SITE_GEOM_3785_IDX ON GW_DATA_PORTAL.WELL_REGISTRY
+--(GEOM_3785)
+--INDEXTYPE IS MDSYS.SPATIAL_INDEX
+--PARAMETERS('LAYER_GTYPE="POINT"')
+--NOPARALLEL;
+
+
+--CREATE INDEX GW_DATA_PORTAL.SITE_GEOM_SP_IDX ON GW_DATA_PORTAL.WELL_REGISTRY
+--(GEOM)
+--INDEXTYPE IS MDSYS.SPATIAL_INDEX
+--PARAMETERS(' SDO_INDX_DIMS=2 LAYER_GTYPE="POINT"')
+--NOPARALLEL;
+
+
+CREATE UNIQUE INDEX GW_DATA_PORTAL.SITE_NO_AGENCY_CD_INDEX ON GW_DATA_PORTAL.WELL_REGISTRY
+(AGENCY_CD, SITE_NO)
+LOGGING
+TABLESPACE GW_DATA_PORTAL
+PCTFREE    10
+INITRANS   2
+MAXTRANS   255
+STORAGE    (
+            INITIAL          64K
+            NEXT             1M
+            MINEXTENTS       1
+            MAXEXTENTS       UNLIMITED
+            PCTINCREASE      0
+            BUFFER_POOL      DEFAULT
+           )
+NOPARALLEL;
+
+
+CREATE UNIQUE INDEX GW_DATA_PORTAL.WELL_REGISTRY_R01 ON GW_DATA_PORTAL.WELL_REGISTRY
+(MY_SITEID)
+LOGGING
+TABLESPACE GW_DATA_PORTAL
+PCTFREE    10
+INITRANS   2
+MAXTRANS   255
+STORAGE    (
+            INITIAL          64K
+            NEXT             1M
+            MINEXTENTS       1
+            MAXEXTENTS       UNLIMITED
+            PCTINCREASE      0
+            BUFFER_POOL      DEFAULT
+           )
+NOPARALLEL;
+
+
+CREATE OR REPLACE TRIGGER GW_DATA_PORTAL.BI_WELL_REGISTRY
+BEFORE INSERT
+ON GW_DATA_PORTAL.WELL_REGISTRY 
+REFERENCING NEW AS NEW OLD AS OLD
+FOR EACH ROW
+DECLARE
+tmpVar NUMBER;
+BEGIN
+
+   :NEW.insert_date := SYSDATE;          
+   
+   EXCEPTION
+     WHEN OTHERS THEN
+       -- Consider logging the error and then re-raise
+       RAISE;
+END BI_WELL_REGISTRY;
+/
+
+
+CREATE OR REPLACE TRIGGER GW_DATA_PORTAL.BU_WELL_REGISTRY
+BEFORE UPDATE
+ON GW_DATA_PORTAL.WELL_REGISTRY REFERENCING NEW AS NEW OLD AS OLD
+FOR EACH ROW
+DECLARE
+tmpVar NUMBER;
+
+BEGIN
+
+   :NEW.update_date := SYSDATE;           
+   
+   EXCEPTION
+     WHEN OTHERS THEN
+       -- Consider logging the error and then re-raise
+       RAISE;
+END BU_WELL_REGISTRY;
+
+
+--Change from text fields to codes
+/
+
+
+ALTER TABLE GW_DATA_PORTAL.WELL_REGISTRY ADD (
+  CONSTRAINT WELL_REGISTRY_R01
+ UNIQUE (MY_SITEID)
+    USING INDEX 
+    TABLESPACE GW_DATA_PORTAL
+    PCTFREE    10
+    INITRANS   2
+    MAXTRANS   255
+    STORAGE    (
+                INITIAL          64K
+                NEXT             1M
+                MINEXTENTS       1
+                MAXEXTENTS       UNLIMITED
+                PCTINCREASE      0
+               ));
+
+--GRANT SELECT ON GW_DATA_PORTAL.WELL_REGISTRY TO GW_DATA_PORTAL_USER;
+
+
+drop index "GW_DATA_PORTAL"."SITE_GEOM_3785_IDX"
+drop index "GW_DATA_PORTAL"."SITE_GEOM_SP_IDX"

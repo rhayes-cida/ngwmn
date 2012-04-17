@@ -1,5 +1,7 @@
 package gov.usgs.ngwmn.dm.io;
 
+import gov.usgs.ngwmn.dm.spec.Specifier;
+
 import java.io.IOException;
 import java.io.OutputStream;
 
@@ -15,8 +17,8 @@ public class SupplyTeeOutput extends Supplier<OutputStream> {
 	}
 	
 	@Override
-	public OutputStream get() throws IOException {
-		return new TeeOutputStream(os1.get(), os2.get());
+	public OutputStream get(Specifier spec) throws IOException {
+		return new TeeOutputStream(os1.get(spec), os2.get(spec));
 	}
 
 }

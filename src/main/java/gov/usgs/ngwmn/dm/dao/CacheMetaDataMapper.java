@@ -8,9 +8,6 @@ import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.ResultMap;
 import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Update;
-import gov.usgs.ngwmn.dm.dao.CacheMetaData;
-import gov.usgs.ngwmn.dm.dao.CacheMetaDataExample;
-import gov.usgs.ngwmn.dm.dao.CacheMetaDataKey;
 
 public interface CacheMetaDataMapper {
 

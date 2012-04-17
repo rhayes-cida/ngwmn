@@ -59,13 +59,18 @@ public class Specifier {
 		if ( getTypeID() == null ) 
 			throw new InvalidParameterException("Well data type Id is required.");
 	}
-	
+
 	public WellRegistryKey getWellRegistryKey() {
 		return new WellRegistryKey(agencyID, featureID);
 	}
 	
 	public void setTypeID(String string) {
 			setTypeID(WellDataType.valueOf(string));
+	}
+	
+	public String getDualId() {
+		// TODO do we want to null protect? or call check?
+		return agencyID + "" + featureID;
 	}
 }
 

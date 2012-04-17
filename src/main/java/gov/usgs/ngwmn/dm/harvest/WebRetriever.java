@@ -43,7 +43,7 @@ public class WebRetriever implements DataFetcher {
 		pipe.setInputSupplier( new Supplier<InputStream>() {
 			
 			@Override
-			public InputStream get() throws IOException {
+			public InputStream get(Specifier spec) throws IOException {
 				pipe.getStatistics().markStart();
 				int statusCode = harvester.wget(url);
 				

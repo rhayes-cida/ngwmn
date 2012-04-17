@@ -37,7 +37,7 @@ implements DataLoader {
 		pipe.addOutputSupplier( new Supplier<OutputStream>() {				
 			
 			@Override
-			public OutputStream get() throws IOException {
+			public OutputStream get(Specifier spec) throws IOException {
 				try {
 					return Loader.this.destination(spec);
 				} catch (IOException ioe) {

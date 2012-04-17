@@ -91,7 +91,7 @@ public class QWTableCacheTest extends ContextualTest {
 	public void testFetchWellData() throws Exception {
 		Specifier spec = makeSpecifier();
 		
-		Pipeline pip = new Pipeline();
+		Pipeline pip = new Pipeline(spec);
 		
 		victim.fetchWellData(spec, pip);
 		InputSupplier<InputStream> iss = pip.getInputSupplier();
@@ -107,7 +107,7 @@ public class QWTableCacheTest extends ContextualTest {
 	public void testDumpData() throws Exception {
 		Specifier spec = makeSpecifier();
 		
-		Pipeline pip = new Pipeline();
+		Pipeline pip = new Pipeline(spec);
 		
 		victim.fetchWellData(spec, pip);
 		InputSupplier<InputStream> iss = pip.getInputSupplier();

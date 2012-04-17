@@ -4,6 +4,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import gov.usgs.ngwmn.dm.cache.PipeStatistics;
+import gov.usgs.ngwmn.dm.spec.Specifier;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -32,16 +33,16 @@ public class GenericInvokerTest {
 		final InputStream is = new ByteArrayInputStream(sample.getBytes());
 		final ByteArrayOutputStream os = new ByteArrayOutputStream();
 		
-		Pipeline pl = new Pipeline();
+		Pipeline pl = new Pipeline(null);
 		pl.setInputSupplier(new Supplier<InputStream>() {
 			@Override
-			public InputStream get() throws IOException {
+			public InputStream get(Specifier spec) throws IOException {
 				return is;
 			}
 		});
 		pl.setOutputSupplier(new Supplier<OutputStream>() {
 			@Override
-			public OutputStream get() throws IOException {
+			public OutputStream get(Specifier spec) throws IOException {
 				return os;
 			}
 		});

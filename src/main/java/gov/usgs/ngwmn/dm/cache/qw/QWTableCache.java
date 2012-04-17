@@ -74,7 +74,7 @@ public class QWTableCache implements Cache {
 	}
 
 	@Override
-	public boolean fetchWellData(Specifier spec, Pipeline pipe)
+	public boolean fetchWellData(final Specifier spec, Pipeline pipe)
 			throws IOException {
 		
 		try {
@@ -111,7 +111,12 @@ public class QWTableCache implements Cache {
 						Supplier<InputStream> supp = new Supplier<InputStream>() {
 			
 							@Override
-							public InputStream get() {
+							public InputStream get(Specifier lspec) {
+								
+								if ( ! lspec.equals(spec)) {
+									throw new RuntimeException("mismatched specifiers!");
+								}
+								
 								try {
 									// have to hook the stream close to close the retained connection
 									InputStream ois = flob.getAsciiStream();

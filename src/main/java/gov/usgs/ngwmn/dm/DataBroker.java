@@ -7,8 +7,8 @@ import gov.usgs.ngwmn.dm.dao.WellRegistryDAO;
 import gov.usgs.ngwmn.dm.dao.WellRegistryKey;
 import gov.usgs.ngwmn.dm.io.Pipeline;
 import gov.usgs.ngwmn.dm.io.Supplier;
-import gov.usgs.ngwmn.dm.io.executor.Executee;
 import gov.usgs.ngwmn.dm.io.executor.ExecFactory;
+import gov.usgs.ngwmn.dm.io.executor.Executee;
 import gov.usgs.ngwmn.dm.spec.Specifier;
 
 import java.io.IOException;
@@ -31,7 +31,7 @@ public class DataBroker implements ExecFactory {
 	
 	private Logger logger = LoggerFactory.getLogger(this.getClass());
 	
-	public void fetchWellData(Specifier spec, final OutputStream out) throws Exception {
+	public void fetchWellData(Specifier spec, final Supplier<OutputStream> out) throws Exception {
 		Pipeline pipe = (Pipeline) makeExecutor(spec, out);
 		invokePipe(pipe);
 		logger.info("Completed request operation for {} result {}", spec, pipe.getStatistics());
@@ -55,12 +55,12 @@ public class DataBroker implements ExecFactory {
 		}
 	}
 	
-	public Executee makeExecutor(Specifier spec, final OutputStream out) throws IOException {	
+	public Executee makeExecutor(Specifier spec, final Supplier<OutputStream> out) throws IOException {	
 
 		check(spec);
 		checkSiteExists(spec);
 		
-		Pipeline pipe    = new Pipeline();
+		Pipeline pipe    = new Pipeline(spec);
 		boolean  success = false;
 
 		pipe.getStatistics().setSpecifier(spec);
@@ -69,22 +69,22 @@ public class DataBroker implements ExecFactory {
 		if (out != null) {
 			pipe.setOutputSupplier( new Supplier<OutputStream>() {
 				@Override
-				public OutputStream get() throws IOException {
-					return out;
+				public OutputStream get(Specifier spec) throws IOException {
+					return out.get(spec);
 				}
 			});
-			success = configureInput(retriever, spec, pipe);
+			success = configureInput(retriever, pipe);
 		}
 		
 		if ( ! success) {
 			loader.configureOutput(spec, pipe);
-			success = configureInput(harvester, spec, pipe); 
+			success = configureInput(harvester, pipe); 
 		}
 		
 		// TODO It's doubtful if we can detect this until we run the pipe.
 		// TODO We need to distinguish "site not found" and "data not found"
 		if ( ! success) {
-			signalDataNotFoundMsg(spec, pipe);
+			signalDataNotFoundMsg(pipe);
 		}
 		
 		return pipe;
@@ -104,7 +104,8 @@ public class DataBroker implements ExecFactory {
 		}
 	}
 
-	private void signalDataNotFoundMsg(Specifier spec, Pipeline pipe) {
+	private void signalDataNotFoundMsg(Pipeline pipe) {
+		Specifier spec = pipe.getSpecifier();
 		logger.warn("No data found for {}", spec);
 		throw new DataNotAvailableException(spec);
 	}
@@ -127,7 +128,8 @@ public class DataBroker implements ExecFactory {
 		spec.check();
 	}
 	
-	boolean configureInput(DataFetcher dataFetcher, Specifier spec, Pipeline pipe) throws IOException {
+	boolean configureInput(DataFetcher dataFetcher, Pipeline pipe) throws IOException {
+		Specifier spec = pipe.getSpecifier();
 		if (dataFetcher != null) {
 			boolean v = dataFetcher.configureInput(spec, pipe);
 			pipe.getStatistics().setCalledBy(dataFetcher.getClass());

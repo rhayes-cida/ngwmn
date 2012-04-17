@@ -1,9 +1,12 @@
 package gov.usgs.ngwmn.dm;
 
 import gov.usgs.ngwmn.WellDataType;
+import gov.usgs.ngwmn.dm.io.SimpleSupplier;
+import gov.usgs.ngwmn.dm.io.Supplier;
 import gov.usgs.ngwmn.dm.spec.Specifier;
 
 import java.io.IOException;
+import java.io.OutputStream;
 
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
@@ -59,9 +62,10 @@ public class DataManagerServlet extends HttpServlet {
 				resp.setBufferSize(8*1024); // a reasonable guess at efficiency
 			}
 			ServletOutputStream puttee = resp.getOutputStream();
+			Supplier<OutputStream> outSupply = new SimpleSupplier<OutputStream>(puttee);
 			try {
 				logger.info("Getting well data for {}", spec);
-				db.fetchWellData(spec, puttee);
+				db.fetchWellData(spec, outSupply);
 			} catch (SiteNotFoundException nse) {
 				// this may fail, if detected after output buffer has been flushed
 				resp.resetBuffer();
