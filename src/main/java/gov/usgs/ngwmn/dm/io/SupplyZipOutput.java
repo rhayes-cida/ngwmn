@@ -29,6 +29,7 @@ public class SupplyZipOutput extends Supplier<OutputStream> {
 			getOutputStream(spec);
 		} else {
 			oz.closeEntry();
+			// TODO should we gracefully handle this and allow for incomplete data?
 		}
 		ZipEntry zip = new ZipEntry(spec.getDualId());
 		oz.putNextEntry(zip);
