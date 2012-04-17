@@ -97,7 +97,7 @@ public class QWTableCache implements Cache {
 						clob = rs.getClob(2);
 					}
 					
-					logger.debug("got clob for specifier {}, fetch_date={}, length={}", new Object[]{spec, fetch_date, clob.length()});
+					logger.debug("got clob for specifier {}, fetch_date={}, length={}", new Object[]{spec, fetch_date, (clob==null)?-1:clob.length()});
 					
 					if (clob == null) {
 						conn.close();
@@ -127,7 +127,7 @@ public class QWTableCache implements Cache {
 											super.close();
 											try {
 												conn.close();
-											} catch (SQLException e) {												// TODO Auto-generated catch block
+											} catch (SQLException e) {
 												throw new IOException(e);
 											}
 										}
