@@ -4,6 +4,7 @@ package gov.usgs.ngwmn.dm.io;
 import gov.usgs.ngwmn.dm.cache.PipeStatistics;
 import gov.usgs.ngwmn.dm.cache.PipeStatistics.Status;
 import gov.usgs.ngwmn.dm.io.executor.Executee;
+import gov.usgs.ngwmn.dm.spec.Specifier;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -13,15 +14,23 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class Pipeline implements Executee {
-
-	private Invoker invoker;
-	private Supplier<InputStream>  iss;
-	private Supplier<OutputStream> oss;
-	private PipeStatistics statistics = new PipeStatistics();
-	private IOException    ioe;
 	
 	private static Logger logger = LoggerFactory.getLogger(Pipeline.class);	
+
+	private Supplier<InputStream>  iss;
+	private Supplier<OutputStream> oss;
+	private PipeStatistics statistics;
+	private IOException    ioe;
+	private Invoker        invoker;
 	
+	
+	private final Specifier      spec;
+	
+	public Pipeline(Specifier sp) {
+		spec = sp;
+		statistics = new PipeStatistics();
+	}
+		
 	public void setInputSupplier(Supplier<InputStream> supply) {
 		iss = supply;
 	}
@@ -77,8 +86,8 @@ public class Pipeline implements Executee {
 	public void invoke() throws IOException {
 		statistics.markStart();
 		try {
-			InputStream  is = iss.get();
-			OutputStream os = oss.get();
+			InputStream  is = iss.get(spec);
+			OutputStream os = oss.get(spec);
 			invoker.invoke(is,os, statistics);
 			statistics.markEnd(Status.DONE);
 			logger.info("Done stats={}", statistics);

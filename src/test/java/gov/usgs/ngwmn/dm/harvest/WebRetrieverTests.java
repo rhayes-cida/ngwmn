@@ -52,7 +52,7 @@ public class WebRetrieverTests {
 				checkValues.put("checkSpecCalled",true);
 			}
 		};
-		pipe = new Pipeline() {
+		pipe = new Pipeline(spec) {
 			@Override
 			public void setInputSupplier(Supplier<InputStream> in) {
 				checkValues.put("setInputCalled", true);

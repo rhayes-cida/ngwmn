@@ -7,8 +7,8 @@ import gov.usgs.ngwmn.dm.dao.WellRegistryDAO;
 import gov.usgs.ngwmn.dm.dao.WellRegistryKey;
 import gov.usgs.ngwmn.dm.io.Pipeline;
 import gov.usgs.ngwmn.dm.io.Supplier;
-import gov.usgs.ngwmn.dm.io.executor.Executee;
 import gov.usgs.ngwmn.dm.io.executor.ExecFactory;
+import gov.usgs.ngwmn.dm.io.executor.Executee;
 import gov.usgs.ngwmn.dm.spec.Specifier;
 
 import java.io.IOException;
@@ -60,7 +60,7 @@ public class DataBroker implements ExecFactory {
 		check(spec);
 		checkSiteExists(spec);
 		
-		Pipeline pipe    = new Pipeline();
+		Pipeline pipe    = new Pipeline(spec);
 		boolean  success = false;
 
 		pipe.getStatistics().setSpecifier(spec);
@@ -69,7 +69,7 @@ public class DataBroker implements ExecFactory {
 		if (out != null) {
 			pipe.setOutputSupplier( new Supplier<OutputStream>() {
 				@Override
-				public OutputStream get() throws IOException {
+				public OutputStream get(Specifier spec) throws IOException {
 					return out;
 				}
 			});

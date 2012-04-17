@@ -7,7 +7,6 @@ import gov.usgs.ngwmn.dm.dao.WellRegistryExample;
 import java.util.Iterator;
 import java.util.List;
 
-
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 public class LatLongResolver implements SpecResolver {

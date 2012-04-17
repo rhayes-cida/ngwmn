@@ -65,7 +65,7 @@ public class QWTableCache implements Cache {
 					Supplier<InputStream> supp = new Supplier<InputStream>() {
 		
 						@Override
-						public InputStream get() {
+						public InputStream get(Specifier spec) {
 							try {
 								return flob.getAsciiStream();
 							} catch (SQLException e) {

@@ -1,7 +1,6 @@
 package gov.usgs.ngwmn.functional;
 
-import static org.junit.Assert.*;
-
+import static org.junit.Assert.assertTrue;
 import gov.usgs.ngwmn.dm.dao.ContextualTest;
 import gov.usgs.ngwmn.dm.spec.LatLongResolver;
 import gov.usgs.ngwmn.dm.spec.Specification;

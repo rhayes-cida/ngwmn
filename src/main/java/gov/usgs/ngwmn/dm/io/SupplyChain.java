@@ -1,5 +1,7 @@
 package gov.usgs.ngwmn.dm.io;
 
+import gov.usgs.ngwmn.dm.spec.Specifier;
+
 import java.io.IOException;
 
 public abstract class SupplyChain<T> extends Supplier<T> {
@@ -28,7 +30,7 @@ public abstract class SupplyChain<T> extends Supplier<T> {
 	 * augment it appropriately and return a new stream
 	 */
 	@Override
-	public T get() throws IOException {
-		return link.get();
+	public T get(Specifier spec) throws IOException {
+		return link.get(spec);
 	}
 }
