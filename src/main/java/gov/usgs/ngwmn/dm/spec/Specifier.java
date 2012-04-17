@@ -63,4 +63,9 @@ public class Specifier {
 	public WellRegistryKey getWellRegistryKey() {
 		return new WellRegistryKey(agencyID, featureID);
 	}
+	
+	public void setTypeID(String string) {
+			setTypeID(WellDataType.valueOf(string));
+	}
 }
+

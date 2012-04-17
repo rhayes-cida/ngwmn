@@ -68,7 +68,7 @@ public class SpecifierTests {
 	
 	@Test
 	public void test_check_noNullTypeId() {
-		spec.setTypeID(null);
+		spec.setTypeID((WellDataType)null);
 		try {
 			spec.check();
 			assertTrue(false);

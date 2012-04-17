@@ -25,7 +25,10 @@ public class Pipeline implements Executee {
 	public void setInputSupplier(Supplier<InputStream> supply) {
 		iss = supply;
 	}
-	
+	public Supplier<InputStream> getInputSupplier() {
+		return iss;
+	}
+
 	public void setOutputSupplier(Supplier<OutputStream> supply) {
 		oss = supply;
 	}
