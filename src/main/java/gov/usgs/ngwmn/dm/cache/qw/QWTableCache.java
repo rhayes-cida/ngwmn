@@ -113,7 +113,7 @@ public class QWTableCache implements Cache {
 							@Override
 							public InputStream get(Specifier lspec) {
 								
-								if ( ! lspec.equals(spec)) {
+								if ( lspec != null && ! lspec.equals(spec)) {
 									throw new RuntimeException("mismatched specifiers!");
 								}
 								
