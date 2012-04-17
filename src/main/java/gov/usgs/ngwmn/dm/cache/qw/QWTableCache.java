@@ -11,6 +11,7 @@ import java.io.FilterOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.FilterInputStream;
 import java.sql.Clob;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -76,9 +77,8 @@ public class QWTableCache implements Cache {
 	public boolean fetchWellData(Specifier spec, Pipeline pipe)
 			throws IOException {
 		
-		Connection conn;		
 		try {
-			conn = ds.getConnection();
+			final Connection conn = ds.getConnection();
 			try {
 				// To use the getCLOBVal function, the table alias must be explicit; use of the implicit alias fails with error ORA-00904
 				String query = "SELECT qw.fetch_date, qw.xml.getCLOBVal() FROM QW qw WHERE qw.agency_cd = ? and qw.site_no = ? order by qw.fetch_date DESC";
@@ -99,6 +99,11 @@ public class QWTableCache implements Cache {
 					
 					logger.debug("got clob for specifier {}, fetch_date={}, length={}", new Object[]{spec, fetch_date, clob.length()});
 					
+					if (clob == null) {
+						conn.close();
+						return false;
+					}
+					
 					// So. Really. Does this change anything about the thread safety of the program?
 					final Clob flob = clob;
 					
@@ -108,7 +113,23 @@ public class QWTableCache implements Cache {
 							@Override
 							public InputStream get() {
 								try {
-									return flob.getAsciiStream();
+									// have to hook the stream close to close the retained connection
+									InputStream ois = flob.getAsciiStream();
+									InputStream fis = new FilterInputStream(ois) {
+
+										@Override
+										public void close() throws IOException {
+											super.close();
+											try {
+												conn.close();
+											} catch (SQLException e) {												// TODO Auto-generated catch block
+												throw new IOException(e);
+											}
+										}
+										
+									};
+									
+									return fis;
 								} catch (SQLException e) {
 									throw new RuntimeException(e);
 								}
@@ -118,21 +139,21 @@ public class QWTableCache implements Cache {
 						pipe.setInputSupplier(supp);
 						return true;
 					}
-			
-					return false;
 				} finally {
-					// Can I do this while the Clob is dangling?
-					// Or do I need to close the statement after the input stream is finished?
+					// Let this hang -- the spec says that closing the Connection deals with all its resources.
 					// ps.close();
 				}
 			} catch (SQLException sqle) {
 				throw new IOException(sqle);
 			} finally {
-				// conn.close();
+				// Cannot close conn here, it needs to stay open until the reader is done with it.
+				logger.debug("Handed connection {} to reader", conn);
 			}
 		} catch (SQLException e1) {
 			throw new IOException(e1);
 		}
+		
+		return false;
 	}
 
 	@Override
@@ -192,7 +213,7 @@ public class QWTableCache implements Cache {
 					}
 					modified = rs.getTimestamp(1);
 					length = rs.getLong(2);
-					logger.debug("Row fetch_date {}, length {}", modified, length);
+					logger.trace("Row fetch_date {}, length {}", modified, length);
 				}
 			} finally {
 				conn.close();
@@ -205,9 +226,7 @@ public class QWTableCache implements Cache {
 		return val;
 	}
 
-	// TODO Is this legit? Can we do the insert before the Clob is filled up?
-	// The alternative would be to create the row with an empty clob, then select 
-	// it for update before writing into the clob.
+	// Cannot do the insert until the Clob has been filled up
 	private void insert(Connection conn, WellRegistryKey key, Clob clob) 
 			throws SQLException
 	{
