@@ -11,11 +11,11 @@ package gov.usgs.ngwmn.dm.spec;
 public class Specification extends Specifier {
 
 	// TODO actual fields required - these are just brainstorm examples.
-	private double latitudeNorth;
-	private double latitudeSouth;
-	private double longitudeEast;
-	private double longitudeWest;
-	
+	private Double latitudeNorth;
+	private Double latitudeSouth;
+	private Double longitudeEast;
+	private Double longitudeWest;
+		
 	public double getLatitudeNorth() {
 		return latitudeNorth;
 	}
@@ -40,4 +40,15 @@ public class Specification extends Specifier {
 	public void setLongitudeWest(double longitudeWest) {
 		this.longitudeWest = longitudeWest;
 	}
+	
+	
+	
+	public boolean isLatLong() {
+		return (latitudeNorth != null
+			&&  latitudeSouth != null
+			&&  longitudeEast != null
+			&&  longitudeWest != null
+		);
+	}
+	
 }
