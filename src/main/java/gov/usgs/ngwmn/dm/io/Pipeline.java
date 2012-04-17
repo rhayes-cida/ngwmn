@@ -70,7 +70,10 @@ public class Pipeline implements Executee {
 	public IOException getException() {
 		return ioe;
 	}
-	
+	public void setException(IOException ioe) {
+		this.ioe = ioe;
+	}
+
 	public void invoke() throws IOException {
 		statistics.markStart();
 		try {
@@ -81,6 +84,7 @@ public class Pipeline implements Executee {
 			logger.info("Done stats={}", statistics);
 		} catch (IOException ioe) {
 			statistics.markEnd(Status.FAIL);
+			setException(ioe);
 			logger.info("Fail stats={}", statistics);
 			throw ioe;
 		}

@@ -2,6 +2,7 @@ package gov.usgs.ngwmn.dm.harvest;
 
 
 import gov.usgs.ngwmn.dm.DataFetcher;
+import gov.usgs.ngwmn.dm.cache.PipeStatistics.Status;
 import gov.usgs.ngwmn.dm.io.CopyInvoker;
 import gov.usgs.ngwmn.dm.io.Pipeline;
 import gov.usgs.ngwmn.dm.io.Supplier;
@@ -24,7 +25,7 @@ public class WebRetriever implements DataFetcher {
 	protected Harvester  harvester  = new Harvester();
 
 	@Override
-	public boolean configureInput(Specifier spec, Pipeline pipe)
+	public boolean configureInput(Specifier spec, final Pipeline pipe)
 			throws IOException {
 		spec.check();
 		
@@ -37,18 +38,20 @@ public class WebRetriever implements DataFetcher {
 		}
 		
 		logger.info("Fetching data for {} from {}", spec, url);
+		pipe.getStatistics().setSource(url);
 
-		// TODO set source etc into stats
 		pipe.setInputSupplier( new Supplier<InputStream>() {
 			
 			@Override
 			public InputStream get() throws IOException {
-				// TODO mark start
+				pipe.getStatistics().markStart();
 				int statusCode = harvester.wget(url);
 				
 		        if (statusCode != HttpStatus.SC_OK) {
-		        	// TODO mark fail
-		        	throw new IOException("HTTP status error: " + statusCode);
+		        	pipe.getStatistics().markEnd(Status.FAIL);
+		        	IOException ioe = new IOException("HTTP status error: " + statusCode);
+		        	pipe.setException(ioe);
+		        	throw ioe;
 		        }
 				return harvester.getInputStream();
 				// it's zero, no help here  logger.info("response stream available {}", is.available());
