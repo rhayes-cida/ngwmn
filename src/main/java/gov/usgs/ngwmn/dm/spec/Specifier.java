@@ -63,4 +63,9 @@ public class Specifier {
 	public WellRegistryKey getWellRegistryKey() {
 		return new WellRegistryKey(agencyID, featureID);
 	}
+	
+	public String getDualId() {
+		// TODO do we want to null protect? or call check?
+		return agencyID + "" + featureID;
+	}
 }

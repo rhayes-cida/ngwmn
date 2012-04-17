@@ -30,7 +30,7 @@ public class SupplyZipOutput extends Supplier<OutputStream> {
 		} else {
 			oz.closeEntry();
 		}
-		ZipEntry zip = new ZipEntry("");
+		ZipEntry zip = new ZipEntry(spec.getDualId());
 		oz.putNextEntry(zip);
 		return oz;
 	}
