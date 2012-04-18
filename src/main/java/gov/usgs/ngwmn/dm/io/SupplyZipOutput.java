@@ -11,29 +11,51 @@ public class SupplyZipOutput extends Supplier<OutputStream> {
 	
 	private Supplier<OutputStream> os;
 	private ZipOutputStream oz;
+	private boolean openEntry;
+	private boolean endEntry;
 
 	public SupplyZipOutput(Supplier<OutputStream> os) {
 		this.os = os;
 	}
 
 	public OutputStream getOutputStream(Specifier spec) throws IOException {
-		if (oz == null) { 
-			oz = new ZipOutputStream(os.get(spec));
+		if (oz == null) {
+			// init and chain the stream if not done yet
+			openEntry = endEntry = false;
+			oz = new ZipOutputStream( os.get(spec) );
 		}
 		return oz;
 	}
 	
 	@Override
 	public OutputStream get(Specifier spec) throws IOException {
-		if (oz == null) {
-			getOutputStream(spec);
-		} else {
-			oz.closeEntry();
-			// TODO should we gracefully handle this and allow for incomplete data?
-		}
-		ZipEntry zip = new ZipEntry(spec.getDualId());
-		oz.putNextEntry(zip);
+		getOutputStream(spec);
+		closeEntry();
+		openEntry(spec);
 		return oz;
 	}
 
+	private void closeEntry() throws IOException {
+		if (endEntry) {
+			// if entry is ended then close it
+			openEntry = endEntry = false;
+			oz.closeEntry();
+		}
+	}
+
+	private void openEntry(Specifier spec) throws IOException {
+		if (!openEntry) {
+			ZipEntry zip = new ZipEntry( spec.getDualId() );
+			oz.putNextEntry(zip);
+			openEntry = true;
+		}
+	}
+
+	@Override
+	public void end() {
+		super.end(); // just in case there is impl there
+		endEntry = true; // record that we received an end signal
+	}
+	
+	
 }

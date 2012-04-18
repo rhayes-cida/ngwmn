@@ -102,6 +102,9 @@ public class Pipeline implements Executee {
 			setException(ioe);
 			logger.info("Fail stats={}", statistics);
 			throw ioe;
+		} finally {
+			iss.end();
+			oss.end();
 		}
 	}
 	
