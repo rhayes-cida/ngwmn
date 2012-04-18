@@ -30,6 +30,11 @@
 	    </bean>
     </beans>
     
+    <beans>
+	    <bean id="QWTableCache" class="gov.usgs.ngwmn.dm.cache.qw.QWTableCache">
+	    	<constructor-arg ref="dataSource"/>
+	    </bean>
+    </beans>
 </beans>
 
        
