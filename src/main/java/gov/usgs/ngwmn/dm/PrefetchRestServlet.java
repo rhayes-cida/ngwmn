@@ -26,6 +26,7 @@ public class PrefetchRestServlet extends HttpServlet {
 	public void init(ServletConfig config) throws ServletException {
 	}
 
+	@SuppressWarnings("unchecked") // this is for getParameterNames cast into generics
 	@Override
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) 
 			throws ServletException, IOException 
