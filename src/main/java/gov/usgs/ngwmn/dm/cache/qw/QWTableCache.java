@@ -73,6 +73,8 @@ public class QWTableCache implements Cache {
 		}
 	}
 
+	
+	// TODO code review : the complexity on this method is too high such that the final return is not even called.
 	@Override
 	public boolean fetchWellData(final Specifier spec, Pipeline pipe)
 			throws IOException {
@@ -158,6 +160,7 @@ public class QWTableCache implements Cache {
 			throw new IOException(e1);
 		}
 		
+		// TODO this is not called - warnings mark it dead code
 		return false;
 	}
 

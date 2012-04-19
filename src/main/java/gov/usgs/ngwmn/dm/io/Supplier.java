@@ -30,4 +30,14 @@ public abstract class Supplier<T> implements InputSupplier<T>, OutputSupplier<T>
 	}
 	
 	public abstract T get(Specifier spec) throws IOException;
+	
+	/**
+	 *  signal the end of a stream for those suppliers that 
+	 *  need to clean up after each source. 
+	 *  
+	 *  for example, Zip Entry management
+	 */
+	public void end() {
+		
+	}
 }
