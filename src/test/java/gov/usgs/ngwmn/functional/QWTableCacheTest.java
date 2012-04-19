@@ -5,7 +5,12 @@ import static org.junit.Assert.*;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.sql.Connection;
+import java.sql.DatabaseMetaData;
+import java.sql.SQLException;
 import java.util.Date;
+
+import javax.sql.DataSource;
 
 import gov.usgs.ngwmn.dm.cache.CacheInfo;
 import gov.usgs.ngwmn.dm.cache.qw.QWTableCache;
@@ -47,6 +52,16 @@ public class QWTableCacheTest extends ContextualTest {
 		assertEquals("bytes", SIZE, ct);
 	}
 
+	public void printDriverVersion(Connection conn) throws SQLException {
+	    DatabaseMetaData meta = conn.getMetaData();
+
+	    // gets driver info:
+	    System.out.println("DriverName: " + meta.getDriverName() );  
+	    System.out.println("DriverVersion: " + meta.getDriverVersion() );  
+	    System.out.println("DriverMajorVersion: " + meta.getDriverMajorVersion() );  
+	    System.out.println("DriverMinorVersion: " + meta.getDriverMinorVersion() );  
+	}
+	
 	@AfterClass
 	public static void tearDownAfterClass() throws Exception {
 	}
@@ -54,6 +69,18 @@ public class QWTableCacheTest extends ContextualTest {
 	@Before
 	public void setUp() throws Exception {
 		victim = ctx.getBean(QWTableCache.class);
+	}
+
+	@Before
+	public void showDriver() throws SQLException {
+		DataSource ds = ctx.getBean("dataSource", DataSource.class);
+		
+		Connection conn = ds.getConnection();
+		try {
+			printDriverVersion(conn);
+		} finally {
+			conn.close();
+		}
 	}
 
 	@After
