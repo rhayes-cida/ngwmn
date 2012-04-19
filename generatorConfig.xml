@@ -27,11 +27,9 @@
     	
     	<columnOverride column="ALT_UNITS" javaType="java.lang.Integer"/>
     	<columnOverride column="ALT_VA" javaType="java.lang.Double"/>
-    	<columnOverride column="COUNTY_CD" javaType="java.lang.Integer"/>
     	<columnOverride column="DEC_LAT_VA" javaType="java.lang.Double"/>
     	<columnOverride column="DEC_LONG_VA" javaType="java.lang.Double"/>
     	<columnOverride column="WELL_DEPTH" javaType="java.lang.Double"/>
-    	<columnOverride column="STATE_CD" javaType="java.lang.Integer"/>
     </table>
     <table schema="GW_DATA_PORTAL" tableName="FETCH_LOG">
     	<columnOverride column="FETCHLOG_ID" javaType="java.lang.Integer" jdbcType="NUMERIC"/>

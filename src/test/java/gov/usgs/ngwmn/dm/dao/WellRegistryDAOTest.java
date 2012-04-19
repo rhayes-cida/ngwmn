@@ -69,7 +69,7 @@ public class WellRegistryDAOTest extends ContextualTest {
 	
 	@Test
 	public void testSelectByState_Montana() {
-		final int MT = 30;
+		final String MT = "30";
 		
 		List<WellRegistry> ww = dao.selectByState(MT);
 		assertNotNull("by state", ww);
@@ -79,14 +79,14 @@ public class WellRegistryDAOTest extends ContextualTest {
 		System.out.printf("MT well count: %d\n", ww.size());
 		
 		for (WellRegistry w : ww) {
-			assertEquals("State cd", MT, w.getStateCd().intValue());
+			assertEquals("State cd", MT, w.getStateCd());
 			assertTrue("agency name contains state name", w.getAgencyNm().contains("Montana"));
 		}
 	}
 	
 	@Test
 	public void testSelectByState_Minnesota() {
-		final int MN = 27;
+		final String MN = "27";
 		
 		List<WellRegistry> ww = dao.selectByState(MN);
 		assertNotNull("by state", ww);
@@ -96,7 +96,7 @@ public class WellRegistryDAOTest extends ContextualTest {
 		System.out.printf("MN well count: %d\n", ww.size());
 		
 		for (WellRegistry w : ww) {
-			assertEquals("State cd", MN, w.getStateCd().intValue());
+			assertEquals("State cd", MN, w.getStateCd());
 			assertTrue("agency name contains state name", w.getAgencyNm().contains("Minnesota"));
 		}
 	}

@@ -78,7 +78,7 @@ public class WellListServlet extends HttpServlet {
 				// user requested by states
 				ww = new ArrayList<WellRegistry>();
 				for (String state_cd : state_fips) {
-					List<WellRegistry> wws = dao.selectByState(Integer.parseInt(state_cd));
+					List<WellRegistry> wws = dao.selectByState(state_cd);
 					
 					ww.addAll(wws);
 				}

@@ -47,7 +47,7 @@ public class WellRegistryDAO {
 		return mapper.selectByAgency(agencyId);
 	}
 
-	public List<WellRegistry> selectByState(int fips) {
+	public List<WellRegistry> selectByState(String fips) {
 		WellRegistryExample filter = new WellRegistryExample();
 		// Only look for displayed wells
 		filter.createCriteria()
