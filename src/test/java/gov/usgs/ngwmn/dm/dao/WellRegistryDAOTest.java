@@ -64,6 +64,7 @@ public class WellRegistryDAOTest extends ContextualTest {
 		
 		for (WellRegistry w : ww) {
 			assertEquals("agency cd", "IL EPA", w.getAgencyCd());
+			assertEquals("display flag", "1", w.getDisplayFlag());
 		}
 	}
 	
@@ -81,6 +82,7 @@ public class WellRegistryDAOTest extends ContextualTest {
 		for (WellRegistry w : ww) {
 			assertEquals("State cd", MT, w.getStateCd());
 			assertTrue("agency name contains state name", w.getAgencyNm().contains("Montana"));
+			assertEquals("display flag", "1", w.getDisplayFlag());
 		}
 	}
 	
@@ -98,6 +100,7 @@ public class WellRegistryDAOTest extends ContextualTest {
 		for (WellRegistry w : ww) {
 			assertEquals("State cd", MN, w.getStateCd());
 			assertTrue("agency name contains state name", w.getAgencyNm().contains("Minnesota"));
+			assertEquals("display flag", "1", w.getDisplayFlag());
 		}
 	}
 	
