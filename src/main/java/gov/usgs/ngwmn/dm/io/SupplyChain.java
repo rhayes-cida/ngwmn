@@ -33,4 +33,9 @@ public abstract class SupplyChain<T> extends Supplier<T> {
 	public T get(Specifier spec) throws IOException {
 		return link.get(spec);
 	}
+	
+	@Override
+	public void end() {
+		link.end();
+	}
 }

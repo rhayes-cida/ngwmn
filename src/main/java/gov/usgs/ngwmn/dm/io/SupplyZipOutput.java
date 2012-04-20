@@ -19,7 +19,7 @@ public class SupplyZipOutput extends Supplier<OutputStream> {
 	}
 
 	public OutputStream getOutputStream(Specifier spec) throws IOException {
-		if (oz == null) {
+		if (oz == null && spec != null) {
 			// init and chain the stream if not done yet
 			openEntry = endEntry = false;
 			oz = new ZipOutputStream( os.get(spec) );
@@ -44,7 +44,7 @@ public class SupplyZipOutput extends Supplier<OutputStream> {
 	}
 
 	private void openEntry(Specifier spec) throws IOException {
-		if (!openEntry) {
+		if (!openEntry && spec != null) {
 			ZipEntry zip = new ZipEntry( spec.getDualId() );
 			oz.putNextEntry(zip);
 			openEntry = true;

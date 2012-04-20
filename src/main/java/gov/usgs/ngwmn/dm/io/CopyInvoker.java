@@ -19,7 +19,11 @@ public class CopyInvoker implements Invoker {
 	public void invoke(InputStream is, OutputStream os, PipeStatistics stats)
 			throws IOException {
 		long ct = ByteStreams.copy(is,os);
-		os.close(); // TODO are we sure that we close here and not at the servlet layer or allow the the container to manage this?
+
+		// see the Pipeline.invoke and note that it calls Supplier.end
+		// the end should close the stream or an individual stream entry based on its requirements
+		//os.close(); // TODO are we sure that we close here and not at the servlet layer or allow the the container to manage this?
+		
 		stats.incrementCount(ct);
 		logger.info("Copied input to destination, stats={}", new Object[]{stats});
 	}

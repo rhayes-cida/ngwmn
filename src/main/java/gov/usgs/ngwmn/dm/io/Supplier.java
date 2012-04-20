@@ -35,9 +35,11 @@ public abstract class Supplier<T> implements InputSupplier<T>, OutputSupplier<T>
 	 *  signal the end of a stream for those suppliers that 
 	 *  need to clean up after each source. 
 	 *  
-	 *  for example, Zip Entry management
+	 *  for example, Zip Entry management will need to close an entry
+	 *  and all streams will need to closed eventually the streams
 	 */
 	public void end() {
-		
+		// TODO maybe the default behavior could be to close the supplied stream
+		// TODO this way the specific impl may be able to 
 	}
 }
