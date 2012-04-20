@@ -3,6 +3,7 @@ package gov.usgs.ngwmn.dm.dao;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 
 import gov.usgs.ngwmn.dm.cache.fs.FileCache;
 import gov.usgs.ngwmn.dm.spec.Specifier;
@@ -75,6 +76,16 @@ public abstract class ContextualTest {
 
 	// low-level, should not depend on much besides the data
 	protected void checkSiteIsVisible(Specifier spec) throws Exception {
+		
+		String agencyID = spec.getAgencyID();
+		String wellID = spec.getFeatureID();
+
+		checkSiteIsVisible(agencyID, wellID);		
+	}
+
+	protected void checkSiteIsVisible(String agencyID, String wellID) 
+			throws SQLException 
+	{
 		DataSource ds = ctx.getBean("dataSource", DataSource.class);
 		
 		Connection conn = ds.getConnection();
@@ -82,8 +93,8 @@ public abstract class ContextualTest {
 			PreparedStatement ps = conn.prepareStatement("SELECT count(*) from WELL_REGISTRY " +
 					"WHERE AGENCY_CD = ? and SITE_NO = ? " +
 					"and DISPLAY_FLAG = '1'");
-			ps.setString(1, spec.getAgencyID());
-			ps.setString(2, spec.getFeatureID());
+			ps.setString(1, agencyID);
+			ps.setString(2, wellID);
 			ResultSet rs = ps.executeQuery();
 			int ct = 0;
 			while (rs.next()) {
@@ -91,11 +102,12 @@ public abstract class ContextualTest {
 			}
 			
 			if (ct != 1) {
-				throw new RuntimeException("Expected site not found or not visible: " + spec);
+				throw new RuntimeException("Expected site not found or not visible: " + agencyID + ":" + wellID);
 			}
 		} finally {
 			conn.close();
-		}		
+		}
 	}
+	
 
 }
