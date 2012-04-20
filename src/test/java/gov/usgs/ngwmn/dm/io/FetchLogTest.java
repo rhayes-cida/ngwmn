@@ -15,6 +15,9 @@ public class FetchLogTest extends ContextualTest {
 	public void setUp() throws Exception {
 		victim = ctx.getBean("FetchRecorder", FetchRecorder.class);
 		//dao = ctx.getBean("FetchLogDAO", FetchLogDAO.class);
+		
+		PipeStatistics stats = StatsMaker.makeStats(getClass());
+		checkSiteIsVisible(stats.getSpecifier());
 	}
 
 	@Test
