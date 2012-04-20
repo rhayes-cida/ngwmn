@@ -54,7 +54,8 @@ public class DataManagerServlet extends HttpServlet {
 		try {
 			WellDataType type = spec.getTypeID();
 			resp.setContentType(type.contentType);
-			resp.setHeader("Content-Disposition", "attachment; filename=" + type.makeFilename(well_name));
+			logger.debug("send as attachment with file name " + type.makeFilename(well_name));
+			resp.setHeader("content-disposition", "attachment;filename=" + type.makeFilename(well_name));
 			
 			// ensure that buffer size is greater than magic lower limit for
 			// non-extant sites

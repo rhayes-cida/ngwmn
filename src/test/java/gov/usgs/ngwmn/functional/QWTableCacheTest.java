@@ -13,7 +13,7 @@ import java.util.Date;
 import javax.sql.DataSource;
 
 import gov.usgs.ngwmn.dm.cache.CacheInfo;
-import gov.usgs.ngwmn.dm.cache.qw.QWTableCache;
+import gov.usgs.ngwmn.dm.cache.qw.DatabaseXMLCache;
 import gov.usgs.ngwmn.dm.dao.ContextualTest;
 import gov.usgs.ngwmn.dm.io.Pipeline;
 import gov.usgs.ngwmn.dm.spec.Specifier;
@@ -37,7 +37,7 @@ public class QWTableCacheTest extends ContextualTest {
 	private static final String AGENCY = "USGS";
 	private static final String filename = AGENCY+ "_" + SITE + "_" + TYPE;
 
-	private QWTableCache victim;
+	private DatabaseXMLCache victim;
 	
 	@BeforeClass
 	public static void checkFile() throws Exception {
@@ -68,7 +68,7 @@ public class QWTableCacheTest extends ContextualTest {
 
 	@Before
 	public void setUp() throws Exception {
-		victim = ctx.getBean(QWTableCache.class);
+		victim = ctx.getBean("QualityCache",DatabaseXMLCache.class);
 	}
 
 	@Before

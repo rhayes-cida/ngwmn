@@ -2,15 +2,16 @@
 <configuration>
 
   <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
-    <layout class="ch.qos.logback.classic.PatternLayout">
-      <Pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</Pattern>
-    </layout>
+  	  <encoder>
+	    <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
+	  </encoder>
   </appender>
   
-  <logger name="com.base22" level="TRACE"/>
-  
-
   <root level="debug">
     <appender-ref ref="STDOUT" />
   </root>
+  
+  <logger level="DEBUG" name="gov.usgs.ngwmn.dm.DataManagerServlet"/>
+  <logger name="com.base22" level="TRACE"/>
+  <logger name="httpclient.wire.content" level="WARN"/>
 </configuration>

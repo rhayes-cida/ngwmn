@@ -31,8 +31,9 @@
     </beans>
     
     <beans>
-	    <bean id="QWTableCache" class="gov.usgs.ngwmn.dm.cache.qw.QWTableCache">
+	    <bean id="QualityCache" class="gov.usgs.ngwmn.dm.cache.qw.DatabaseXMLCache">
 	    	<constructor-arg ref="dataSource"/>
+	    	<constructor-arg value="QUALITY_CACHE"></constructor-arg>
 	    </bean>
     </beans>
 </beans>
