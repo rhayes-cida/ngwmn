@@ -86,7 +86,7 @@ public class DatabaseXMLCache implements Cache {
 			final Connection conn = ds.getConnection();
 			try {
 				// To use the getCLOBVal function, the table alias must be explicit; use of the implicit alias fails with error ORA-00904
-				String query = "SELECT cachetable.fetch_date, cachetable.xml.getCLOBVal() FROM "+tablename+" cachetable WHERE cachetable.agency_cd = ? and cachetable.site_no = ? order by cachetable.fetch_date DESC";
+				String query = "SELECT cachetable.fetch_date, cachetable.xml.getCLOBVal() FROM GW_DATA_PORTAL."+tablename+" cachetable WHERE cachetable.agency_cd = ? and cachetable.site_no = ? order by cachetable.fetch_date DESC";
 				PreparedStatement ps = conn.prepareStatement(query);
 				try {
 					ps.setMaxRows(1);
@@ -173,7 +173,7 @@ public class DatabaseXMLCache implements Cache {
 		try {
 			conn = ds.getConnection();
 			try {
-				String query = "SELECT count(*) FROM "+tablename+" WHERE agency_cd = ? and site_no = ? ";
+				String query = "SELECT count(*) FROM GW_DATA_PORTAL."+tablename+" WHERE agency_cd = ? and site_no = ? ";
 				PreparedStatement ps = conn.prepareStatement(query);
 				try {
 					ps.setString(1, spec.getAgencyID());
@@ -210,7 +210,7 @@ public class DatabaseXMLCache implements Cache {
 			try {
 				PreparedStatement ps = conn.prepareStatement("SELECT fetch_date, " +
 						"dbms_lob.getlength(xmltype.getclobval(xml)) sz " +
-						"from "+tablename+" " +
+						"from GW_DATA_PORTAL."+tablename+" " +
 						"where agency_cd = ? and site_no = ? " +
 						"order by fetch_date ASC ");
 				ps.setString(1, spec.getAgencyID());
@@ -241,7 +241,7 @@ public class DatabaseXMLCache implements Cache {
 	private void insert(Connection conn, WellRegistryKey key, Clob clob) 
 			throws SQLException
 	{
-		String SQLTEXT = "INSERT INTO "+tablename+"(agency_cd,site_no,fetch_date,xml) VALUES (" +
+		String SQLTEXT = "INSERT INTO GW_DATA_PORTAL."+tablename+"(agency_cd,site_no,fetch_date,xml) VALUES (" +
 				"?, ?, ?, XMLType(?))";
 		
 		PreparedStatement s = conn.prepareStatement(SQLTEXT);
