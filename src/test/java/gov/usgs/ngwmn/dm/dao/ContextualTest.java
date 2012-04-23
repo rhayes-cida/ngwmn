@@ -90,7 +90,7 @@ public abstract class ContextualTest {
 		
 		Connection conn = ds.getConnection();
 		try {
-			PreparedStatement ps = conn.prepareStatement("SELECT count(*) from WELL_REGISTRY " +
+			PreparedStatement ps = conn.prepareStatement("SELECT count(*) from GW_DATA_PORTAL.WELL_REGISTRY " +
 					"WHERE AGENCY_CD = ? and SITE_NO = ? " +
 					"and DISPLAY_FLAG = '1'");
 			ps.setString(1, agencyID);
