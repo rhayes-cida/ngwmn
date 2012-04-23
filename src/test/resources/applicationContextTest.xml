@@ -42,12 +42,6 @@
 	    </bean>
     </beans>
     
-    <beans>
-	    <bean id="QualityCache" class="gov.usgs.ngwmn.dm.cache.qw.DatabaseXMLCache">
-	    	<constructor-arg ref="dataSource"/>
-	    	<constructor-arg value="QUALITY_CACHE"></constructor-arg>
-	    </bean>
-    </beans>
 </beans>
 
        
