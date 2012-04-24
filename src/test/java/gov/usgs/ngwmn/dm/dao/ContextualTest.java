@@ -13,7 +13,6 @@ import javax.sql.DataSource;
 
 import org.junit.BeforeClass;
 import org.junit.runner.RunWith;
-import static org.junit.Assert.*;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;

@@ -12,15 +12,12 @@ import gov.usgs.ngwmn.dm.io.StatsMaker;
 import gov.usgs.ngwmn.dm.io.Supplier;
 import gov.usgs.ngwmn.dm.spec.Specifier;
 
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.*;
 
 public class DataBrokerTest extends ContextualTest {
 
-	private static final String SITE_URL = "http://localhost:8080/ngwmn/data?agency_cd=USGS&featureID=402734087033401";
+	// TODO not used
+	//private static final String SITE_URL = "http://localhost:8080/ngwmn/data?agency_cd=USGS&featureID=402734087033401";
 
 	private DataBroker victim;
 	

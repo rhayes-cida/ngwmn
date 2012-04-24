@@ -10,8 +10,6 @@ import org.apache.ibatis.annotations.ResultMap;
 import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.SelectKey;
 import org.apache.ibatis.annotations.Update;
-import gov.usgs.ngwmn.dm.dao.FetchLog;
-import gov.usgs.ngwmn.dm.dao.FetchLogExample;
 
 public interface FetchLogMapper {
 

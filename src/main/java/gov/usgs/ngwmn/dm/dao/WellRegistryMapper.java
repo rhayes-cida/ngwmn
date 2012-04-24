@@ -4,9 +4,6 @@ import java.util.List;
 
 import org.apache.ibatis.annotations.ResultMap;
 import org.apache.ibatis.annotations.Select;
-import gov.usgs.ngwmn.dm.dao.WellRegistry;
-import gov.usgs.ngwmn.dm.dao.WellRegistryExample;
-import gov.usgs.ngwmn.dm.dao.WellRegistryKey;
 
 public interface WellRegistryMapper {
 
