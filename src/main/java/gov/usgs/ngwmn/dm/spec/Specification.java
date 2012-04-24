@@ -1,5 +1,7 @@
 package gov.usgs.ngwmn.dm.spec;
 
+import java.util.List;
+
 
 /**
  * A specifier with potentially more complex request parameters that must be 
@@ -8,19 +10,47 @@ package gov.usgs.ngwmn.dm.spec;
  * @author david
  *
  */
-public class Specification extends Specifier {
+public class Specification {
 
+	// Delineated list of agency well IDs
+	private List<String> wellIDs;
+	
 	// TODO actual fields required - these are just brainstorm examples.
+	// DEC_LAT_VA
 	private Double latitudeNorth;
 	private Double latitudeSouth;
+	// DEC_LONG_VA
 	private Double longitudeEast;
 	private Double longitudeWest;
 	
-	private String aquiferId;
+	// NAT_AQUIFER_CD
+	private String aquiferID;
+	// AGENCY_CD
 	private String agencyAdmin;
-	private String wlClass;
-	private String qwClass;
-		
+	
+	// WL_SN_FLAG
+	private String wlSnFlag;
+	// WL_BASELINE_FLAG
+	private String wlBaseFlag;
+	// WL_WELL_CHARS
+	private String wlChars;
+	// WL_WELL_PURPOSE
+	private String wlPurpose;
+	// WL_WELL_TYPE
+	private String wlType;
+
+	// QW_SN_FLAG
+	private String qwSnFlag;
+	// QW_BASELINE_FLAG
+	private String qwBaseFlag;
+	// QW_WELL_CHARS
+	private String qwChars;
+	// QW_WELL_PURPOSE
+	private String qwPurpose;
+	// QW_WELL_TYPE
+	private String qwType;
+	
+	
 	public Double getLatitudeNorth() {
 		return latitudeNorth;
 	}
@@ -47,29 +77,89 @@ public class Specification extends Specifier {
 	}
 	
 	
-	public String getAquiferId() {
-		return aquiferId;
-	}
-	public void setAquiferId(String aquiferId) {
-		this.aquiferId = aquiferId;
-	}
 	public String getAgencyAdmin() {
 		return agencyAdmin;
 	}
 	public void setAgencyAdmin(String agencyAdmin) {
 		this.agencyAdmin = agencyAdmin;
 	}
-	public String getWlClass() {
-		return wlClass;
+	
+	
+	public List<String> getWellIDs() {
+		return wellIDs;
 	}
-	public void setWlClass(String wlClass) {
-		this.wlClass = wlClass;
+	public void setWellIDs(List<String> wellIDs) {
+		this.wellIDs = wellIDs;
 	}
-	public String getQwClass() {
-		return qwClass;
+	public String getAquiferID() {
+		return aquiferID;
 	}
-	public void setQwClass(String qwClass) {
-		this.qwClass = qwClass;
+	public void setAquiferID(String aquiferID) {
+		this.aquiferID = aquiferID;
+	}
+	
+	
+	public String getWlSnFlag() {
+		return wlSnFlag;
+	}
+	public void setWlSnFlag(String wlSnFlag) {
+		this.wlSnFlag = wlSnFlag;
+	}
+	public String getWlBaseFlag() {
+		return wlBaseFlag;
+	}
+	public void setWlBaseFlag(String wlBaseFlag) {
+		this.wlBaseFlag = wlBaseFlag;
+	}
+	public String getWlChars() {
+		return wlChars;
+	}
+	public void setWlChars(String wlChars) {
+		this.wlChars = wlChars;
+	}
+	public String getWlPurpose() {
+		return wlPurpose;
+	}
+	public void setWlPurpose(String wlPurpose) {
+		this.wlPurpose = wlPurpose;
+	}
+	public String getWlType() {
+		return wlType;
+	}
+	public void setWlType(String wlType) {
+		this.wlType = wlType;
+	}
+	
+	
+	public String getQwSnFlag() {
+		return qwSnFlag;
+	}
+	public void setQwSnFlag(String qwSnFlag) {
+		this.qwSnFlag = qwSnFlag;
+	}
+	public String getQwBaseFlag() {
+		return qwBaseFlag;
+	}
+	public void setQwBaseFlag(String qwBaseFlag) {
+		this.qwBaseFlag = qwBaseFlag;
+	}
+	public String getQwChars() {
+		return qwChars;
+	}
+	public void setQwChars(String qwChars) {
+		this.qwChars = qwChars;
+	}
+	public String getQwPurpose() {
+		return qwPurpose;
+	}
+	public void setQwPurpose(String qwPurpose) {
+		this.qwPurpose = qwPurpose;
+	}
+	public String getQwType() {
+		return qwType;
+	}
+	public void setQwType(String qwType) {
+		this.qwType = qwType;
 	}
 	
 	

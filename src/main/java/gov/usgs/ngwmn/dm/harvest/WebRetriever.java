@@ -44,7 +44,7 @@ public class WebRetriever implements DataFetcher {
 			
 			@Override
 			public InputStream get(Specifier spec) throws IOException {
-				pipe.getStatistics().markStart();
+				pipe.getStatistics().markStart();  // TODO did not expect this behavior. seems out of place
 				int statusCode = harvester.wget(url);
 				
 		        if (statusCode != HttpStatus.SC_OK) {
@@ -56,6 +56,12 @@ public class WebRetriever implements DataFetcher {
 				return harvester.getInputStream();
 				// it's zero, no help here  logger.info("response stream available {}", is.available());
 			}
+			
+			@Override
+			public void end(Specifier spec) {
+				// TODO do nothing for now
+			}
+			
 		});
 		
 		return true;

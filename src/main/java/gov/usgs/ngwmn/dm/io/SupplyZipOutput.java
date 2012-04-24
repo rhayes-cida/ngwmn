@@ -52,8 +52,7 @@ public class SupplyZipOutput extends Supplier<OutputStream> {
 	}
 
 	@Override
-	public void end() {
-		super.end(); // just in case there is impl there
+	public void end(Specifier spec) {
 		endEntry = true; // record that we received an end signal
 	}
 	

@@ -20,6 +20,9 @@ public abstract class SupplyChain<T> extends Supplier<T> {
 		if (supply == null) {
 			throw new NullPointerException("Supplier for chain may not be null.");
 		}
+		if (link != null) {
+			throw new RuntimeException("Supplier for chain may not be set multiple times.");
+		}
 		link = supply;
 	}
 	
@@ -34,8 +37,11 @@ public abstract class SupplyChain<T> extends Supplier<T> {
 		return link.get(spec);
 	}
 	
+	/**
+	 * override-able default impl that ensures the link receives the end signal.
+	 */
 	@Override
-	public void end() {
-		link.end();
+	public void end(Specifier spec) {
+		link.end(spec);
 	}
 }

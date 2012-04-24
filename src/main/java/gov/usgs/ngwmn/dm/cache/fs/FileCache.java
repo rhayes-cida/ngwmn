@@ -80,18 +80,17 @@ public class FileCache implements Cache {
 	 * @see gov.usgs.ngwmn.dm.cache.Cache#putter(gov.usgs.ngwmn.dm.spec.Specifier)
 	 */
 	@Override
-	public OutputStream destination(Specifier well)
+	public OutputStream destination(Specifier spec)
 			throws IOException
 	{
-		File f = contentFile(well);
+		File f = contentFile(spec);
 		File tf = File.createTempFile("LDR", ".xml");
 		
 		// TODO Need to make these stats available to DataBroker
 		PipeStatistics s = new PipeStatistics();
-		s.setStatus(Status.OPEN);
 		
 		OutputStream v = new TempfileOutputStream(f, tf, s);
-		logger.info("Created tempfile output for {}", well);
+		logger.info("Created tempfile output for {}", spec);
 		return v;
 	}
 	
@@ -140,7 +139,7 @@ public class FileCache implements Cache {
 			stat.incrementCount(ict);
 		}
 		
-		os.close();
+		//os.close();
 	}
 
 	public static void copyStream(InputStream is, OutputStream os, PipeStatistics stats) 

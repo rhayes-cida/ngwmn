@@ -26,7 +26,7 @@ public class PipelineTest extends Pipeline {
 		final InputStream is = new ByteArrayInputStream(sample.getBytes());
 		ByteArrayOutputStream os = new ByteArrayOutputStream();
 		final OpCountOutputStream cos = new OpCountOutputStream(os);
-		Invoker victim = new GenericInvoker();
+		Invoker invoker = new GenericInvoker();
 		
 		Pipeline pl = new Pipeline(null);
 		pl.setInputSupplier(new Supplier<InputStream>() {
@@ -41,14 +41,14 @@ public class PipelineTest extends Pipeline {
 				return cos;
 			}
 		});
-		pl.setInvoker(victim);
+		pl.setInvoker(invoker);
 		try {
 			pl.invoke();
-			assertEquals("noted success", PipeStatistics.Status.DONE, pl.getStatistics().getStatus());
-			assertEquals("stream closed", 1, cos.getCloseCt());
-			assertEquals("contents", sample, os.toString());
-			assertEquals("count", sample.length(), pl.getStatistics().getCount());
-			assertEquals("write byte count", sample.length(), cos.getWriteByteCt());
+			assertEquals("pipeline stats should indicate DONE", PipeStatistics.Status.DONE, pl.getStatistics().getStatus());
+			assertEquals("output stream should be closed", 1, cos.getCloseCt());
+			assertEquals("pipeline stats data count should match the original data", sample.length(), pl.getStatistics().getCount());
+			assertEquals("write byte count should match the original data", sample.length(), cos.getWriteByteCt());
+			assertEquals("output data should match input data", sample, os.toString());
 		} catch (IOException ioe) {
 			assertEquals("noted failure", PipeStatistics.Status.FAIL, pl.getStatistics().getStatus());
 		}

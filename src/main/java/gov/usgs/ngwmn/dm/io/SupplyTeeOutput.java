@@ -20,5 +20,11 @@ public class SupplyTeeOutput extends Supplier<OutputStream> {
 	public OutputStream get(Specifier spec) throws IOException {
 		return new TeeOutputStream(os1.get(spec), os2.get(spec));
 	}
+	
+	@Override
+	public void end(Specifier spec) {
+		os1.end(spec);
+		os2.end(spec);
+	}
 
 }

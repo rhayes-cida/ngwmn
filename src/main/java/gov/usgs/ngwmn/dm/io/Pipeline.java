@@ -23,8 +23,8 @@ public class Pipeline implements Executee {
 	private IOException    ioe;
 	private Invoker        invoker;
 	
-	
 	private final Specifier      spec;
+	
 	
 	public Pipeline(Specifier sp) {
 		spec = sp;
@@ -60,7 +60,7 @@ public class Pipeline implements Executee {
 		setOutputSupplier(supply);
 	}
 	public void chainOutputSupplier(SupplyChain<OutputStream> supply) {
-		
+		// TODO this currently does not fail safe when oss is null as addOutputSupplier does
 		supply.setSupply(oss);
 		setOutputSupplier(supply);
 	}
@@ -106,8 +106,8 @@ public class Pipeline implements Executee {
 			logger.info("Fail stats={}", statistics);
 			throw ioe;
 		} finally {
-			iss.end();
-			oss.end();
+			iss.end(spec);
+			oss.end(spec);
 		}
 	}
 	
