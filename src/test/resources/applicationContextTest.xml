@@ -25,16 +25,23 @@
 	        <!--  <property name="driverClassName" value="oracle.jdbc.driver.OracleDriver" /> -->
 			<property name="URL"
 	                  value="jdbc:oracle:thin:@192.168.56.10:1521:orcl" />
+	        <property name="user" value="ngwmn_cache" />
+	        <property name="password" value="tiger" />
+	    </bean>
+    </beans>
+    
+    <beans profile="local-gw_portal_portal">
+	    <bean id="dataSource"
+	        class="oracle.jdbc.pool.OracleDataSource"
+	        destroy-method="close">
+	        <!--  <property name="driverClassName" value="oracle.jdbc.driver.OracleDriver" /> -->
+			<property name="URL"
+	                  value="jdbc:oracle:thin:@192.168.56.10:1521:orcl" />
 	        <property name="user" value="gw_data_portal" />
 	        <property name="password" value="oracle" />
 	    </bean>
     </beans>
     
-    <beans>
-	    <bean id="QWTableCache" class="gov.usgs.ngwmn.dm.cache.qw.QWTableCache">
-	    	<constructor-arg ref="dataSource"/>
-	    </bean>
-    </beans>
 </beans>
 
        

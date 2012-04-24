@@ -44,6 +44,7 @@ public class BasicServletTest extends ContextualTest {
 	
 	@Test
 	public void testWithData() throws Exception {
+		checkSiteIsVisible("USGS", "402734087033401");
 		ServletRunner sr = new ServletRunner(this.getClass().getResourceAsStream("/servlet-test-web.xml"), "/ngwmn");
 		
 		ServletUnitClient sc = sr.newClient();
@@ -61,6 +62,7 @@ public class BasicServletTest extends ContextualTest {
 
 	@Test
 	public void testWithNoData() throws Exception {
+		checkSiteIsVisible("NJGS","2288614");
 		// this site exists, but has no data (on 2012/03/23)
 		ServletRunner sr = new ServletRunner(this.getClass().getResourceAsStream("/servlet-test-web.xml"), "/ngwmn");
 		

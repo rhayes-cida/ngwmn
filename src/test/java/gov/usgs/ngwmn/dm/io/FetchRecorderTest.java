@@ -30,6 +30,13 @@ public class FetchRecorderTest extends ContextualTest {
 		victim = ctx.getBean("FetchRecorder", FetchRecorder.class);
 		dao = ctx.getBean("FetchLogDAO", FetchLogDAO.class);
 	}
+	
+	@Before
+	public void checkSite() throws Exception {
+		PipeStatistics stats = StatsMaker.makeStats(getClass());
+		
+		checkSiteIsVisible(stats.getSpecifier());
+	}
 
 	private int getFetchCount(Specifier spec) {
 		WellRegistryKey well = spec.getWellRegistryKey();

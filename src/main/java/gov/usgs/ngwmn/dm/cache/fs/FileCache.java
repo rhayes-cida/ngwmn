@@ -164,7 +164,7 @@ public class FileCache implements Cache {
 			throw new IOException("Base directory does not exist");			
 		}
 		if ( ! basedir.isDirectory() ) {
-			throw new IOException("Bse dir not a directory");
+			throw new IOException("Base dir not a directory");
 		}
 		if ( ! basedir.canRead()) {
 			throw new IOException("Cannot read base directory");

@@ -25,12 +25,15 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 
-public class QWTableCache implements Cache {
+public class DatabaseXMLCache implements Cache {
 
-	private static Logger logger = LoggerFactory.getLogger(QWTableCache.class);
+	private static Logger logger = LoggerFactory.getLogger(DatabaseXMLCache.class);
 	
-	public QWTableCache(DataSource ds) {
+	private final String tablename;
+	
+	public DatabaseXMLCache(DataSource ds, String tablename) {
 		this.ds = ds;
+		this.tablename = tablename;
 	}
 
 	private DataSource ds;
@@ -83,7 +86,7 @@ public class QWTableCache implements Cache {
 			final Connection conn = ds.getConnection();
 			try {
 				// To use the getCLOBVal function, the table alias must be explicit; use of the implicit alias fails with error ORA-00904
-				String query = "SELECT qw.fetch_date, qw.xml.getCLOBVal() FROM QW qw WHERE qw.agency_cd = ? and qw.site_no = ? order by qw.fetch_date DESC";
+				String query = "SELECT cachetable.fetch_date, cachetable.xml.getCLOBVal() FROM GW_DATA_PORTAL."+tablename+" cachetable WHERE cachetable.agency_cd = ? and cachetable.site_no = ? order by cachetable.fetch_date DESC";
 				PreparedStatement ps = conn.prepareStatement(query);
 				try {
 					ps.setMaxRows(1);
@@ -170,7 +173,7 @@ public class QWTableCache implements Cache {
 		try {
 			conn = ds.getConnection();
 			try {
-				String query = "SELECT count(*) FROM QW WHERE agency_cd = ? and site_no = ? ";
+				String query = "SELECT count(*) FROM GW_DATA_PORTAL."+tablename+" WHERE agency_cd = ? and site_no = ? ";
 				PreparedStatement ps = conn.prepareStatement(query);
 				try {
 					ps.setString(1, spec.getAgencyID());
@@ -207,7 +210,7 @@ public class QWTableCache implements Cache {
 			try {
 				PreparedStatement ps = conn.prepareStatement("SELECT fetch_date, " +
 						"dbms_lob.getlength(xmltype.getclobval(xml)) sz " +
-						"from QW " +
+						"from GW_DATA_PORTAL."+tablename+" " +
 						"where agency_cd = ? and site_no = ? " +
 						"order by fetch_date ASC ");
 				ps.setString(1, spec.getAgencyID());
@@ -238,7 +241,7 @@ public class QWTableCache implements Cache {
 	private void insert(Connection conn, WellRegistryKey key, Clob clob) 
 			throws SQLException
 	{
-		String SQLTEXT = "INSERT INTO qw(agency_cd,site_no,fetch_date,xml) VALUES (" +
+		String SQLTEXT = "INSERT INTO GW_DATA_PORTAL."+tablename+"(agency_cd,site_no,fetch_date,xml) VALUES (" +
 				"?, ?, ?, XMLType(?))";
 		
 		PreparedStatement s = conn.prepareStatement(SQLTEXT);

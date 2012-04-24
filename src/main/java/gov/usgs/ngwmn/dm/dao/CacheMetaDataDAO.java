@@ -43,7 +43,7 @@ public class CacheMetaDataDAO {
 	public void updateStatistics() throws Exception {
 		Connection conn = dataSource.getConnection();
 		try {
-			CallableStatement s = conn.prepareCall("{call UPDATE_CACHE_META_DATA}");
+			CallableStatement s = conn.prepareCall("{call GW_DATA_PORTAL.UPDATE_CACHE_META_DATA}");
 			int uc = s.executeUpdate();
 			logger.info("Updated cache meta data, result = {}", uc);
 		} finally {

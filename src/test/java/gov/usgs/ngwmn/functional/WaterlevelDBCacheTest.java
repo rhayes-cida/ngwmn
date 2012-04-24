@@ -5,10 +5,16 @@ import static org.junit.Assert.*;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.sql.Connection;
+import java.sql.DatabaseMetaData;
+import java.sql.SQLException;
 import java.util.Date;
 
+import javax.sql.DataSource;
+
+import gov.usgs.ngwmn.WellDataType;
 import gov.usgs.ngwmn.dm.cache.CacheInfo;
-import gov.usgs.ngwmn.dm.cache.qw.QWTableCache;
+import gov.usgs.ngwmn.dm.cache.qw.DatabaseXMLCache;
 import gov.usgs.ngwmn.dm.dao.ContextualTest;
 import gov.usgs.ngwmn.dm.io.Pipeline;
 import gov.usgs.ngwmn.dm.spec.Specifier;
@@ -24,19 +30,19 @@ import com.google.common.io.CountingOutputStream;
 import com.google.common.io.InputSupplier;
 import com.google.common.io.NullOutputStream;
 
-public class QWTableCacheTest extends ContextualTest {
+public class WaterlevelDBCacheTest extends ContextualTest {
 
-	private static final int SIZE = 17779;
-	private static final String TYPE = "QUALITY";
-	private static final String SITE = "394212075275101";
+	private static final int SIZE = 4102;
+	private static final String TYPE = WellDataType.WATERLEVEL.name();
+	private static final String SITE = "385748074511001";
 	private static final String AGENCY = "USGS";
 	private static final String filename = AGENCY+ "_" + SITE + "_" + TYPE;
 
-	private QWTableCache victim;
+	private DatabaseXMLCache victim;
 	
 	@BeforeClass
 	public static void checkFile() throws Exception {
-		InputStream ris = QWTableCacheTest.class.getResourceAsStream("/sample-data/" + filename);
+		InputStream ris = WaterlevelDBCacheTest.class.getResourceAsStream("/sample-data/" + filename);
 		
 		CountingOutputStream cos = new CountingOutputStream(new NullOutputStream());
 		
@@ -47,13 +53,35 @@ public class QWTableCacheTest extends ContextualTest {
 		assertEquals("bytes", SIZE, ct);
 	}
 
+	public void printDriverVersion(Connection conn) throws SQLException {
+	    DatabaseMetaData meta = conn.getMetaData();
+
+	    // gets driver info:
+	    System.out.println("DriverName: " + meta.getDriverName() );  
+	    System.out.println("DriverVersion: " + meta.getDriverVersion() );  
+	    System.out.println("DriverMajorVersion: " + meta.getDriverMajorVersion() );  
+	    System.out.println("DriverMinorVersion: " + meta.getDriverMinorVersion() );  
+	}
+	
 	@AfterClass
 	public static void tearDownAfterClass() throws Exception {
 	}
 
 	@Before
 	public void setUp() throws Exception {
-		victim = ctx.getBean(QWTableCache.class);
+		victim = ctx.getBean("QualityCache",DatabaseXMLCache.class);
+	}
+
+	@Before
+	public void showDriver() throws SQLException {
+		DataSource ds = ctx.getBean("dataSource", DataSource.class);
+		
+		Connection conn = ds.getConnection();
+		try {
+			printDriverVersion(conn);
+		} finally {
+			conn.close();
+		}
 	}
 
 	@After
@@ -72,8 +100,8 @@ public class QWTableCacheTest extends ContextualTest {
 		long ct = ByteStreams.copy(inp, os);
 		os.close();
 		
-		assertTrue("got bytes", ct > 0);
-		assertEquals("byte count", SIZE, ct);
+		assertTrue("expect got some bytes", ct > 0);
+		assertEquals("expect byte count has not changed", SIZE, ct);
 	}
 
 	private Specifier makeSpecifier() {
@@ -97,7 +125,7 @@ public class QWTableCacheTest extends ContextualTest {
 		ByteStreams.copy(iss, dest);
 		
 		// Contents may have expanded in shipping, due to pretty printing
-		assertTrue("byte count", dest.size() >= SIZE);
+		assertTrue("expect byte count has not shrunk", dest.size() >= SIZE);
 	}
 
 	// @Test
@@ -111,7 +139,7 @@ public class QWTableCacheTest extends ContextualTest {
 		
 		ByteStreams.copy(iss, System.out);
 		
-		assertTrue("still alive", true);
+		assertTrue("expect test method reaches end", true);
 	}
 
 	@Test
@@ -120,7 +148,7 @@ public class QWTableCacheTest extends ContextualTest {
 		
 		boolean e = victim.contains(spec);
 		
-		assertTrue("exists", e);
+		assertTrue("expect cache exists", e);
 	}
 	
 	@Test
@@ -131,10 +159,10 @@ public class QWTableCacheTest extends ContextualTest {
 		
 		// Contents may have expanded in shipping, due to pretty printing
 		// assertEquals(SIZE, info.getLength());
-		assertTrue("size", info.getLength() >= SIZE);
-		assertTrue(info.isExists());
+		assertTrue("expect size no smaller than inpout file", info.getLength() >= SIZE);
+		assertTrue("expect cache exists",info.isExists());
 		
-		assertTrue("created before now", info.getCreated().before(new Date()));
-		assertFalse("created after modified", info.getCreated().after(info.getModified()));
+		assertTrue("expect created before now", info.getCreated().before(new Date()));
+		assertFalse("expect create time after modify time", info.getCreated().after(info.getModified()));
 	}
 }

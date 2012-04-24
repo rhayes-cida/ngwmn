@@ -99,6 +99,25 @@
 		<property name="harvester" ref="WebRetriever"/>
 	</bean>
 
+    <beans>
+	    <bean id="QualityCache" class="gov.usgs.ngwmn.dm.cache.qw.DatabaseXMLCache">
+	    	<constructor-arg ref="dataSource"/>
+	    	<constructor-arg value="QUALITY_CACHE"></constructor-arg>
+	    </bean>
+    </beans>
+    <beans>
+	    <bean id="LogCache" class="gov.usgs.ngwmn.dm.cache.qw.DatabaseXMLCache">
+	    	<constructor-arg ref="dataSource"/>
+	    	<constructor-arg value="LOG_CACHE"></constructor-arg>
+	    </bean>
+    </beans>
+    <beans>
+	    <bean id="WaterlevelCache" class="gov.usgs.ngwmn.dm.cache.qw.DatabaseXMLCache">
+	    	<constructor-arg ref="dataSource"/>
+	    	<constructor-arg value="WATERLEVEL_CACHE"></constructor-arg>
+	    </bean>
+    </beans>
+
 </beans>
 
        
