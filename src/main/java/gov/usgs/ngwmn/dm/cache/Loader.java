@@ -17,10 +17,10 @@ implements DataLoader {
 	private Cache cache;
 	private Logger logger = LoggerFactory.getLogger(this.getClass());
 	
-	public OutputStream destination(Specifier well) 
+	public OutputStream destination(Specifier spec) 
 			throws IOException
 	{
-		return cache.destination(well);
+		return cache.destination(spec);
 	}
 
 	public Cache getCache() {
@@ -35,11 +35,14 @@ implements DataLoader {
 	public boolean configureOutput(final Specifier spec, Pipeline pipe) throws IOException {
 			
 		pipe.addOutputSupplier( new Supplier<OutputStream>() {				
-			
+			OutputStream os;
 			@Override
 			public OutputStream get(Specifier spec) throws IOException {
 				try {
-					return Loader.this.destination(spec);
+					if (os==null) {
+						os = Loader.this.destination(spec);
+					}
+					return os;
 				} catch (IOException ioe) {
 					String message = "Problem building output stream for spec " + spec;
 					logger.error(message, ioe);
