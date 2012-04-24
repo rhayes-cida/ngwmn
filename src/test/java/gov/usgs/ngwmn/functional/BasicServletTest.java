@@ -106,12 +106,12 @@ public class BasicServletTest extends ContextualTest {
 */
 
 	// Now repeat the tests; we expect to get cached results
-	@Test(timeout=1000)
+	@Test(timeout=2000)
 	public void testWithData_2() throws Exception {
 		testWithData();
 	}
 	
-	@Test(timeout=1000)
+	@Test(timeout=2000)
 	public void testWithNoData_2() throws Exception {
 		testWithNoData();
 	}
