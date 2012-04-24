@@ -12,7 +12,6 @@ public class SupplyZipOutput extends Supplier<OutputStream> {
 	private Supplier<OutputStream> os;
 	private ZipOutputStream oz;
 	private boolean openEntry;
-	private boolean endEntry;
 
 	public SupplyZipOutput(Supplier<OutputStream> os) {
 		this.os = os;
@@ -21,7 +20,7 @@ public class SupplyZipOutput extends Supplier<OutputStream> {
 	public OutputStream getOutputStream(Specifier spec) throws IOException {
 		if (oz == null && spec != null) {
 			// init and chain the stream if not done yet
-			openEntry = endEntry = false;
+			openEntry = false;
 			oz = new ZipOutputStream( os.get(spec) );
 		}
 		return oz;
@@ -30,17 +29,8 @@ public class SupplyZipOutput extends Supplier<OutputStream> {
 	@Override
 	public OutputStream get(Specifier spec) throws IOException {
 		getOutputStream(spec);
-		closeEntry();
 		openEntry(spec);
 		return oz;
-	}
-
-	private void closeEntry() throws IOException {
-		if (endEntry) {
-			// if entry is ended then close it
-			openEntry = endEntry = false;
-			oz.closeEntry();
-		}
 	}
 
 	private void openEntry(Specifier spec) throws IOException {
@@ -51,9 +41,21 @@ public class SupplyZipOutput extends Supplier<OutputStream> {
 		}
 	}
 
+	private void closeEntry() throws IOException {
+		if (openEntry) {
+			// if entry is ended then close it
+			oz.closeEntry();
+			openEntry = false;
+		}
+	}
+	
 	@Override
-	public void end(Specifier spec) {
-		endEntry = true; // record that we received an end signal
+	public void end(Specifier spec) throws IOException {
+		if (openEntry) {
+			closeEntry();
+		} else {
+			super.end(spec);
+		}
 	}
 	
 	
