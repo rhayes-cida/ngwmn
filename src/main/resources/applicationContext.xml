@@ -99,34 +99,29 @@
 		<property name="harvester" ref="WebRetriever"/>
 	</bean>
 
+	<bean id="lobHandler" class="org.springframework.jdbc.support.lob.DefaultLobHandler">
+		<property name="streamAsLob" value="true"/>
+	</bean>
+	
     <beans>
 	    <bean id="QualityCache" class="gov.usgs.ngwmn.dm.cache.qw.DatabaseXMLCache">
 	    	<constructor-arg ref="dataSource"/>
 	    	<constructor-arg value="QUALITY_CACHE"></constructor-arg>
-	    	<constructor-arg>
-		    	<!--  not sure if this is sharable, so give each cache its own -->
-	    		<bean class="org.springframework.jdbc.support.xml.Jdbc4SqlXmlHandler"/>
-	    	</constructor-arg>
+	    	<constructor-arg ref="lobHandler"/>
 	    </bean>
     </beans>
     <beans>
 	    <bean id="LogCache" class="gov.usgs.ngwmn.dm.cache.qw.DatabaseXMLCache">
 	    	<constructor-arg ref="dataSource"/>
 	    	<constructor-arg value="LOG_CACHE"></constructor-arg>
-	    	<constructor-arg>
-		    	<!--  not sure if this is sharable, so give each cache its own -->
-	    		<bean class="org.springframework.jdbc.support.xml.Jdbc4SqlXmlHandler"/>
-	    	</constructor-arg>
+	    	<constructor-arg ref="lobHandler"/>
 	    </bean>
     </beans>
     <beans>
 	    <bean id="WaterlevelCache" class="gov.usgs.ngwmn.dm.cache.qw.DatabaseXMLCache">
 	    	<constructor-arg ref="dataSource"/>
 	    	<constructor-arg value="WATERLEVEL_CACHE"></constructor-arg>
-	    	<constructor-arg>
-		    	<!--  not sure if this is sharable, so give each cache its own -->
-	    		<bean class="org.springframework.jdbc.support.xml.Jdbc4SqlXmlHandler"/>
-	    	</constructor-arg>
+	    	<constructor-arg ref="lobHandler"/>
 	    </bean>
     </beans>
 

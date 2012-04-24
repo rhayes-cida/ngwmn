@@ -24,7 +24,7 @@ import javax.sql.DataSource;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.jdbc.support.xml.SqlXmlHandler;
+import org.springframework.jdbc.support.lob.LobHandler;
 
 
 public class DatabaseXMLCache implements Cache {
@@ -33,15 +33,15 @@ public class DatabaseXMLCache implements Cache {
 	
 	private final String tablename;
 	
-	public DatabaseXMLCache(DataSource ds, String tablename, SqlXmlHandler sxh) {
+	public DatabaseXMLCache(DataSource ds, String tablename, LobHandler h) {
 		this.ds = ds;
 		this.tablename = tablename;
-		this.handler = sxh;
+		this.handler = h;
 	}
 
 	private DataSource ds;
 	// private PreparedStatement insert;
-	private SqlXmlHandler handler;
+	private LobHandler handler;
 	
 	@Override
 	public OutputStream destination(final Specifier well) throws IOException {
@@ -64,6 +64,8 @@ public class DatabaseXMLCache implements Cache {
 						logger.debug("About to insert, clob.length={}", length);
 						insert(conn, key, clob);
 						conn.commit();
+						// TODO Clean up clob?
+						clob.free();
 						conn.close();
 						logger.info("saved data for {}, sz {}", well, length);
 					} catch (SQLException sqle) {
@@ -85,51 +87,66 @@ public class DatabaseXMLCache implements Cache {
 	@Override
 	public boolean fetchWellData(final Specifier spec, Pipeline pipe)
 			throws IOException {
-		
+
 		try {
 			final Connection conn = ds.getConnection();
-			try {
-				// To use the getCLOBVal function, the table alias must be explicit; use of the implicit alias fails with error ORA-00904
-				String query = "SELECT cachetable.fetch_date, cachetable.xml.getCLOBVal() FROM GW_DATA_PORTAL."+tablename+" cachetable WHERE cachetable.agency_cd = ? and cachetable.site_no = ? order by cachetable.fetch_date DESC";
-				PreparedStatement ps = conn.prepareStatement(query);
-				try {
-					ps.setMaxRows(1);
-					ps.setString(1, spec.getAgencyID());
-					ps.setString(2, spec.getFeatureID());
-					
-					Timestamp fetch_date = null;
-					InputStream stream = null;
-					
-					ResultSet rs = ps.executeQuery();
-					while (rs.next()) {
-						fetch_date = rs.getTimestamp(1);
-						stream = handler.getXmlAsBinaryStream(rs, 2);
-					}
-					
-					logger.debug("got stream for specifier {}, fetch_date={}, length={}", new Object[]{spec, fetch_date, (stream==null)?-1:stream.available()});
-					
-					if (stream == null) {
-						conn.close();
-						return false;
-					}
-					
-					// So. Really. Does this change anything about the thread safety of the program?
-					Supplier<InputStream> supply = new SimpleSupplier<InputStream>(stream);
-					
-					pipe.setInputSupplier(supply);
-					
-					return true;
-				} finally {
-					// should we close the query?
-				}
-			} finally {
-				// should we close the connection?
+			// To use the getCLOBVal function, the table alias must be explicit; use of the implicit alias fails with error ORA-00904
+			String query = "SELECT cachetable.fetch_date, cachetable.xml.getCLOBVal() FROM GW_DATA_PORTAL."+tablename+" cachetable WHERE cachetable.agency_cd = ? and cachetable.site_no = ? order by cachetable.fetch_date DESC";
+			PreparedStatement ps = conn.prepareStatement(query);
+			ps.setMaxRows(1);
+			ps.setString(1, spec.getAgencyID());
+			ps.setString(2, spec.getFeatureID());
+
+			Timestamp fetch_date = null;
+			InputStream stream = null;
+
+			ResultSet rs = ps.executeQuery();
+			while (rs.next()) {
+				fetch_date = rs.getTimestamp(1);
+				stream = handler.getClobAsAsciiStream(rs, 2);
 			}
+
+			logger.debug("got stream for specifier {}, fetch_date={}, length={}", new Object[]{spec, fetch_date, (stream==null)?-1:stream.available()});
+
+			if (stream == null) {
+				conn.close();
+				return false;
+			}
+
+			stream = new ConnectionClosingInputStream(conn, stream);
+			Supplier<InputStream> supply = new SimpleSupplier<InputStream>(stream);
+
+			pipe.setInputSupplier(supply);
+
+			return true;
 		} catch (SQLException e1) {
 			throw new IOException(e1);
 		}
 	}
 
+	private static class ConnectionClosingInputStream extends FilterInputStream {
+
+		private Connection conn;
+		
+		public ConnectionClosingInputStream(Connection conn, InputStream in) {
+			super(in);
+			this.conn = conn;
+		}
+
+		@Override
+		public void close() throws IOException {
+			try {
+				super.close();
+			} finally {
+				try {
+					conn.close();
+				} catch (SQLException ioe) {
+					throw new IOException(ioe);
+				}
+			}
+		}
+	};
+	
 	@Override
 	public boolean contains(Specifier spec) {
 		Connection conn;
