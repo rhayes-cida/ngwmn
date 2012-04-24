@@ -22,7 +22,7 @@ public class SupplyTeeOutput extends Supplier<OutputStream> {
 	}
 	
 	@Override
-	public void end(Specifier spec) {
+	public void end(Specifier spec) throws IOException {
 		os1.end(spec);
 		os2.end(spec);
 	}

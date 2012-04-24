@@ -41,7 +41,7 @@ public abstract class SupplyChain<T> extends Supplier<T> {
 	 * override-able default impl that ensures the link receives the end signal.
 	 */
 	@Override
-	public void end(Specifier spec) {
+	public void end(Specifier spec) throws IOException {
 		link.end(spec);
 	}
 }
