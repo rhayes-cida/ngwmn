@@ -103,18 +103,30 @@
 	    <bean id="QualityCache" class="gov.usgs.ngwmn.dm.cache.qw.DatabaseXMLCache">
 	    	<constructor-arg ref="dataSource"/>
 	    	<constructor-arg value="QUALITY_CACHE"></constructor-arg>
+	    	<constructor-arg>
+		    	<!--  not sure if this is sharable, so give each cache its own -->
+	    		<bean class="org.springframework.jdbc.support.xml.Jdbc4SqlXmlHandler"/>
+	    	</constructor-arg>
 	    </bean>
     </beans>
     <beans>
 	    <bean id="LogCache" class="gov.usgs.ngwmn.dm.cache.qw.DatabaseXMLCache">
 	    	<constructor-arg ref="dataSource"/>
 	    	<constructor-arg value="LOG_CACHE"></constructor-arg>
+	    	<constructor-arg>
+		    	<!--  not sure if this is sharable, so give each cache its own -->
+	    		<bean class="org.springframework.jdbc.support.xml.Jdbc4SqlXmlHandler"/>
+	    	</constructor-arg>
 	    </bean>
     </beans>
     <beans>
 	    <bean id="WaterlevelCache" class="gov.usgs.ngwmn.dm.cache.qw.DatabaseXMLCache">
 	    	<constructor-arg ref="dataSource"/>
 	    	<constructor-arg value="WATERLEVEL_CACHE"></constructor-arg>
+	    	<constructor-arg>
+		    	<!--  not sure if this is sharable, so give each cache its own -->
+	    		<bean class="org.springframework.jdbc.support.xml.Jdbc4SqlXmlHandler"/>
+	    	</constructor-arg>
 	    </bean>
     </beans>
 

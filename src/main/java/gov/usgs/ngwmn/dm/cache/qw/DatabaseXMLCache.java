@@ -4,6 +4,7 @@ import gov.usgs.ngwmn.dm.cache.Cache;
 import gov.usgs.ngwmn.dm.cache.CacheInfo;
 import gov.usgs.ngwmn.dm.dao.WellRegistryKey;
 import gov.usgs.ngwmn.dm.io.Pipeline;
+import gov.usgs.ngwmn.dm.io.SimpleSupplier;
 import gov.usgs.ngwmn.dm.io.Supplier;
 import gov.usgs.ngwmn.dm.spec.Specifier;
 
@@ -23,6 +24,7 @@ import javax.sql.DataSource;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.jdbc.support.xml.SqlXmlHandler;
 
 
 public class DatabaseXMLCache implements Cache {
@@ -31,13 +33,15 @@ public class DatabaseXMLCache implements Cache {
 	
 	private final String tablename;
 	
-	public DatabaseXMLCache(DataSource ds, String tablename) {
+	public DatabaseXMLCache(DataSource ds, String tablename, SqlXmlHandler sxh) {
 		this.ds = ds;
 		this.tablename = tablename;
+		this.handler = sxh;
 	}
 
 	private DataSource ds;
 	// private PreparedStatement insert;
+	private SqlXmlHandler handler;
 	
 	@Override
 	public OutputStream destination(final Specifier well) throws IOException {
@@ -93,78 +97,37 @@ public class DatabaseXMLCache implements Cache {
 					ps.setString(1, spec.getAgencyID());
 					ps.setString(2, spec.getFeatureID());
 					
-					Clob clob = null;
 					Timestamp fetch_date = null;
+					InputStream stream = null;
 					
 					ResultSet rs = ps.executeQuery();
 					while (rs.next()) {
 						fetch_date = rs.getTimestamp(1);
-						clob = rs.getClob(2);
+						stream = handler.getXmlAsBinaryStream(rs, 2);
 					}
 					
-					logger.debug("got clob for specifier {}, fetch_date={}, length={}", new Object[]{spec, fetch_date, (clob==null)?-1:clob.length()});
+					logger.debug("got stream for specifier {}, fetch_date={}, length={}", new Object[]{spec, fetch_date, (stream==null)?-1:stream.available()});
 					
-					if (clob == null) {
+					if (stream == null) {
 						conn.close();
 						return false;
 					}
 					
 					// So. Really. Does this change anything about the thread safety of the program?
-					final Clob flob = clob;
+					Supplier<InputStream> supply = new SimpleSupplier<InputStream>(stream);
 					
-					if (clob != null) {
-						Supplier<InputStream> supp = new Supplier<InputStream>() {
-			
-							@Override
-							public InputStream get(Specifier lspec) {
-								
-								if ( lspec != null && ! lspec.equals(spec)) {
-									throw new RuntimeException("mismatched specifiers!");
-								}
-								
-								try {
-									// have to hook the stream close to close the retained connection
-									InputStream ois = flob.getAsciiStream();
-									InputStream fis = new FilterInputStream(ois) {
-
-										@Override
-										public void close() throws IOException {
-											super.close();
-											try {
-												conn.close();
-											} catch (SQLException e) {
-												throw new IOException(e);
-											}
-										}
-										
-									};
-									
-									return fis;
-								} catch (SQLException e) {
-									throw new RuntimeException(e);
-								}
-							}
-							
-						};
-						pipe.setInputSupplier(supp);
-						return true;
-					}
+					pipe.setInputSupplier(supply);
+					
+					return true;
 				} finally {
-					// Let this hang -- the spec says that closing the Connection deals with all its resources.
-					// ps.close();
+					// should we close the query?
 				}
-			} catch (SQLException sqle) {
-				throw new IOException(sqle);
 			} finally {
-				// Cannot close conn here, it needs to stay open until the reader is done with it.
-				logger.debug("Handed connection {} to reader", conn);
+				// should we close the connection?
 			}
 		} catch (SQLException e1) {
 			throw new IOException(e1);
 		}
-		
-		// TODO this is not called - warnings mark it dead code
-		return false;
 	}
 
 	@Override
