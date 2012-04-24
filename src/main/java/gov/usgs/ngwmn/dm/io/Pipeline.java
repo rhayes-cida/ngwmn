@@ -94,20 +94,27 @@ public class Pipeline implements Executee {
 
 	public void invoke() throws IOException {
 		statistics.markStart();
+		InputStream  is = iss.get(spec);
 		try {
-			InputStream  is = iss.get(spec);
-			OutputStream os = oss.get(spec);
-			invoker.invoke(is,os, statistics);
-			statistics.markEnd(Status.DONE);
-			logger.info("Done stats={}", statistics);
-		} catch (IOException ioe) {
-			statistics.markEnd(Status.FAIL);
-			setException(ioe);
-			logger.info("Fail stats={}", statistics);
-			throw ioe;
+			try {
+				OutputStream os = oss.get(spec);
+				invoker.invoke(is,os, statistics);
+				statistics.markEnd(Status.DONE);
+				logger.info("Done stats={}", statistics);
+			} catch (IOException ioe) {
+				statistics.markEnd(Status.FAIL);
+				setException(ioe);
+				logger.info("Fail stats={}", statistics);
+				throw ioe;
+			} finally {
+				if (oss != null) {
+					oss.end(spec);
+				}
+			}
 		} finally {
-			iss.end(spec);
-			oss.end(spec);
+			if (iss != null) {
+				iss.end(spec);
+			}
 		}
 	}
 	

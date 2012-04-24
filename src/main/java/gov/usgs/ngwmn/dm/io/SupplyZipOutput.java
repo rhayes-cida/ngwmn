@@ -43,12 +43,15 @@ public class SupplyZipOutput extends Supplier<OutputStream> {
 
 	private void closeEntry() throws IOException {
 		if (openEntry) {
-			// if entry is ended then close it
+			// only if entry is open then close it
 			oz.closeEntry();
 			openEntry = false;
 		}
 	}
 	
+	/**
+	 *  if there is an entry open, close the entry, otherwise we close the stream
+	 */
 	@Override
 	public void end(Specifier spec) throws IOException {
 		if (openEntry) {
