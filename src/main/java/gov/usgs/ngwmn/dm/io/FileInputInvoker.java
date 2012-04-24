@@ -1,6 +1,24 @@
 package gov.usgs.ngwmn.dm.io;
 
-public class FileInputInvoker extends GenericInvoker {
+import gov.usgs.ngwmn.dm.cache.PipeStatistics;
+import gov.usgs.ngwmn.dm.cache.fs.FileCache;
 
-	// TODO specialize if needed
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+public class FileInputInvoker implements Invoker {
+
+	protected Logger logger = LoggerFactory.getLogger(this.getClass());
+	
+	@Override
+	public void invoke(InputStream is, OutputStream os, PipeStatistics stats) throws IOException {
+		FileCache.copyStream(is, os, stats);
+		// output was closed by copyStream.
+		logger.info("Copied {} to destination {}, stats={}", new Object[]{is, os, stats});
+	}
+
 }

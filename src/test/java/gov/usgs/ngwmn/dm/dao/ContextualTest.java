@@ -49,6 +49,9 @@ public abstract class ContextualTest {
 	public static void setBasedir(String basedir) {
 		ContextualTest.basedir = basedir;
 	}
+	public static String getBaseDir() {
+		return basedir;
+	}
 
 	protected void checkSiteExists(Specifier spec) throws Exception {
 		DataSource ds = ctx.getBean("dataSource", DataSource.class);

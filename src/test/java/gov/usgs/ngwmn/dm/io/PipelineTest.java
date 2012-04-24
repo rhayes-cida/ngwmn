@@ -26,7 +26,7 @@ public class PipelineTest extends Pipeline {
 		final InputStream is = new ByteArrayInputStream(sample.getBytes());
 		ByteArrayOutputStream os = new ByteArrayOutputStream();
 		final OpCountOutputStream cos = new OpCountOutputStream(os);
-		Invoker invoker = new GenericInvoker();
+		Invoker invoker = new FileInputInvoker();
 		
 		Pipeline pl = new Pipeline(null);
 		pl.setInputSupplier(new Supplier<InputStream>() {

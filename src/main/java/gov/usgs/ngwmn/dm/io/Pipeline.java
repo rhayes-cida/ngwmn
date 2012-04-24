@@ -111,6 +111,7 @@ public class Pipeline implements Executee {
 					oss.end(spec);
 				}
 			}
+		// TODO maybe a catch here too?!
 		} finally {
 			if (iss != null) {
 				iss.end(spec);

@@ -10,6 +10,7 @@ public class SupplyTeeOutput extends Supplier<OutputStream> {
 
 	private Supplier<OutputStream> os1;
 	private Supplier<OutputStream> os2;
+	private OutputStream os;
 	
 	public SupplyTeeOutput(Supplier<OutputStream> os1, Supplier<OutputStream> os2) {
 		this.os1 = os1;
@@ -18,13 +19,19 @@ public class SupplyTeeOutput extends Supplier<OutputStream> {
 	
 	@Override
 	public OutputStream get(Specifier spec) throws IOException {
-		return new TeeOutputStream(os1.get(spec), os2.get(spec));
+		if (os==null) {
+			os = new TeeOutputStream(os1.get(spec), os2.get(spec));
+		}
+		return os;
 	}
 	
 	@Override
 	public void end(Specifier spec) throws IOException {
-		os1.end(spec);
-		os2.end(spec);
+		try {
+			os1.end(spec);
+		} finally {
+			os2.end(spec);
+		}
 	}
 
 }

@@ -15,11 +15,11 @@ import java.io.OutputStream;
 import org.junit.Before;
 import org.junit.Test;
 
-public class GenericInvokerTest {
+public class FileInputInvokerTest {
 
 	protected Invoker victim;
 	protected Invoker getVictim() {
-		return new GenericInvoker();
+		return new FileInputInvoker();
 	}
 	
 	@Before

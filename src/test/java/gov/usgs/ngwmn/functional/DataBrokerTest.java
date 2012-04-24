@@ -29,7 +29,6 @@ public class DataBrokerTest extends ContextualTest {
 		dataBroker  = ctx.getBean("DataBroker", DataBroker.class);		
 		
 		// TODO this should really be done in Spring...
-//		FileCache c = new FileCache();
 		dataBroker.setRetriever( new Retriever(c) );
 		dataBroker.setLoader(    new Loader(c)    );
 		dataBroker.setHarvester( new WebRetriever() );

@@ -27,12 +27,15 @@ public class FileCache implements Cache {
 	private File basedir;
 
 	public static final String BASEDIR_JNDI_NAME = "java:comp/env/GWDP/FileCache/basedir";
+	
+	
 	private String filename(Specifier spec) {
 		// Note that there is no requirement to decode a cache file name; 
 		// having the file name be human-readable is helpful for debugging,
 		// not required for system operation
 		return spec.getAgencyID()+"_"+spec.getFeatureID()+"_"+spec.getTypeID();
 	}
+	
 	private String safeFileName(Specifier spec) {
 		String starter = filename(spec);
 		String scrambled = DigestUtils.md5Hex(starter);
@@ -40,21 +43,6 @@ public class FileCache implements Cache {
 	}
 	
 	private boolean isSafeFilename(String fn) {
-		// could try to create the file, then delete it on success.
-		// but that's pretty heavy-handed.
-		// also susceptible to path injection, if ../ is allowed in input
-		
-		/* This is too liberal -- almost any character *can* be in a Unix filename.
-		 */
-/*		try {
- * 			File f = new File(fn);
-			f.getCanonicalPath();
-			// make sure they didn't spoof in a directory change
-			return fn.equals(f.getName();
-		} catch (IOException ioe) {
-			return false;
-		}
-*/		
 		return fn.matches("[A-Z a-z\\.0-9_-]+");
 	}
 	
@@ -82,15 +70,15 @@ public class FileCache implements Cache {
 	public OutputStream destination(Specifier spec)
 			throws IOException
 	{
-		File f = contentFile(spec);
-		File tf = File.createTempFile("LDR", ".xml");
+		File file = contentFile(spec);
+		File tmpFile = File.createTempFile("LDR", ".xml");
 		
 		// TODO Need to make these stats available to DataBroker
 		PipeStatistics s = new PipeStatistics();
 		
-		OutputStream v = new TempfileOutputStream(f, tf, s);
+		OutputStream tmp = new TempfileOutputStream(file, tmpFile, s);
 		logger.info("Created tempfile output for {}", spec);
-		return v;
+		return tmp;
 	}
 	
 	/**
@@ -153,7 +141,7 @@ public class FileCache implements Cache {
 	}
 
 	public void setBasedir(File basedir) throws IOException {
-		if ( ! basedir.exists()) {
+		if ( ! basedir.exists() ) {
 			boolean ok = basedir.mkdirs();
 			if ( ! ok) {
 				logger.warn("Failed to create base dir {}", basedir);
@@ -165,7 +153,7 @@ public class FileCache implements Cache {
 		if ( ! basedir.isDirectory() ) {
 			throw new IOException("Base dir not a directory");
 		}
-		if ( ! basedir.canRead()) {
+		if ( ! basedir.canRead() ) {
 			throw new IOException("Cannot read base directory");
 		}
 		this.basedir = basedir;
@@ -178,11 +166,11 @@ public class FileCache implements Cache {
 			logger.warn("no such file spec as {}", f);
 			return false;
 		}
-		if ( ! f.exists()) {
+		if ( ! f.exists() ) {
 			logger.info("no cached file {}", f);
 			return false;
 		}
-		if ( ! f.canRead()) {
+		if ( ! f.canRead() ) {
 			logger.warn("file exists but not readable {}", f);
 		}
 		return true;
@@ -198,7 +186,7 @@ public class FileCache implements Cache {
 		Date modified = null;
 		
 		if (exists) {
-			modified = new Date(f.lastModified());
+			modified = new Date( f.lastModified() );
 			// Java 6 does not provide access to file create time
 			// Java 7 does
 			sz = f.length();

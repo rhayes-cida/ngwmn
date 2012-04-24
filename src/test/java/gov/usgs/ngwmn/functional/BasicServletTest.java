@@ -24,15 +24,16 @@ public class BasicServletTest extends ContextualTest {
 
 	@BeforeClass
 	public static void clearCache() {
-		File c = new File("/tmp/gwdp-cache");
+		File c = new File( getBaseDir() );
 		if (c.exists() && c.isDirectory()) {
 			for (File f : c.listFiles()) {
-				if (f.canWrite()) {
+				if ( f.canWrite() ) {
 					boolean did = f.delete();
 					if (did) {
 						System.out.printf("Deleted cache file %s\n", f);
 					} else {
 						System.out.printf("Could not delete cache file %s\n", f);
+						f.deleteOnExit(); // this way subsequent runs might work
 					}
 				} else {
 					System.out.printf("Preserving cache file %s\n", f);
@@ -45,7 +46,7 @@ public class BasicServletTest extends ContextualTest {
 	@Test
 	public void testWithData() throws Exception {
 		checkSiteIsVisible("USGS", "402734087033401");
-		ServletRunner sr = new ServletRunner(this.getClass().getResourceAsStream("/servlet-test-web.xml"), "/ngwmn");
+		ServletRunner sr = new ServletRunner( getClass().getResourceAsStream("/servlet-test-web.xml"), "/ngwmn");
 		
 		ServletUnitClient sc = sr.newClient();
 		WebRequest req = new GetMethodWebRequest(WELL_WITH_DATA);
@@ -64,7 +65,7 @@ public class BasicServletTest extends ContextualTest {
 	public void testWithNoData() throws Exception {
 		checkSiteIsVisible("NJGS","2288614");
 		// this site exists, but has no data (on 2012/03/23)
-		ServletRunner sr = new ServletRunner(this.getClass().getResourceAsStream("/servlet-test-web.xml"), "/ngwmn");
+		ServletRunner sr = new ServletRunner( getClass().getResourceAsStream("/servlet-test-web.xml"), "/ngwmn");
 		
 		ServletUnitClient sc = sr.newClient();
 		WebRequest req = new GetMethodWebRequest(WELL_NO_DATA);
@@ -84,7 +85,7 @@ public class BasicServletTest extends ContextualTest {
 	@Test(expected=HttpNotFoundException.class)
 	public void testNonSite() throws Exception {
 		// this site does not exist, so we expect an Exception when fetching
-		ServletRunner sr = new ServletRunner(this.getClass().getResourceAsStream("/servlet-test-web.xml"), "/ngwmn");
+		ServletRunner sr = new ServletRunner( getClass().getResourceAsStream("/servlet-test-web.xml"), "/ngwmn");
 		
 		ServletUnitClient sc = sr.newClient();
 		WebRequest req = new GetMethodWebRequest("http://localhost:8080/ngwmn/data?featureID=NOSUCHSITE&agency_cd=USGS");

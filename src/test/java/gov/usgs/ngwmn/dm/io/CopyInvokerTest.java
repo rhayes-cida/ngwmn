@@ -3,7 +3,7 @@ package gov.usgs.ngwmn.dm.io;
 import org.junit.Before;
 import org.junit.Test;
 
-public class CopyInvokerTest extends GenericInvokerTest {
+public class CopyInvokerTest extends FileInputInvokerTest {
 
 	protected Invoker getVictim() {
 		return new CopyInvoker();
