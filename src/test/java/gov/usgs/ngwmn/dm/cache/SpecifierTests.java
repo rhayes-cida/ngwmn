@@ -11,21 +11,11 @@ import org.junit.Test;
 
 public class SpecifierTests {
 
-	Specifier spec;
-	
-	@Before
-	public void setUp() {
-		spec = new Specifier();
-		spec.setAgencyID("agency");
-		spec.setFeatureID("well");
-		spec.setTypeID(WellDataType.LOG);
-	}
 	
 	@Test
 	public void test_check_noEmptyFeatureId() {
-		spec.setFeatureID("");
 		try {
-			spec.check();
+			Specifier spec = new Specifier("agency","",WellDataType.LOG);
 			assertTrue(false);
 		} catch (NullPointerException e) {
 			assertTrue(false);
@@ -38,9 +28,8 @@ public class SpecifierTests {
 
 	@Test
 	public void test_check_noEmptyAgencyId() {
-		spec.setAgencyID("");
 		try {
-			spec.check();
+			Specifier spec = new Specifier("","well",WellDataType.LOG);
 			assertTrue(false);
 		} catch (NullPointerException e) {
 			assertTrue(false);
@@ -53,9 +42,8 @@ public class SpecifierTests {
 	
 	@Test
 	public void test_check_notNullAgencyId() {
-		spec.setAgencyID(null);
 		try {
-			spec.check();
+			Specifier spec = new Specifier(null,"well",WellDataType.LOG);
 			assertTrue(false);
 		} catch (NullPointerException e) {
 			assertTrue(false);
@@ -68,9 +56,8 @@ public class SpecifierTests {
 	
 	@Test
 	public void test_check_noNullTypeId() {
-		spec.setTypeID((WellDataType)null);
 		try {
-			spec.check();
+			Specifier spec = new Specifier("agency","well",null);
 			assertTrue(false);
 		} catch (NullPointerException e) {
 			assertTrue(false);
@@ -83,9 +70,8 @@ public class SpecifierTests {
 
 	@Test
 	public void test_check_noNullFeatureId() {
-		spec.setFeatureID(null);
 		try {
-			spec.check();
+			Specifier spec = new Specifier("agency",null,WellDataType.LOG);
 			assertTrue(false);
 		} catch (NullPointerException e) {
 			assertTrue(false);
@@ -95,6 +81,4 @@ public class SpecifierTests {
 			assertTrue(false);
 		}
 	}
-
-
 }

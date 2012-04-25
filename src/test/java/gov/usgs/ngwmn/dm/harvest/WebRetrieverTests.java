@@ -2,6 +2,7 @@ package gov.usgs.ngwmn.dm.harvest;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import gov.usgs.ngwmn.WellDataType;
 import gov.usgs.ngwmn.dm.io.Invoker;
 import gov.usgs.ngwmn.dm.io.Pipeline;
 import gov.usgs.ngwmn.dm.io.Supplier;
@@ -47,11 +48,7 @@ public class WebRetrieverTests {
 				return HttpStatus.SC_OK;
 			}
 		};
-		spec = new Specifier() {
-			public void check() {
-				checkValues.put("checkSpecCalled",true);
-			}
-		};
+		spec = new Specifier("A","F",WellDataType.ALL);
 		pipe = new Pipeline(spec) {
 			@Override
 			public void setInputSupplier(Supplier<InputStream> in) {
@@ -72,8 +69,6 @@ public class WebRetrieverTests {
 		
 		assertTrue(result);
 		assertTrue(checkValues.get("makeUrlCalled"));
-//		assertTrue(checkValues.get("wgetCalled")); // this used to be called but is now deferred
-		assertTrue(checkValues.get("checkSpecCalled"));
 		assertTrue(checkValues.get("setInvokerCalled"));
 		assertTrue(checkValues.get("setInputCalled"));
 	}

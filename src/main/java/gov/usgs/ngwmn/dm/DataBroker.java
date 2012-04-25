@@ -125,7 +125,6 @@ public class DataBroker implements ExecFactory {
 			throw new NullPointerException("At least one Data Fetcher is required");
 		if (spec == null) 
 			throw new NullPointerException("Specifier is required");
-		spec.check();
 	}
 	
 	boolean configureInput(DataFetcher dataFetcher, Pipeline pipe) throws IOException {

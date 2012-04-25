@@ -33,7 +33,7 @@ import com.google.common.io.NullOutputStream;
 public class LogDBCacheTest extends ContextualTest {
 
 	private static final int SIZE = 27180;
-	private static final String TYPE = WellDataType.LOG.name();
+	private static final WellDataType TYPE = WellDataType.LOG;
 	private static final String SITE = "P408750";
 	private static final String AGENCY = "IL EPA";
 	private static final String filename = AGENCY+ "_" + SITE + "_" + TYPE;
@@ -105,10 +105,7 @@ public class LogDBCacheTest extends ContextualTest {
 	}
 
 	private Specifier makeSpecifier() {
-		Specifier spec = new Specifier();
-		spec.setAgencyID(AGENCY);
-		spec.setFeatureID(SITE);
-		spec.setTypeID(TYPE);
+		Specifier spec = new Specifier(AGENCY,SITE,TYPE);
 		return spec;
 	}
 

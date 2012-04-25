@@ -25,9 +25,7 @@ public class WebRetriever implements DataFetcher {
 	protected Harvester  harvester  = new Harvester();
 
 	@Override
-	public boolean configureInput(Specifier spec, final Pipeline pipe)
-			throws IOException {
-		spec.check();
+	public boolean configureInput(Specifier spec, final Pipeline pipe) throws IOException {
 		
 		pipe.setInvoker(new CopyInvoker());
 		

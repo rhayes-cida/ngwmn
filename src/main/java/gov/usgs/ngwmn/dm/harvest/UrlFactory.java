@@ -33,8 +33,6 @@ public class UrlFactory {
 	}
 
 	public String makeUrl(Specifier spec) {
-		spec.check();
-		
 		String url = urls.get( spec.getTypeID() );
 		
 		if ( Strings.isNullOrEmpty(url) ) {

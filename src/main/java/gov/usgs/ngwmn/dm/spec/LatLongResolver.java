@@ -1,5 +1,6 @@
 package gov.usgs.ngwmn.dm.spec;
 
+import gov.usgs.ngwmn.WellDataType;
 import gov.usgs.ngwmn.dm.dao.WellRegistry;
 import gov.usgs.ngwmn.dm.dao.WellRegistryDAO;
 import gov.usgs.ngwmn.dm.dao.WellRegistryExample;
@@ -44,7 +45,7 @@ public class LatLongResolver implements SpecResolver {
 						// if we do not check the hasNext here then the error on next call
 						// will be transmitted to the caller. Note that if a null is returned
 						// then we will throw an NPE because of the specifier constructor.
-						Specifier spec = new Specifier( wells.next() );
+						Specifier spec = new Specifier( wells.next(), WellDataType.ALL );
 						return spec;
 					}
 		

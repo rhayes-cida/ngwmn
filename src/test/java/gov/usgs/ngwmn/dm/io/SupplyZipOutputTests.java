@@ -1,6 +1,7 @@
 package gov.usgs.ngwmn.dm.io;
 
 import static org.junit.Assert.*;
+import gov.usgs.ngwmn.WellDataType;
 import gov.usgs.ngwmn.dm.spec.Specifier;
 
 import java.io.ByteArrayInputStream;
@@ -20,9 +21,7 @@ public class SupplyZipOutputTests {
 
 	@Before
 	public void setUp() {
-		spec = new Specifier();
-		spec.setAgencyID("USGS");
-		spec.setFeatureID("1234");
+		spec = new Specifier("USGS","1234",WellDataType.ALL);
 	}
 	
 	@Test

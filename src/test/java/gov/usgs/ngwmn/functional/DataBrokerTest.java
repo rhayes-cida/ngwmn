@@ -35,11 +35,7 @@ public class DataBrokerTest extends ContextualTest {
 	}
 
 	private Specifier makeSpec(String agency, String site) {
-		Specifier spec = new Specifier();
-		spec.setAgencyID(agency);
-		spec.setFeatureID(site);
-		spec.setTypeID(WellDataType.ALL);
-		
+		Specifier spec = new Specifier(agency,site,WellDataType.ALL);
 		return spec;
 	}
 

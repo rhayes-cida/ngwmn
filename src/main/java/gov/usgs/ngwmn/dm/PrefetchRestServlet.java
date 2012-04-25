@@ -74,10 +74,7 @@ public class PrefetchRestServlet extends HttpServlet {
 			if (type == null) {
 				type = "ALL";
 			}
-			spec = new Specifier();
-			spec.setAgencyID(agency);
-			spec.setFeatureID(site);
-			spec.setTypeID(WellDataType.valueOf(type));
+			spec = new Specifier(agency,site,WellDataType.valueOf(type));
 		}
 		
 		// TODO something useful

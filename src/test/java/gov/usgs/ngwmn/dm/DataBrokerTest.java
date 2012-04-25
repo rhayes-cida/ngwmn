@@ -5,6 +5,7 @@ import static org.junit.Assert.*;
 import java.io.ByteArrayOutputStream;
 import java.io.OutputStream;
 
+import gov.usgs.ngwmn.WellDataType;
 import gov.usgs.ngwmn.dm.cache.Cache;
 import gov.usgs.ngwmn.dm.dao.ContextualTest;
 import gov.usgs.ngwmn.dm.io.SimpleSupplier;
@@ -32,10 +33,7 @@ public class DataBrokerTest extends ContextualTest {
 
 	@Test
 	public void testFetchWellData() throws Exception {
-		Specifier spec = StatsMaker.makeStats(this.getClass()).getSpecifier();
-		spec.setAgencyID("USGS");
-		spec.setFeatureID("402734087033401");
-		spec.setTypeID("ALL");
+		Specifier spec = new Specifier("USGS","402734087033401",WellDataType.ALL);
 		
 		ByteArrayOutputStream bos = new ByteArrayOutputStream();
 		

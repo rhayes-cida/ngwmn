@@ -11,21 +11,16 @@ import org.junit.Test;
 
 public class UrlFactoryTests {
 
-	Specifier  spec;
 	UrlFactory urls;
 	
 	@Before
 	public void setUp() {
-		spec = new Specifier();
-		spec.setAgencyID("USGS");
-		spec.setFeatureID("WELL0");
-		spec.setTypeID(WellDataType.LOG);
 		urls = new UrlFactory();
 	}
 	
 	@Test
 	public void test_makeUrl_forAllData() {
-		spec.setTypeID(WellDataType.ALL);
+		Specifier  spec = new Specifier("USGS","WELL0",WellDataType.ALL);
 		String url = urls.makeUrl(spec);
 		System.out.println(url);
 		assertTrue(url.startsWith("http://cida.usgs.gov/gw_data_portal/"));
@@ -34,8 +29,7 @@ public class UrlFactoryTests {
 	
 	@Test
 	public void test_makeUrl_forAllData_withSpace() {
-		spec.setTypeID(WellDataType.ALL);
-		spec.setAgencyID("MN DNR");
+		Specifier  spec = new Specifier("MN DNR","WELL0",WellDataType.ALL);
 		String url = urls.makeUrl(spec);
 		System.out.println(url);
 		assertFalse(url.contains(" "));
@@ -43,7 +37,7 @@ public class UrlFactoryTests {
 
 	@Test
 	public void test_makeUrl_forWaterQualityData() {
-		spec.setTypeID(WellDataType.QUALITY);
+		Specifier  spec = new Specifier("USGS","WELL0",WellDataType.QUALITY);
 		String url = urls.makeUrl(spec);
 		System.out.println(url);
 		assertTrue(url.contains("qw?"));
@@ -51,7 +45,7 @@ public class UrlFactoryTests {
 	
 	@Test
 	public void test_makeUrl_forWaterLevelData() {
-		spec.setTypeID(WellDataType.WATERLEVEL);
+		Specifier  spec = new Specifier("USGS","WELL0",WellDataType.WATERLEVEL);
 		String url = urls.makeUrl(spec);
 		System.out.println(url);
 		assertTrue(url.contains("sos?"));
@@ -59,7 +53,7 @@ public class UrlFactoryTests {
 	
 	@Test
 	public void test_makeUrl_forLogData() {
-		spec.setTypeID(WellDataType.LOG);
+		Specifier  spec = new Specifier("USGS","WELL0",WellDataType.LOG);
 		String url = urls.makeUrl(spec);
 		System.out.println(url);
 		assertTrue(url.contains("wfs?"));
@@ -67,6 +61,7 @@ public class UrlFactoryTests {
 		
 	@Test
 	public void test_makeUrl_containsAgencyAndFeature() {
+		Specifier  spec = new Specifier("USGS","WELL0",WellDataType.LOG);
 		String url = urls.makeUrl(spec);
 		assertTrue(url.contains(spec.getAgencyID()));
 		assertTrue(url.contains(spec.getFeatureID()));
@@ -74,10 +69,17 @@ public class UrlFactoryTests {
 	
 	@Test
 	public void test_makeUrl_startsWithBaseUrl() {
+		Specifier  spec = new Specifier("USGS","WELL0",WellDataType.LOG);
 		String url = urls.makeUrl(spec);
 		assertTrue(url.startsWith("http://cida.usgs.gov/cocoon/gin/gwdp/agency/"));
 	}
 	
+	@Test
+	public void test_makeUrl_startsWithBaseUrl_forAllIsUnique() {
+		Specifier  spec = new Specifier("USGS","WELL0",WellDataType.ALL);
+		String url = urls.makeUrl(spec);
+		assertTrue(url.startsWith("http://cida.usgs.gov/gw_data_portal/export"));
+	}
 	
 	@Test
 	public void test_loadPropertiesFile() {
@@ -92,6 +94,7 @@ public class UrlFactoryTests {
 	
 	@Test
 	public void test_injectParams() {
+		Specifier  spec = new Specifier("USGS","WELL0",WellDataType.ALL);
 		String url = "<agencyId><featureId>";
 		String actual = urls.injectParams(url, spec.getAgencyID(), spec.getFeatureID());
 		assertEquals("USGSWELL0", actual);

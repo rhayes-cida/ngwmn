@@ -24,10 +24,7 @@ public class FileCache_FilenameTest extends FileCache {
 	
 	@Test
 	public void testBaseContentFile() throws IOException {
-		Specifier spec = new Specifier();
-		spec.setFeatureID("safe");
-		spec.setAgencyID("SAFE");
-		spec.setTypeID(WellDataType.ALL);
+		Specifier spec = new Specifier("SAFE","safe",WellDataType.ALL);
 		
 		File f = super.contentFile(spec);
 		assertTrue("pre-existing condition", f.createNewFile()||f.exists());
@@ -35,10 +32,7 @@ public class FileCache_FilenameTest extends FileCache {
 
 	@Test
 	public void testUnsafeFeatureID() throws IOException {
-		Specifier spec = new Specifier();
-		spec.setFeatureID(":very/unsafe/Feature!ID");
-		spec.setAgencyID("SAFE");
-		spec.setTypeID(WellDataType.ALL);
+		Specifier spec = new Specifier("SAFE",":very/unsafe/Feature!ID",WellDataType.ALL);
 		
 		File f = super.contentFile(spec);
 		f.createNewFile();
@@ -47,10 +41,7 @@ public class FileCache_FilenameTest extends FileCache {
 	
 	@Test
 	public void testUnsafeAgencyID() throws IOException {
-		Specifier spec = new Specifier();
-		spec.setFeatureID("safe");
-		spec.setAgencyID("un/safe/\u0003Agency/ID");
-		spec.setTypeID(WellDataType.ALL);
+		Specifier spec = new Specifier("un/safe/\u0003Agency/ID","safe",WellDataType.ALL);
 		
 		File f = super.contentFile(spec);
 		f.createNewFile();
@@ -59,65 +50,52 @@ public class FileCache_FilenameTest extends FileCache {
 	
 	@Test
 	public void testRepeatable() {
-		Specifier spec = new Specifier();
-		spec.setFeatureID("safe");
-		spec.setAgencyID("AGID");
-		spec.setTypeID(WellDataType.ALL);
+		Specifier spec = new Specifier("AGID","safe",WellDataType.ALL);
 		
 		File f1 = super.contentFile(spec);
 		File f2 = super.contentFile(spec);
+		
 		assertEquals("same cache file", f1,f2);
 	}
 
 	@Test
 	public void testUsesAgency() {
-		Specifier spec = new Specifier();
-		spec.setFeatureID("safe");
-		spec.setAgencyID("ONE");
-		spec.setTypeID(WellDataType.ALL);
-		
+		Specifier spec = new Specifier("ONE","safe",WellDataType.ALL);
 		File f1 = super.contentFile(spec);
-		spec.setAgencyID("TWO");
-		File f2 = super.contentFile(spec);
-		assertFalse("same cache file", f1.equals(f2));
 		
+		spec = new Specifier("TWO","safe",WellDataType.ALL);
+		File f2 = super.contentFile(spec);
+		
+		assertFalse("should not be same cache file", f1.equals(f2));
 	}
 	
 	@Test
 	public void testUsesFeature() {
-		Specifier spec = new Specifier();
-		spec.setFeatureID("feature");
-		spec.setAgencyID("AGID");
-		spec.setTypeID(WellDataType.ALL);
-		
+		Specifier spec = new Specifier("AGID","feature",WellDataType.ALL);
 		File f1 = super.contentFile(spec);
-		spec.setFeatureID("creature");
+		
+		spec = new Specifier("AGID","creature",WellDataType.ALL);
 		File f2 = super.contentFile(spec);
-		assertFalse("same cache file", f1.equals(f2));
+		
+		assertFalse("should not be same cache file", f1.equals(f2));
 		
 	}
 	
 	@Test
 	public void testUsesType() {
-		Specifier spec = new Specifier();
-		spec.setFeatureID("safe");
-		spec.setAgencyID("AGID");
-		spec.setTypeID(WellDataType.WATERLEVEL);
-		
+		Specifier spec = new Specifier("AGID","safe",WellDataType.WATERLEVEL);
 		File f1 = super.contentFile(spec);
-		spec.setTypeID(WellDataType.QUALITY);
 		
+		spec = new Specifier("AGID","safe",WellDataType.QUALITY);
 		File f2 = super.contentFile(spec);
+		
 		assertFalse("same cache file", f1.equals(f2));
 		
 	}
 	
 	@Test
 	public void testPreservesSpace() {
-		Specifier spec = new Specifier();
-		spec.setFeatureID("safe name with space");
-		spec.setAgencyID("AGID");
-		spec.setTypeID(WellDataType.WATERLEVEL);
+		Specifier spec = new Specifier("AGID","safe name with space",WellDataType.WATERLEVEL);
 		
 		File f1 = super.contentFile(spec);
 		assertTrue("feature ID is human-readable", f1.getName().contains(spec.getFeatureID()));

@@ -33,7 +33,7 @@ import com.google.common.io.NullOutputStream;
 public class QualityDBCacheTest extends ContextualTest {
 
 	private static final int SIZE = 17779;
-	private static final String TYPE = WellDataType.QUALITY.name();
+	private static final WellDataType TYPE = WellDataType.QUALITY;
 	private static final String SITE = "394212075275101";
 	private static final String AGENCY = "USGS";
 	private static final String filename = AGENCY+ "_" + SITE + "_" + TYPE;
@@ -105,10 +105,7 @@ public class QualityDBCacheTest extends ContextualTest {
 	}
 
 	private Specifier makeSpecifier() {
-		Specifier spec = new Specifier();
-		spec.setAgencyID(AGENCY);
-		spec.setFeatureID(SITE);
-		spec.setTypeID(TYPE);
+		Specifier spec = new Specifier(AGENCY,SITE,TYPE);
 		return spec;
 	}
 

@@ -106,15 +106,11 @@ public class DataManagerServlet extends HttpServlet {
 	protected Specifier parseSpecifier(HttpServletRequest req) {
 		String featureID = req.getParameter("featureID");
 		
-		Specifier spec = new Specifier();
-		spec.setFeatureID(featureID);
-		
 		String type = req.getParameter("type");
 		if (type == null) {
 			type = "ALL";
 		}
 		WellDataType wdt = WellDataType.valueOf(type);
-		spec.setTypeID(wdt);
 		
 		String agency = req.getParameter("agency_cd");
 		if (agency == null) {
@@ -122,7 +118,8 @@ public class DataManagerServlet extends HttpServlet {
 		}
 		// TODO Find a better place for this hack
 		agency = agency.replace("_", " ");
-		spec.setAgencyID(agency);
+		
+		Specifier spec = new Specifier(agency,featureID,wdt);
 		
 		return spec;
 	}

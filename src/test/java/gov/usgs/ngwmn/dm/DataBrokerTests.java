@@ -14,10 +14,7 @@ public class DataBrokerTests {
 	
 	@Before
 	public void setUp() {
-		spec = new Specifier();
-		spec.setAgencyID("agency");
-		spec.setFeatureID("well");
-		spec.setTypeID(WellDataType.LOG);
+		spec = new Specifier("agency","well",WellDataType.LOG);
 	}
 
 	@Test

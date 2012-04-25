@@ -10,36 +10,33 @@ import java.security.InvalidParameterException;
 import com.google.common.base.Strings;
 
 public class Specifier {
-	private String agencyID;
-	private String featureID;
-	private WellDataType typeID;
+	private final String agencyID;
+	private final String featureID;
+	private final WellDataType typeID;
 	
-	public Specifier() {
+	
+	
+	public Specifier(String agencyID, String featureID, WellDataType typeID) {
+		this.agencyID = agencyID;
+		this.featureID = featureID;
+		this.typeID = typeID;
+		check();
 	}
-	public Specifier(WellRegistry well) {
-		setAgencyID( well.getAgencyCd() );
-		setFeatureID( well.getSiteNo() );
+	
+	public Specifier(WellRegistry well, WellDataType typeID) {
+		this( well.getAgencyCd(), well.getSiteNo(), typeID );
 	}
+	
 	public String getAgencyID() {
 		return agencyID;
-	}
-	public void setAgencyID(String agency) {
-		this.agencyID = agency;
 	}
 	
 	public String getFeatureID() {
 		return featureID;
 	}
-	public void setFeatureID(String featureID) {
-		this.featureID = featureID;
-	}
 	
 	public synchronized WellDataType getTypeID() {
 		return typeID;
-	}
-	
-	public void setTypeID(WellDataType typeID) {
-		this.typeID = typeID;
 	}
 	
 	@Override
@@ -51,7 +48,7 @@ public class Specifier {
 		return builder.toString();
 	}
 
-	public void check() {
+	private void check() {
 		if ( Strings.isNullOrEmpty(getAgencyID()) ) 
 			throw new InvalidParameterException("Well agency Id is required.");
 		if ( Strings.isNullOrEmpty(getFeatureID()) ) 
@@ -62,10 +59,6 @@ public class Specifier {
 
 	public WellRegistryKey getWellRegistryKey() {
 		return new WellRegistryKey(agencyID, featureID);
-	}
-	
-	public void setTypeID(String string) {
-			setTypeID(WellDataType.valueOf(string));
 	}
 	
 	public String getDualId() {

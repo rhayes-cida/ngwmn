@@ -33,7 +33,7 @@ import com.google.common.io.NullOutputStream;
 public class WaterlevelDBCacheTest extends ContextualTest {
 
 	private static final int SIZE = 4102;
-	private static final String TYPE = WellDataType.WATERLEVEL.name();
+	private static final WellDataType TYPE = WellDataType.WATERLEVEL;
 	private static final String SITE = "385748074511001";
 	private static final String AGENCY = "USGS";
 	private static final String filename = AGENCY+ "_" + SITE + "_" + TYPE;
@@ -105,10 +105,7 @@ public class WaterlevelDBCacheTest extends ContextualTest {
 	}
 
 	private Specifier makeSpecifier() {
-		Specifier spec = new Specifier();
-		spec.setAgencyID(AGENCY);
-		spec.setFeatureID(SITE);
-		spec.setTypeID(TYPE);
+		Specifier spec = new Specifier(AGENCY,SITE,TYPE);
 		return spec;
 	}
 
