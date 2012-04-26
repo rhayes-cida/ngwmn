@@ -9,7 +9,6 @@ import gov.usgs.ngwmn.WellDataType;
 import gov.usgs.ngwmn.dm.cache.Cache;
 import gov.usgs.ngwmn.dm.dao.ContextualTest;
 import gov.usgs.ngwmn.dm.io.SimpleSupplier;
-import gov.usgs.ngwmn.dm.io.StatsMaker;
 import gov.usgs.ngwmn.dm.io.Supplier;
 import gov.usgs.ngwmn.dm.spec.Specifier;
 
