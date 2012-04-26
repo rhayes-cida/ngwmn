@@ -102,7 +102,7 @@ public class SupplyZipOutputTests {
 		ZipInputStream zis = new ZipInputStream(bais);
 		ZipEntry entry = zis.getNextEntry();
 		
-		assertEquals(spec.getDualId(), entry.getName());
+		assertTrue(entry.getName().startsWith(spec.getAgencyID()));
 		
 		int size = zis.read(buffer);
 		assertEquals(10, size);
