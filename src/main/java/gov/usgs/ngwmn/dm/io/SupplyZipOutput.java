@@ -35,7 +35,7 @@ public class SupplyZipOutput extends Supplier<OutputStream> {
 
 	private void openEntry(Specifier spec) throws IOException {
 		if (!openEntry && spec != null) {
-			ZipEntry zip = new ZipEntry( spec.getDualId() );
+			ZipEntry zip = new ZipEntry( spec.getAgencyID() + spec.getFeatureID() + "." + spec.getTypeID() );
 			oz.putNextEntry(zip);
 			openEntry = true;
 		}

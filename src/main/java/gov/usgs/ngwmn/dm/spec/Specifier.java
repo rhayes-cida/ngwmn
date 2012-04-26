@@ -15,7 +15,6 @@ public class Specifier {
 	private final WellDataType typeID;
 	
 	
-	
 	public Specifier(String agencyID, String featureID, WellDataType typeID) {
 		this.agencyID = agencyID;
 		this.featureID = featureID;
@@ -59,11 +58,6 @@ public class Specifier {
 
 	public WellRegistryKey getWellRegistryKey() {
 		return new WellRegistryKey(agencyID, featureID);
-	}
-	
-	public String getDualId() {
-		// TODO do we want to null protect? or call check?
-		return agencyID + "" + featureID;
 	}
 }
 
