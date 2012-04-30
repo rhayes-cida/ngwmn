@@ -12,8 +12,10 @@ import java.util.List;
  */
 public class Specification {
 
+	private boolean bundled;
+	
 	// Delineated list of agency well IDs
-	private List<String> wellIDs;
+	private List<Specifier> wellIDs;
 	
 	// TODO actual fields required - these are just brainstorm examples.
 	// DEC_LAT_VA
@@ -51,6 +53,16 @@ public class Specification {
 	private String qwType;
 	
 	
+	
+	
+	public boolean isBundled() {
+		return bundled;
+	}
+	public void setBundled(boolean bundled) {
+		this.bundled = bundled;
+	}
+	
+	
 	public Double getLatitudeNorth() {
 		return latitudeNorth;
 	}
@@ -85,10 +97,10 @@ public class Specification {
 	}
 	
 	
-	public List<String> getWellIDs() {
+	public List<Specifier> getWellIDs() {
 		return wellIDs;
 	}
-	public void setWellIDs(List<String> wellIDs) {
+	public void setWellIDs(List<Specifier> wellIDs) {
 		this.wellIDs = wellIDs;
 	}
 	public String getAquiferID() {

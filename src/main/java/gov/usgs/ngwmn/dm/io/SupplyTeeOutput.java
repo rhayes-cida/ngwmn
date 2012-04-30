@@ -18,19 +18,19 @@ public class SupplyTeeOutput extends Supplier<OutputStream> {
 	}
 	
 	@Override
-	public OutputStream get(Specifier spec) throws IOException {
+	public OutputStream makeSupply(Specifier spec) throws IOException {
 		if (os==null) {
-			os = new TeeOutputStream(os1.get(spec), os2.get(spec));
+			os = new TeeOutputStream(os1.begin(spec), os2.begin(spec));
 		}
 		return os;
 	}
 	
 	@Override
-	public void end(Specifier spec) throws IOException {
+	public void end(boolean threw) throws IOException {
 		try {
-			os1.end(spec);
+			os1.end(threw);
 		} finally {
-			os2.end(spec);
+			os2.end(threw);
 		}
 	}
 

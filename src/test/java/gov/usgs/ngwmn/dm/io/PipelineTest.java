@@ -31,13 +31,13 @@ public class PipelineTest extends Pipeline {
 		Pipeline pl = new Pipeline(null);
 		pl.setInputSupplier(new Supplier<InputStream>() {
 			@Override
-			public InputStream get(Specifier spec) throws IOException {
+			public InputStream makeSupply(Specifier spec) throws IOException {
 				return is;
 			}
 		});
 		pl.setOutputSupplier(new Supplier<OutputStream>() {
 			@Override
-			public OutputStream get(Specifier spec) throws IOException {
+			public OutputStream makeSupply(Specifier spec) throws IOException {
 				return cos;
 			}
 		});
@@ -61,7 +61,7 @@ public class PipelineTest extends Pipeline {
 			ByteArrayOutputStream os = new ByteArrayOutputStream(10);
 			
 			@Override
-			public OutputStream get(Specifier spec) throws IOException {
+			public OutputStream makeSupply(Specifier spec) throws IOException {
 				return os;
 			}
 		};
@@ -69,7 +69,7 @@ public class PipelineTest extends Pipeline {
 		Supplier<InputStream> ins = new Supplier<InputStream>() {
 			
 			@Override
-			public InputStream get(Specifier spec) throws IOException {
+			public InputStream makeSupply(Specifier spec) throws IOException {
 				byte buffer[] = new byte[]{0x0,0x1,0x2,0x3,0x4,0x5,0x6,0x7,0x8,0x9};
 				ByteArrayInputStream is = new ByteArrayInputStream(buffer);
 				return is;
@@ -84,7 +84,7 @@ public class PipelineTest extends Pipeline {
 		
 		ByteArrayOutputStream out;
 		
-		out = (ByteArrayOutputStream) outs1.get(null);
+		out = (ByteArrayOutputStream) outs1.begin(null);
 		checkBytes( out.toByteArray() );
 	}
 	
@@ -95,7 +95,7 @@ public class PipelineTest extends Pipeline {
 			ByteArrayOutputStream os = new ByteArrayOutputStream(10);
 			
 			@Override
-			public OutputStream get(Specifier spec) throws IOException {
+			public OutputStream makeSupply(Specifier spec) throws IOException {
 				return os;
 			}
 		};
@@ -103,7 +103,7 @@ public class PipelineTest extends Pipeline {
 			ByteArrayOutputStream os = new ByteArrayOutputStream(10);
 			
 			@Override
-			public OutputStream get(Specifier spec) throws IOException {
+			public OutputStream makeSupply(Specifier spec) throws IOException {
 				return os;
 			}
 		};
@@ -111,7 +111,7 @@ public class PipelineTest extends Pipeline {
 		Supplier<InputStream> ins = new Supplier<InputStream>() {
 			
 			@Override
-			public InputStream get(Specifier spec) throws IOException {
+			public InputStream makeSupply(Specifier spec) throws IOException {
 				byte buffer[] = new byte[]{0x0,0x1,0x2,0x3,0x4,0x5,0x6,0x7,0x8,0x9};
 				ByteArrayInputStream is = new ByteArrayInputStream(buffer);
 				return is;
@@ -127,10 +127,10 @@ public class PipelineTest extends Pipeline {
 		
 		ByteArrayOutputStream out;
 		
-		out = (ByteArrayOutputStream) outs1.get(null);
+		out = (ByteArrayOutputStream) outs1.begin(null);
 		checkBytes( out.toByteArray() );
 		
-		out = (ByteArrayOutputStream) outs2.get(null);
+		out = (ByteArrayOutputStream) outs2.begin(null);
 		checkBytes( out.toByteArray() );		
 	}
 	
@@ -141,7 +141,7 @@ public class PipelineTest extends Pipeline {
 			ByteArrayOutputStream os = new ByteArrayOutputStream(10);
 			
 			@Override
-			public OutputStream get(Specifier spec) throws IOException {
+			public OutputStream makeSupply(Specifier spec) throws IOException {
 				return os;
 			}
 		};
@@ -149,7 +149,7 @@ public class PipelineTest extends Pipeline {
 			ByteArrayOutputStream os = new ByteArrayOutputStream(10);
 			
 			@Override
-			public OutputStream get(Specifier spec) throws IOException {
+			public OutputStream makeSupply(Specifier spec) throws IOException {
 				return os;
 			}
 		};
@@ -158,7 +158,7 @@ public class PipelineTest extends Pipeline {
 			ByteArrayOutputStream os = new ByteArrayOutputStream(10);
 			
 			@Override
-			public OutputStream get(Specifier spec) throws IOException {
+			public OutputStream makeSupply(Specifier spec) throws IOException {
 				return os;
 			}
 		};
@@ -166,7 +166,7 @@ public class PipelineTest extends Pipeline {
 		Supplier<InputStream> ins = new Supplier<InputStream>() {
 			
 			@Override
-			public InputStream get(Specifier spec) throws IOException {
+			public InputStream makeSupply(Specifier spec) throws IOException {
 				byte buffer[] = new byte[]{0x0,0x1,0x2,0x3,0x4,0x5,0x6,0x7,0x8,0x9};
 				ByteArrayInputStream is = new ByteArrayInputStream(buffer);
 				return is;
@@ -183,13 +183,13 @@ public class PipelineTest extends Pipeline {
 		
 		ByteArrayOutputStream out;
 		
-		out = (ByteArrayOutputStream) outs1.get(null);
+		out = (ByteArrayOutputStream) outs1.begin(null);
 		checkBytes( out.toByteArray() );
 		
-		out = (ByteArrayOutputStream) outs2.get(null);
+		out = (ByteArrayOutputStream) outs2.begin(null);
 		checkBytes( out.toByteArray() );		
 		
-		out = (ByteArrayOutputStream) outs3.get(null);
+		out = (ByteArrayOutputStream) outs3.begin(null);
 		checkBytes( out.toByteArray() );		
 	}
 	
@@ -209,7 +209,7 @@ public class PipelineTest extends Pipeline {
 			ByteArrayOutputStream os = new ByteArrayOutputStream(10);
 			
 			@Override
-			public OutputStream get(Specifier spec) throws IOException {
+			public OutputStream makeSupply(Specifier spec) throws IOException {
 				return os;
 			}
 		};
@@ -217,7 +217,7 @@ public class PipelineTest extends Pipeline {
 		Supplier<InputStream> ins = new Supplier<InputStream>() {
 			
 			@Override
-			public InputStream get(Specifier spec) throws IOException {
+			public InputStream makeSupply(Specifier spec) throws IOException {
 				byte buffer[] = new byte[]{0x0,0x1,0x2,0x3,0x4,0x5,0x6,0x7,0x8,0x9};
 				ByteArrayInputStream is = new ByteArrayInputStream(buffer);
 				return is;
@@ -226,8 +226,8 @@ public class PipelineTest extends Pipeline {
 
 		SupplyChain<OutputStream> chain = new SupplyChain<OutputStream>() {
 			@Override
-			public OutputStream get(Specifier spec) throws IOException {
-				OutputStream os = super.get(spec);
+			public OutputStream makeSupply(Specifier spec) throws IOException {
+				OutputStream os = super.makeSupply(spec);
 				os = new FilterOutputStream(os) {
 					@Override
 					public void write(int b) throws IOException {
@@ -248,7 +248,7 @@ public class PipelineTest extends Pipeline {
 		
 		ByteArrayOutputStream out;
 		
-		out = (ByteArrayOutputStream) outs1.get(null);
+		out = (ByteArrayOutputStream) outs1.begin(null);
 		checkDoubleBytes( out.toByteArray() );
 	}
 

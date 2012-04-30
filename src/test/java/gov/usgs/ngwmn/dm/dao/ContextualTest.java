@@ -30,7 +30,7 @@ public abstract class ContextualTest {
 	@Autowired
 	protected ApplicationContext ctx;
 
-	private static String basedir = "/tmp/gwdp-cache";
+	private static String basedir = "/tmp/gwdp-cache-2";
 
 	@BeforeClass
 	public static void setupNaming() throws Exception {

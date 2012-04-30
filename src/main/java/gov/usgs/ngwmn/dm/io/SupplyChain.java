@@ -4,9 +4,16 @@ import gov.usgs.ngwmn.dm.spec.Specifier;
 
 import java.io.IOException;
 
-public abstract class SupplyChain<T> extends Supplier<T> {
+public class SupplyChain<T> extends Supplier<T> {
 
 	private Supplier<T> link;
+	
+	public SupplyChain() {
+		
+	}
+	public SupplyChain(Supplier<T> upstream) {
+		link = upstream;
+	}
 
 	/**
 	 * Requires the supplier that this intercepts and is linked.
@@ -33,15 +40,15 @@ public abstract class SupplyChain<T> extends Supplier<T> {
 	 * augment it appropriately and return a new stream
 	 */
 	@Override
-	public T get(Specifier spec) throws IOException {
-		return link.get(spec);
+	public T makeSupply(Specifier spec) throws IOException {
+		return link.begin(spec);
 	}
 	
 	/**
 	 * override-able default impl that ensures the link receives the end signal.
 	 */
 	@Override
-	public void end(Specifier spec) throws IOException {
-		link.end(spec);
+	public void end(boolean threw) throws IOException {
+		link.end(threw);
 	}
 }

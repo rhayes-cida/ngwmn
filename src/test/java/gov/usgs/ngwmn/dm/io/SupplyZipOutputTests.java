@@ -25,12 +25,12 @@ public class SupplyZipOutputTests {
 	}
 	
 	@Test
-	public void test_newEntries() throws Exception {
+	public void test_createZipOutput_thenCompareOriginalToZipInput() throws Exception {
 		Supplier<OutputStream> outs = new Supplier<OutputStream>() {
 			ByteArrayOutputStream os = new ByteArrayOutputStream(10);
 			
 			@Override
-			public OutputStream get(Specifier spec) throws IOException {
+			public OutputStream makeSupply(Specifier spec) throws IOException {
 				return os;
 			}
 		};
@@ -38,7 +38,7 @@ public class SupplyZipOutputTests {
 		Supplier<InputStream> ins = new Supplier<InputStream>() {
 			
 			@Override
-			public InputStream get(Specifier spec) throws IOException {
+			public InputStream makeSupply(Specifier spec) throws IOException {
 				byte buffer[] = new byte[]{0x0,0x1,0x2,0x3,0x4,0x5,0x6,0x7,0x8,0x9};
 				ByteArrayInputStream bais = new ByteArrayInputStream(buffer){
 					@Override
@@ -73,8 +73,8 @@ public class SupplyZipOutputTests {
 			}
 			
 			@Override
-			public OutputStream get(Specifier spec) throws IOException {
-				return oz.get(spec);
+			public OutputStream makeSupply(Specifier spec) throws IOException {
+				return oz.begin(spec);
 			}
 		};
 		
@@ -85,11 +85,11 @@ public class SupplyZipOutputTests {
 		pipe.setInvoker(new CopyInvoker());
 		pipe.invoke();
 		
-		chain.get(null).close(); // this is not helping but it does close the entry and stream
+		chain.end(false); // this is not helping but it does close the entry and stream
 		
 		ByteArrayOutputStream out;
 		
-		out = (ByteArrayOutputStream) outs.get(null);
+		out = (ByteArrayOutputStream) outs.begin(null);
 		checkBytes( out.toByteArray() );
 	}
 	

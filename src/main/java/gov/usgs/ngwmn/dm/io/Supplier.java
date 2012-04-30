@@ -12,6 +12,7 @@ import com.google.common.io.OutputSupplier;
 public abstract class Supplier<T> implements InputSupplier<T>, OutputSupplier<T> {
 	
 	private Specifier defaultSpec;
+	private T supply;
 	
 	public Specifier getDefaultSpec() {
 		return defaultSpec;
@@ -23,15 +24,22 @@ public abstract class Supplier<T> implements InputSupplier<T>, OutputSupplier<T>
 
 	@Override
 	public final T getInput() throws IOException {
-		return get(defaultSpec);
+		return begin(defaultSpec);
 	}
 	
 	@Override
 	public final T getOutput() throws IOException {
-		return get(defaultSpec);
+		return begin(defaultSpec);
 	}
 	
-	public abstract T get(Specifier spec) throws IOException;
+	public final T begin(Specifier spec) throws IOException {
+		// TODO might need to null bypass
+		supply = makeSupply(spec);
+		return supply;
+	}
+	
+	public abstract T makeSupply(Specifier spec) throws IOException;
+	
 	
 	/**
 	 *  signal the end of a stream for those suppliers that 
@@ -40,10 +48,10 @@ public abstract class Supplier<T> implements InputSupplier<T>, OutputSupplier<T>
 	 *  for example, Zip Entry management will need to close an entry
 	 *  and all streams will need to closed eventually the streams
 	 */
-	public void end(Specifier spec) throws IOException {
+	public void end(boolean threw) throws IOException {
 		// TODO maybe the default behavior could be to close the supplied stream
 		// TODO this way the specific impl may be able to 
 		// TODO this might not be the best but will be fleshed out in time
-		Closeables.close( (Closeable)get(spec), false );
+		Closeables.close( (Closeable)supply, threw );
 	}
 }

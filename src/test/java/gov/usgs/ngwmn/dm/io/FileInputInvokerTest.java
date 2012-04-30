@@ -36,13 +36,13 @@ public class FileInputInvokerTest {
 		Pipeline pl = new Pipeline(null);
 		pl.setInputSupplier(new Supplier<InputStream>() {
 			@Override
-			public InputStream get(Specifier spec) throws IOException {
+			public InputStream makeSupply(Specifier spec) throws IOException {
 				return is;
 			}
 		});
 		pl.setOutputSupplier(new Supplier<OutputStream>() {
 			@Override
-			public OutputStream get(Specifier spec) throws IOException {
+			public OutputStream makeSupply(Specifier spec) throws IOException {
 				return os;
 			}
 		});

@@ -55,7 +55,7 @@ public class DataBroker implements ExecFactory {
 		}
 	}
 	
-	public Executee makeExecutor(Specifier spec, final Supplier<OutputStream> out) throws IOException {	
+	public Executee makeExecutor(Specifier spec, Supplier<OutputStream> out) throws IOException {	
 
 		check(spec);
 		checkSiteExists(spec);
@@ -67,12 +67,7 @@ public class DataBroker implements ExecFactory {
 		
 		// pre-fetch will send in a null output stream
 		if (out != null) {
-			pipe.setOutputSupplier( new Supplier<OutputStream>() {
-				@Override
-				public OutputStream get(Specifier spec) throws IOException {
-					return out.get(spec);
-				}
-			});
+			pipe.setOutputSupplier(out);
 			success = configureInput(retriever, pipe);
 		}
 		

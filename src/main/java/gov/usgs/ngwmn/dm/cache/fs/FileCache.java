@@ -96,7 +96,7 @@ public class FileCache implements Cache {
 		pipe.setInputSupplier( new Supplier<InputStream>() {
 			
 			@Override
-			public InputStream get(Specifier spec) throws IOException {
+			public InputStream makeSupply(Specifier spec) throws IOException {
 				File f = contentFile(spec);
 				FileInputStream fis = new FileInputStream(f);
 				return fis;

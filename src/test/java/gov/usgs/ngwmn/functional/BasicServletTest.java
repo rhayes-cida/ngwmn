@@ -6,10 +6,12 @@ import static org.junit.Assert.assertTrue;
 import gov.usgs.ngwmn.dm.dao.ContextualTest;
 
 import java.io.File;
+import java.io.FileOutputStream;
 
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import com.google.common.io.ByteStreams;
 import com.meterware.httpunit.GetMethodWebRequest;
 import com.meterware.httpunit.HttpNotFoundException;
 import com.meterware.httpunit.WebRequest;
@@ -19,6 +21,8 @@ import com.meterware.servletunit.ServletUnitClient;
 
 public class BasicServletTest extends ContextualTest {
 
+	private static final String WELL_LIST_DATA = "http://localhost:8080/ngwmn/data?listOfWells=USGS:402734087033401&listOfWells=NJGS:2288614&type=WATERLEVEL";
+//	private static final String WELL_LIST_DATA = "http://localhost:8080/ngwmn/data?listOfWells=NJGS:2288614&listOfWells=NJGS:2288614&type=LOG";
 	private static final String WELL_WITH_DATA = "http://localhost:8080/ngwmn/data?agency_cd=USGS&featureID=402734087033401";
 	private static final String WELL_NO_DATA   = "http://localhost:8080/ngwmn/data?agency_cd=NJGS&featureID=2288614";
 
@@ -40,6 +44,33 @@ public class BasicServletTest extends ContextualTest {
 				}
 			}
 		}
+	}
+	
+	
+	@Test
+	public void test_listOfWells() throws Exception {
+		checkSiteIsVisible("NJGS","2288614");
+		checkSiteIsVisible("USGS", "402734087033401");
+		ServletRunner sr = new ServletRunner( getClass().getResourceAsStream("/servlet-test-web.xml"), "/ngwmn");
+		
+		ServletUnitClient sc = sr.newClient();
+		WebRequest req = new GetMethodWebRequest(WELL_LIST_DATA);
+		WebResponse resp = sc.getResponse(req);
+		assertNotNull("response", resp);
+		
+		for (String hn : resp.getHeaderFieldNames()) {
+			System.out.printf("Header %s:%s\n", hn, resp.getHeaderField(hn));
+		}
+		String body = resp.getText();
+		System.out.printf("contentLength=%d,size=%d\n", resp.getContentLength(), body.length());
+		
+		File file = new File("tmp/gwdp-cache","data.zip");
+		FileOutputStream fos = new FileOutputStream(file);
+		ByteStreams.copy(resp.getInputStream(), fos);
+		fos.flush();
+		fos.close();
+		
+		assertTrue("response size", body.length() > 10000);
 	}
 	
 	
@@ -107,12 +138,12 @@ public class BasicServletTest extends ContextualTest {
 */
 
 	// Now repeat the tests; we expect to get cached results
-	@Test(timeout=2000)
+	@Test(timeout=1000)
 	public void testWithData_2() throws Exception {
 		testWithData();
 	}
 	
-	@Test(timeout=2000)
+	@Test(timeout=1000)
 	public void testWithNoData_2() throws Exception {
 		testWithNoData();
 	}
@@ -121,5 +152,6 @@ public class BasicServletTest extends ContextualTest {
 	public void testNonSite_2() throws Exception {
 		testNonSite();
 	}
-
+	
+	
 }

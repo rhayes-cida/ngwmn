@@ -69,15 +69,8 @@ public class Pipeline implements Executee {
 		invoker = invoke;
 	}
 	
-	public Void call() {
-		
-		try {
-			invoke();
-		} catch (IOException e) {
-			// TODO this is a first attempt at handling - expect a refactor
-			ioe = e;
-		}
-		
+	public Void call() throws IOException {
+		invoke();
 		return null;
 	}
 	
@@ -94,13 +87,15 @@ public class Pipeline implements Executee {
 
 	public void invoke() throws IOException {
 		statistics.markStart();
-		InputStream  is = iss.get(spec);
+		InputStream  is = iss.begin(spec);
+		boolean threw = true;
 		try {
 			try {
-				OutputStream os = oss.get(spec);
+				OutputStream os = oss.begin(spec);
 				invoker.invoke(is,os, statistics);
 				statistics.markEnd(Status.DONE);
 				logger.info("Done stats={}", statistics);
+				threw = false;
 			} catch (IOException ioe) {
 				statistics.markEnd(Status.FAIL);
 				setException(ioe);
@@ -108,13 +103,13 @@ public class Pipeline implements Executee {
 				throw ioe;
 			} finally {
 				if (oss != null) {
-					oss.end(spec);
+					oss.end(threw);
 				}
 			}
 		// TODO maybe a catch here too?!
 		} finally {
 			if (iss != null) {
-				iss.end(spec);
+				iss.end(threw);
 			}
 		}
 	}

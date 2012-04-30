@@ -31,7 +31,7 @@ public class WebRetriever implements DataFetcher {
 		
 		final String url = urlFactory.makeUrl(spec);
 		
-		if (Strings.isNullOrEmpty(url)) {
+		if ( Strings.isNullOrEmpty(url) ) {
 			return false;
 		}
 		
@@ -41,7 +41,7 @@ public class WebRetriever implements DataFetcher {
 		pipe.setInputSupplier( new Supplier<InputStream>() {
 			
 			@Override
-			public InputStream get(Specifier spec) throws IOException {
+			public InputStream makeSupply(Specifier spec) throws IOException {
 				pipe.getStatistics().markStart();  // TODO did not expect this behavior. seems out of place
 				int statusCode = harvester.wget(url);
 				
@@ -54,12 +54,6 @@ public class WebRetriever implements DataFetcher {
 				return harvester.getInputStream();
 				// it's zero, no help here  logger.info("response stream available {}", is.available());
 			}
-			
-			@Override
-			public void end(Specifier spec) {
-				// TODO do nothing for now
-			}
-			
 		});
 		
 		return true;
