@@ -1,7 +1,9 @@
-package gov.usgs.ngwmn.dm.io;
+package gov.usgs.ngwmn.functional;
 
 import gov.usgs.ngwmn.dm.cache.PipeStatistics;
 import gov.usgs.ngwmn.dm.dao.ContextualTest;
+import gov.usgs.ngwmn.dm.io.FetchRecorder;
+import gov.usgs.ngwmn.dm.io.StatsMaker;
 
 import org.junit.Before;
 import org.junit.Test;

@@ -1,10 +1,14 @@
-package gov.usgs.ngwmn.dm.dao;
+package gov.usgs.ngwmn.functional;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
+
+import gov.usgs.ngwmn.dm.dao.ContextualTest;
+import gov.usgs.ngwmn.dm.dao.WellRegistry;
+import gov.usgs.ngwmn.dm.dao.WellRegistryDAO;
 
 import java.util.List;
 
