@@ -1,11 +1,10 @@
 package gov.usgs.ngwmn.functional;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 import gov.usgs.ngwmn.dm.dao.ContextualTest;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 
 import org.junit.BeforeClass;
@@ -63,14 +62,16 @@ public class BasicServletTest extends ContextualTest {
 		}
 		String body = resp.getText();
 		System.out.printf("contentLength=%d,size=%d\n", resp.getContentLength(), body.length());
+		assertTrue("response size", body.length() > 10000);
 		
-		File file = new File("tmp/gwdp-cache","data.zip");
+		File file = new File("/tmp","data.zip");
 		FileOutputStream fos = new FileOutputStream(file);
 		ByteStreams.copy(resp.getInputStream(), fos);
 		fos.flush();
 		fos.close();
-		
-		assertTrue("response size", body.length() > 10000);
+		int available = new FileInputStream(file).available();
+		int bodyLenth = body.length();
+		assertEquals("response size", available, bodyLenth);
 	}
 	
 	

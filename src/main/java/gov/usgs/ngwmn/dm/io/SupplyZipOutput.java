@@ -45,7 +45,7 @@ public class SupplyZipOutput extends Supplier<OutputStream> {
 		if (!openEntry && spec != null) {
 			logger.warn("openEntry : making zip entry {}", spec);
 			
-			ZipEntry zip = new ZipEntry( spec.getAgencyID() + spec.getFeatureID() + new Random().nextInt(100) + "." + spec.getTypeID() );
+			ZipEntry zip = new ZipEntry( spec.getAgencyID() + spec.getFeatureID() + "." + spec.getTypeID() );
 			oz.putNextEntry(zip);
 			openEntry = true;
 		}
