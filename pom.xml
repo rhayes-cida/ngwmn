@@ -212,6 +212,7 @@
 		        		<include>**/integration/**</include>
 		        		<include>**/functional/**</include>
 		        	</includes>
+		        	<testFailureIgnore>true</testFailureIgnore>
 		        </configuration>
 		        <executions>
 		          <execution>
