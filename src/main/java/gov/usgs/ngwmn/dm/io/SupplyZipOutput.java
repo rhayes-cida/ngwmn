@@ -4,7 +4,6 @@ import gov.usgs.ngwmn.dm.spec.Specifier;
 
 import java.io.IOException;
 import java.io.OutputStream;
-import java.util.Random;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
@@ -25,7 +24,7 @@ public class SupplyZipOutput extends Supplier<OutputStream> {
 
 	private OutputStream getOutputStream(Specifier spec) throws IOException {
 		if (oz == null) {
-			logger.warn("getOutputStream : making zip output stream");
+			logger.debug("getOutputStream : making zip output stream");
 			// init and chain the stream if not done yet
 			openEntry = false;
 			oz = new ZipOutputStream( os.begin(spec) );
@@ -35,7 +34,6 @@ public class SupplyZipOutput extends Supplier<OutputStream> {
 	
 	@Override
 	public OutputStream makeSupply(Specifier spec) throws IOException {
-//		logger.warn("makeSupply : making zip output stream");
 		getOutputStream(spec);
 		openEntry(spec);
 		return oz;
@@ -43,7 +41,7 @@ public class SupplyZipOutput extends Supplier<OutputStream> {
 
 	private void openEntry(Specifier spec) throws IOException {
 		if (!openEntry && spec != null) {
-			logger.warn("openEntry : making zip entry {}", spec);
+			logger.debug("openEntry : making zip entry {}", spec);
 			
 			ZipEntry zip = new ZipEntry( spec.getAgencyID() + spec.getFeatureID() + "." + spec.getTypeID() );
 			oz.putNextEntry(zip);
@@ -53,7 +51,7 @@ public class SupplyZipOutput extends Supplier<OutputStream> {
 
 	private void closeEntry() throws IOException {
 		if (openEntry) {
-			logger.warn("closeEntry : closing zip entry");
+			logger.debug("closeEntry : closing zip entry");
 			// only if entry is open then close it
 			oz.closeEntry();
 			openEntry = false;
@@ -66,8 +64,6 @@ public class SupplyZipOutput extends Supplier<OutputStream> {
 	@Override
 	public void end(boolean threw) throws IOException {
 		if (openEntry) {
-			//logger.warn("end : closing zip entry");
-
 			try {
 				closeEntry();
 			} catch (IOException e) {
@@ -76,7 +72,7 @@ public class SupplyZipOutput extends Supplier<OutputStream> {
 				}
 			}
 		} else {
-			logger.warn("end : closing zip stream");
+			logger.debug("end : closing zip stream");
 			super.end(threw);
 		}
 	}
