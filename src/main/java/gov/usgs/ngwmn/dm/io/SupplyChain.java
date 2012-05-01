@@ -2,9 +2,10 @@ package gov.usgs.ngwmn.dm.io;
 
 import gov.usgs.ngwmn.dm.spec.Specifier;
 
+import java.io.Closeable;
 import java.io.IOException;
 
-public class SupplyChain<T> extends Supplier<T> {
+public class SupplyChain<T extends Closeable> extends Supplier<T> {
 
 	private Supplier<T> link;
 	
@@ -41,7 +42,7 @@ public class SupplyChain<T> extends Supplier<T> {
 	 */
 	@Override
 	public T makeSupply(Specifier spec) throws IOException {
-		return link.begin(spec);
+		return link.makeSupply(spec);
 	}
 	
 	/**

@@ -32,7 +32,9 @@ public class SequentialExec implements Executee {
     	Executee exec = null;
     	boolean threw = true;
     	try {
-    		output.begin(null);
+    		// this is only done to show the pairing with end.
+    		output.begin(null); // TODO since it is not needed - this is contrived
+    		
 	        for (Specifier spec : specifiers) {
 	        	logger.info("Getting well data for {}", spec);
 	        	exec = factory.makeExecutor(spec, output);

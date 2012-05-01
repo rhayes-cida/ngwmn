@@ -26,42 +26,30 @@ public class SupplyZipOutputTests {
 	
 	@Test
 	public void test_createZipOutput_thenCompareOriginalToZipInput() throws Exception {
-		Supplier<OutputStream> outs = new Supplier<OutputStream>() {
-			ByteArrayOutputStream os = new ByteArrayOutputStream(10);
-			
-			@Override
-			public OutputStream makeSupply(Specifier spec) throws IOException {
-				return os;
-			}
-		};
 		
-		Supplier<InputStream> ins = new Supplier<InputStream>() {
+		ByteArrayOutputStream os = new ByteArrayOutputStream(10);
+		Supplier<OutputStream> outs = new SimpleSupplier<OutputStream>(os);
+
+		byte buffer[] = new byte[]{0x0,0x1,0x2,0x3,0x4,0x5,0x6,0x7,0x8,0x9};
+		ByteArrayInputStream bais = new ByteArrayInputStream(buffer){
+			@Override
+			public int read(byte[] bytes) throws IOException {
+				int length = super.read(bytes);
+				for (int b=0; b<length; b++) {
+					System.out.print(bytes[b]);
+				}
+				System.out.println();
+				return length;
+			}
 			
 			@Override
-			public InputStream makeSupply(Specifier spec) throws IOException {
-				byte buffer[] = new byte[]{0x0,0x1,0x2,0x3,0x4,0x5,0x6,0x7,0x8,0x9};
-				ByteArrayInputStream bais = new ByteArrayInputStream(buffer){
-					@Override
-					public int read(byte[] bytes) throws IOException {
-						int length = super.read(bytes);
-						for (int b=0; b<length; b++) {
-							System.out.print(bytes[b]);
-						}
-						System.out.println();
-						return length;
-					}
-					
-					@Override
-					public synchronized int read() {
-						int b = super.read();
-						System.out.println(b);
-						return b;
-					}
-				};
-				
-				return bais;
+			public synchronized int read() {
+				int b = super.read();
+				System.out.println(b);
+				return b;
 			}
 		};
+		Supplier<InputStream> ins = new SimpleSupplier<InputStream>(bais);
 		
 		SupplyChain<OutputStream> chain = new SupplyChain<OutputStream>() {
 			SupplyZipOutput oz;

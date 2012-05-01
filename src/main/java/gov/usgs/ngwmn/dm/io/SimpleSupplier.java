@@ -2,10 +2,11 @@ package gov.usgs.ngwmn.dm.io;
 
 import gov.usgs.ngwmn.dm.spec.Specifier;
 
+import java.io.Closeable;
 import java.io.IOException;
 
 
-public class SimpleSupplier<T> extends Supplier<T> {
+public class SimpleSupplier<T extends Closeable> extends Supplier<T> {
 
 	private final T supply; // the stream
 	

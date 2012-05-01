@@ -9,7 +9,7 @@ import com.google.common.io.Closeables;
 import com.google.common.io.InputSupplier;
 import com.google.common.io.OutputSupplier;
 
-public abstract class Supplier<T> implements InputSupplier<T>, OutputSupplier<T> {
+public abstract class Supplier<T extends Closeable> implements InputSupplier<T>, OutputSupplier<T> {
 	
 	private Specifier defaultSpec;
 	private T supply;
@@ -33,7 +33,8 @@ public abstract class Supplier<T> implements InputSupplier<T>, OutputSupplier<T>
 	}
 	
 	public final T begin(Specifier spec) throws IOException {
-		// TODO might need to null bypass
+		// cannot do a null bypass because zip supply needs to make a new entry
+		// each impl must be smart about its makeSupply
 		supply = makeSupply(spec);
 		return supply;
 	}
@@ -52,6 +53,6 @@ public abstract class Supplier<T> implements InputSupplier<T>, OutputSupplier<T>
 		// TODO maybe the default behavior could be to close the supplied stream
 		// TODO this way the specific impl may be able to 
 		// TODO this might not be the best but will be fleshed out in time
-		Closeables.close( (Closeable)supply, threw );
+		Closeables.close( supply, threw );
 	}
 }

@@ -7,6 +7,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 
+import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -21,7 +22,6 @@ import com.meterware.servletunit.ServletUnitClient;
 public class BasicServletTest extends ContextualTest {
 
 	private static final String WELL_LIST_DATA = "http://localhost:8080/ngwmn/data?listOfWells=USGS:402734087033401&listOfWells=NJGS:2288614&type=WATERLEVEL";
-//	private static final String WELL_LIST_DATA = "http://localhost:8080/ngwmn/data?listOfWells=NJGS:2288614&listOfWells=NJGS:2288614&type=LOG";
 	private static final String WELL_WITH_DATA = "http://localhost:8080/ngwmn/data?agency_cd=USGS&featureID=402734087033401";
 	private static final String WELL_NO_DATA   = "http://localhost:8080/ngwmn/data?agency_cd=NJGS&featureID=2288614";
 
@@ -43,6 +43,13 @@ public class BasicServletTest extends ContextualTest {
 				}
 			}
 		}
+	}
+	
+	@Before
+	public void logSeparator() {
+		System.out.println();
+		System.out.println("    ----");
+		System.out.println();
 	}
 	
 	

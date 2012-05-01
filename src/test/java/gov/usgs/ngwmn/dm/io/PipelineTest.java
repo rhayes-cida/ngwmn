@@ -23,24 +23,14 @@ public class PipelineTest extends Pipeline {
 	@Test
 	public void testClose() {
 		String sample = "Hello";
-		final InputStream is = new ByteArrayInputStream(sample.getBytes());
+		InputStream is           = new ByteArrayInputStream(sample.getBytes());
 		ByteArrayOutputStream os = new ByteArrayOutputStream();
-		final OpCountOutputStream cos = new OpCountOutputStream(os);
+		OpCountOutputStream cos  = new OpCountOutputStream(os);
 		Invoker invoker = new FileInputInvoker();
 		
 		Pipeline pl = new Pipeline(null);
-		pl.setInputSupplier(new Supplier<InputStream>() {
-			@Override
-			public InputStream makeSupply(Specifier spec) throws IOException {
-				return is;
-			}
-		});
-		pl.setOutputSupplier(new Supplier<OutputStream>() {
-			@Override
-			public OutputStream makeSupply(Specifier spec) throws IOException {
-				return cos;
-			}
-		});
+		pl.setInputSupplier(  new SimpleSupplier<InputStream>(is) );
+		pl.setOutputSupplier( new SimpleSupplier<OutputStream>(cos) );
 		pl.setInvoker(invoker);
 		try {
 			pl.invoke();
@@ -57,24 +47,12 @@ public class PipelineTest extends Pipeline {
 	@Test
 	public void test_simpleChain()  throws Exception {
 		
-		Supplier<OutputStream> outs1 = new Supplier<OutputStream>() {
-			ByteArrayOutputStream os = new ByteArrayOutputStream(10);
-			
-			@Override
-			public OutputStream makeSupply(Specifier spec) throws IOException {
-				return os;
-			}
-		};
+		ByteArrayOutputStream os = new ByteArrayOutputStream(10);
+		Supplier<OutputStream> outs1 = new SimpleSupplier<OutputStream>(os);
 		
-		Supplier<InputStream> ins = new Supplier<InputStream>() {
-			
-			@Override
-			public InputStream makeSupply(Specifier spec) throws IOException {
-				byte buffer[] = new byte[]{0x0,0x1,0x2,0x3,0x4,0x5,0x6,0x7,0x8,0x9};
-				ByteArrayInputStream is = new ByteArrayInputStream(buffer);
-				return is;
-			}
-		};
+		byte buffer[] = new byte[]{0x0,0x1,0x2,0x3,0x4,0x5,0x6,0x7,0x8,0x9};
+		ByteArrayInputStream is = new ByteArrayInputStream(buffer);
+		Supplier<InputStream> ins = new SimpleSupplier<InputStream>(is);
 		
 		Pipeline pipe = new Pipeline(null);
 		pipe.setInputSupplier(ins);
@@ -91,32 +69,14 @@ public class PipelineTest extends Pipeline {
 	@Test
 	public void test_uniTeeChain()  throws Exception {
 		
-		Supplier<OutputStream> outs1 = new Supplier<OutputStream>() {
-			ByteArrayOutputStream os = new ByteArrayOutputStream(10);
-			
-			@Override
-			public OutputStream makeSupply(Specifier spec) throws IOException {
-				return os;
-			}
-		};
-		Supplier<OutputStream> outs2 = new Supplier<OutputStream>() {
-			ByteArrayOutputStream os = new ByteArrayOutputStream(10);
-			
-			@Override
-			public OutputStream makeSupply(Specifier spec) throws IOException {
-				return os;
-			}
-		};
-		
-		Supplier<InputStream> ins = new Supplier<InputStream>() {
-			
-			@Override
-			public InputStream makeSupply(Specifier spec) throws IOException {
-				byte buffer[] = new byte[]{0x0,0x1,0x2,0x3,0x4,0x5,0x6,0x7,0x8,0x9};
-				ByteArrayInputStream is = new ByteArrayInputStream(buffer);
-				return is;
-			}
-		};
+		ByteArrayOutputStream os1 = new ByteArrayOutputStream(10);
+		Supplier<OutputStream> outs1 = new SimpleSupplier<OutputStream>(os1);
+		ByteArrayOutputStream os2 = new ByteArrayOutputStream(10);
+		Supplier<OutputStream> outs2 = new SimpleSupplier<OutputStream>(os2);
+
+		byte buffer[] = new byte[]{0x0,0x1,0x2,0x3,0x4,0x5,0x6,0x7,0x8,0x9};
+		ByteArrayInputStream is = new ByteArrayInputStream(buffer);
+		Supplier<InputStream> ins = new SimpleSupplier<InputStream>(is);
 		
 		Pipeline pipe = new Pipeline(null);
 		pipe.setInputSupplier(ins);		
@@ -137,41 +97,16 @@ public class PipelineTest extends Pipeline {
 	@Test
 	public void test_doubleTeeChain()  throws Exception {
 		
-		Supplier<OutputStream> outs1 = new Supplier<OutputStream>() {
-			ByteArrayOutputStream os = new ByteArrayOutputStream(10);
-			
-			@Override
-			public OutputStream makeSupply(Specifier spec) throws IOException {
-				return os;
-			}
-		};
-		Supplier<OutputStream> outs2 = new Supplier<OutputStream>() {
-			ByteArrayOutputStream os = new ByteArrayOutputStream(10);
-			
-			@Override
-			public OutputStream makeSupply(Specifier spec) throws IOException {
-				return os;
-			}
-		};
+		ByteArrayOutputStream os1 = new ByteArrayOutputStream(10);
+		Supplier<OutputStream> outs1 = new SimpleSupplier<OutputStream>(os1);
+		ByteArrayOutputStream os2 = new ByteArrayOutputStream(10);
+		Supplier<OutputStream> outs2 = new SimpleSupplier<OutputStream>(os2);
+		ByteArrayOutputStream os3 = new ByteArrayOutputStream(10);
+		Supplier<OutputStream> outs3 = new SimpleSupplier<OutputStream>(os3);
 		
-		Supplier<OutputStream> outs3 = new Supplier<OutputStream>() {
-			ByteArrayOutputStream os = new ByteArrayOutputStream(10);
-			
-			@Override
-			public OutputStream makeSupply(Specifier spec) throws IOException {
-				return os;
-			}
-		};
-		
-		Supplier<InputStream> ins = new Supplier<InputStream>() {
-			
-			@Override
-			public InputStream makeSupply(Specifier spec) throws IOException {
-				byte buffer[] = new byte[]{0x0,0x1,0x2,0x3,0x4,0x5,0x6,0x7,0x8,0x9};
-				ByteArrayInputStream is = new ByteArrayInputStream(buffer);
-				return is;
-			}
-		};
+		byte buffer[] = new byte[]{0x0,0x1,0x2,0x3,0x4,0x5,0x6,0x7,0x8,0x9};
+		ByteArrayInputStream is = new ByteArrayInputStream(buffer);
+		Supplier<InputStream> ins = new SimpleSupplier<InputStream>(is);
 		
 		Pipeline pipe = new Pipeline(null);
 		pipe.setInputSupplier(ins);		
@@ -205,25 +140,13 @@ public class PipelineTest extends Pipeline {
 	@Test
 	public void test_SupplyChain()  throws Exception {
 		
-		Supplier<OutputStream> outs1 = new Supplier<OutputStream>() {
-			ByteArrayOutputStream os = new ByteArrayOutputStream(10);
-			
-			@Override
-			public OutputStream makeSupply(Specifier spec) throws IOException {
-				return os;
-			}
-		};
-		
-		Supplier<InputStream> ins = new Supplier<InputStream>() {
-			
-			@Override
-			public InputStream makeSupply(Specifier spec) throws IOException {
-				byte buffer[] = new byte[]{0x0,0x1,0x2,0x3,0x4,0x5,0x6,0x7,0x8,0x9};
-				ByteArrayInputStream is = new ByteArrayInputStream(buffer);
-				return is;
-			}
-		};
+		ByteArrayOutputStream os = new ByteArrayOutputStream(10);
+		Supplier<OutputStream> outs1 = new SimpleSupplier<OutputStream>(os);
 
+		byte buffer[] = new byte[]{0x0,0x1,0x2,0x3,0x4,0x5,0x6,0x7,0x8,0x9};
+		ByteArrayInputStream is = new ByteArrayInputStream(buffer);
+		Supplier<InputStream> ins = new SimpleSupplier<InputStream>(is);
+		
 		SupplyChain<OutputStream> chain = new SupplyChain<OutputStream>() {
 			@Override
 			public OutputStream makeSupply(Specifier spec) throws IOException {

@@ -1,7 +1,7 @@
 package gov.usgs.ngwmn.dm;
 
 import gov.usgs.ngwmn.WellDataType;
-import gov.usgs.ngwmn.dm.io.SimpleSupplier;
+import gov.usgs.ngwmn.dm.io.HttpResponseSupplier;
 import gov.usgs.ngwmn.dm.io.Supplier;
 import gov.usgs.ngwmn.dm.io.SupplyZipOutput;
 import gov.usgs.ngwmn.dm.io.executor.Executee;
@@ -19,7 +19,6 @@ import java.util.List;
 
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
-import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -32,10 +31,6 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
 public class DataManagerServlet extends HttpServlet {
 
 	private   static final long   serialVersionUID = 2L;
-	protected static final int    MAX_BUFFER_SIZE  = 1024<<3; // a reasonable guess at efficiency
-	protected static final int    MIN_BUFFER_SIZE  = 2000;   // a reasonable guess at inefficiency
-	public    static final String ZIP_CONTENT_TYPE = "application/zip";
-	public    static final String XML_CONTENT_TYPE = "text/xml";
 	
 	protected static final String PARAM_AGENCY     = "agency_cd";
 	protected static final String PARAM_FEATURE    = "featureID";
@@ -43,9 +38,7 @@ public class DataManagerServlet extends HttpServlet {
 	protected static final String PARAM_WELLS_LIST = "listOfWells";
 	protected static final String PARAM_BUNDLED    = "bundled";
 	
-	
-	
-	private Logger logger = LoggerFactory.getLogger(getClass());
+	private  final Logger logger = LoggerFactory.getLogger(getClass());
 	
 	protected DataBroker db;
 	protected ApplicationContext ctx;
@@ -69,31 +62,13 @@ public class DataManagerServlet extends HttpServlet {
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp)
 			throws ServletException, IOException 
 	{
-		
-		Specification spect = makeSpecification(req);
-		
 		try {
-			ServletOutputStream requestStream = resp.getOutputStream();
-			Supplier<OutputStream> outSupply  = new SimpleSupplier<OutputStream>(requestStream);
-			// TODO this is not ideal - not as elegant as the enum solution
-			// TODO however it is no longer the data type domain - it is the full request 
-			if ( spect.isBundled() || spect.getWellIDs().get(0).getTypeID().contentType.contains("zip") ) {
-				resp.setContentType(ZIP_CONTENT_TYPE);
-			} else {
-				resp.setContentType(XML_CONTENT_TYPE);
-			}
+			Specification spect = makeSpecification(req);
+			Supplier<OutputStream> outSupply = new HttpResponseSupplier(spect, resp);
 			if ( spect.isBundled() ) {
 				outSupply  = new SupplyZipOutput(outSupply);
 			}
-			
-			// TODO need to name the bundle some how
-			logger.debug("send as attachment with file name data.zip");
-			resp.setHeader("content-disposition", "attachment;filename=data.zip");
-			// ensure that buffer size is greater than magic lower limit for non-extant sites
-			if (resp.getBufferSize() < MIN_BUFFER_SIZE) {
-				resp.setBufferSize(MAX_BUFFER_SIZE); 
-			}
-		
+					
 			try {
 				SpecResolver resolver = new WellListResolver();
 				Executee exec = new SequentialExec(db, resolver.specIterator(spect), outSupply);
@@ -101,23 +76,16 @@ public class DataManagerServlet extends HttpServlet {
 			} catch (SiteNotFoundException nse) {
 				// this may fail, if detected after output buffer has been flushed
 				resp.resetBuffer();
-				requestStream = null;
 				resp.sendError(HttpServletResponse.SC_NOT_FOUND, nse.getLocalizedMessage());
 			} catch (DataNotAvailableException nda) {
 				resp.resetBuffer();
-				requestStream = null;
 				// TODO What's the right error code? 503? 504?
 				resp.sendError(HttpServletResponse.SC_GATEWAY_TIMEOUT, nda.getLocalizedMessage());
 			} catch (Exception e) {
 				logger.error("Problem getting well data", e);
-				requestStream = null;
 				// TODO this message should not be rendered to the request
 				// TODO it could reveal too much detail to the user
 				throw new ServletException(e);
-			} finally {
-				if (requestStream != null) {
-					requestStream.close();
-				}
 			}
 		} finally {
 			// TODO identify the request
