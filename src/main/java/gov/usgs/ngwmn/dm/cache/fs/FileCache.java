@@ -94,11 +94,14 @@ public class FileCache implements Cache {
 		pipe.setInvoker(i);
 		
 		pipe.setInputSupplier( new Supplier<InputStream>() {
+			FileInputStream fis;
 			
 			@Override
 			public InputStream makeSupply(Specifier spec) throws IOException {
-				File f = contentFile(spec);
-				FileInputStream fis = new FileInputStream(f);
+				if (fis==null) {
+					File file = contentFile(spec);
+					fis = new FileInputStream(file);
+				}
 				return fis;
 			}
 		});

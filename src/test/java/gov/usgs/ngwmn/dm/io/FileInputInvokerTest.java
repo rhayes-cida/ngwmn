@@ -4,7 +4,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import gov.usgs.ngwmn.dm.cache.PipeStatistics;
-import gov.usgs.ngwmn.dm.spec.Specifier;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -34,18 +33,8 @@ public class FileInputInvokerTest {
 		final ByteArrayOutputStream os = new ByteArrayOutputStream();
 		
 		Pipeline pl = new Pipeline(null);
-		pl.setInputSupplier(new Supplier<InputStream>() {
-			@Override
-			public InputStream makeSupply(Specifier spec) throws IOException {
-				return is;
-			}
-		});
-		pl.setOutputSupplier(new Supplier<OutputStream>() {
-			@Override
-			public OutputStream makeSupply(Specifier spec) throws IOException {
-				return os;
-			}
-		});
+		pl.setInputSupplier(new SimpleSupplier<InputStream>(is));
+		pl.setOutputSupplier(new SimpleSupplier<OutputStream>(os));
 		pl.setInvoker(victim);
 		try {
 			pl.invoke();

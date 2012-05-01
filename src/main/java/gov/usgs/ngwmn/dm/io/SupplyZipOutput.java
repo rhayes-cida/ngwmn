@@ -22,7 +22,7 @@ public class SupplyZipOutput extends Supplier<OutputStream> {
 		this.os = os;
 	}
 
-	private OutputStream getOutputStream(Specifier spec) throws IOException {
+	private OutputStream makeOutputStream(Specifier spec) throws IOException {
 		if (oz == null) {
 			logger.debug("getOutputStream : making zip output stream");
 			// init and chain the stream if not done yet
@@ -34,7 +34,7 @@ public class SupplyZipOutput extends Supplier<OutputStream> {
 	
 	@Override
 	public OutputStream makeSupply(Specifier spec) throws IOException {
-		getOutputStream(spec);
+		makeOutputStream(spec);
 		openEntry(spec);
 		return oz;
 	}

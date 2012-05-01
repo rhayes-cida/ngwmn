@@ -42,7 +42,7 @@ public class SupplyChain<T extends Closeable> extends Supplier<T> {
 	 */
 	@Override
 	public T makeSupply(Specifier spec) throws IOException {
-		return link.begin(spec);
+		return link.makeSupply(spec);
 	}
 	
 	/**

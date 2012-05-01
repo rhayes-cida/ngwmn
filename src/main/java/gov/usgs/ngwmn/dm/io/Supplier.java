@@ -33,7 +33,8 @@ public abstract class Supplier<T extends Closeable> implements InputSupplier<T>,
 	}
 	
 	public final T begin(Specifier spec) throws IOException {
-		// TODO might need to null bypass
+		// cannot do a null bypass because zip supply needs to make a new entry
+		// each impl must be smart about its makeSupply
 		supply = makeSupply(spec);
 		return supply;
 	}

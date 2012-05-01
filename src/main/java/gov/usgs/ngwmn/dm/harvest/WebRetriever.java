@@ -39,10 +39,15 @@ public class WebRetriever implements DataFetcher {
 		pipe.getStatistics().setSource(url);
 
 		pipe.setInputSupplier( new Supplier<InputStream>() {
+			InputStream is;
 			
 			@Override
 			public InputStream makeSupply(Specifier spec) throws IOException {
-				pipe.getStatistics().markStart();  // TODO did not expect this behavior. seems out of place
+				if (is!=null) return is;
+				
+				// TODO did not expect this behavior. seems out of place
+				pipe.getStatistics().markStart();  
+				
 				int statusCode = harvester.wget(url);
 				
 		        if (statusCode != HttpStatus.SC_OK) {
@@ -51,7 +56,8 @@ public class WebRetriever implements DataFetcher {
 		        	pipe.setException(ioe);
 		        	throw ioe;
 		        }
-				return harvester.getInputStream();
+		        is = harvester.getInputStream();
+				return is;
 				// it's zero, no help here  logger.info("response stream available {}", is.available());
 			}
 		});

@@ -7,6 +7,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 
+import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -42,6 +43,13 @@ public class BasicServletTest extends ContextualTest {
 				}
 			}
 		}
+	}
+	
+	@Before
+	public void logSeparator() {
+		System.out.println();
+		System.out.println("    ----");
+		System.out.println();
 	}
 	
 	
