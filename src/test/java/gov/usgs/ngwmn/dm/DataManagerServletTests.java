@@ -42,6 +42,34 @@ public class DataManagerServletTests {
 	}
 
 	
+	@Test(expected=RuntimeException.class)
+	public void test_precheckWells_duplicateWellInList() {
+		List<Specifier> specs = new ArrayList<Specifier>();
+		specs.add( new Specifier("USGS", "007", WellDataType.LOG));
+		specs.add( new Specifier("USGS", "007", WellDataType.LOG));
+		
+		dms.precheckWells(specs);
+	}
+	
+	@Test
+	public void test_precheckWells_checksWellsInList() {
+		List<Specifier> specs = new ArrayList<Specifier>();
+		specs.add( new Specifier("USGS", "007", WellDataType.LOG));
+		specs.add( new Specifier("USGS", "006", WellDataType.LOG));
+		
+		final Map<String,Integer> called = new HashMap<String,Integer>();
+		called.put("check",0);
+		dms.db = new DataBroker() {
+			@Override
+			void check(Specifier spec) {
+				called.put("check", called.get("check")+1);
+			}
+		};
+		dms.precheckWells(specs);
+		assertEquals("DataBroker.check must be called in precheck for each spec",
+				Integer.valueOf(2),called.get("check"));
+	}
+	
 	@Test
 	@SuppressWarnings("serial")
 	public void test_makeSpecification_successfullSingle_notBundled() {
@@ -60,6 +88,9 @@ public class DataManagerServletTests {
 			@Override
 			protected List<Specifier> parseSpecifier(HttpServletRequest req) {
 				return specsList;
+			}
+			@Override
+			protected void precheckWells(List<Specifier> specs) {
 			}
 		};
 		
@@ -94,6 +125,9 @@ public class DataManagerServletTests {
 			protected List<Specifier> parseSpecifier(HttpServletRequest req) {
 				return specsList;
 			}
+			@Override
+			protected void precheckWells(List<Specifier> specs) {
+			}
 		};
 		
 		HttpServletRequest req = new MockRequest() {
@@ -126,6 +160,9 @@ public class DataManagerServletTests {
 			@Override
 			protected List<Specifier> parseSpecifier(HttpServletRequest req) {
 				throw new RuntimeException("Should not be called for list of wells.");
+			}
+			@Override
+			protected void precheckWells(List<Specifier> specs) {
 			}
 		};
 		

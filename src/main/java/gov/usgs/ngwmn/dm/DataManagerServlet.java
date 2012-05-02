@@ -15,7 +15,9 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
@@ -32,11 +34,11 @@ public class DataManagerServlet extends HttpServlet {
 
 	private   static final long   serialVersionUID = 2L;
 	
-	protected static final String PARAM_AGENCY     = "agency_cd";
-	protected static final String PARAM_FEATURE    = "featureID";
-	protected static final String PARAM_TYPE       = "type";
-	protected static final String PARAM_WELLS_LIST = "listOfWells";
-	protected static final String PARAM_BUNDLED    = "bundled";
+	public static final String PARAM_AGENCY     = "agencyID";
+	public static final String PARAM_FEATURE    = "featureID";
+	public static final String PARAM_TYPE       = "type";
+	public static final String PARAM_WELLS_LIST = "listOfWells";
+	public static final String PARAM_BUNDLED    = "bundled";
 	
 	private  final Logger logger = LoggerFactory.getLogger(getClass());
 	
@@ -55,8 +57,8 @@ public class DataManagerServlet extends HttpServlet {
 	 * @see javax.servlet.http.HttpServlet#doGet(javax.servlet.http.HttpServletRequest, javax.servlet.http.HttpServletResponse)
 	 * 
 	 * Sample invocations:
-	 * 		http://localhost:8080/ngwmn/data?agency_cd=IL%20EPA&featureID=P405805 gets all the data
-	 * 		http://localhost:8080/ngwmn/data?agency_cd=IL%20EPA&featureID=P405805&type=LOG  gets just the log data
+	 * 		http://localhost:8080/ngwmn/data?agencyID=IL%20EPA&featureID=P405805 gets all the data
+	 * 		http://localhost:8080/ngwmn/data?agencyID=IL%20EPA&featureID=P405805&type=LOG  gets just the log data
 	 */
 	@Override
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp)
@@ -116,10 +118,27 @@ public class DataManagerServlet extends HttpServlet {
 		if ( ! wells.isEmpty() ) {
 			spec.setWellIDs(wells);
 		}
-
+		
 		// TODO parse out BBox and other query params
 		
+		precheckWells(spec.getWellIDs());
+		
 		return spec;
+	}
+
+	
+	protected void precheckWells(List<Specifier> specs) throws SiteNotFoundException  {
+
+		// check duplicates
+		Set<Specifier> specSet = new HashSet<Specifier>(specs);
+		if (specs.size() != specSet.size()) {
+			throw new RuntimeException("Duplicate requested wells.");
+		}
+
+		// check exists and display
+		for (Specifier spec : specs) {
+			db.check(spec);
+		}
 	}
 
 	protected String wellname(Specifier spec) {

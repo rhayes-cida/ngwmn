@@ -19,7 +19,7 @@ import gov.usgs.ngwmn.dm.spec.Specifier;
 import org.junit.Before;
 import org.junit.Test;
 
-public class DataBrokerTest extends ContextualTest {
+public class DataBrokerIntegrationTest extends ContextualTest {
 
 	private DataBroker dataBroker;
 	

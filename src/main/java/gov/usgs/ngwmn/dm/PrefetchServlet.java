@@ -19,7 +19,7 @@ import org.slf4j.LoggerFactory;
 /**
  * Servlet implementation class WellListServlet
  * 
- * Sample invocation: http://localhost:8080/ngwmn/prefetch?featureID=402734087033401&agency_cd=USGS
+ * Sample invocation: http://localhost:8080/ngwmn/prefetch?featureID=402734087033401&agencyID=USGS
  */
 public class PrefetchServlet extends DataManagerServlet {
 	

@@ -1,6 +1,8 @@
 package gov.usgs.ngwmn.functional;
 
 import static org.junit.Assert.*;
+import static gov.usgs.ngwmn.dm.DataManagerServlet.*;
+import gov.usgs.ngwmn.WellDataType;
 import gov.usgs.ngwmn.dm.dao.ContextualTest;
 
 import java.io.File;
@@ -21,9 +23,10 @@ import com.meterware.servletunit.ServletUnitClient;
 
 public class BasicServletTest extends ContextualTest {
 
-	private static final String WELL_LIST_DATA = "http://localhost:8080/ngwmn/data?listOfWells=USGS:402734087033401&listOfWells=NJGS:2288614&type=WATERLEVEL";
-	private static final String WELL_WITH_DATA = "http://localhost:8080/ngwmn/data?agency_cd=USGS&featureID=402734087033401";
-	private static final String WELL_NO_DATA   = "http://localhost:8080/ngwmn/data?agency_cd=NJGS&featureID=2288614";
+	private static final String WELL_LIST_AGENCY_DATA = "http://localhost:8080/ngwmn/data?"+PARAM_AGENCY+"=USGS&"+PARAM_WELLS_LIST+"=402734087033401&"+PARAM_WELLS_LIST+"=402247074250301&"+PARAM_TYPE+"="+WellDataType.WATERLEVEL;
+	private static final String WELL_LIST_DATA = "http://localhost:8080/ngwmn/data?"+PARAM_WELLS_LIST+"=USGS:402734087033401&"+PARAM_WELLS_LIST+"=NJGS:2288614&"+PARAM_TYPE+"="+WellDataType.WATERLEVEL;
+	private static final String WELL_WITH_DATA = "http://localhost:8080/ngwmn/data?"+PARAM_AGENCY+"=USGS&"+PARAM_FEATURE+"=402734087033401";
+	private static final String WELL_NO_DATA   = "http://localhost:8080/ngwmn/data?"+PARAM_AGENCY+"=NJGS&"+PARAM_FEATURE+"=2288614";
 
 	@BeforeClass
 	public static void clearCache() {
@@ -81,6 +84,35 @@ public class BasicServletTest extends ContextualTest {
 		assertEquals("response size", available, bodyLenth);
 	}
 	
+	@Test
+	public void test_listOfWells_forSingleAgency() throws Exception {
+		checkSiteIsVisible("USGS","400204074145401");
+		checkSiteIsVisible("USGS","402734087033401");
+		ServletRunner sr = new ServletRunner( getClass().getResourceAsStream("/servlet-test-web.xml"), "/ngwmn");
+		
+		ServletUnitClient sc = sr.newClient();
+		WebRequest req = new GetMethodWebRequest(WELL_LIST_AGENCY_DATA);
+		WebResponse resp = sc.getResponse(req);
+		assertNotNull("response", resp);
+		
+		
+		for (String hn : resp.getHeaderFieldNames()) {
+			System.out.printf("Header %s:%s\n", hn, resp.getHeaderField(hn));
+		}
+		String body = resp.getText();
+		System.out.printf("contentLength=%d,size=%d\n", resp.getContentLength(), body.length());
+		assertTrue("response size", body.length() > 10000);
+		
+		File file = new File("/tmp","data2.zip");
+		FileOutputStream fos = new FileOutputStream(file);
+		ByteStreams.copy(resp.getInputStream(), fos);
+		fos.flush();
+		fos.close();
+		int available = new FileInputStream(file).available();
+		int bodyLenth = body.length();
+		assertEquals("response size", available, bodyLenth);
+	}
+	
 	
 	@Test
 	public void testWithData() throws Exception {
@@ -127,7 +159,7 @@ public class BasicServletTest extends ContextualTest {
 		ServletRunner sr = new ServletRunner( getClass().getResourceAsStream("/servlet-test-web.xml"), "/ngwmn");
 		
 		ServletUnitClient sc = sr.newClient();
-		WebRequest req = new GetMethodWebRequest("http://localhost:8080/ngwmn/data?featureID=NOSUCHSITE&agency_cd=USGS");
+		WebRequest req = new GetMethodWebRequest("http://localhost:8080/ngwmn/data?"+PARAM_FEATURE+"=NOSUCHSITE&"+PARAM_AGENCY+"=USGS");
 		sc.getResponse(req);
 		assertFalse("expected exception", true);
 	}
@@ -139,7 +171,7 @@ public class BasicServletTest extends ContextualTest {
 		ServletRunner sr = new ServletRunner(this.getClass().getResourceAsStream("/servlet-test-web.xml"), "/ngwmn");
 		
 		ServletUnitClient sc = sr.newClient();
-		WebRequest req = new GetMethodWebRequest("http://localhost:8080/ngwmn/data?featureID=NOSUCHSITE&agency_cd=TEST_INPUT_ERROR");
+		WebRequest req = new GetMethodWebRequest("http://localhost:8080/ngwmn/data?"+PARAM_FEATURE+"=NOSUCHSITE&"+PARAM_AGENCY+"=TEST_INPUT_ERROR");
 		sc.getResponse(req);
 		assertFalse("expected exception", true);
 	}

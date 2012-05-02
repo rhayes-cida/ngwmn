@@ -67,9 +67,9 @@ public class WellListServlet extends HttpServlet {
 			List<WellRegistry> ww;
 			
 			String[] state_fips = request.getParameterValues("state");
-			String[] agency_cds = request.getParameterValues("agency_cd");
+			String[] agencyIDs = request.getParameterValues("agencyID");
 			
-			if (state_fips != null && agency_cds != null) {
+			if (state_fips != null && agencyIDs != null) {
 				response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Agency and state combination not supported");
 				return;
 			}
@@ -82,11 +82,11 @@ public class WellListServlet extends HttpServlet {
 					
 					ww.addAll(wws);
 				}
-			} else if (agency_cds != null) {
+			} else if (agencyIDs != null) {
 				// user requested by states
 				ww = new ArrayList<WellRegistry>();
-				for (String agency_cd: agency_cds) {
-					List<WellRegistry> wws = dao.selectByAgency(agency_cd);
+				for (String agencyID: agencyIDs) {
+					List<WellRegistry> wws = dao.selectByAgency(agencyID);
 					
 					ww.addAll(wws);
 				}
@@ -97,13 +97,13 @@ public class WellListServlet extends HttpServlet {
 			
 			for (WellRegistry w : ww) {
 				if (tt == null) {
-					sos.print(String.format("<a href=\"%s?agency_cd=%s&featureID=%s\">", servletPath, w.getAgencyCd(), w.getSiteNo()));
+					sos.print(String.format("<a href=\"%s?agencyID=%s&featureID=%s\">", servletPath, w.getAgencyCd(), w.getSiteNo()));
 					sos.print(String.format("%s site %s", Strings.nullToEmpty(w.getAgencyNm()), Objects.firstNonNull(w.getSiteName(), w.getSiteNo())));
 					sos.println("</a><br />\n");
 				} else {
 					sos.print(String.format("%s site %s", Strings.nullToEmpty(w.getAgencyNm()), Objects.firstNonNull(w.getSiteName(), w.getSiteNo())));
 					for (String t : tt) {
-						sos.print(String.format(" <a href=\"%s?agency_cd=%s&featureID=%s&type=%s\">", servletPath, w.getAgencyCd(), w.getSiteNo(), t));
+						sos.print(String.format(" <a href=\"%s?agencyID=%s&featureID=%s&type=%s\">", servletPath, w.getAgencyCd(), w.getSiteNo(), t));
 						sos.print(t);
 						sos.println("</a>");
 					}

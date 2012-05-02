@@ -132,11 +132,6 @@ public class DataBroker implements ExecFactory {
 		return false;
 	}
 	
-	// to be replaced with util function - apache commons?
-	boolean isEmpty(String string) {
-		return string == null || string.length()==0;
-	}
-
 	public void setWellRegistry(WellRegistryDAO wellDAO) {
 		this.wellDAO = wellDAO;
 	}

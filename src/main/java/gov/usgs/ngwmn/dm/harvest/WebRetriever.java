@@ -52,7 +52,7 @@ public class WebRetriever implements DataFetcher {
 				
 		        if (statusCode != HttpStatus.SC_OK) {
 		        	pipe.getStatistics().markEnd(Status.FAIL);
-		        	IOException ioe = new IOException("HTTP status error: " + statusCode);
+		        	IOException ioe = new IOException("HTTP status error: " + statusCode +" for spec " + spec);
 		        	pipe.setException(ioe);
 		        	throw ioe;
 		        }

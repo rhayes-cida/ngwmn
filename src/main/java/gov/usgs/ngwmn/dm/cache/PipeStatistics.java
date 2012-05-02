@@ -39,6 +39,8 @@ public class PipeStatistics {
 			for (Status s : values()) {
 				Status prev = tmp.put(s.as4Char(), s);
 				if (prev != null) {
+					// byte code manipulation would be required to test this
+					// if two status match in the first four chars it is detected on class load
 					throw new RuntimeException("Conflict on 4char representation " + s.as4Char());
 				}
 			}	
@@ -71,10 +73,10 @@ public class PipeStatistics {
 		return status;
 	}
 
-	public synchronized void setStatus(PipeStatistics.Status status) {
-		this.status = status;
-		if (status.isDone()) {
-			throw new RuntimeException("Use markEnd instead");
+	public synchronized void setStatus(PipeStatistics.Status newStatus) {
+		status = newStatus;
+		if ( newStatus.isDone() ) {
+			markEnd(newStatus);
 		}
 	}
 
