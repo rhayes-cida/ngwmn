@@ -100,12 +100,8 @@ public class DataManagerServlet extends HttpServlet {
 
 		List<Specifier> wells = parseListOfWells(req);
 		
-		// if there is no list of well there surely should be a sigle well request
+		// if there is no wells list there surely should be a single well request
 		if ( wells.isEmpty() ) {
-			String typeID = req.getParameter(PARAM_TYPE);
-			if (typeID==null) {
-				typeID = WellDataType.ALL.toString();
-			}		
 			String bundled = req.getParameter(PARAM_BUNDLED);
 			spec.setBundled(bundled != null);
 			wells = parseSpecifier(req);
@@ -124,6 +120,14 @@ public class DataManagerServlet extends HttpServlet {
 		precheckWells(spec.getWellIDs());
 		
 		return spec;
+	}
+
+	protected String parseDataType(HttpServletRequest req) {
+		String typeID = req.getParameter(PARAM_TYPE);
+		if (typeID==null) {
+			typeID = WellDataType.ALL.toString();
+		}
+		return typeID;
 	}
 
 	
@@ -150,11 +154,7 @@ public class DataManagerServlet extends HttpServlet {
 		// TODO this is how we can enforce one agency?
 		String agencyDefault = req.getParameter(PARAM_AGENCY);
 
-		// TODO only one type for all wells requested?
-		String typeID = req.getParameter(PARAM_TYPE);
-		if (typeID==null) {
-			typeID = WellDataType.ALL.toString();
-		}
+		String typeID = parseDataType(req);
 		
 		String wells[] = req.getParameterValues(PARAM_WELLS_LIST);
 		if (wells==null || wells.length==0) {
@@ -171,9 +171,17 @@ public class DataManagerServlet extends HttpServlet {
 			try {
 				// attempt to separate the agency and site IDs
 				String specParts[] = well.split("[:_]");
+				boolean hasSeparator = well.contains(":") || well.contains("_");
+				
 				// list of wells might be a list of sites only or a list of agency:site combos
-				String agencyID  = specParts.length==1 ? agencyDefault : specParts[0];
-				String featureID = specParts.length==1 ? specParts[0]  : specParts[1];
+				String agencyID  = specParts.length==1 && !hasSeparator ? agencyDefault : specParts[0];
+				
+				// TODO with all this commentary it would be better to rewrite
+				// if the well contains only one entry and a separator then the agency was given w/o feature
+				// however, if there is no separator with one entry then the feature is given w/o agency
+				String featureID = specParts.length==1 ? (hasSeparator ?  "" : specParts[0])  
+						: specParts[1]; // otherwise, we had both agency and well with separator
+								
 				
 				Specifier spec   = makeSpec(agencyID, featureID, typeID);
 				specs.add(spec);
@@ -204,7 +212,7 @@ public class DataManagerServlet extends HttpServlet {
 		
 		String agencyID  = req.getParameter(PARAM_AGENCY);
 		String featureID = req.getParameter(PARAM_FEATURE);
-		String typeID    = req.getParameter(PARAM_TYPE);
+		String typeID    = parseDataType(req);
 
 		Specifier spec   = makeSpec(agencyID, featureID, typeID);
 		

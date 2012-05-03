@@ -48,11 +48,11 @@ public class Specifier {
 	}
 
 	private void check() {
-		if ( Strings.isNullOrEmpty(getAgencyID()) ) 
+		if ( Strings.isNullOrEmpty(agencyID) ) 
 			throw new InvalidParameterException("Well agency Id is required.");
-		if ( Strings.isNullOrEmpty(getFeatureID()) ) 
+		if ( Strings.isNullOrEmpty(featureID) ) 
 			throw new InvalidParameterException("Well Feature/Site Id is required.");
-		if ( getTypeID() == null ) 
+		if ( typeID == null ) 
 			throw new InvalidParameterException("Well data type Id is required.");
 	}
 

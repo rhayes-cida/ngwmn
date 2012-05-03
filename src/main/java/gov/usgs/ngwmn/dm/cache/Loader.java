@@ -46,7 +46,7 @@ implements DataLoader {
 				} catch (IOException ioe) {
 					String message = "Problem building output stream for spec " + spec;
 					logger.error(message, ioe);
-					throw new RuntimeException(message, ioe);
+					throw new IOException(message, ioe);
 				}
 			}
 		});

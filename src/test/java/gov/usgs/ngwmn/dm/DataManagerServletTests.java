@@ -5,6 +5,7 @@ import static org.junit.Assert.*;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.security.InvalidParameterException;
 import java.security.Principal;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -40,7 +41,6 @@ public class DataManagerServletTests {
 		dms = new DataManagerServlet();
 	}
 
-	
 	@Test(expected=RuntimeException.class)
 	public void test_precheckWells_duplicateWellInList() {
 		List<Specifier> specs = new ArrayList<Specifier>();
@@ -177,8 +177,6 @@ public class DataManagerServletTests {
 	}
 
 	
-	// TODO possibly test a bad well format, non-existing well, etc
-	
 	@Test
 	@SuppressWarnings("serial")
 	public void test_parseListOfWells_successfully_multiAgency() {
@@ -227,7 +225,6 @@ public class DataManagerServletTests {
 		params.put(PARAM_TYPE,   "LOG");
 		final String[] arrayOfWells = new String[] {"007","123","ABC"};
 		
-//		final Specifier spec = new Specifier("AGRA", "007", WellDataType.LOG);
 		dms = new DataManagerServlet() {
 			@Override
 			protected Specifier makeSpec(String agency, String featureID, String type) {
@@ -259,7 +256,81 @@ public class DataManagerServletTests {
 		assertEquals(arrayOfWells.length, list.size());
 	}
 	
+	@Test
+	public void test_parseListOfWells_successfully_oneBad() {
+		final Map<String,String> params = new HashMap<String, String>();
+		params.put(PARAM_TYPE,   "LOG");
+		final String[] arrayOfWells = new String[] {"AGRA:007","FOO:","BARG:ABC"}; // FOO has no well
+		
+		HttpServletRequest req = new MockRequest() {
+			@Override
+			public String getParameter(String param) {
+				return params.get(param);
+			}
+			@Override
+			public String[] getParameterValues(String param) {
+				if ("listOfWells".equals(param)) {
+					return arrayOfWells;
+				}
+				return null;
+			}
+		};
+		
+		List<Specifier> list = dms.parseListOfWells(req);
+		assertEquals("expect one less well spec than the supplied list", arrayOfWells.length-1, list.size());
+	}
 	
+	@Test(expected=InvalidParameterException.class)
+	public void test_parseListOfWells_successfully_twoBadIsTooMany() {
+		final Map<String,String> params = new HashMap<String, String>();
+		params.put(PARAM_TYPE,   "LOG");
+		final String[] arrayOfWells = new String[] {"AGRA:007","FOO:","BAR:"}; // FOO and BAR have no wells
+		
+		HttpServletRequest req = new MockRequest() {
+			@Override
+			public String getParameter(String param) {
+				return params.get(param);
+			}
+			@Override
+			public String[] getParameterValues(String param) {
+				if ("listOfWells".equals(param)) {
+					return arrayOfWells;
+				}
+				return null;
+			}
+		};
+		
+		dms.parseListOfWells(req);
+	}
+	
+	
+	@Test
+	public void test_parseDataType_successful_notNull() {
+		final Map<String,String> params = new HashMap<String, String>();
+		params.put(PARAM_TYPE,   "LOG");
+		
+		HttpServletRequest req = new MockRequest() {
+			@Override
+			public String getParameter(String param) {
+				return params.get(param);
+			}
+		};
+		
+		String typeID = dms.parseDataType(req);
+		assertEquals("LOG", typeID);
+	}
+	
+	@Test
+	public void test_parseDataType_defaultAll() {
+		HttpServletRequest req = new MockRequest() {
+			@Override
+			public String getParameter(String param) {
+				return null;
+			}
+		};
+		String typeID = dms.parseDataType(req);
+		assertEquals("ALL", typeID);
+	}
 	
 	
 	@Test
