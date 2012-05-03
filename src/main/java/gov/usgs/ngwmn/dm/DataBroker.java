@@ -76,12 +76,6 @@ public class DataBroker implements ExecFactory {
 			success = configureInput(harvester, pipe); 
 		}
 		
-		// TODO It's doubtful if we can detect this until we run the pipe.
-		// TODO We need to distinguish "site not found" and "data not found"
-		if ( ! success) {
-			signalDataNotFoundMsg(pipe);
-		}
-		
 		return pipe;
 	}
 	
@@ -99,11 +93,18 @@ public class DataBroker implements ExecFactory {
 		}
 	}
 
-	private void signalDataNotFoundMsg(Pipeline pipe) {
-		Specifier spec = pipe.getSpecifier();
-		logger.warn("No data found for {}", spec);
-		throw new DataNotAvailableException(spec);
-	}
+// TODO this should probably be moved to the harvester or webretriever on begin
+//	// TODO It's doubtful if we can detect this until we run the pipe.
+//	// TODO We need to distinguish "site not found" and "data not found"
+//	if ( ! success) {
+//		signalDataNotFoundMsg(pipe);
+//	}
+//	
+//	private void signalDataNotFoundMsg(Pipeline pipe) {
+//		Specifier spec = pipe.getSpecifier();
+//		logger.warn("No data found for {}", spec);
+//		throw new DataNotAvailableException(spec);
+//	}
 	
 	public void setHarvester(DataFetcher harvester) {
 		this.harvester = harvester;
