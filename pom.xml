@@ -223,7 +223,6 @@
 		              <goal>verify</goal>
 		            </goals>
 		          </execution>
-		          
 		        </executions>
 		      </plugin>
 		
@@ -238,9 +237,9 @@
 						<configuration>
 							<propertyFile>src/test/resources/liquibase.properties</propertyFile>
 							<changeLogFile>src/test/resources/testChangeLog.xml</changeLogFile>							
-							<url>${db.url}</url>
-							<password>${db.password}</password>
-							<username>${db.username}</username>
+							<url>${liquibase.testdb.url}</url>
+							<password>${liquibase.testdb.password}</password>
+							<username>${liquibase.testdb.username}</username>
 						</configuration>
 						<goals>
 							<goal>update</goal>
@@ -253,9 +252,9 @@
 							<propertyFile>src/test/resources/liquibase.properties</propertyFile>
 							<changeLogFile>src/test/resources/testChangeLog.xml</changeLogFile>
 							<changesToApply>USGS:007</changesToApply>
-							<url>${db.url}</url>
-							<password>${db.password}</password>
-							<username>${db.username}</username>
+							<url>${liquibase.testdb.url}</url>
+							<password>${liquibase.testdb.password}</password>
+							<username>${liquibase.testdb.username}</username>
 							<promptOnNonLocalDatabase>False</promptOnNonLocalDatabase>
 							<rollbackCount>1</rollbackCount>
 						</configuration>
