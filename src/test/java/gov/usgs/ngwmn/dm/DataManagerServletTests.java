@@ -21,14 +21,13 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
+import gov.usgs.ngwmn.NotImplementedException;
 import gov.usgs.ngwmn.WellDataType;
 import gov.usgs.ngwmn.dm.spec.Specification;
 import gov.usgs.ngwmn.dm.spec.Specifier;
 
 import org.junit.Before;
 import org.junit.Test;
-
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import static gov.usgs.ngwmn.dm.DataManagerServlet.*;
 
