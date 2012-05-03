@@ -239,7 +239,7 @@
 							<changeLogFile>src/test/resources/testChangeLog.xml</changeLogFile>							
 							<url>${liquibase.testdb.url}</url>
 							<password>${liquibase.testdb.password}</password>
-							<promptOnNonLocalDatabase>false</promptOnNonLocalDatabase>
+							<promptOnNonLocalDatabase>${liquibase.testdb.prompt}</promptOnNonLocalDatabase>
 							<username>${liquibase.testdb.username}</username>
 						</configuration>
 						<goals>
@@ -256,7 +256,7 @@
 							<url>${liquibase.testdb.url}</url>
 							<password>${liquibase.testdb.password}</password>
 							<username>${liquibase.testdb.username}</username>
-							<promptOnNonLocalDatabase>false</promptOnNonLocalDatabase>
+							<promptOnNonLocalDatabase>${liquibase.testdb.prompt}</promptOnNonLocalDatabase>
 							<rollbackCount>1</rollbackCount>
 						</configuration>
 						<goals>
