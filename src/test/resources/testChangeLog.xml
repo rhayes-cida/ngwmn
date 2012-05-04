@@ -50,7 +50,7 @@
 		<column name="DISPLAY_FLAG" value="1"/>
 		<column name="COUNTRY_CD" value="US"/>
 		<column name="STATE_CD" value="45"/>
-		<column name="COUNTY_CD" value="013"/>
+		<column name="COUNTY_CD" value="000"/>
 		<column name="DEC_LAT_VA" valueNumeric="46.339343"/>
 		<column name="DEC_LONG_VA" valueNumeric="2.603760"/>
 		<column name="HORZ_DATUM" value="NAD83"/>
