@@ -64,6 +64,7 @@
 		<column name="WL_WELL_PURPOSE" value="1"/>
 		<column name="WL_DEPTH" valueNumeric="312.44"/>
 	</insert>
+<!-- 	
 	<rollback>
 		<delete schemaName="GW_DATA_PORTAL"  tableName="well_registry_main">
 			<where>
@@ -71,6 +72,7 @@
 			</where> 
 		</delete>
 	</rollback>
+-->
 </changeSet>
 
 </databaseChangeLog>
