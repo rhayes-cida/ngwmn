@@ -34,7 +34,7 @@ public class WaterlevelDBCacheTest extends ContextualTest {
 
 	private static final int SIZE = 4102;
 	private static final WellDataType TYPE = WellDataType.WATERLEVEL;
-	private static final String SITE = "385748074511001";
+	private static final String SITE = "402734087033401";
 	private static final String AGENCY = "USGS";
 	private static final String filename = AGENCY+ "_" + SITE + "_" + TYPE;
 
