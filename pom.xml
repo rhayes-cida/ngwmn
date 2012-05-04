@@ -246,24 +246,6 @@
 							<goal>update</goal>
 						</goals>
 					</execution>
-					<execution>
-						<id>liquibase-post-integration-test</id>
-						<phase>post-integration-test</phase>
-						<configuration>
-							<propertyFile>src/test/resources/liquibase.properties</propertyFile>
-							<changeLogFile>src/test/resources/testChangeLog.xml</changeLogFile>
-							<changesToApply>USGS:007</changesToApply>
-							<url>${liquibase.testdb.url}</url>
-							<password>${liquibase.testdb.password}</password>
-							<username>${liquibase.testdb.username}</username>
-							<promptOnNonLocalDatabase>${liquibase.testdb.prompt}</promptOnNonLocalDatabase>
-							<rollbackCount>1</rollbackCount>
-						</configuration>
-						<goals>
-							<goal>rollback</goal>
-						</goals>
-						
-					</execution>
 				</executions>
 		
 			</plugin>
