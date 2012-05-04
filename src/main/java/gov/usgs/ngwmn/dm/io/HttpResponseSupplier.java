@@ -32,11 +32,10 @@ public class HttpResponseSupplier extends Supplier<OutputStream> {
 	}
 	
 	@Override
-	public OutputStream makeSupply(Specifier spec) throws IOException {
+	public synchronized OutputStream makeSupply(Specifier spec) throws IOException {
 
 		if (requestStream != null) return requestStream;
 		
-		requestStream = hsr.getOutputStream();
 		// TODO this is not ideal - not as elegant as the enum solution
 		// TODO however it is no longer the data type domain - it is the full request 
 		if ( spect.isBundled() || spect.getWellIDs().get(0).getTypeID().contentType.contains("zip") ) {
@@ -53,6 +52,7 @@ public class HttpResponseSupplier extends Supplier<OutputStream> {
 			hsr.setBufferSize(MAX_BUFFER_SIZE); 
 		}
 		
+		requestStream = hsr.getOutputStream();
 		return requestStream;
 	}
 	
