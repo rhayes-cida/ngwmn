@@ -36,20 +36,6 @@ public class DataBrokerTest extends ContextualTest {
 		victim = ctx.getBean("DataBroker", DataBroker.class);
 	}
 
-	@Test
-	public void testFetchWellData() throws Exception {
-		Specifier spec = new Specifier("USGS","402734087033401",WellDataType.ALL);
-		
-		ByteArrayOutputStream bos = new ByteArrayOutputStream();
-		
-		Supplier<OutputStream> out = new SimpleSupplier<OutputStream>(bos);
-		victim.fetchWellData(spec, out);
-		
-		Cache cache = ctx.getBean("FileCache", Cache.class);
-		
-		assertTrue("expect well data is cached", cache.contains(spec));
-	}
-	
 	@Test(expected=NullPointerException.class)
 	public void test_validation_noDataFetchers() {
 		DataBroker broker = new DataBroker();

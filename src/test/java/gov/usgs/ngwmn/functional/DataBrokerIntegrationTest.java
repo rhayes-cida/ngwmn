@@ -4,9 +4,14 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+
+import java.io.ByteArrayOutputStream;
+import java.io.OutputStream;
+
 import gov.usgs.ngwmn.WellDataType;
 import gov.usgs.ngwmn.dm.DataBroker;
 import gov.usgs.ngwmn.dm.SiteNotFoundException;
+import gov.usgs.ngwmn.dm.cache.Cache;
 import gov.usgs.ngwmn.dm.cache.Loader;
 import gov.usgs.ngwmn.dm.cache.PipeStatistics;
 import gov.usgs.ngwmn.dm.cache.PipeStatistics.Status;
@@ -14,6 +19,8 @@ import gov.usgs.ngwmn.dm.cache.Retriever;
 import gov.usgs.ngwmn.dm.cache.fs.FileCache;
 import gov.usgs.ngwmn.dm.dao.ContextualTest;
 import gov.usgs.ngwmn.dm.harvest.WebRetriever;
+import gov.usgs.ngwmn.dm.io.SimpleSupplier;
+import gov.usgs.ngwmn.dm.io.Supplier;
 import gov.usgs.ngwmn.dm.spec.Specifier;
 
 import org.junit.Before;
@@ -21,6 +28,8 @@ import org.junit.Test;
 
 public class DataBrokerIntegrationTest extends ContextualTest {
 
+	private static final String AGENCY_CD = "USGS";
+	private static final String SITE_NO = "402734087033401";
 	private DataBroker dataBroker;
 	
 	@Before
@@ -42,7 +51,7 @@ public class DataBrokerIntegrationTest extends ContextualTest {
 	@Test
 	public void testSiteNotFound() throws Exception {
 		
-		Specifier spec = makeSpec("USGS","no-such-site");
+		Specifier spec = makeSpec(AGENCY_CD,"no-such-site");
 		
 		try {
 			dataBroker.checkSiteExists(spec);
@@ -54,7 +63,7 @@ public class DataBrokerIntegrationTest extends ContextualTest {
 	@Test
 	public void testSiteFound() throws Exception {
 		
-		Specifier spec = makeSpec("USGS","402734087033401");
+		Specifier spec = makeSpec(AGENCY_CD,SITE_NO);
 		
 		try {
 			dataBroker.checkSiteExists(spec);
@@ -66,7 +75,7 @@ public class DataBrokerIntegrationTest extends ContextualTest {
 
 	@Test
 	public void testPrefetch() throws Exception {
-		Specifier spec = makeSpec("USGS","402734087033401");
+		Specifier spec = makeSpec(AGENCY_CD,SITE_NO);
 
 		PipeStatistics stats = dataBroker.prefetchWellData(spec);
 		
@@ -76,4 +85,20 @@ public class DataBrokerIntegrationTest extends ContextualTest {
 		assertTrue("got bytes", stats.getCount() > 100);
 		assertEquals("caller", "WebRetriever", stats.getCalledBy().getSimpleName());
 	}
+	
+	@Test
+	public void testFetchWellData() throws Exception {
+		Specifier spec = new Specifier(AGENCY_CD,SITE_NO,WellDataType.ALL);
+		
+		ByteArrayOutputStream bos = new ByteArrayOutputStream();
+		
+		Supplier<OutputStream> out = new SimpleSupplier<OutputStream>(bos);
+		dataBroker.fetchWellData(spec, out);
+		
+		Cache cache = ctx.getBean("FileCache", Cache.class);
+		
+		assertTrue("expect well data is cached", cache.contains(spec));
+	}
+	
+
 }

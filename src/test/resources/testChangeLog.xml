@@ -6,7 +6,7 @@
   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
          http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-2.0.xsd">
 
-<changeSet id="USGS:007" author="rhayes">
+<changeSet id="functional_test_preflight" author="rhayes">
 	<preConditions>
 		<or>
 			<viewExists schemaName="GW_DATA_PORTAL" viewName="WELL_REGISTRY"/>
@@ -29,6 +29,14 @@
 		</sqlCheck>
 		
 	</preConditions>
+</changeSet>
+	
+<changeSet id="USGS:007" author="rhayes">
+	<preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="0">
+            SELECT count(*) FROM GW_DATA_PORTAL.WELL_REGISTRY WHERE agency_cd='USGS' and site_no='007'
+            </sqlCheck>
+	</preConditions>
 	
 	<insert schemaName="GW_DATA_PORTAL" tableName="well_registry_main">
 		<column name="AGENCY_CD" value="USGS"/>
@@ -44,11 +52,11 @@
 		<column name="NAT_AQUIFER_CD" value="NA"/>
 	</insert>
 	<rollback>
-	<delete schemaName="GW_DATA_PORTAL"  tableName="well_registry_main">
-		<where>
-			AGENCY_CD = 'USGS' AND SITE_NO = '007'			
-		</where> 
-	</delete>
+		<delete schemaName="GW_DATA_PORTAL"  tableName="well_registry_main">
+			<where>
+				AGENCY_CD = 'USGS' AND SITE_NO = '007'			
+			</where> 
+		</delete>
 	</rollback>
 </changeSet>
 
