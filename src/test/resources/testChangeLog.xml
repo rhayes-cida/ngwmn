@@ -12,9 +12,22 @@
 			<viewExists schemaName="GW_DATA_PORTAL" viewName="WELL_REGISTRY"/>
 			<tableExists schemaName="GW_DATA_PORTAL" tableName="WELL_REGISTRY"/>
 		</or>
+		
+		<!--  sample site with space in agency code  MN DNR    200661 -->
 		<sqlCheck expectedResult="1">
-		SELECT count(*) FROM GW_DATA_PORTAL.WELL_REGISTRY WHERE agency_cd='IL EPA' and site_no='P408223'
+		SELECT count(*) FROM GW_DATA_PORTAL.WELL_REGISTRY WHERE agency_cd='MN DNR' and site_no='200661'
 		</sqlCheck>
+		
+		<!-- with data: USGS 402734087033401  --> 
+		<sqlCheck expectedResult="1">
+		SELECT count(*) FROM GW_DATA_PORTAL.WELL_REGISTRY WHERE agency_cd='USGS' and site_no='402734087033401'
+		</sqlCheck>
+		
+		<!-- without data: NJGS 2288614  --> 
+		<sqlCheck expectedResult="1">
+		SELECT count(*) FROM GW_DATA_PORTAL.WELL_REGISTRY WHERE agency_cd='NJGS' and site_no='2288614'
+		</sqlCheck>
+		
 	</preConditions>
 	
 	<insert schemaName="GW_DATA_PORTAL" tableName="well_registry_main">

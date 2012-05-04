@@ -17,8 +17,14 @@ import org.junit.Before;
 import org.junit.Test;
 
 public class WellRegistryDAOTest extends ContextualTest {
+	// test well: MN DNR:200661 
+	private static final String AGENCY_CD = "MN DNR";
+	private static final String SITE_NO = "200661";
+	private static final String MT = "30";
+	private static final String MN = "27";
+
 	private WellRegistryDAO dao;
-		
+
 	@Before
 	public void setUp() throws Exception {
 		dao = ctx.getBean("WellRegistryDAO", WellRegistryDAO.class);
@@ -39,43 +45,41 @@ public class WellRegistryDAOTest extends ContextualTest {
 		}
 	}
 	
-	// IL EPA, P408223
 	@Test
 	public void testFindOne() {
-		WellRegistry w = dao.findByKey("IL EPA", "P408223");
+		WellRegistry w = dao.findByKey(AGENCY_CD, SITE_NO);
 		assertNotNull("well",w);
-		assertEquals("agency", "IL EPA", w.getAgencyCd());
-		assertEquals("site", "P408223", w.getSiteNo());
+		assertEquals("agency", AGENCY_CD, w.getAgencyCd());
+		assertEquals("site", SITE_NO, w.getSiteNo());
 	}
 
 	@Test
 	public void testFindNone() {
 		WellRegistry w;
-		w = dao.findByKey("no-such-agency", "P408223");
+		w = dao.findByKey("no-such-agency", SITE_NO);
 		assertNull("well",w);
-		w = dao.findByKey("IL EPA", "no-such-well");
+		w = dao.findByKey(AGENCY_CD, "no-such-well");
 		assertNull("well",w);
 	}
 	
 	@Test
 	public void testSelectByAgency() {
-		List<WellRegistry> ww = dao.selectByAgency("IL EPA");
+		List<WellRegistry> ww = dao.selectByAgency(AGENCY_CD);
 		assertNotNull("all", ww);
+
+		System.out.printf("agency well count: %d for %s\n", ww.size(), AGENCY_CD);
+		
 		assertFalse("empty", ww.isEmpty());
 		assertFalse("too many", ww.size() > 100);
 		
-		System.out.printf("IL well count: %d\n", ww.size());
-		
 		for (WellRegistry w : ww) {
-			assertEquals("agency cd", "IL EPA", w.getAgencyCd());
+			assertEquals("agency cd", AGENCY_CD, w.getAgencyCd());
 			assertEquals("display flag", "1", w.getDisplayFlag());
 		}
 	}
 	
 	@Test
 	public void testSelectByState_Montana() {
-		final String MT = "30";
-		
 		List<WellRegistry> ww = dao.selectByState(MT);
 		assertNotNull("by state", ww);
 		assertFalse("empty", ww.isEmpty());
@@ -92,8 +96,6 @@ public class WellRegistryDAOTest extends ContextualTest {
 	
 	@Test
 	public void testSelectByState_Minnesota() {
-		final String MN = "27";
-		
 		List<WellRegistry> ww = dao.selectByState(MN);
 		assertNotNull("by state", ww);
 		assertFalse("empty", ww.isEmpty());
