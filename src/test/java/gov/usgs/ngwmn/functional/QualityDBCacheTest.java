@@ -72,7 +72,7 @@ public class QualityDBCacheTest extends ContextualTest {
 		victim = ctx.getBean("QualityCache",DatabaseXMLCache.class);
 	}
 
-	@Before
+	// @Before
 	public void showDriver() throws SQLException {
 		DataSource ds = ctx.getBean("dataSource", DataSource.class);
 		
@@ -89,6 +89,11 @@ public class QualityDBCacheTest extends ContextualTest {
 	}
 
 	@Test
+	public void testSaveAndFetch() throws Exception {
+		testSave();
+		testFetchWellData();
+	}
+
 	public void testSave() throws Exception {
 				
 		Specifier spec = makeSpecifier();
@@ -109,7 +114,6 @@ public class QualityDBCacheTest extends ContextualTest {
 		return spec;
 	}
 
-	@Test
 	public void testFetchWellData() throws Exception {
 		Specifier spec = makeSpecifier();
 		
