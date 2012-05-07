@@ -89,6 +89,11 @@ public class QualityDBCacheTest extends ContextualTest {
 	}
 
 	@Test
+	public void testSaveAndFetch() throws Exception {
+		testSave();
+		testFetchWellData();
+	}
+
 	public void testSave() throws Exception {
 				
 		Specifier spec = makeSpecifier();
@@ -109,7 +114,6 @@ public class QualityDBCacheTest extends ContextualTest {
 		return spec;
 	}
 
-	@Test
 	public void testFetchWellData() throws Exception {
 		Specifier spec = makeSpecifier();
 		
