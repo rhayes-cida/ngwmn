@@ -117,7 +117,7 @@ public class DataManagerServlet extends HttpServlet {
 		
 		// TODO parse out BBox and other query params
 		
-		precheckWells(spec.getWellIDs());
+		precheckWells( spec.getWellIDs() );
 		
 		return spec;
 	}

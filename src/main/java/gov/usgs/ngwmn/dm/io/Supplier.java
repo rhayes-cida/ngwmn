@@ -55,4 +55,10 @@ public abstract class Supplier<T extends Closeable> implements InputSupplier<T>,
 		// TODO this might not be the best but will be fleshed out in time
 		Closeables.close( supply, threw );
 	}
+	
+	
+	public Supplier<T> makeEntry(Specifier spec) {
+		return this;
+	}
+
 }

@@ -51,33 +51,16 @@ public class SupplyZipOutputTests {
 		};
 		Supplier<InputStream> ins = new SimpleSupplier<InputStream>(bais);
 		
-		SupplyChain<OutputStream> chain = new SupplyChain<OutputStream>() {
-			SupplyZipOutput oz;
-			
-			@Override
-			public void setSupply(Supplier<OutputStream> supply) {
-				oz = new SupplyZipOutput(supply);
-				super.setSupply(oz);
-			}
-			
-			@Override
-			public OutputStream makeSupply(Specifier spec) throws IOException {
-				return oz.begin(spec);
-			}
-		};
+		SupplyZipOutput oz = new SupplyZipOutput(outs);
+		Supplier<OutputStream> ze = oz.makeEntry(spec);
 		
 		Pipeline pipe = new Pipeline(spec);
 		pipe.setInputSupplier(ins);
-		pipe.setOutputSupplier(outs);
-		pipe.chainOutputSupplier(chain);
+		pipe.setOutputSupplier(ze);
 		pipe.setInvoker(new CopyInvoker());
 		pipe.invoke();
-		
-		chain.end(false); // this is not helping but it does close the entry and stream
-		
-		ByteArrayOutputStream out;
-		
-		out = (ByteArrayOutputStream) outs.begin(null);
+				
+		ByteArrayOutputStream out = (ByteArrayOutputStream) outs.begin(null);
 		checkBytes( out.toByteArray() );
 	}
 	

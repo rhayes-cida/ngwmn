@@ -37,7 +37,7 @@ public class SequentialExec implements Executee {
     		
 	        for (Specifier spec : specifiers) {
 	        	logger.info("Getting well data for {}", spec);
-	        	exec = factory.makeExecutor(spec, output);
+	        	exec = factory.makeExecutor(spec, output.makeEntry(spec));
 	        	exec.call();
 	        }
         	threw = false;
