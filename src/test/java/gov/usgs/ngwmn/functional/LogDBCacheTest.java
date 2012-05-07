@@ -69,10 +69,10 @@ public class LogDBCacheTest extends ContextualTest {
 
 	@Before
 	public void setUp() throws Exception {
-		victim = ctx.getBean("QualityCache",DatabaseXMLCache.class);
+		victim = ctx.getBean("LogCache",DatabaseXMLCache.class);
 	}
 
-	@Before
+	// @Before
 	public void showDriver() throws SQLException {
 		DataSource ds = ctx.getBean("dataSource", DataSource.class);
 		

@@ -72,7 +72,7 @@ public class QualityDBCacheTest extends ContextualTest {
 		victim = ctx.getBean("QualityCache",DatabaseXMLCache.class);
 	}
 
-	@Before
+	// @Before
 	public void showDriver() throws SQLException {
 		DataSource ds = ctx.getBean("dataSource", DataSource.class);
 		
