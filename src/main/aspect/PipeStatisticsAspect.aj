@@ -15,9 +15,14 @@ import com.google.common.eventbus.EventBus;
 
 public aspect PipeStatisticsAspect {
 	private PipeStatistics Pipeline.stats = new PipeStatistics();
+	
 	// we expect this to be overridden by Spring configuration
 	private EventBus fetchEventBus = new EventBus();
 	
+	public void setEventBus(EventBus eventBus) {
+		this.fetchEventBus = eventBus;
+	}
+
 	private Logger logger = LoggerFactory.getLogger(this.getClass());
 		
 	// Monitor pipeline setup

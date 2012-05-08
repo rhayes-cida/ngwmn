@@ -4,6 +4,7 @@ import gov.usgs.ngwmn.dm.cache.PipeStatistics;
 import gov.usgs.ngwmn.dm.cache.PipeStatisticsWithProblem;
 import gov.usgs.ngwmn.dm.dao.FetchLog;
 import gov.usgs.ngwmn.dm.dao.FetchLogDAO;
+import gov.usgs.ngwmn.dm.spec.Specifier;
 
 import com.google.common.eventbus.Subscribe;
 
@@ -30,14 +31,24 @@ public class FetchRecorder {
 	private FetchLog notify(PipeStatistics stats, Throwable problem) {
 		
 		FetchLog item = new FetchLog();
-		item.setWell(stats.getSpecifier().getWellRegistryKey());
+		Specifier specifier = stats.getSpecifier();
+		if (specifier != null) {
+			item.setWell(specifier.getWellRegistryKey());
+			item.setDataStream(specifier.getTypeID().toString());
+			item.setSpecifier(specifier.toString());			
+		} else {
+			item.setAgencyCd("");
+			item.setSiteNo("");
+		}
 		item.setElapsedSec(stats.getElapsedTime());
 		item.setStartedAt(stats.getStartDate());
-		item.setFetcher(stats.getCalledBy().getSimpleName());
+		if (stats.getCalledBy() != null) {
+			item.setFetcher(stats.getCalledBy().getSimpleName());
+		}
 		item.setSource(stats.getSource());
-		item.setDataStream(stats.getSpecifier().getTypeID().toString());
-		item.setSpecifier(stats.getSpecifier().toString());
-		item.setStatus(stats.getStatus().as4Char());
+		if (stats.getStatus() != null) {
+			item.setStatus(stats.getStatus().as4Char());
+		}
 		if (problem != null) {
 			item.setProblem(problem.toString());
 		}

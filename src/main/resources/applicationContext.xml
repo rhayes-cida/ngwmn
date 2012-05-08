@@ -66,6 +66,10 @@
      		</list>
    		</property>
  	</bean>
+ 	<bean class="gov.usgs.ngwmn.dm.aspect.PipeStatisticsAspect"
+ 		factory-method="aspectOf">
+ 		<property name="eventBus" ref="FetchEventBus"/>
+ 	</bean>
 		
 	<jee:jndi-lookup id="FSCache.basedir" 
 		jndi-name="java:comp/env/GWDP/FileCache/basedir" 

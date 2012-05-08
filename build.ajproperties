@@ -1,0 +1,8 @@
+src.includes = src/main/java/,\
+               src/main/resources/,\
+               src/test/java/,\
+               src/main/webapp/WEB-INF/,\
+               src/test/resources/
+src.excludes = src/main/resources/**,\
+               src/main/webapp/WEB-INF/**,\
+               src/test/resources/**
