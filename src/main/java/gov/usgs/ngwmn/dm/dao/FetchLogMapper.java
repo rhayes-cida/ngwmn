@@ -130,4 +130,16 @@ public interface FetchLogMapper {
 		"#{specifier,jdbcType=VARCHAR}, #{fetcher,jdbcType=VARCHAR}, #{dataStream,jdbcType=VARCHAR})" })
 	@Options(useGeneratedKeys=true, keyProperty="fetchlogId", keyColumn="FETCHLOG_ID")
 	int insertId(FetchLog record);
+	
+	@Select({
+		"select",
+		"FETCHLOG_ID, AGENCY_CD, SITE_NO, DATA_SOURCE, STARTED_AT, STATUS, PROBLEM, CT, ",
+		"ELAPSED_SEC, SPECIFIER, FETCHER, DATA_STREAM",
+		"from GW_DATA_PORTAL.FETCH_LOG",
+		"where AGENCY_CD = #{agency_cd,jdbcType=VARCHAR} and SITE_NO = #{site_no,jdbcType=VARCHAR} ",
+		"ORDER BY STARTED_AT DESC ",
+		"LIMIT 1"})
+	@ResultMap("BaseResultMap")
+	FetchLog selectLatestByWell(String agency_cd, String site_no);
+
 }

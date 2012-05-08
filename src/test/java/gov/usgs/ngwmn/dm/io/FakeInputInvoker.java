@@ -1,6 +1,5 @@
 package gov.usgs.ngwmn.dm.io;
 
-import gov.usgs.ngwmn.dm.cache.PipeStatistics;
 import gov.usgs.ngwmn.dm.cache.fs.FileCache;
 import gov.usgs.ngwmn.dm.spec.Specifier;
 
@@ -17,13 +16,13 @@ public class FakeInputInvoker implements Invoker {
 	}
 
 	@Override
-	public long invoke(InputStream is, OutputStream os, PipeStatistics stats)
+	public long invoke(InputStream is, OutputStream os)
 			throws IOException {
 		String s = String.valueOf(specifier);
 		
 		InputStream fakeInput = new ByteArrayInputStream(s.getBytes());
 		
-		return FileCache.copyStream(fakeInput, os, stats);
+		return FileCache.copyStream(fakeInput, os);
 
 	}
 

@@ -1,6 +1,5 @@
 package gov.usgs.ngwmn.dm;
 
-import gov.usgs.ngwmn.dm.cache.PipeStatistics;
 import gov.usgs.ngwmn.dm.spec.Specifier;
 
 import java.io.IOException;
@@ -57,11 +56,13 @@ public class PrefetchServlet extends DataManagerServlet {
 			ServletOutputStream puttee = response.getOutputStream();
 			try {
 				logger.info("Getting well data for {} with well name {}", spec, well_name);
-				PipeStatistics stats = db.prefetchWellData(spec);
+				long ct = db.prefetchWellData(spec);
+				
+				// TODO Get statistics from database or somewhere.
 				
 				puttee.println("<html><body>");
 				puttee.println("<h1>Pre-fetch result</h1>");
-				puttee.println("<pre>" + stats + "</pre>");
+				puttee.println("<pre>" + "got " + ct + " bytes" + "</pre>");
 				puttee.println("</body></html>");
 			} catch (SiteNotFoundException nse) {
 				// this may fail, if detected after output buffer has been flushed

@@ -34,25 +34,18 @@ public class DataBroker implements ExecFactory {
 	public void fetchWellData(Specifier spec, final Supplier<OutputStream> out) throws Exception {
 		Pipeline pipe = (Pipeline) makeExecutor(spec, out);
 		invokePipe(pipe);
-		logger.info("Completed request operation for {} result {}", spec, pipe.getStatistics());
+		logger.info("Completed request operation for {}", spec);
 	}
 	
-	public PipeStatistics prefetchWellData(Specifier spec) throws Exception {
+	public long prefetchWellData(Specifier spec) throws Exception {
 		Pipeline pipe = (Pipeline) makeExecutor(spec, null);
-		invokePipe(pipe);
-		logger.info("Completed prefetch operation for {} result {}", spec, pipe.getStatistics());
-		return pipe.getStatistics();
+		long ct = invokePipe(pipe);
+		logger.info("Completed prefetch operation for {}", spec);
+		return ct;
 	}
 
-	private void invokePipe(Pipeline pipe) throws IOException {
-		try {
-			pipe.invoke();
-			fetchEventBus.post(pipe.getStatistics());
-		} catch (IOException oops) {
-			PipeStatisticsWithProblem pswp = new PipeStatisticsWithProblem(pipe.getStatistics(), oops);
-			fetchEventBus.post(pswp);
-			throw oops;
-		}
+	private long invokePipe(Pipeline pipe) throws IOException {
+		return pipe.invoke();
 	}
 	
 	public Executee makeExecutor(Specifier spec, Supplier<OutputStream> out) throws IOException {	
@@ -63,8 +56,6 @@ public class DataBroker implements ExecFactory {
 		Pipeline pipe    = new Pipeline(spec);
 		boolean  success = false;
 
-		pipe.getStatistics().setSpecifier(spec);
-		
 		// pre-fetch will send in a null output stream
 		if (out != null) {
 			pipe.setOutputSupplier(out);
@@ -127,7 +118,6 @@ public class DataBroker implements ExecFactory {
 		Specifier spec = pipe.getSpecifier();
 		if (dataFetcher != null) {
 			boolean v = dataFetcher.configureInput(spec, pipe);
-			pipe.getStatistics().setCalledBy(dataFetcher.getClass());
 			return v;
 		}
 		return false;

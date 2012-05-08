@@ -18,7 +18,7 @@ public class Retriever implements DataFetcher {
 			throws IOException 
 	{
 		if (cache.contains(spec)) {
-			pipe.getStatistics().setCalledBy(this.getClass());
+			// pipe.getStatistics().setCalledBy(this.getClass());
 			return cache.fetchWellData(spec, pipe); 
 		}
 		return false;

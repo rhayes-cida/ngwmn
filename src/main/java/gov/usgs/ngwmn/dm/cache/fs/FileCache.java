@@ -73,10 +73,7 @@ public class FileCache implements Cache {
 		File file = contentFile(spec);
 		File tmpFile = File.createTempFile("LDR", ".xml");
 		
-		// TODO Need to make these stats available to DataBroker
-		PipeStatistics s = new PipeStatistics();
-		
-		OutputStream tmp = new TempfileOutputStream(file, tmpFile, s);
+		OutputStream tmp = new TempfileOutputStream(file, tmpFile);
 		logger.info("Created tempfile output for {}", spec);
 		return tmp;
 	}
@@ -88,8 +85,6 @@ public class FileCache implements Cache {
 	public boolean fetchWellData(final Specifier spec, Pipeline pipe) 
 			throws IOException
 	{
-		
-		pipe.getStatistics().setSpecifier(spec);
 		Invoker i = new FileInputInvoker();
 		pipe.setInvoker(i);
 		
@@ -104,7 +99,7 @@ public class FileCache implements Cache {
 		return true;
 	}
 	
-	private static long copyTo(InputStream is, OutputStream os, PipeStatistics stat) 
+	private static long copyTo(InputStream is, OutputStream os) 
 			throws IOException 
 	{
 		// TODO: measure performance, see if nio might be worthwhile.
@@ -119,17 +114,16 @@ public class FileCache implements Cache {
 			}
 			os.write(buf,0,ict);
 			ops += ict;
-			stat.incrementCount(ict);
 		}
 		
 		//os.close();
 		return ops;
 	}
 
-	public static long copyStream(InputStream is, OutputStream os, PipeStatistics stats) 
+	public static long copyStream(InputStream is, OutputStream os) 
 			throws IOException
 	{
-		return copyTo(is, os, stats);
+		return copyTo(is, os);
 	}
 	
 	

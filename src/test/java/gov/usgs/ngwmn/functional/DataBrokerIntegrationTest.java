@@ -77,13 +77,9 @@ public class DataBrokerIntegrationTest extends ContextualTest {
 	public void testPrefetch() throws Exception {
 		Specifier spec = makeSpec(AGENCY_CD,SITE_NO);
 
-		PipeStatistics stats = dataBroker.prefetchWellData(spec);
+		long ct = dataBroker.prefetchWellData(spec);
 		
-		assertNotNull("stats", stats);
-		assertEquals("spec", spec, stats.getSpecifier());
-		assertEquals("success", Status.DONE, stats.getStatus());
-		assertTrue("got bytes", stats.getCount() > 100);
-		assertEquals("caller", "WebRetriever", stats.getCalledBy().getSimpleName());
+		assertTrue("got bytes", ct > 100);
 	}
 	
 	@Test

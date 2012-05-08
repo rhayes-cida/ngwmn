@@ -1,6 +1,5 @@
 package gov.usgs.ngwmn.dm;
 
-import gov.usgs.ngwmn.dm.cache.PipeStatistics;
 import gov.usgs.ngwmn.dm.io.Invoker;
 import gov.usgs.ngwmn.dm.io.Pipeline;
 import gov.usgs.ngwmn.dm.spec.Specifier;
@@ -14,7 +13,7 @@ public class ErrorFetcher implements DataFetcher {
 	public class ErrorInvoker implements Invoker {
 
 		@Override
-		public long invoke(InputStream is, OutputStream os, PipeStatistics stats)
+		public long invoke(InputStream is, OutputStream os)
 				throws IOException {
 			throw new IOException("some problem");
 		}

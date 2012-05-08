@@ -14,6 +14,10 @@ public class FetchLogDAO {
 		mapper.insertId(item);
 	}
 
+	public FetchLog mostRecent(WellRegistryKey well) {	
+		return mapper.selectLatestByWell(well.getAgencyCd(), well.getSiteNo());
+	}
+	
 	public List<FetchLog> byWell(WellRegistryKey well) {
 		FetchLogExample selector = new FetchLogExample();
 		selector.createCriteria()

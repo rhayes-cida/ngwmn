@@ -42,14 +42,10 @@ public class WebRetriever implements DataFetcher {
 		@Override
 		public InputStream makeSupply(Specifier spec) throws IOException {
 			if (is!=null) return is;
-			
-			// TODO did not expect this behavior. seems out of place
-			pipe.getStatistics().markStart();  
-			
+						
 			int statusCode = h.wget(url);
 			
 		    if (statusCode != HttpStatus.SC_OK) {
-		    	pipe.getStatistics().markEnd(Status.FAIL);
 		    	IOException ioe = new IOException("HTTP status error: " + statusCode +" for spec " + spec);
 		    	pipe.setException(ioe);
 		    	throw ioe;
@@ -77,7 +73,6 @@ public class WebRetriever implements DataFetcher {
 		}
 		
 		logger.info("Fetching data for {} from {}", spec, url);
-		pipe.getStatistics().setSource(url);
 
 		pipe.setInputSupplier(new WebInputSupplier(pipe, url, harvester));
 		

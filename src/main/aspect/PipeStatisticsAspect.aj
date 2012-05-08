@@ -38,7 +38,7 @@ public aspect PipeStatisticsAspect {
 	
 	after(DataFetcher df, Specifier spec, Pipeline p) throwing (Exception oops): setInput(df, spec, p) {
 		p.stats.markEnd(Status.FAIL);
-		logger.warn("stopped in setInput {}", p);
+		logger.debug("stopped in setInput {}", p);
 		PipeStatisticsWithProblem pswp = new PipeStatisticsWithProblem(p.stats, oops);
 		fetchEventBus.post(pswp);
 	}
@@ -51,19 +51,19 @@ public aspect PipeStatisticsAspect {
 	
 	before(Pipeline p): invoke(p){
 		p.stats.markStart();
-		logger.warn("started {} in invoke", p);
+		logger.debug("started {} in invoke", p);
 	}
 	
 	after(Pipeline p) returning (long ct): invoke(p) {
 		p.stats.incrementCount(ct);
-		logger.warn("stopped in invoke {} returning {}", p, ct);
+		logger.debug("stopped in invoke {} returning {}", p, ct);
 		// System.out.println("returning tjp=" + thisJointPoint);
 		p.stats.markEnd(Status.DONE);
 		fetchEventBus.post(p.stats);
 	}
 	
 	after(Pipeline p) throwing (Exception e) : invoke(p) {
-		logger.warn("stopped in invoke {} throwing {}", p, e);
+		logger.debug("stopped in invoke {} throwing {}", p, e);
 		// System.out.println("throwing tjp=" + thisJointPoint);
 		p.stats.markEnd(Status.FAIL);
 		PipeStatisticsWithProblem pswp = new PipeStatisticsWithProblem(p.stats, e);
@@ -80,12 +80,12 @@ public aspect PipeStatisticsAspect {
 		Pipeline pipe = s.getPipeline();
 		pipe.stats.setSource(s.getUrl());
 		pipe.stats.markStart(); 
-		logger.warn("started in webfetch {}", pipe);
+		logger.debug("started in webfetch {}", pipe);
 	}
 	
 	after(WebRetriever.WebInputSupplier s) throwing(Exception e): webfetch(s) {
 		Pipeline pipe = s.getPipeline();
-		logger.warn("stopped in webfetch {} throw", pipe);
+		logger.debug("stopped in webfetch {} throw", pipe);
 		pipe.stats.markEnd(Status.FAIL);
 		
 		PipeStatisticsWithProblem pswp = new PipeStatisticsWithProblem(pipe.stats, e);

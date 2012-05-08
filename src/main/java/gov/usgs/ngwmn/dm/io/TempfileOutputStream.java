@@ -1,6 +1,5 @@
 package gov.usgs.ngwmn.dm.io;
 
-import gov.usgs.ngwmn.dm.cache.PipeStatistics;
 import gov.usgs.ngwmn.dm.cache.PipeStatistics.Status;
 
 import java.io.File;
@@ -12,36 +11,28 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class TempfileOutputStream extends OutputStream {
-	private PipeStatistics stat;
 	private File endpoint;
 	private File tempfile;
+	private Status status;
 	
 	private FileOutputStream delegate;
 	
 	private static Logger logger = LoggerFactory.getLogger(TempfileOutputStream.class);
 	
-	public TempfileOutputStream(File ep, File tmp, PipeStatistics s) {
-		stat = s;
-		if (stat == null) {
-			stat = new PipeStatistics();
-			stat.setStatus(Status.OPEN);
-		}
+	public TempfileOutputStream(File ep, File tmp) {
 		endpoint = ep;
 		tempfile = tmp;
-		
+
 		try {
 			delegate = new FileOutputStream(tmp);
 		} catch (Exception e) {
-			stat.markEnd(PipeStatistics.Status.FAIL);
+			status = Status.FAIL;
+			throw new RuntimeException(e);
 		}
 	}
 	
 	public Status getStatus() {
-		return stat.getStatus();
-	}
-	
-	public PipeStatistics getStatistics() {
-		return stat;
+		return status;
 	}
 	
 	public void close() throws IOException {

@@ -1,6 +1,5 @@
 package gov.usgs.ngwmn.dm.io;
 
-import gov.usgs.ngwmn.dm.cache.PipeStatistics;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -16,7 +15,7 @@ public class CopyInvoker implements Invoker {
 	protected Logger logger = LoggerFactory.getLogger(this.getClass());
 
 	@Override
-	public long invoke(InputStream is, OutputStream os, PipeStatistics stats)
+	public long invoke(InputStream is, OutputStream os)
 			throws IOException {
 		long ct = ByteStreams.copy(is,os);
 
@@ -24,8 +23,7 @@ public class CopyInvoker implements Invoker {
 		// the end should close the stream or an individual stream entry based on its requirements
 		//os.close(); // TODO are we sure that we close here and not at the servlet layer or allow the the container to manage this?
 		
-		stats.incrementCount(ct);
-		logger.info("Copied input to destination, stats={}", new Object[]{stats});
+		logger.info("Copied input to destination, ct={}", ct);
 		
 		return ct;
 	}

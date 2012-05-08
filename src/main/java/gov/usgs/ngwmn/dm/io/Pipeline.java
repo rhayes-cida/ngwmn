@@ -19,7 +19,6 @@ public class Pipeline implements Executee {
 
 	private Supplier<InputStream>  iss;
 	private Supplier<OutputStream> oss;
-	private PipeStatistics statistics;
 	private IOException    ioe;
 	private Invoker        invoker;
 	
@@ -28,7 +27,6 @@ public class Pipeline implements Executee {
 	
 	public Pipeline(Specifier sp) {
 		spec = sp;
-		statistics = new PipeStatistics();
 		invoker    = new CopyInvoker(); // it makes nice to have a default impl
 	}
 		
@@ -87,21 +85,17 @@ public class Pipeline implements Executee {
 	}
 
 	public long invoke() throws IOException {
-		statistics.markStart();
 		InputStream  is = iss.begin();
 		boolean threw = true;
 		long ct = 0;
 		try {
 			try {
-				OutputStream os = oss.begin(spec);
-				ct = invoker.invoke(is,os, statistics);
-				statistics.markEnd(Status.DONE);
-				logger.info("Done stats={}", statistics);
+				OutputStream os = oss.begin();
+				ct = invoker.invoke(is,os);
 				threw = false;
 			} catch (IOException ioe) {
-				statistics.markEnd(Status.FAIL);
 				setException(ioe);
-				logger.info("Fail stats={}", statistics);
+				logger.info("Fail message={}", ioe.getMessage());
 				throw ioe;
 			} finally {
 				if (oss != null) {
@@ -117,7 +111,4 @@ public class Pipeline implements Executee {
 		return ct;
 	}
 	
-	public PipeStatistics getStatistics() {
-		return statistics;
-	}
 }
