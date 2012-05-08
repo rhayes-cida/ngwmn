@@ -86,14 +86,15 @@ public class Pipeline implements Executee {
 		this.ioe = ioe;
 	}
 
-	public void invoke() throws IOException {
+	public long invoke() throws IOException {
 		statistics.markStart();
 		InputStream  is = iss.begin();
 		boolean threw = true;
+		long ct = 0;
 		try {
 			try {
-				OutputStream os = oss.begin();
-				invoker.invoke(is,os, statistics);
+				OutputStream os = oss.begin(spec);
+				ct = invoker.invoke(is,os, statistics);
 				statistics.markEnd(Status.DONE);
 				logger.info("Done stats={}", statistics);
 				threw = false;
@@ -113,6 +114,7 @@ public class Pipeline implements Executee {
 				iss.end(threw);
 			}
 		}
+		return ct;
 	}
 	
 	public PipeStatistics getStatistics() {

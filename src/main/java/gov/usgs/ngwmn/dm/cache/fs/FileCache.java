@@ -104,33 +104,32 @@ public class FileCache implements Cache {
 		return true;
 	}
 	
-	private static void copyTo(InputStream is, OutputStream os, PipeStatistics stat) 
+	private static long copyTo(InputStream is, OutputStream os, PipeStatistics stat) 
 			throws IOException 
 	{
 		// TODO: measure performance, see if nio might be worthwhile.
 		
 		byte[] buf = new byte[1024];
 		
-		
-		//TODO this var is not used at this time - is it for statistics?
-		//int ops = 0;
+		long ops = 0;
 		while (true) {
 			int ict = is.read(buf);
 			if (ict <= 0) {
 				break;
 			}
 			os.write(buf,0,ict);
-			//ops += ict;
+			ops += ict;
 			stat.incrementCount(ict);
 		}
 		
 		//os.close();
+		return ops;
 	}
 
-	public static void copyStream(InputStream is, OutputStream os, PipeStatistics stats) 
+	public static long copyStream(InputStream is, OutputStream os, PipeStatistics stats) 
 			throws IOException
 	{
-		copyTo(is, os, stats);
+		return copyTo(is, os, stats);
 	}
 	
 	

@@ -99,7 +99,7 @@ public class PipeStatistics {
 			return;
 		}
 		if (status != Status.OPEN) {
-			throw new RuntimeException("Improper pre-start status");
+			throw new RuntimeException("Improper pre-start status " + status);
 		}
 		status = Status.STARTED;
 		start = System.currentTimeMillis();
@@ -108,7 +108,7 @@ public class PipeStatistics {
 	public synchronized void markEnd(Status endStatus) {
 		end = System.currentTimeMillis();
 		if (status != Status.STARTED) {
-			throw new RuntimeException("Improper pre-end status");
+			throw new RuntimeException("Improper pre-end status " + status);
 		}
 		status = endStatus;
 		this.notifyAll();

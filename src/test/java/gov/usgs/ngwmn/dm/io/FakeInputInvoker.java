@@ -17,13 +17,13 @@ public class FakeInputInvoker implements Invoker {
 	}
 
 	@Override
-	public void invoke(InputStream is, OutputStream os, PipeStatistics stats)
+	public long invoke(InputStream is, OutputStream os, PipeStatistics stats)
 			throws IOException {
 		String s = String.valueOf(specifier);
 		
 		InputStream fakeInput = new ByteArrayInputStream(s.getBytes());
 		
-		FileCache.copyStream(fakeInput, os, stats);
+		return FileCache.copyStream(fakeInput, os, stats);
 
 	}
 

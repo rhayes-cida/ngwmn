@@ -14,7 +14,7 @@ public class ErrorFetcher implements DataFetcher {
 	public class ErrorInvoker implements Invoker {
 
 		@Override
-		public void invoke(InputStream is, OutputStream os, PipeStatistics stats)
+		public long invoke(InputStream is, OutputStream os, PipeStatistics stats)
 				throws IOException {
 			throw new IOException("some problem");
 		}

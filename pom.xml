@@ -22,6 +22,7 @@
 	    <org.springframework.version>3.1.1.RELEASE</org.springframework.version>
 	    
 	    <db.classpath>${maven.dependency.com.oracle.ojdbc6.jar.path}</db.classpath>
+	    <aspectj.version>1.6.11</aspectj.version>
 	</properties>
 
 	<issueManagement>
@@ -148,6 +149,11 @@
 			<artifactId>spring-test</artifactId>
 			<version>${org.springframework.version}</version>
 		</dependency>
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-aop</artifactId>
+			<version>${org.springframework.version}</version>
+		</dependency>
             
 
 		<!-- Provided dependencies -->
@@ -174,6 +180,17 @@
 			<artifactId>jstl</artifactId>
 			<version>1.2</version>
 		</dependency>
+		
+		<dependency>
+      		<groupId>org.aspectj</groupId>
+      		<artifactId>aspectjrt</artifactId>
+      		<version>${aspectj.version}</version>
+    	</dependency>
+		<dependency>
+      		<groupId>org.aspectj</groupId>
+      		<artifactId>aspectjweaver</artifactId>
+      		<version>${aspectj.version}</version>
+    	</dependency>
 		 
 	</dependencies>
 
@@ -249,6 +266,28 @@
 				</executions>
 		
 			</plugin>
+			<plugin>
+        		<groupId>org.codehaus.mojo</groupId>
+        		<artifactId>aspectj-maven-plugin</artifactId>
+        		<version>1.4</version>
+        		<configuration>
+        			<aspectDirectory>src/main/aspect</aspectDirectory>
+        			<complianceLevel>1.6</complianceLevel>
+        			<outxml>TRUE</outxml>
+        			<target>1.6</target>
+        			<verbose>TRUE</verbose>
+        		</configuration>
+        		
+        		<executions>
+          			<execution>
+            			<goals>
+              				<goal>compile</goal>       <!-- use this goal to weave all your main classes -->
+              				<goal>test-compile</goal>  <!-- use this goal to weave all your test classes -->
+            			</goals>
+          			</execution>
+        		</executions>
+      		</plugin>
+			
 		</plugins>
 		
 		<testResources>

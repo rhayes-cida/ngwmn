@@ -16,7 +16,7 @@ public class CopyInvoker implements Invoker {
 	protected Logger logger = LoggerFactory.getLogger(this.getClass());
 
 	@Override
-	public void invoke(InputStream is, OutputStream os, PipeStatistics stats)
+	public long invoke(InputStream is, OutputStream os, PipeStatistics stats)
 			throws IOException {
 		long ct = ByteStreams.copy(is,os);
 
@@ -26,6 +26,8 @@ public class CopyInvoker implements Invoker {
 		
 		stats.incrementCount(ct);
 		logger.info("Copied input to destination, stats={}", new Object[]{stats});
+		
+		return ct;
 	}
 
 }

@@ -16,8 +16,8 @@ public class FileInputInvoker implements Invoker {
 	protected Logger logger = LoggerFactory.getLogger(this.getClass());
 	
 	@Override
-	public void invoke(InputStream is, OutputStream os, PipeStatistics stats) throws IOException {
-		FileCache.copyStream(is, os, stats);
+	public long invoke(InputStream is, OutputStream os, PipeStatistics stats) throws IOException {
+		long ct = FileCache.copyStream(is, os, stats);
 		// output was closed by copyStream.
 		String outputDescription;
 		if (os instanceof ByteArrayOutputStream) {
@@ -26,6 +26,7 @@ public class FileInputInvoker implements Invoker {
 			outputDescription = String.valueOf(os);
 		}
 		logger.info("Copied {} to destination {}, stats={}", new Object[]{is, outputDescription, stats});
+		return ct;
 	}
 
 }
