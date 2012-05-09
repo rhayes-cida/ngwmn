@@ -35,14 +35,10 @@ implements DataLoader {
 	public boolean configureOutput(final Specifier spec, Pipeline pipe) throws IOException {
 			
 		pipe.addOutputSupplier( new Supplier<OutputStream>() {				
-			OutputStream os;
 			@Override
-			public OutputStream makeSupply(Specifier spec) throws IOException {
+			public OutputStream initialize() throws IOException {
 				try {
-					if (os==null) {
-						os = Loader.this.destination(spec);
-					}
-					return os;
+					return Loader.this.destination(spec);
 				} catch (IOException ioe) {
 					String message = "Problem building output stream for spec " + spec;
 					logger.error(message, ioe);

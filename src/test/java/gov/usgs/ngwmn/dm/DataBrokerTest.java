@@ -27,6 +27,8 @@ public class DataBrokerTest extends ContextualTest {
 	public void test_validation_noDataFetchers() {
 		DataBroker broker = new DataBroker();
 		broker.check(spec);
+		
+		assertTrue("should not get here - expecting an exception.", false);
 	}
 		
 	@Test(expected=NullPointerException.class)
@@ -38,6 +40,8 @@ public class DataBrokerTest extends ContextualTest {
 		broker.setHarvester(new WebRetriever());
 		
 		broker.check(null);
+		
+		assertTrue("should not get here - expecting an exception.", false);
 	}
 		
 

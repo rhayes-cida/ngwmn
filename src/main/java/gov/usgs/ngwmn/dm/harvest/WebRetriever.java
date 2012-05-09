@@ -25,7 +25,7 @@ public class WebRetriever implements DataFetcher {
 	protected Harvester  harvester  = new Harvester();
 
 	@Override
-	public boolean configureInput(Specifier spec, final Pipeline pipe) throws IOException {
+	public boolean configureInput(final Specifier spec, final Pipeline pipe) throws IOException {
 		
 		pipe.setInvoker(new CopyInvoker());
 		
@@ -39,12 +39,8 @@ public class WebRetriever implements DataFetcher {
 		pipe.getStatistics().setSource(url);
 
 		pipe.setInputSupplier( new Supplier<InputStream>() {
-			InputStream is;
-			
 			@Override
-			public InputStream makeSupply(Specifier spec) throws IOException {
-				if (is!=null) return is;
-				
+			public InputStream initialize() throws IOException {
 				// TODO did not expect this behavior. seems out of place
 				pipe.getStatistics().markStart();  
 				
@@ -56,8 +52,7 @@ public class WebRetriever implements DataFetcher {
 		        	pipe.setException(ioe);
 		        	throw ioe;
 		        }
-		        is = harvester.getInputStream();
-				return is;
+		        return harvester.getInputStream();
 				// it's zero, no help here  logger.info("response stream available {}", is.available());
 			}
 		});

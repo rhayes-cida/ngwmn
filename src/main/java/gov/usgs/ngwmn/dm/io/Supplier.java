@@ -12,7 +12,7 @@ import com.google.common.io.OutputSupplier;
 public abstract class Supplier<T extends Closeable> implements InputSupplier<T>, OutputSupplier<T> {
 	
 	private Specifier defaultSpec;
-	private T supply;
+	private T source;
 	
 	public Specifier getDefaultSpec() {
 		return defaultSpec;
@@ -24,22 +24,28 @@ public abstract class Supplier<T extends Closeable> implements InputSupplier<T>,
 
 	@Override
 	public final T getInput() throws IOException {
-		return begin(defaultSpec);
+		return begin();
 	}
 	
 	@Override
 	public final T getOutput() throws IOException {
-		return begin(defaultSpec);
+		return begin();
 	}
 	
-	public final T begin(Specifier spec) throws IOException {
-		// cannot do a null bypass because zip supply needs to make a new entry
-		// each impl must be smart about its makeSupply
-		supply = makeSupply(spec);
-		return supply;
+	public final T begin() throws IOException {
+
+		if ( isInitialized() ) {
+			throw new IOException("Supplier must be initiated only once.");
+		}
+		
+		return source = initialize();
 	}
 	
-	public abstract T makeSupply(Specifier spec) throws IOException;
+	public boolean isInitialized() {
+		return source != null;
+	}
+	
+	public abstract T initialize() throws IOException;
 	
 	
 	/**
@@ -50,15 +56,22 @@ public abstract class Supplier<T extends Closeable> implements InputSupplier<T>,
 	 *  and all streams will need to closed eventually the streams
 	 */
 	public void end(boolean threw) throws IOException {
-		// TODO maybe the default behavior could be to close the supplied stream
-		// TODO this way the specific impl may be able to 
-		// TODO this might not be the best but will be fleshed out in time
-		Closeables.close( supply, threw );
+		if (source == null) {
+			throw new IOException("call to end prior to source begin.");
+		}
+		Closeables.close(source, threw);
 	}
 	
 	
 	public Supplier<T> makeEntry(Specifier spec) {
 		return this;
 	}
-
+	
+	// this is for primarily for testing and might be able to be protected
+	protected T getSource() {
+		if (source == null) {
+			throw new NullPointerException("call to getSource prior to source initialization.");
+		}
+		return source;
+	}
 }

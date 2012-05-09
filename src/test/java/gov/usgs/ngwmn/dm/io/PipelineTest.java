@@ -3,7 +3,6 @@ package gov.usgs.ngwmn.dm.io;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import gov.usgs.ngwmn.dm.cache.PipeStatistics;
-import gov.usgs.ngwmn.dm.spec.Specifier;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -62,7 +61,7 @@ public class PipelineTest extends Pipeline {
 		
 		ByteArrayOutputStream out;
 		
-		out = (ByteArrayOutputStream) outs1.begin(null);
+		out = (ByteArrayOutputStream) outs1.getSource();
 		checkBytes( out.toByteArray() );
 	}
 	
@@ -87,10 +86,10 @@ public class PipelineTest extends Pipeline {
 		
 		ByteArrayOutputStream out;
 		
-		out = (ByteArrayOutputStream) outs1.begin(null);
+		out = (ByteArrayOutputStream) outs1.getSource();
 		checkBytes( out.toByteArray() );
 		
-		out = (ByteArrayOutputStream) outs2.begin(null);
+		out = (ByteArrayOutputStream) outs2.getSource();
 		checkBytes( out.toByteArray() );		
 	}
 	
@@ -118,13 +117,13 @@ public class PipelineTest extends Pipeline {
 		
 		ByteArrayOutputStream out;
 		
-		out = (ByteArrayOutputStream) outs1.begin(null);
+		out = (ByteArrayOutputStream) outs1.getSource();
 		checkBytes( out.toByteArray() );
 		
-		out = (ByteArrayOutputStream) outs2.begin(null);
+		out = (ByteArrayOutputStream) outs2.getSource();
 		checkBytes( out.toByteArray() );		
 		
-		out = (ByteArrayOutputStream) outs3.begin(null);
+		out = (ByteArrayOutputStream) outs3.getSource();
 		checkBytes( out.toByteArray() );		
 	}
 	
@@ -149,8 +148,8 @@ public class PipelineTest extends Pipeline {
 		
 		SupplyChain<OutputStream> chain = new SupplyChain<OutputStream>() {
 			@Override
-			public OutputStream makeSupply(Specifier spec) throws IOException {
-				OutputStream os = super.makeSupply(spec);
+			public OutputStream initialize() throws IOException {
+				OutputStream os = super.initialize();
 				os = new FilterOutputStream(os) {
 					@Override
 					public void write(int b) throws IOException {
@@ -166,12 +165,9 @@ public class PipelineTest extends Pipeline {
 		pipe.setOutputSupplier(outs1);
 		pipe.chainOutputSupplier(chain);
 		pipe.setInvoker(new CopyInvoker());
-		
 		pipe.invoke();
 		
-		ByteArrayOutputStream out;
-		
-		out = (ByteArrayOutputStream) outs1.begin(null);
+		ByteArrayOutputStream out = (ByteArrayOutputStream) outs1.getSource();
 		checkDoubleBytes( out.toByteArray() );
 	}
 

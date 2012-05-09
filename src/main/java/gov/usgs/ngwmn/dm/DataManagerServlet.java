@@ -66,14 +66,19 @@ public class DataManagerServlet extends HttpServlet {
 	{
 		try {
 			Specification spect = makeSpecification(req);
-			Supplier<OutputStream> outSupply = new HttpResponseSupplier(spect, resp);
-			if ( spect.isBundled() ) {
-				outSupply  = new SupplyZipOutput(outSupply);
-			}
+			Supplier<OutputStream> outs = new HttpResponseSupplier(spect, resp);
 					
 			try {
-				SpecResolver resolver = new WellListResolver();
-				Executee exec = new SequentialExec(db, resolver.specIterator(spect), outSupply);
+				Executee exec = null;
+				if ( spect.isBundled() ) {
+					SpecResolver resolver = new WellListResolver();
+					outs = new SupplyZipOutput(outs);
+					exec = new SequentialExec(db, resolver.specIterator(spect), outs);
+				} else {
+					// TODO initial impl of single unbundled request
+					// this is required because there is only one pipe and the seq exec calls begin unnecessarily
+					exec = db.makeExecutor(spect.getWellIDs().get(0), outs);
+				}
 				exec.call();
 			} catch (SiteNotFoundException nse) {
 				// this may fail, if detected after output buffer has been flushed

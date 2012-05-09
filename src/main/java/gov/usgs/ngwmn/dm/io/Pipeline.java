@@ -87,11 +87,11 @@ public class Pipeline implements Executee {
 
 	public void invoke() throws IOException {
 		statistics.markStart();
-		InputStream  is = iss.begin(spec);
+		InputStream  is = iss.begin();
 		boolean threw = true;
 		try {
 			try {
-				OutputStream os = oss.begin(spec);
+				OutputStream os = oss.begin();
 				invoker.invoke(is,os, statistics);
 				statistics.markEnd(Status.DONE);
 				logger.info("Done stats={}", statistics);

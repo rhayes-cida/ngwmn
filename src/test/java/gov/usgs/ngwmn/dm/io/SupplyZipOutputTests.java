@@ -58,9 +58,17 @@ public class SupplyZipOutputTests {
 		pipe.setInputSupplier(ins);
 		pipe.setOutputSupplier(ze);
 		pipe.setInvoker(new CopyInvoker());
-		pipe.invoke();
-				
-		ByteArrayOutputStream out = (ByteArrayOutputStream) outs.begin(null);
+		
+		boolean threw = false;
+		try {
+			oz.begin();
+			pipe.invoke();
+			threw = false;
+		} catch (Exception e) {
+			oz.end(threw); // because it is a test i could have just passed in false but this shows the use contract
+		}	
+		
+		ByteArrayOutputStream out = (ByteArrayOutputStream) outs.getSource();
 		checkBytes( out.toByteArray() );
 	}
 	

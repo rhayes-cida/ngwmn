@@ -32,8 +32,7 @@ public class SequentialExec implements Executee {
     	Executee exec = null;
     	boolean threw = true;
     	try {
-    		// this is only done to show the pairing with end.
-    		output.begin(null); // TODO since it is not needed - this is contrived
+    		output.begin();
     		
 	        for (Specifier spec : specifiers) {
 	        	logger.info("Getting well data for {}", spec);

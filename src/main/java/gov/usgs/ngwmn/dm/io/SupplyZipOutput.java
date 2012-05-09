@@ -16,7 +16,6 @@ public class SupplyZipOutput extends Supplier<OutputStream> {
 	
 	private Supplier<OutputStream> os;
 	private ZipOutputStream oz;
-
 	
 	public SupplyZipOutput(Supplier<OutputStream> os) {
 		this.os = os;
@@ -24,13 +23,9 @@ public class SupplyZipOutput extends Supplier<OutputStream> {
 
 	
 	@Override
-	public OutputStream makeSupply(Specifier spec) throws IOException {
-		if (oz != null) return oz;
-		
+	public OutputStream initialize() throws IOException {
 		logger.debug("getOutputStream : making zip output stream");
-		// init and chain the stream if not done yet
-		oz = new ZipOutputStream( os.begin(spec) );
-		return oz;
+		return oz = new ZipOutputStream( os.begin() );
 	}
 
 	/**
@@ -38,12 +33,19 @@ public class SupplyZipOutput extends Supplier<OutputStream> {
 	 */
 	@Override
 	public void end(boolean threw) throws IOException {
-			logger.debug("end : closing zip stream");
-			super.end(threw);
+		logger.debug("end : closing zip stream");
+		super.end(threw);
 	}
 	
 	
 	public Supplier<OutputStream> makeEntry(Specifier spec) {
 		return new SupplyZipEntry(this, spec);
+	}
+	
+	protected ZipOutputStream getZip() {
+		if (oz == null) {
+			throw new NullPointerException("call to getZip prior to source initialization.");
+		}
+		return oz;
 	}
 }

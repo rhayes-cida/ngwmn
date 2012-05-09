@@ -14,11 +14,15 @@ import javax.sql.DataSource;
 import org.junit.BeforeClass;
 import org.junit.runner.RunWith;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.mock.jndi.SimpleNamingContextBuilder;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+
+import ch.qos.logback.classic.Level;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration({"classpath:applicationContextTest.xml"})
@@ -44,6 +48,13 @@ public abstract class ContextualTest {
 			InitialContext ctx = new InitialContext();
 			ctx.bind(FileCache.BASEDIR_JNDI_NAME, basedir);
 		}
+	}
+	
+	@BeforeClass
+	public static void setUpLogging() {
+		ch.qos.logback.classic.Logger log = (ch.qos.logback.classic.Logger)
+				LoggerFactory.getLogger( Logger.ROOT_LOGGER_NAME );
+		log.setLevel(Level.INFO);
 	}
 
 	public static void setBasedir(String basedir) {

@@ -1,11 +1,14 @@
 package gov.usgs.ngwmn.dm.io;
 
-import gov.usgs.ngwmn.dm.spec.Specifier;
 
 import java.io.Closeable;
 import java.io.IOException;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public class SupplyChain<T extends Closeable> extends Supplier<T> {
+	private final Logger logger = LoggerFactory.getLogger(getClass());
 
 	private Supplier<T> link;
 	
@@ -41,8 +44,9 @@ public class SupplyChain<T extends Closeable> extends Supplier<T> {
 	 * augment it appropriately and return a new stream
 	 */
 	@Override
-	public T makeSupply(Specifier spec) throws IOException {
-		return link.makeSupply(spec);
+	public T initialize() throws IOException {
+		logger.info("initialize chain link source");
+		return link.begin();
 	}
 	
 	/**
@@ -50,6 +54,7 @@ public class SupplyChain<T extends Closeable> extends Supplier<T> {
 	 */
 	@Override
 	public void end(boolean threw) throws IOException {
+		logger.info("end chain link source");
 		link.end(threw);
 	}
 }
