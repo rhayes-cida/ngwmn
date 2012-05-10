@@ -59,10 +59,7 @@ public class PipelineTest extends Pipeline {
 		pipe.setInvoker(new CopyInvoker());
 		pipe.invoke();
 		
-		ByteArrayOutputStream out;
-		
-		out = (ByteArrayOutputStream) outs1.getSource();
-		checkBytes( out.toByteArray() );
+		checkBytes( os.toByteArray() );
 	}
 	
 	@Test
@@ -84,13 +81,8 @@ public class PipelineTest extends Pipeline {
 		pipe.setInvoker(new CopyInvoker());
 		pipe.invoke();
 		
-		ByteArrayOutputStream out;
-		
-		out = (ByteArrayOutputStream) outs1.getSource();
-		checkBytes( out.toByteArray() );
-		
-		out = (ByteArrayOutputStream) outs2.getSource();
-		checkBytes( out.toByteArray() );		
+		checkBytes( os1.toByteArray() );
+		checkBytes( os2.toByteArray() );		
 	}
 	
 	@Test
@@ -115,16 +107,9 @@ public class PipelineTest extends Pipeline {
 		pipe.setInvoker(new CopyInvoker());
 		pipe.invoke();
 		
-		ByteArrayOutputStream out;
-		
-		out = (ByteArrayOutputStream) outs1.getSource();
-		checkBytes( out.toByteArray() );
-		
-		out = (ByteArrayOutputStream) outs2.getSource();
-		checkBytes( out.toByteArray() );		
-		
-		out = (ByteArrayOutputStream) outs3.getSource();
-		checkBytes( out.toByteArray() );		
+		checkBytes( os1.toByteArray() );
+		checkBytes( os2.toByteArray() );		
+		checkBytes( os3.toByteArray() );		
 	}
 	
 	private void checkBytes(byte bytes[]) {
@@ -167,8 +152,7 @@ public class PipelineTest extends Pipeline {
 		pipe.setInvoker(new CopyInvoker());
 		pipe.invoke();
 		
-		ByteArrayOutputStream out = (ByteArrayOutputStream) outs1.getSource();
-		checkDoubleBytes( out.toByteArray() );
+		checkDoubleBytes( os.toByteArray() );
 	}
 
 	private void checkDoubleBytes(byte bytes[]) {
