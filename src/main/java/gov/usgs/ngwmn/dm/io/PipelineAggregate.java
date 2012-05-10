@@ -10,11 +10,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Iterator;
-import java.util.NoSuchElementException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 
 
 public class PipelineAggregate extends Pipeline {
@@ -47,13 +45,12 @@ public class PipelineAggregate extends Pipeline {
     	boolean threw = true;
     	Supplier<OutputStream> output = getOutputSupplier();
     	
-    	int count = 0;
     	try {
     		logger.info("invoke for aggregated stream container -- begin");
     		output.begin();
     		
 	        for (Specifier spec : specs) {
-				count++;
+	        	// both the supply and this need the specs list and this loop just ensures we execute for each list entry
 	        	try {
 	        		logger.info("invoke for aggregated stream entry being for {}", spec);
 	        		threw = true;
@@ -61,17 +58,13 @@ public class PipelineAggregate extends Pipeline {
 					aggregatedSupply.invoke(null,null,null); // no params used
 	        		threw = false;
 	        	} catch (RuntimeException e) {
-	        		logger.error("Error:", e);
+	        		logger.error("Error:", e); // just so I can see the initial cause of failure
 	        		throw e;
 				} finally {
 	        		logger.info("invoke for aggregated stream entry end");
 					aggregatedSupply.end(threw);
 				}
 	        }
-    	} catch (NoSuchElementException e) {
-    		// this exception just means we are done
-    		logger.info("finished calling entries after {} entries", count);
-        	threw = false;
 		} finally {
     		logger.info("invoke for aggregated stream container -- end");
 			output.end(threw);
