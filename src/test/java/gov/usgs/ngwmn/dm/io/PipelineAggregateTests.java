@@ -123,14 +123,10 @@ public class PipelineAggregateTests {
 			assertTrue(entry.getName().startsWith(spec.getAgencyID()));
 			
 			int size = zis.read(buffer);
-			assertEquals(10, size);
 			
 	//		assertEquals(10, bytes.length);
-			byte n = 0;
-			for (byte b : buffer) {
-				assertEquals(count*n++,b);
-			}
-		
+			PipelineTest.checkBytes(buffer, count);
+			
 			size = zis.read(buffer);
 			assertEquals(-1, size);
 		}

@@ -59,7 +59,7 @@ public class PipelineTest extends Pipeline {
 		pipe.setInvoker(new CopyInvoker());
 		pipe.invoke();
 		
-		checkBytes( os.toByteArray() );
+		checkBytes( os.toByteArray(), 1 );
 	}
 	
 	@Test
@@ -81,8 +81,8 @@ public class PipelineTest extends Pipeline {
 		pipe.setInvoker(new CopyInvoker());
 		pipe.invoke();
 		
-		checkBytes( os1.toByteArray() );
-		checkBytes( os2.toByteArray() );		
+		checkBytes( os1.toByteArray(), 1 );
+		checkBytes( os2.toByteArray(), 1 );
 	}
 	
 	@Test
@@ -107,17 +107,18 @@ public class PipelineTest extends Pipeline {
 		pipe.setInvoker(new CopyInvoker());
 		pipe.invoke();
 		
-		checkBytes( os1.toByteArray() );
-		checkBytes( os2.toByteArray() );		
-		checkBytes( os3.toByteArray() );		
+		checkBytes( os1.toByteArray(), 1 );
+		checkBytes( os2.toByteArray(), 1 );		
+		checkBytes( os3.toByteArray(), 1 );		
 	}
 	
-	private void checkBytes(byte bytes[]) {
+	// used in multiple i/o tests
+	public static void checkBytes(byte bytes[], int factor) {
 		assertNotNull(bytes);
 		assertEquals(10, bytes.length);
 		byte n = 0;
 		for (byte b : bytes) {
-			assertEquals(n++,b);
+			assertEquals(factor*n++,b);
 		}
 	}
 	
@@ -152,16 +153,6 @@ public class PipelineTest extends Pipeline {
 		pipe.setInvoker(new CopyInvoker());
 		pipe.invoke();
 		
-		checkDoubleBytes( os.toByteArray() );
+		checkBytes( os.toByteArray(), 2 );
 	}
-
-	private void checkDoubleBytes(byte bytes[]) {
-		assertNotNull(bytes);
-		assertEquals(10, bytes.length);
-		byte n = 0;
-		for (byte b : bytes) {
-			assertEquals(2*n++,b);
-		}
-	}
-
 }

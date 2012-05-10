@@ -84,13 +84,9 @@ public class SupplyZipOutputTests {
 		assertTrue(entry.getName().startsWith(spec.getAgencyID()));
 		
 		int size = zis.read(buffer);
-		assertEquals(10, size);
 		
 //		assertEquals(10, bytes.length);
-		byte n = 0;
-		for (byte b : buffer) {
-			assertEquals(n++,b);
-		}
+		PipelineTest.checkBytes(buffer, 1);
 		
 		size = zis.read(buffer);
 		assertEquals(-1, size);
