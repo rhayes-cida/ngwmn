@@ -106,6 +106,10 @@ public class PipeStatistics {
 	}
 	
 	public synchronized void markEnd(Status endStatus) {
+		if (status == endStatus) {
+			// already marked, let it ride
+			return;
+		}
 		end = System.currentTimeMillis();
 		if (status != Status.STARTED) {
 			throw new RuntimeException("Improper pre-end status " + status);

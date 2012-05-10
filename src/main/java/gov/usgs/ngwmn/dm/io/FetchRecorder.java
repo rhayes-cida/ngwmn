@@ -40,8 +40,10 @@ public class FetchRecorder {
 			item.setAgencyCd("");
 			item.setSiteNo("");
 		}
+		
 		item.setElapsedSec(stats.getElapsedTime());
 		item.setStartedAt(stats.getStartDate());
+		item.setCt(stats.getCount());
 		if (stats.getCalledBy() != null) {
 			item.setFetcher(stats.getCalledBy().getSimpleName());
 		}

@@ -15,7 +15,8 @@ import com.google.common.eventbus.EventBus;
 
 public aspect PipeStatisticsAspect {
 	private PipeStatistics Pipeline.stats = new PipeStatistics();
-	
+	private Logger logger = LoggerFactory.getLogger(this.getClass());
+		
 	// we expect this to be overridden by Spring configuration
 	private EventBus fetchEventBus = new EventBus();
 	
@@ -23,8 +24,6 @@ public aspect PipeStatisticsAspect {
 		this.fetchEventBus = eventBus;
 	}
 
-	private Logger logger = LoggerFactory.getLogger(this.getClass());
-		
 	// Monitor pipeline setup
 	pointcut setInput(DataFetcher df, Specifier spec, Pipeline p) : 
 		call(* DataFetcher.configureInput(Specifier, Pipeline))
