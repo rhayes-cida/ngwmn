@@ -11,7 +11,7 @@ import org.junit.Test;
 public class FetchLogDAOTest extends ContextualTest {
 
 	private static final String AGENCY_CD = "USGS";
-	private static final String SITE_NO = "402734087033401";
+	private static final String SITE_NO = "007";
 	private FetchLogDAO dao;
 	
 	@Before
@@ -33,6 +33,7 @@ public class FetchLogDAOTest extends ContextualTest {
 		entry.setAgencyCd(AGENCY_CD);
 		entry.setSiteNo(SITE_NO);
 		entry.setCt(ct);
+		entry.setFetcher(getClass().getSimpleName());
 		dao.insertId(entry);
 		return entry;
 	}
