@@ -11,17 +11,8 @@ import com.google.common.io.OutputSupplier;
 
 public abstract class Supplier<T extends Closeable> implements InputSupplier<T>, OutputSupplier<T> {
 	
-	private Specifier defaultSpec;
 	private T source;
 	
-	public Specifier getDefaultSpec() {
-		return defaultSpec;
-	}
-
-	public void setDefaultSpec(Specifier defaultSpec) {
-		this.defaultSpec = defaultSpec;
-	}
-
 	@Override
 	public final T getInput() throws IOException {
 		return begin();
@@ -60,6 +51,9 @@ public abstract class Supplier<T extends Closeable> implements InputSupplier<T>,
 			throw new IOException("call to end prior to source begin.");
 		}
 		Closeables.close(source, threw);
+		
+		// once closed it is no longer initialized
+		source = null; // this is also useful for multiple item bundling
 	}
 	
 	
@@ -67,10 +61,12 @@ public abstract class Supplier<T extends Closeable> implements InputSupplier<T>,
 		return this;
 	}
 	
+	
 	// this is for primarily for testing and might be able to be protected
+	// alternatively we could make the source attribute protected
 	protected T getSource() {
-		if (source == null) {
-			throw new NullPointerException("call to getSource prior to source initialization.");
+		if ( ! isInitialized() ) {
+			throw new NullPointerException("call to getSource prior to initialization.");
 		}
 		return source;
 	}

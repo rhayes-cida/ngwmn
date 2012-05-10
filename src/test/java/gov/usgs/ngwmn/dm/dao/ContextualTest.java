@@ -52,9 +52,12 @@ public abstract class ContextualTest {
 	
 	@BeforeClass
 	public static void setUpLogging() {
+		setUpLogging(Level.INFO);
+	}
+	public static void setUpLogging(Level level) {
 		ch.qos.logback.classic.Logger log = (ch.qos.logback.classic.Logger)
 				LoggerFactory.getLogger( Logger.ROOT_LOGGER_NAME );
-		log.setLevel(Level.INFO);
+		log.setLevel(level);
 	}
 
 	public static void setBasedir(String basedir) {

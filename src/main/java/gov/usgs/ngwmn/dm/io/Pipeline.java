@@ -29,6 +29,7 @@ public class Pipeline implements Executee {
 	public Pipeline(Specifier sp) {
 		spec = sp;
 		statistics = new PipeStatistics();
+		invoker    = new CopyInvoker(); // it makes nice to have a default impl
 	}
 		
 	

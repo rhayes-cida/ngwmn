@@ -27,8 +27,10 @@ public class SupplyZipOutputTests {
 	@Test
 	public void test_createZipOutput_thenCompareOriginalToZipInput() throws Exception {
 		
-		ByteArrayOutputStream os = new ByteArrayOutputStream(10);
+		ByteArrayOutputStream os    = new ByteArrayOutputStream(10);
 		Supplier<OutputStream> outs = new SimpleSupplier<OutputStream>(os);
+		SupplyZipOutput oz          = new SupplyZipOutput(outs);
+		Supplier<OutputStream> ze   = oz.makeEntry(spec);
 
 		byte buffer[] = new byte[]{0x0,0x1,0x2,0x3,0x4,0x5,0x6,0x7,0x8,0x9};
 		ByteArrayInputStream bais = new ByteArrayInputStream(buffer){
@@ -51,8 +53,6 @@ public class SupplyZipOutputTests {
 		};
 		Supplier<InputStream> ins = new SimpleSupplier<InputStream>(bais);
 		
-		SupplyZipOutput oz = new SupplyZipOutput(outs);
-		Supplier<OutputStream> ze = oz.makeEntry(spec);
 		
 		Pipeline pipe = new Pipeline(spec);
 		pipe.setInputSupplier(ins);
