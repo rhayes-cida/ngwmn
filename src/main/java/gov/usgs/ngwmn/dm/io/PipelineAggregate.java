@@ -81,12 +81,15 @@ class SupplyInputAggregate extends Supplier<InputStream> implements Invoker {
 	protected Supplier<OutputStream> out;
 	private Pipeline pipe;
 	
+	// just a marker that should not be called/used
 	private final InputStream marker = new InputStream() {
 		@Override
 		public int read() throws IOException {
-			// TODO Auto-generated method stub
-			return 0;
+			throw new NotImplementedException();
 		}
+		public void close() throws IOException {
+			// do nothing
+		};
 	};
 	
 	public SupplyInputAggregate(ExecFactory factory, Iterable<Specifier> specifiers, Supplier<OutputStream> output) {
