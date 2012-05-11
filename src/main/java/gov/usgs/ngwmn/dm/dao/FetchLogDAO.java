@@ -23,6 +23,7 @@ public class FetchLogDAO {
 		selector.createCriteria()
 			.andAgencyCdEqualTo(well.getAgencyCd())
 			.andSiteNoEqualTo(well.getSiteNo());
+		// newest first
 		selector.setOrderByClause("started_at DESC");
 		
 		return mapper.selectByExample(selector);

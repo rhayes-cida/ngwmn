@@ -81,7 +81,8 @@ public class FetchRecorderTest extends ContextualTest {
 			}
 		}
 		
-		FetchLog last = wfr.get(wfr.size()-1);
+		// Most recent is first -- list is in descending start time.
+		FetchLog last = wfr.get(0);
 		assertEquals("type", stats.getSpecifier().getTypeID().toString(), last.getDataStream());
 		
 		assertTrue("found at least one", type_ct > 0);

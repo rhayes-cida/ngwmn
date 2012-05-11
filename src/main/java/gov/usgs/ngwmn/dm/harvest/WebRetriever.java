@@ -40,13 +40,11 @@ public class WebRetriever implements DataFetcher {
 		}
 
 		@Override
-		public InputStream makeSupply(Specifier spec) throws IOException {
-			if (is!=null) return is;
-						
+		public InputStream initialize() throws IOException {
 			int statusCode = h.wget(url);
 			
 		    if (statusCode != HttpStatus.SC_OK) {
-		    	IOException ioe = new IOException("HTTP status error: " + statusCode +" for spec " + spec);
+		    	IOException ioe = new IOException("HTTP status error: " + statusCode +" for url " + url);
 		    	pipe.setException(ioe);
 		    	throw ioe;
 		    }

@@ -40,10 +40,11 @@ public class PipelineAggregate extends Pipeline {
     }
     
 	@Override
-	public void invoke() throws IOException {
+	public long invoke() throws IOException {
 		
     	boolean threw = true;
     	Supplier<OutputStream> output = getOutputSupplier();
+    	long ct = 0;
     	
     	try {
     		logger.info("invoke for aggregated stream container -- begin");
@@ -55,7 +56,7 @@ public class PipelineAggregate extends Pipeline {
 	        		logger.info("invoke for aggregated stream entry being for {}", spec);
 	        		threw = true;
 					aggregatedSupply.begin();
-					aggregatedSupply.invoke(null,null,null); // no params used
+					ct += aggregatedSupply.invoke(null,null); // no params used
 	        		threw = false;
 	        	} catch (RuntimeException e) {
 	        		logger.error("Error:", e); // just so I can see the initial cause of failure
@@ -69,6 +70,7 @@ public class PipelineAggregate extends Pipeline {
     		logger.info("invoke for aggregated stream container -- end");
 			output.end(threw);
 		}
+    	return ct;
 	}
 	    
 }
@@ -110,9 +112,9 @@ class SupplyInputAggregate extends Supplier<InputStream> implements Invoker {
 	}
 
 	@Override
-	public void invoke(InputStream is, OutputStream os, PipeStatistics stats) throws IOException {
+	public long invoke(InputStream is, OutputStream os) throws IOException {
 		logger.info("invoke for aggregated stream entry -- invoke");
-		pipe.invoke();
+		return pipe.invoke();
 	}
 	
 	@Override
