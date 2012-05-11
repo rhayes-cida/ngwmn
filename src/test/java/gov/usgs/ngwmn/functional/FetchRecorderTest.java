@@ -74,6 +74,7 @@ public class FetchRecorderTest extends ContextualTest {
 		
 		List<FetchLog> wfr = dao.byWell(well);
 
+		// Need to watch out for null start times in the underlying select (causing test failure).
 		int type_ct = 0;
 		for (FetchLog fl : wfr) {
 			if (type.toString().equals(fl.getDataStream())) {

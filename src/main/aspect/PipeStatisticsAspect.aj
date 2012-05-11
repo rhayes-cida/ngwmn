@@ -5,6 +5,7 @@ import gov.usgs.ngwmn.dm.cache.PipeStatistics;
 import gov.usgs.ngwmn.dm.cache.PipeStatisticsWithProblem;
 import gov.usgs.ngwmn.dm.cache.PipeStatistics.Status;
 import gov.usgs.ngwmn.dm.io.Pipeline;
+import gov.usgs.ngwmn.dm.io.PipelineAggregate;
 import gov.usgs.ngwmn.dm.spec.Specifier;
 import gov.usgs.ngwmn.dm.harvest.WebRetriever;
 
@@ -43,9 +44,11 @@ public aspect PipeStatisticsAspect {
 	}
 		
 	// monitor pipeline execution
+	// TODO Find a better way to handle aggregate pipelines
 	pointcut invoke(Pipeline p):
 		call(* Pipeline.invoke()) &&
-		target(p);
+		target(p) &&
+		! target(PipelineAggregate);
 	
 	before(Pipeline p): invoke(p){
 		p.stats.markStart();
@@ -57,15 +60,25 @@ public aspect PipeStatisticsAspect {
 		logger.debug("stopped in invoke {} returning {}", p, ct);
 		// System.out.println("returning tjp=" + thisJointPoint);
 		p.stats.markEnd(Status.DONE);
-		fetchEventBus.post(p.stats);
+		if (null == p.stats.getSpecifier()) {
+			// presume it was an aggregate, have to use somne generalized recording mechanism
+			logger.info("after invoke of aggregate {}", p);
+		} else {
+			fetchEventBus.post(p.stats);
+		}
 	}
 	
 	after(Pipeline p) throwing (Exception e) : invoke(p) {
 		logger.debug("stopped in invoke {} throwing {}", p, e);
 		// System.out.println("throwing tjp=" + thisJointPoint);
 		p.stats.markEnd(Status.FAIL);
-		PipeStatisticsWithProblem pswp = new PipeStatisticsWithProblem(p.stats, e);
-		fetchEventBus.post(pswp);
+		if (null == p.stats.getSpecifier()) {
+			// presume it was an aggregate, have to use somne generalized recording mechanism
+			logger.info("after invoke of aggregate {}", p);
+		} else {
+			PipeStatisticsWithProblem pswp = new PipeStatisticsWithProblem(p.stats, e);
+			fetchEventBus.post(pswp);
+		}
 	}
 	
 	// special monitoring for web fetcher
