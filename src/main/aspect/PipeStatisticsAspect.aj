@@ -45,7 +45,6 @@ public aspect PipeStatisticsAspect {
 	// monitor pipeline execution
 	pointcut invoke(Pipeline p):
 		call(* Pipeline.invoke()) &&
-		// TODO Restrict so webfetch is excluded
 		target(p);
 	
 	before(Pipeline p): invoke(p){
@@ -72,7 +71,7 @@ public aspect PipeStatisticsAspect {
 	// special monitoring for web fetcher
 	// gov.usgs.ngwmn.dm.harvest.WebRetriever.WebInputSupplier.makeSupply(Specifier)
 	pointcut webfetch(WebRetriever.WebInputSupplier supplier):
-		call(* *.makeSupply(Specifier)) &&
+		call(* *.initialize()) &&
 		target(supplier);
 	
 	before(WebRetriever.WebInputSupplier s):webfetch(s) {
