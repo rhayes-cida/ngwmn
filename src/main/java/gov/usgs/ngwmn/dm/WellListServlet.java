@@ -83,7 +83,7 @@ public class WellListServlet extends HttpServlet {
 					ww.addAll(wws);
 				}
 			} else if (agencyIDs != null) {
-				// user requested by states
+				// user requested by agencies
 				ww = new ArrayList<WellRegistry>();
 				for (String agencyID: agencyIDs) {
 					List<WellRegistry> wws = dao.selectByAgency(agencyID);
