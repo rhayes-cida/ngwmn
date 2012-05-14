@@ -2,7 +2,6 @@ package gov.usgs.ngwmn.dm.harvest;
 
 
 import gov.usgs.ngwmn.dm.DataFetcher;
-import gov.usgs.ngwmn.dm.cache.PipeStatistics.Status;
 import gov.usgs.ngwmn.dm.io.CopyInvoker;
 import gov.usgs.ngwmn.dm.io.Pipeline;
 import gov.usgs.ngwmn.dm.io.Supplier;

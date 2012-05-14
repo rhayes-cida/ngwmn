@@ -16,7 +16,6 @@ import gov.usgs.ngwmn.dm.io.StatsMaker;
 import gov.usgs.ngwmn.dm.spec.Specifier;
 
 import java.util.List;
-import java.util.ListIterator;
 
 import org.junit.Before;
 import org.junit.Test;

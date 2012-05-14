@@ -1,8 +1,6 @@
 package gov.usgs.ngwmn.dm.io;
 
 
-import gov.usgs.ngwmn.dm.cache.PipeStatistics;
-import gov.usgs.ngwmn.dm.cache.PipeStatistics.Status;
 import gov.usgs.ngwmn.dm.io.executor.Executee;
 import gov.usgs.ngwmn.dm.spec.Specifier;
 

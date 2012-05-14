@@ -1,9 +1,6 @@
 package gov.usgs.ngwmn.functional;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import java.io.ByteArrayOutputStream;
 import java.io.OutputStream;
@@ -13,8 +10,6 @@ import gov.usgs.ngwmn.dm.DataBroker;
 import gov.usgs.ngwmn.dm.SiteNotFoundException;
 import gov.usgs.ngwmn.dm.cache.Cache;
 import gov.usgs.ngwmn.dm.cache.Loader;
-import gov.usgs.ngwmn.dm.cache.PipeStatistics;
-import gov.usgs.ngwmn.dm.cache.PipeStatistics.Status;
 import gov.usgs.ngwmn.dm.cache.Retriever;
 import gov.usgs.ngwmn.dm.cache.fs.FileCache;
 import gov.usgs.ngwmn.dm.dao.ContextualTest;
