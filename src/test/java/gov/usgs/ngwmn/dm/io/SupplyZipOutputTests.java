@@ -32,24 +32,24 @@ public class SupplyZipOutputTests {
 		SupplyZipOutput oz          = new SupplyZipOutput(outs);
 		Supplier<OutputStream> ze   = oz.makeEntry(spec);
 
-		byte buffer[] = new byte[]{0x0,0x1,0x2,0x3,0x4,0x5,0x6,0x7,0x8,0x9};
+		byte buffer[] = PipelineTest.makeBytes(10, 1);
 		ByteArrayInputStream bais = new ByteArrayInputStream(buffer){
-			@Override
-			public int read(byte[] bytes) throws IOException {
-				int length = super.read(bytes);
-				for (int b=0; b<length; b++) {
-					System.out.print(bytes[b]);
-				}
-				System.out.println();
-				return length;
-			}
-			
-			@Override
-			public synchronized int read() {
-				int b = super.read();
-				System.out.println(b);
-				return b;
-			}
+//			@Override
+//			public int read(byte[] bytes) throws IOException {
+//				int length = super.read(bytes);
+//				for (int b=0; b<length; b++) {
+//					System.out.print(bytes[b]);
+//				}
+//				System.out.println();
+//				return length;
+//			}
+//			
+//			@Override
+//			public synchronized int read() {
+//				int b = super.read();
+//				System.out.println(b);
+//				return b;
+//			}
 		};
 		Supplier<InputStream> ins = new SimpleSupplier<InputStream>(bais);
 		
@@ -86,7 +86,7 @@ public class SupplyZipOutputTests {
 		int size = zis.read(buffer);
 		
 //		assertEquals(10, bytes.length);
-		PipelineTest.checkBytes(buffer, 1);
+		PipelineTest.checkBytes(buffer, 10, 1);
 		
 		size = zis.read(buffer);
 		assertEquals(-1, size);

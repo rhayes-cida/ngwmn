@@ -34,13 +34,14 @@ public class FetchRecorderTest extends ContextualTest {
 		dao = ctx.getBean("FetchLogDAO", FetchLogDAO.class);
 	}
 	
-	@Before
-	public void checkSite() throws Exception {
-		PipeStatistics stats = StatsMaker.makeStats(getClass());
+	@Override
+	public void preTest() throws Exception {
+		System.out.println("beforeOnce - checking sites used in these tests.");
 		
-		checkSiteIsVisible(stats.getSpecifier());
+		Specifier spec = StatsMaker.makeStats(getClass()).getSpecifier();
+		checkSiteIsVisible(spec);
 	}
-
+	
 	private int getFetchCount(Specifier spec) {
 		WellRegistryKey well = spec.getWellRegistryKey();
 		List<FetchLog> wfr = dao.byWell(well);

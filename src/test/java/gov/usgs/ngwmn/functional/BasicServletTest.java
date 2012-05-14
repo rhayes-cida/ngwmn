@@ -9,7 +9,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 
-import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -22,15 +21,19 @@ import com.meterware.servletunit.ServletRunner;
 import com.meterware.servletunit.ServletUnitClient;
 
 public class BasicServletTest extends ContextualTest {
-
+	
 	private static final String WELL_LIST_AGENCY_DATA = "http://localhost:8080/ngwmn/data?"+PARAM_AGENCY+"=USGS&"+PARAM_WELLS_LIST+"=402734087033401&"+PARAM_WELLS_LIST+"=402431075020801&"+PARAM_TYPE+"="+WellDataType.WATERLEVEL;
 	private static final String WELL_LIST_DATA = "http://localhost:8080/ngwmn/data?"+PARAM_WELLS_LIST+"=USGS:402734087033401&"+PARAM_WELLS_LIST+"=NJGS:2288614&"+PARAM_TYPE+"="+WellDataType.WATERLEVEL;
 	private static final String WELL_WITH_DATA = "http://localhost:8080/ngwmn/data?"+PARAM_AGENCY+"=USGS&"+PARAM_FEATURE+"=402734087033401";
 	private static final String WELL_NO_DATA   = "http://localhost:8080/ngwmn/data?"+PARAM_AGENCY+"=NJGS&"+PARAM_FEATURE+"=2288614";
 
+//	private final Logger logger = LoggerFactory.getLogger(getClass());	
+	
 	@BeforeClass
 	public static void clearCache() {
+		// TODO on windows this is not the final destination for the cache. it is relative to the working dir
 		File c = new File( getBaseDir() );
+		
 		if (c.exists() && c.isDirectory()) {
 			for (File f : c.listFiles()) {
 				if ( f.canWrite() ) {
@@ -48,18 +51,18 @@ public class BasicServletTest extends ContextualTest {
 		}
 	}
 	
-	@Before
-	public void logSeparator() {
-		System.out.println();
-		System.out.println("    ----");
-		System.out.println();
+	@Override
+	public void preTest() throws Exception {
+		System.out.println("beforeOnce - checking sites used in these tests.");
+		
+		checkSiteIsVisible("NJGS","2288614");
+		checkSiteIsVisible("USGS","400204074145401");
+		checkSiteIsVisible("USGS","402734087033401");
 	}
 	
 	
 	@Test
 	public void test_listOfWells() throws Exception {
-//		checkSiteIsVisible("NJGS","2288614");
-//		checkSiteIsVisible("USGS", "402734087033401");
 		ServletRunner sr = new ServletRunner( getClass().getResourceAsStream("/servlet-test-web.xml"), "/ngwmn");
 		
 		ServletUnitClient sc = sr.newClient();
@@ -86,8 +89,6 @@ public class BasicServletTest extends ContextualTest {
 	
 	@Test
 	public void test_listOfWells_forSingleAgency() throws Exception {
-		checkSiteIsVisible("USGS","400204074145401");
-		checkSiteIsVisible("USGS","402734087033401");
 		ServletRunner sr = new ServletRunner( getClass().getResourceAsStream("/servlet-test-web.xml"), "/ngwmn");
 		
 		ServletUnitClient sc = sr.newClient();
@@ -116,7 +117,6 @@ public class BasicServletTest extends ContextualTest {
 	
 	@Test
 	public void testWithData() throws Exception {
-		checkSiteIsVisible("USGS", "402734087033401");
 		ServletRunner sr = new ServletRunner( getClass().getResourceAsStream("/servlet-test-web.xml"), "/ngwmn");
 		
 		ServletUnitClient sc = sr.newClient();
@@ -134,7 +134,6 @@ public class BasicServletTest extends ContextualTest {
 
 	@Test
 	public void testWithNoData() throws Exception {
-		checkSiteIsVisible("NJGS","2288614");
 		// this site exists, but has no data (on 2012/03/23)
 		ServletRunner sr = new ServletRunner( getClass().getResourceAsStream("/servlet-test-web.xml"), "/ngwmn");
 		

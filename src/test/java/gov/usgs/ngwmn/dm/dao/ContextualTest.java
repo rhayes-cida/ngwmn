@@ -1,5 +1,6 @@
 package gov.usgs.ngwmn.dm.dao;
 
+import java.io.IOException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -11,6 +12,7 @@ import gov.usgs.ngwmn.dm.spec.Specifier;
 import javax.naming.InitialContext;
 import javax.sql.DataSource;
 
+import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.runner.RunWith;
 
@@ -31,11 +33,23 @@ import ch.qos.logback.classic.Level;
 // @ActiveProfiles("local")
 public abstract class ContextualTest {
 	
+	private static String  basedir   = "/tmp/gwdp-cache";
+	private static boolean preTestedOnce;
+	private static boolean databaseAvailable;
+	private static boolean ginAvailable;
+
 	@Autowired
 	protected ApplicationContext ctx;
 
-	private static String basedir = "/tmp/gwdp-cache";
-
+	
+	
+	public static void setBasedir(String basedir) {
+		ContextualTest.basedir = basedir;
+	}
+	public static String getBaseDir() {
+		return basedir;
+	}
+	
 	@BeforeClass
 	public static void setupNaming() throws Exception {
 		final SimpleNamingContextBuilder builder = new SimpleNamingContextBuilder();
@@ -60,13 +74,82 @@ public abstract class ContextualTest {
 		log.setLevel(level);
 	}
 
-	public static void setBasedir(String basedir) {
-		ContextualTest.basedir = basedir;
-	}
-	public static String getBaseDir() {
-		return basedir;
+	@Before
+	public final void logSeparator() {
+		System.out.println();
+		System.out.println("    ----");
+		System.out.println();
 	}
 
+	public final void resourceAvailable(String resource, boolean available) throws Exception {
+		if (available) {
+			System.out.println("preTest: available " + resource);
+		} else {
+			String msg = ">>>> preTest: " + resource + " NOT available <<<<";
+			System.out.println();
+			System.out.println(msg);
+			System.out.println();
+			throw new IOException(msg);
+		}
+	}
+	@Before
+	public final void preTestGin() throws Exception {
+		resourceAvailable("GIN", ginAvailable);
+	}
+	@Before
+	public final void preTestDatabase() throws Exception {
+		resourceAvailable("DATABASE OR TABLE", databaseAvailable);
+	}
+	
+	public final void checkGin() throws Exception {
+		// TODO check GIN system with an http call
+		System.out.println("preTest - gin available");
+	}
+	public final void checkDatabase() throws Exception {
+		System.out.println("preTest - database available");
+		
+		DataSource ds = ctx.getBean("dataSource", DataSource.class);
+		Connection conn = ds.getConnection();
+
+//		import static org.junit.Assume.*; // TODO note that the following line require this import
+//		assumeNotNull(conn); // TODO not sure how to use this method
+		
+		if (conn == null) {
+			String msg = ">>>> DATABASE OR TABLE IS NOT AVAILABLE <<<<";
+			logSeparator();
+			System.out.println(msg);
+			throw new IOException(msg);
+		}
+	}
+	@Before
+	public final void beforeOnce() throws Exception {
+		
+		if ( ! preTestedOnce ) {
+			try {
+				logSeparator();
+				
+				checkDatabase();
+				databaseAvailable = true;
+				
+				checkGin();
+				ginAvailable = true;
+				
+				preTest();
+				preTestedOnce = true;
+				
+			} catch (Exception e) {
+				System.out.println();
+				System.out.println(">>>> beforeOnce ERROR running pre-test method <<<<");
+				System.out.println();
+				e.printStackTrace();
+			}
+		}
+	}
+	public void preTest() throws Exception {
+		// subclasses override to have a preTests run only once.
+	}
+	
+	
 	protected void checkSiteExists(Specifier spec) throws Exception {
 		DataSource ds = ctx.getBean("dataSource", DataSource.class);
 		
