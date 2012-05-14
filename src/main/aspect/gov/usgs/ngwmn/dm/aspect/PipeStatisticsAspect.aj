@@ -5,7 +5,6 @@ import gov.usgs.ngwmn.dm.cache.PipeStatistics;
 import gov.usgs.ngwmn.dm.cache.PipeStatisticsWithProblem;
 import gov.usgs.ngwmn.dm.cache.PipeStatistics.Status;
 import gov.usgs.ngwmn.dm.io.Pipeline;
-import gov.usgs.ngwmn.dm.io.PipelineAggregate;
 import gov.usgs.ngwmn.dm.spec.Specifier;
 import gov.usgs.ngwmn.dm.harvest.WebRetriever;
 
@@ -46,9 +45,8 @@ public aspect PipeStatisticsAspect {
 	// monitor pipeline execution
 	// TODO Find a better way to handle aggregate pipelines
 	pointcut invoke(Pipeline p):
-		call(* Pipeline.invoke()) &&
-		target(p) &&
-		! target(PipelineAggregate);
+		call(* Pipeline.invoke())
+		&& target(p);
 	
 	before(Pipeline p): invoke(p){
 		p.stats.markStart();
@@ -84,8 +82,8 @@ public aspect PipeStatisticsAspect {
 	// special monitoring for web fetcher
 	// gov.usgs.ngwmn.dm.harvest.WebRetriever.WebInputSupplier.makeSupply(Specifier)
 	pointcut webfetch(WebRetriever.WebInputSupplier supplier):
-		call(* *.initialize()) &&
-		target(supplier);
+		call(* *.initialize())
+		&& target(supplier);
 	
 	before(WebRetriever.WebInputSupplier s):webfetch(s) {
 		Pipeline pipe = s.getPipeline();
