@@ -96,7 +96,6 @@
 	</bean>
 		
 	<bean id="DataBroker" class="gov.usgs.ngwmn.dm.DataBroker">
-		<property name="fetchEventBus" ref="FetchEventBus"/>
 		<property name="wellRegistry" ref="WellRegistryDAO"/>
 		<property name="retriever" ref="Retriever"/>
 		<property name="loader" ref="Loader"/>

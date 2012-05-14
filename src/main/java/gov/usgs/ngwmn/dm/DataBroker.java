@@ -1,7 +1,5 @@
 package gov.usgs.ngwmn.dm;
 
-import gov.usgs.ngwmn.dm.cache.PipeStatistics;
-import gov.usgs.ngwmn.dm.cache.PipeStatisticsWithProblem;
 import gov.usgs.ngwmn.dm.dao.WellRegistry;
 import gov.usgs.ngwmn.dm.dao.WellRegistryDAO;
 import gov.usgs.ngwmn.dm.dao.WellRegistryKey;
@@ -17,8 +15,6 @@ import java.io.OutputStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.common.eventbus.EventBus;
-
 public class DataBroker implements ExecFactory {
 
 	private DataFetcher harvester;
@@ -27,7 +23,6 @@ public class DataBroker implements ExecFactory {
 	private DataLoader  loader;
 	
 	private WellRegistryDAO wellDAO;
-	private EventBus fetchEventBus;
 	
 	private Logger logger = LoggerFactory.getLogger(this.getClass());
 	
@@ -125,10 +120,6 @@ public class DataBroker implements ExecFactory {
 	
 	public void setWellRegistry(WellRegistryDAO wellDAO) {
 		this.wellDAO = wellDAO;
-	}
-
-	public void setFetchEventBus(EventBus fetchEventBus) {
-		this.fetchEventBus = fetchEventBus;
 	}
 
 }

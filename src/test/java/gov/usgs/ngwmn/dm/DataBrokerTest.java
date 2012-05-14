@@ -2,9 +2,21 @@ package gov.usgs.ngwmn.dm;
 
 import static org.junit.Assert.*;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.util.concurrent.atomic.AtomicInteger;
+
 import gov.usgs.ngwmn.WellDataType;
 import gov.usgs.ngwmn.dm.dao.ContextualTest;
+import gov.usgs.ngwmn.dm.dao.WellRegistry;
+import gov.usgs.ngwmn.dm.dao.WellRegistryDAO;
+import gov.usgs.ngwmn.dm.dao.WellRegistryKey;
 import gov.usgs.ngwmn.dm.harvest.WebRetriever;
+import gov.usgs.ngwmn.dm.io.Pipeline;
+import gov.usgs.ngwmn.dm.io.SimpleSupplier;
 import gov.usgs.ngwmn.dm.spec.Specifier;
 
 import org.junit.*;
@@ -15,12 +27,12 @@ public class DataBrokerTest extends ContextualTest {
 	
 	@Before
 	public void setUp() {
-		spec = new Specifier("agency","well",WellDataType.LOG);
+		spec = new Specifier("USGS","007",WellDataType.LOG);
 	}
 	
 	@Before
 	public void checkSite() throws Exception {
-		checkSiteIsVisible("USGS", "402734087033401");
+		checkSiteIsVisible("USGS", "007");
 	}
 
 	@Test(expected=NullPointerException.class)
@@ -44,5 +56,73 @@ public class DataBrokerTest extends ContextualTest {
 		assertTrue("should not get here - expecting an exception.", false);
 	}
 		
+	@Test
+	public void testPrefetchCallRetriever() throws Exception {
+		DataBroker broker = new DataBroker();
+		
+		final AtomicInteger retrieverCallCt = new AtomicInteger(0);
+		final AtomicInteger loaderCallCt = new AtomicInteger(0);
+		final AtomicInteger harvestorCallCt = new AtomicInteger(0);
+		
+		
+		broker.setHarvester(new DataFetcher() {
 
+			@Override
+			public boolean configureInput(Specifier spec, Pipeline pipe)
+					throws IOException {
+				harvestorCallCt.incrementAndGet();
+				return false;
+			}
+			
+		});
+		broker.setRetriever(new DataFetcher() {
+
+			@Override
+			public boolean configureInput(Specifier spec, Pipeline pipe)
+					throws IOException {
+				retrieverCallCt.incrementAndGet();
+				return false;
+			}
+			
+		});
+		
+		broker.setWellRegistry(new WellRegistryDAO() {
+
+			@Override
+			public WellRegistry findByKey(WellRegistryKey key) {
+				WellRegistry value = new WellRegistry() {
+
+					@Override
+					public String getDisplayFlag() {
+						return "1";
+					}
+					
+				};
+				return value;
+			}
+			
+		});
+		
+		broker.setLoader(new DataLoader() {
+
+			@Override
+			public boolean configureOutput(Specifier spec, Pipeline pipe)
+					throws IOException {
+				byte[] buf = new byte[10];
+				ByteArrayOutputStream baos = new ByteArrayOutputStream();
+				pipe.setInputSupplier(new SimpleSupplier<InputStream>(new ByteArrayInputStream(buf)));
+				pipe.setOutputSupplier(new SimpleSupplier<OutputStream>(baos));
+				
+				loaderCallCt.incrementAndGet();
+				return true;
+			}
+			
+		});
+		
+		broker.prefetchWellData(spec);
+		
+		assertEquals(1, loaderCallCt.get());
+		assertEquals(1, harvestorCallCt.get());
+		assertEquals(0, retrieverCallCt.get());
+	}
 }
