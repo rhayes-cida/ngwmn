@@ -16,6 +16,7 @@ import gov.usgs.ngwmn.dm.io.StatsMaker;
 import gov.usgs.ngwmn.dm.spec.Specifier;
 
 import java.util.List;
+import java.util.ListIterator;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -83,8 +84,16 @@ public class FetchRecorderTest extends ContextualTest {
 		}
 		
 		// Most recent is first -- list is in descending start time.
-		FetchLog last = wfr.get(0);
-		assertEquals("type", stats.getSpecifier().getTypeID().toString(), last.getDataStream());
+		// but need to skip any entries with null start time, they are synthetic test data
+		FetchLog mostRecent = null;
+		for (FetchLog entry : wfr) {
+			if (entry.getStartedAt() != null) {
+				mostRecent = entry;
+				break;
+			}
+		}
+		
+		assertEquals("type", stats.getSpecifier().getTypeID().toString(), mostRecent.getDataStream());
 		
 		assertTrue("found at least one", type_ct > 0);
 	}
