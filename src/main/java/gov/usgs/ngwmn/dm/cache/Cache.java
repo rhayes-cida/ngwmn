@@ -1,5 +1,6 @@
 package gov.usgs.ngwmn.dm.cache;
 
+import gov.usgs.ngwmn.WellDataType;
 import gov.usgs.ngwmn.dm.io.Pipeline;
 import gov.usgs.ngwmn.dm.spec.Specifier;
 
@@ -22,5 +23,7 @@ public interface Cache {
 	public boolean contains(Specifier spec);
 	
 	public CacheInfo getInfo(Specifier spec);
+	
+	public WellDataType getDatatype();
 }
 

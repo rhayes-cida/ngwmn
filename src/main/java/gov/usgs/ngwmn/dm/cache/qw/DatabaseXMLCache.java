@@ -1,5 +1,6 @@
 package gov.usgs.ngwmn.dm.cache.qw;
 
+import gov.usgs.ngwmn.WellDataType;
 import gov.usgs.ngwmn.dm.cache.Cache;
 import gov.usgs.ngwmn.dm.cache.CacheInfo;
 import gov.usgs.ngwmn.dm.dao.WellRegistryKey;
@@ -32,10 +33,12 @@ public class DatabaseXMLCache implements Cache {
 	private static Logger logger = LoggerFactory.getLogger(DatabaseXMLCache.class);
 	
 	private final String tablename;
+	private final WellDataType wdt;
 	
-	public DatabaseXMLCache(DataSource ds, String tablename, LobHandler h) {
+	public DatabaseXMLCache(DataSource ds, WellDataType datatype, LobHandler h) {
 		this.ds = ds;
-		this.tablename = tablename;
+		wdt = datatype;
+		this.tablename = wdt.name() + "_CACHE";
 		this.handler = h;
 	}
 
@@ -43,6 +46,13 @@ public class DatabaseXMLCache implements Cache {
 	// private PreparedStatement insert;
 	private LobHandler handler;
 	
+	
+	@Override
+	public WellDataType getDatatype() {
+		return wdt;
+	}
+
+
 	@Override
 	public OutputStream destination(final Specifier well) throws IOException {
 		try {

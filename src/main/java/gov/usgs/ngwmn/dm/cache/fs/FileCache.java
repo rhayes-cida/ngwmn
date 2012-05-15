@@ -1,5 +1,6 @@
 package gov.usgs.ngwmn.dm.cache.fs;
 
+import gov.usgs.ngwmn.WellDataType;
 import gov.usgs.ngwmn.dm.cache.Cache;
 import gov.usgs.ngwmn.dm.cache.CacheInfo;
 import gov.usgs.ngwmn.dm.io.FileInputInvoker;
@@ -27,7 +28,13 @@ public class FileCache implements Cache {
 
 	public static final String BASEDIR_JNDI_NAME = "java:comp/env/GWDP/FileCache/basedir";
 	
+	private final WellDataType wdt = WellDataType.ALL;
 	
+	@Override
+	public WellDataType getDatatype() {
+		return wdt;
+	}
+
 	private String filename(Specifier spec) {
 		// Note that there is no requirement to decode a cache file name; 
 		// having the file name be human-readable is helpful for debugging,
