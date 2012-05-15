@@ -1,7 +1,6 @@
 package gov.usgs.ngwmn.dm.dao;
 
 import static org.junit.Assert.*;
-import static org.junit.Assert.assertNotNull;
 
 import java.util.List;
 
@@ -42,7 +41,7 @@ public class FetchLogDAOTest extends ContextualTest {
 	@Test
 	public void testSelectByWell() {
 		long ct = System.currentTimeMillis();
-		FetchLog n = insertWithCt(ct);
+		insertWithCt(ct);
 		
 		WellRegistryKey key = new WellRegistryKey(AGENCY_CD, SITE_NO);
 		

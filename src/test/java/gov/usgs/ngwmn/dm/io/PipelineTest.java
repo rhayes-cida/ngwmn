@@ -1,8 +1,6 @@
 package gov.usgs.ngwmn.dm.io;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import gov.usgs.ngwmn.dm.cache.PipeStatistics;
+import static org.junit.Assert.*;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -49,7 +47,7 @@ public class PipelineTest extends Pipeline {
 		ByteArrayOutputStream os = new ByteArrayOutputStream(10);
 		Supplier<OutputStream> outs1 = new SimpleSupplier<OutputStream>(os);
 		
-		byte buffer[] = new byte[]{0x0,0x1,0x2,0x3,0x4,0x5,0x6,0x7,0x8,0x9};
+		byte buffer[] = makeBytes(10, 1);
 		ByteArrayInputStream is = new ByteArrayInputStream(buffer);
 		Supplier<InputStream> ins = new SimpleSupplier<InputStream>(is);
 		
@@ -59,7 +57,7 @@ public class PipelineTest extends Pipeline {
 		pipe.setInvoker(new CopyInvoker());
 		pipe.invoke();
 		
-		checkBytes( os.toByteArray(), 1 );
+		checkBytes( os.toByteArray(), 10, 1 );
 	}
 	
 	@Test
@@ -70,7 +68,7 @@ public class PipelineTest extends Pipeline {
 		ByteArrayOutputStream os2 = new ByteArrayOutputStream(10);
 		Supplier<OutputStream> outs2 = new SimpleSupplier<OutputStream>(os2);
 
-		byte buffer[] = new byte[]{0x0,0x1,0x2,0x3,0x4,0x5,0x6,0x7,0x8,0x9};
+		byte buffer[] = makeBytes(10, 1);
 		ByteArrayInputStream is = new ByteArrayInputStream(buffer);
 		Supplier<InputStream> ins = new SimpleSupplier<InputStream>(is);
 		
@@ -81,8 +79,8 @@ public class PipelineTest extends Pipeline {
 		pipe.setInvoker(new CopyInvoker());
 		pipe.invoke();
 		
-		checkBytes( os1.toByteArray(), 1 );
-		checkBytes( os2.toByteArray(), 1 );
+		checkBytes( os1.toByteArray(), 10, 1 );
+		checkBytes( os2.toByteArray(), 10, 1 );
 	}
 	
 	@Test
@@ -95,7 +93,7 @@ public class PipelineTest extends Pipeline {
 		ByteArrayOutputStream os3 = new ByteArrayOutputStream(10);
 		Supplier<OutputStream> outs3 = new SimpleSupplier<OutputStream>(os3);
 		
-		byte buffer[] = new byte[]{0x0,0x1,0x2,0x3,0x4,0x5,0x6,0x7,0x8,0x9};
+		byte buffer[] = makeBytes(10, 1);
 		ByteArrayInputStream is = new ByteArrayInputStream(buffer);
 		Supplier<InputStream> ins = new SimpleSupplier<InputStream>(is);
 		
@@ -107,19 +105,28 @@ public class PipelineTest extends Pipeline {
 		pipe.setInvoker(new CopyInvoker());
 		pipe.invoke();
 		
-		checkBytes( os1.toByteArray(), 1 );
-		checkBytes( os2.toByteArray(), 1 );		
-		checkBytes( os3.toByteArray(), 1 );		
+		checkBytes( os1.toByteArray(), 10, 1 );
+		checkBytes( os2.toByteArray(), 10, 1 );		
+		checkBytes( os3.toByteArray(), 10, 1 );		
 	}
 	
 	// used in multiple i/o tests
-	public static void checkBytes(byte bytes[], int factor) {
+	public static void checkBytes(byte bytes[], int length, int factor) {
 		assertNotNull(bytes);
-		assertEquals(10, bytes.length);
+		assertEquals(length, bytes.length);
 		byte n = 0;
 		for (byte b : bytes) {
-			assertEquals(factor*n++,b);
+			assertEquals("Bytes in stream data did not match expectation <" 
+					+ factor*n +"> but was <" + b + ">.", factor*n++,b);
 		}
+	}
+	
+	public static byte[] makeBytes(int length, int factor) {
+		byte bytes[] = new byte[length];
+		for (int b=0; b<length; b++) {
+			bytes[b] = (byte) (b * factor);
+		}
+		return bytes;
 	}
 	
 	@Test
@@ -128,7 +135,7 @@ public class PipelineTest extends Pipeline {
 		ByteArrayOutputStream os = new ByteArrayOutputStream(10);
 		Supplier<OutputStream> outs1 = new SimpleSupplier<OutputStream>(os);
 
-		byte buffer[] = new byte[]{0x0,0x1,0x2,0x3,0x4,0x5,0x6,0x7,0x8,0x9};
+		byte buffer[] = makeBytes(10, 1);
 		ByteArrayInputStream is = new ByteArrayInputStream(buffer);
 		Supplier<InputStream> ins = new SimpleSupplier<InputStream>(is);
 		
@@ -153,6 +160,6 @@ public class PipelineTest extends Pipeline {
 		pipe.setInvoker(new CopyInvoker());
 		pipe.invoke();
 		
-		checkBytes( os.toByteArray(), 2 );
+		checkBytes( os.toByteArray(), 10, 2 );
 	}
 }

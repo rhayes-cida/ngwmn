@@ -30,10 +30,14 @@ public class DataBrokerTest extends ContextualTest {
 		spec = new Specifier("USGS","007",WellDataType.LOG);
 	}
 	
-	@Before
-	public void checkSite() throws Exception {
+	@Override
+	public void preTest() throws Exception {
+		System.out.println("beforeOnce - checking sites used in these tests.");
+		
 		checkSiteIsVisible("USGS", "007");
+		checkSiteIsVisible("USGS", "402734087033401");
 	}
+	
 
 	@Test(expected=NullPointerException.class)
 	public void test_validation_noDataFetchers() {

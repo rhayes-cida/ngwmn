@@ -15,6 +15,7 @@ import java.io.OutputStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+
 public class DataBroker implements ExecFactory {
 
 	private DataFetcher harvester;
@@ -121,5 +122,6 @@ public class DataBroker implements ExecFactory {
 	public void setWellRegistry(WellRegistryDAO wellDAO) {
 		this.wellDAO = wellDAO;
 	}
+
 
 }

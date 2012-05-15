@@ -4,6 +4,7 @@ import gov.usgs.ngwmn.dm.cache.PipeStatistics;
 import gov.usgs.ngwmn.dm.dao.ContextualTest;
 import gov.usgs.ngwmn.dm.io.FetchRecorder;
 import gov.usgs.ngwmn.dm.io.StatsMaker;
+import gov.usgs.ngwmn.dm.spec.Specifier;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -17,9 +18,14 @@ public class FetchLogTest extends ContextualTest {
 	public void setUp() throws Exception {
 		victim = ctx.getBean("FetchRecorder", FetchRecorder.class);
 		//dao = ctx.getBean("FetchLogDAO", FetchLogDAO.class);
+	}
+	
+	@Override
+	public void preTest() throws Exception {
+		System.out.println("beforeOnce - checking sites used in these tests.");
 		
-		PipeStatistics stats = StatsMaker.makeStats(getClass());
-		checkSiteIsVisible(stats.getSpecifier());
+		Specifier spec = StatsMaker.makeStats(getClass()).getSpecifier();
+		checkSiteIsVisible(spec);
 	}
 
 	@Test
