@@ -88,14 +88,16 @@ public class Pipeline implements Executee {
 		try {
 			try {
 				OutputStream os = oss.begin();
+				logger.debug("began oss={}, oss.source={}", oss, oss.getSource());
 				ct = invoker.invoke(is,os);
+				logger.debug("done with invoke, oss={}, oss.source={}", oss, oss.getSource());
 				threw = false;
 			} catch (IOException ioe) {
 				setException(ioe);
-				logger.info("Fail message={}", ioe.getMessage());
+				logger.warn("Fail message={}", ioe.getMessage());
 				throw ioe;
 			} finally {
-				if (oss != null) {
+				if (oss != null && oss.isInitialized()) {
 					oss.end(threw);
 				}
 			}

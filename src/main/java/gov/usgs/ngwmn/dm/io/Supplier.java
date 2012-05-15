@@ -5,6 +5,9 @@ import gov.usgs.ngwmn.dm.spec.Specifier;
 import java.io.Closeable;
 import java.io.IOException;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.google.common.io.Closeables;
 import com.google.common.io.InputSupplier;
 import com.google.common.io.OutputSupplier;
@@ -12,6 +15,7 @@ import com.google.common.io.OutputSupplier;
 public abstract class Supplier<T extends Closeable> implements InputSupplier<T>, OutputSupplier<T> {
 	
 	private T source;
+	protected transient Logger logger = LoggerFactory.getLogger(this.getClass());
 	
 	@Override
 	public final T getInput() throws IOException {
@@ -23,13 +27,17 @@ public abstract class Supplier<T extends Closeable> implements InputSupplier<T>,
 		return begin();
 	}
 	
-	public final T begin() throws IOException {
+	public synchronized final T begin() throws IOException {
 
 		if ( isInitialized() ) {
 			throw new IOException("Supplier must be initiated only once.");
 		}
 		
-		return source = initialize();
+		source = initialize();
+		
+		logger.info("Subclass created a stream {}", source);
+		
+		return source;
 	}
 	
 	public boolean isInitialized() {

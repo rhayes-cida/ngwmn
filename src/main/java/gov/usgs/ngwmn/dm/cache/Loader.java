@@ -18,11 +18,30 @@ import org.slf4j.LoggerFactory;
 public class Loader 
 implements DataLoader {
 
+	private class CacheSavingSupplier extends Supplier<OutputStream> {
+		private final Specifier spec;
+
+		private CacheSavingSupplier(Specifier spec) {
+			this.spec = spec;
+		}
+
+		@Override
+		public OutputStream initialize() throws IOException {
+			try {
+				return makeDestination(spec);
+			} catch (IOException ioe) {
+				String message = "Problem building output stream for spec " + spec;
+				logger.error(message, ioe);
+				throw new IOException(message, ioe);
+			}
+		}
+	}
+
 	private Map<WellDataType, Cache> caches;
 	
 	private Logger logger = LoggerFactory.getLogger(this.getClass());
 	
-	public OutputStream destination(Specifier spec) 
+	public OutputStream makeDestination(Specifier spec) 
 			throws IOException
 	{
 		Cache cache = caches.get(spec.getTypeID());
@@ -42,22 +61,13 @@ implements DataLoader {
 			caches.put(c.getDatatype(), c);
 		}
 	}
+	
+	
 
 	@Override
 	public boolean configureOutput(final Specifier spec, Pipeline pipe) throws IOException {
 			
-		pipe.addOutputSupplier( new Supplier<OutputStream>() {				
-			@Override
-			public OutputStream initialize() throws IOException {
-				try {
-					return Loader.this.destination(spec);
-				} catch (IOException ioe) {
-					String message = "Problem building output stream for spec " + spec;
-					logger.error(message, ioe);
-					throw new IOException(message, ioe);
-				}
-			}
-		});
+		pipe.addOutputSupplier( new CacheSavingSupplier(spec));
 		// TODO can inject more outputsuppliers for stats and whatnot
 			
 		return true;
