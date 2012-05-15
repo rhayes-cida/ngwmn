@@ -27,6 +27,7 @@ public class DataBrokerIntegrationTest extends ContextualTest {
 
 	private static final String AGENCY_CD = "USGS";
 	private static final String SITE_NO = "402734087033401";
+	private static final long TIMESLOP = 1000;
 	private DataBroker dataBroker;
 	private Cache qualityCache;
 	private Cache fileCache;
@@ -75,7 +76,8 @@ public class DataBrokerIntegrationTest extends ContextualTest {
 
 	@Test
 	public void testPrefetch_ALL() throws Exception {
-		Date bot = new Date();
+		// allow for some slop in the clock
+		Date bot = new Date(System.currentTimeMillis() - TIMESLOP);
 		
 		Specifier spec = makeSpec(AGENCY_CD,SITE_NO);
 
@@ -91,7 +93,8 @@ public class DataBrokerIntegrationTest extends ContextualTest {
 	
 	@Test
 	public void testPrefetch_QUALITY() throws Exception {
-		Date bot = new Date();
+		// allow for some slop in the clock
+		Date bot = new Date(System.currentTimeMillis() - TIMESLOP);
 		Specifier spec = makeSpec(AGENCY_CD,SITE_NO, WellDataType.QUALITY);
 
 		long ct = dataBroker.prefetchWellData(spec);
