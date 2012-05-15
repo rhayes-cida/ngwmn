@@ -15,6 +15,9 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSortedMap;
+
 public class Loader 
 implements DataLoader {
 
@@ -39,7 +42,7 @@ implements DataLoader {
 
 	private Map<WellDataType, Cache> caches;
 	
-	private Logger logger = LoggerFactory.getLogger(this.getClass());
+	protected transient Logger logger = LoggerFactory.getLogger(this.getClass());
 	
 	public OutputStream makeDestination(Specifier spec) 
 			throws IOException
@@ -56,18 +59,23 @@ implements DataLoader {
 	}
 
 	public Loader(Collection<Cache> cc) {
-		caches = new HashMap<WellDataType, Cache>(WellDataType.values().length);
+		ImmutableMap.Builder<WellDataType,Cache> builder = ImmutableSortedMap.naturalOrder();		
 		for (Cache c : cc) {
-			caches.put(c.getDatatype(), c);
+			builder.put(c.getDatatype(), c);
 		}
+		caches = builder.build();
+		
+		logger.debug("initialized, cache map = {}", caches);
 	}
 	
-	
+	public Map<WellDataType, Cache> getCacheMap() {
+		return caches;
+	}
 
 	@Override
 	public boolean configureOutput(final Specifier spec, Pipeline pipe) throws IOException {
 			
-		pipe.addOutputSupplier( new CacheSavingSupplier(spec));
+		pipe.addOutputSupplier(new CacheSavingSupplier(spec));
 		// TODO can inject more outputsuppliers for stats and whatnot
 			
 		return true;

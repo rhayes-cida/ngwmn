@@ -191,6 +191,15 @@ public class FileCache implements Cache {
 		
 		return new CacheInfo(created, exists, modified, sz);
 	}
+
+	@Override
+	public String toString() {
+		StringBuilder builder = new StringBuilder();
+		builder.append("FileCache [basedir=").append(basedir).
+			// append(", wdt=").append(wdt).
+			append("]");
+		return builder.toString();
+	}
 	
 	
 }

@@ -1,4 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" ?>
+<%@page import="gov.usgs.ngwmn.dm.cache.Loader"%>
+<%@page import="gov.usgs.ngwmn.dm.cache.Cache"%>
 <%@page import="gov.usgs.ngwmn.dm.dao.CacheMetaDataDAO"%>
 <%@ page import="org.springframework.web.context.support.WebApplicationContextUtils"%>
 <%@ page language="java" contentType="text/html; charset=UTF-8"
@@ -10,6 +12,9 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<style type="text/css">
+th { text-align: left; }
+</style>
 <title>Ground Water Data Cache</title>
 </head>
 <body>
@@ -23,20 +28,26 @@ ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(config.getServ
 
 CacheMetaDataDAO
 dao = ctx.getBean("CacheMetaDataDAO", CacheMetaDataDAO.class);
+
+Loader loader = ctx.getBean("Loader", Loader.class);
 %>
 
-<p>
-Storage: FileCache<br />
-Base directory: <%= ctx.getBean("FSCache.basedir") %><br />
-</p>
+<h2>Caches:</h2>
+<table>
+<tr><th>Data type</th><th>Cache</th></tr>
+<c:forEach  var="cmi" items="<%= loader.getCacheMap().entrySet() %>">
+<tr><td><c:out value="${cmi.key}"/></td><td><c:out value="${cmi.value}"/></td></tr>
+</c:forEach>
+</table>
 
+<h2>Fetch record:</h2>
 <table>
 <tr>
-<th>Agency Code</th>
+<th>Agency<br/>Code</th>
 <th>Site #</th>
 <th>Data Type</th>
-<th>Success Count</th>
-<th>Fail Count</th>
+<th>Success<br/>Count</th>
+<th>Fail<br/>Count</th>
 <th>Last Success</th>
 </tr>
 

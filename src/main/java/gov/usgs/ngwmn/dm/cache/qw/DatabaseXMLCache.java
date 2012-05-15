@@ -246,4 +246,17 @@ public class DatabaseXMLCache implements Cache {
 		
 	}
 
+
+	@Override
+	public String toString() {
+		StringBuilder builder = new StringBuilder();
+		builder.append("DatabaseXMLCache [")
+				.append("tablename=").append(tablename)
+		// 		.append(", ds=").append(ds)
+				.append("]");
+		return builder.toString();
+	}
+	
+	
+
 }
