@@ -198,6 +198,7 @@ public class DatabaseXMLCache implements Cache {
 		try {
 		Connection conn = ds.getConnection();
 			try {
+				// TODO Do not really need to fetch all rows.
 				PreparedStatement ps = conn.prepareStatement("SELECT fetch_date, " +
 						"dbms_lob.getlength(xmltype.getclobval(xml)) sz " +
 						"from GW_DATA_PORTAL."+tablename+" " +

@@ -100,6 +100,7 @@ public class DataBrokerIntegrationTest extends ContextualTest {
 		
 		CacheInfo info = qualityCache.getInfo(spec);
 		assertTrue("cache exists", info.isExists());
+		System.out.printf("now %s, modified %s\n", bot, info.getModified());
 		assertTrue("is recent",  ! info.getModified().before(bot));
 		assertEquals("cached size", ct, info.getLength());
 	}
