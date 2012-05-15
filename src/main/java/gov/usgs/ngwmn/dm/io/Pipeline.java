@@ -103,7 +103,7 @@ public class Pipeline implements Executee {
 			}
 		// TODO maybe a catch here too?!
 		} finally {
-			if (iss != null) {
+			if (iss != null && iss.isInitialized()) {
 				iss.end(threw);
 			}
 		}
