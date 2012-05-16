@@ -11,28 +11,28 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
-public class ParallelExec implements Executee {
-	ExecFactory 		   factory;
+public class ParallelFlowAggregator implements Flow {
+	FlowFactory 		   factory;
 	Iterable<Specifier>    specifiers;
 	Supplier<OutputStream> output;
 	
 	int parallex = 1;
     
-    public ParallelExec(ExecFactory fac, Iterable<Specifier> specs, OutputStream out) {
+    public ParallelFlowAggregator(FlowFactory fac, Iterable<Specifier> specs, OutputStream out) {
     	factory    = fac;
     	specifiers = specs;
     	output     =  new SimpleSupplier<OutputStream>(out);
     }
-    public ParallelExec(ExecFactory fac, Iterable<Specifier> specs, OutputStream out, int parallelism) {
+    public ParallelFlowAggregator(FlowFactory fac, Iterable<Specifier> specs, OutputStream out, int parallelism) {
     	this(fac, specs, out);
     	parallex = parallelism;
     }
     
     @Override
     public Void call() throws Exception {
-    	List<Executee> execs = new LinkedList<Executee>();
+    	List<Flow> execs = new LinkedList<Flow>();
         for (Specifier spec : specifiers) {
-        	execs.add( factory.makeExecutor(spec, output) );
+        	execs.add( factory.makeFlow(spec, output) );
         }
         
         ExecutorService exec = Executors.newFixedThreadPool(parallex);

@@ -5,8 +5,8 @@ import gov.usgs.ngwmn.dm.dao.WellRegistryDAO;
 import gov.usgs.ngwmn.dm.dao.WellRegistryKey;
 import gov.usgs.ngwmn.dm.io.Pipeline;
 import gov.usgs.ngwmn.dm.io.Supplier;
-import gov.usgs.ngwmn.dm.io.executor.ExecFactory;
-import gov.usgs.ngwmn.dm.io.executor.Executee;
+import gov.usgs.ngwmn.dm.io.executor.FlowFactory;
+import gov.usgs.ngwmn.dm.io.executor.Flow;
 import gov.usgs.ngwmn.dm.spec.Specifier;
 
 import java.io.IOException;
@@ -16,7 +16,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 
-public class DataBroker implements ExecFactory {
+public class DataBroker implements FlowFactory {
 
 	private DataFetcher harvester;
 	private DataFetcher retriever;
@@ -28,13 +28,13 @@ public class DataBroker implements ExecFactory {
 	private Logger logger = LoggerFactory.getLogger(this.getClass());
 	
 	public void fetchWellData(Specifier spec, final Supplier<OutputStream> out) throws Exception {
-		Pipeline pipe = (Pipeline) makeExecutor(spec, out);
+		Pipeline pipe = (Pipeline) makeFlow(spec, out);
 		invokePipe(pipe);
 		logger.info("Completed request operation for {}", spec);
 	}
 	
 	public long prefetchWellData(Specifier spec) throws Exception {
-		Pipeline pipe = (Pipeline) makeExecutor(spec, null);
+		Pipeline pipe = (Pipeline) makeFlow(spec, null);
 		long ct = invokePipe(pipe);
 		logger.info("Completed prefetch operation for {}", spec);
 		return ct;
@@ -44,7 +44,7 @@ public class DataBroker implements ExecFactory {
 		return pipe.invoke();
 	}
 	
-	public Executee makeExecutor(Specifier spec, Supplier<OutputStream> out) throws IOException {	
+	public Flow makeFlow(Specifier spec, Supplier<OutputStream> out) throws IOException {	
 
 		check(spec);
 		checkSiteExists(spec);
