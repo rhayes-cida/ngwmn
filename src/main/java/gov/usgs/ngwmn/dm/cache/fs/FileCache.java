@@ -77,7 +77,7 @@ public class FileCache implements Cache {
 			throws IOException
 	{
 		File file = contentFile(spec);
-		File tmpFile = File.createTempFile("LDR", ".xml");
+		File tmpFile = File.createTempFile("LDR", "." + spec.getTypeID().suffix);
 		
 		OutputStream tmp = new TempfileOutputStream(file, tmpFile);
 		logger.info("Created tempfile output for {}", spec);
