@@ -11,11 +11,7 @@ import gov.usgs.ngwmn.dm.DataBroker;
 import gov.usgs.ngwmn.dm.SiteNotFoundException;
 import gov.usgs.ngwmn.dm.cache.Cache;
 import gov.usgs.ngwmn.dm.cache.CacheInfo;
-import gov.usgs.ngwmn.dm.cache.Loader;
-import gov.usgs.ngwmn.dm.cache.Retriever;
-import gov.usgs.ngwmn.dm.cache.fs.FileCache;
 import gov.usgs.ngwmn.dm.dao.ContextualTest;
-import gov.usgs.ngwmn.dm.harvest.WebRetriever;
 import gov.usgs.ngwmn.dm.io.SimpleSupplier;
 import gov.usgs.ngwmn.dm.io.Supplier;
 import gov.usgs.ngwmn.dm.spec.Specifier;
@@ -34,7 +30,7 @@ public class DataBrokerIntegrationTest extends ContextualTest {
 	
 	@Before
 	public void setUp() throws Exception {
-		FileCache c = ctx.getBean("FileCache",  FileCache.class);
+		//FileCache c = ctx.getBean("FileCache",  FileCache.class);
 		dataBroker  = ctx.getBean("DataBroker", DataBroker.class);		
 		qualityCache = ctx.getBean("QualityCache", Cache.class);
 		fileCache = ctx.getBean("FileCache", Cache.class);

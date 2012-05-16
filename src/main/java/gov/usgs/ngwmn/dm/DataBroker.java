@@ -5,7 +5,6 @@ import gov.usgs.ngwmn.dm.dao.WellRegistryDAO;
 import gov.usgs.ngwmn.dm.dao.WellRegistryKey;
 import gov.usgs.ngwmn.dm.io.Pipeline;
 import gov.usgs.ngwmn.dm.io.Supplier;
-import gov.usgs.ngwmn.dm.io.aggregate.Flow;
 import gov.usgs.ngwmn.dm.io.aggregate.FlowFactory;
 import gov.usgs.ngwmn.dm.spec.Specifier;
 
@@ -44,7 +43,7 @@ public class DataBroker implements FlowFactory {
 		return pipe.invoke();
 	}
 	
-	public Flow makeFlow(Specifier spec, Supplier<OutputStream> out) throws IOException {	
+	public Pipeline makeFlow(Specifier spec, Supplier<OutputStream> out) throws IOException {	
 
 		check(spec);
 		checkSiteExists(spec);
