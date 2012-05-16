@@ -83,7 +83,7 @@ public class DataBrokerIntegrationTest extends ContextualTest {
 		
 		CacheInfo info = fileCache.getInfo(spec);
 		assertTrue("cache exists", info.isExists());
-//		assertTrue("is recent",  ! info.getModified().before(bot));
+		assertTrue("Cache was not updated - expect the entry to have a modified time after test commenced.",  ! info.getModified().before(bot));
 		assertEquals("cached size", ct, info.getLength());
 	}
 	
