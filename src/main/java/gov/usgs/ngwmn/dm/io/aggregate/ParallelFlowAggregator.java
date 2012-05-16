@@ -1,4 +1,4 @@
-package gov.usgs.ngwmn.dm.io.executor;
+package gov.usgs.ngwmn.dm.io.aggregate;
 
 import gov.usgs.ngwmn.dm.io.SimpleSupplier;
 import gov.usgs.ngwmn.dm.io.Supplier;

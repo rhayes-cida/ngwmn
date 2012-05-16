@@ -5,8 +5,8 @@ import gov.usgs.ngwmn.dm.dao.WellRegistryDAO;
 import gov.usgs.ngwmn.dm.dao.WellRegistryKey;
 import gov.usgs.ngwmn.dm.io.Pipeline;
 import gov.usgs.ngwmn.dm.io.Supplier;
-import gov.usgs.ngwmn.dm.io.executor.FlowFactory;
-import gov.usgs.ngwmn.dm.io.executor.Flow;
+import gov.usgs.ngwmn.dm.io.aggregate.Flow;
+import gov.usgs.ngwmn.dm.io.aggregate.FlowFactory;
 import gov.usgs.ngwmn.dm.spec.Specifier;
 
 import java.io.IOException;

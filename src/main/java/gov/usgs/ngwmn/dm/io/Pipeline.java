@@ -1,6 +1,6 @@
 package gov.usgs.ngwmn.dm.io;
 
-import gov.usgs.ngwmn.dm.io.executor.Flow;
+import gov.usgs.ngwmn.dm.io.aggregate.Flow;
 import gov.usgs.ngwmn.dm.spec.Specifier;
 
 import java.io.IOException;
