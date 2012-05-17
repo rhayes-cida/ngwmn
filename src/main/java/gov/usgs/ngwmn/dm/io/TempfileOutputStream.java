@@ -38,7 +38,29 @@ public class TempfileOutputStream extends OutputStream {
 	public void close() throws IOException {
 		try {
 			delegate.close();
-			tempfile.renameTo(endpoint);
+			File endpointTmp = new File(endpoint.getAbsoluteFile() + "_tmp");
+			if ( endpoint.exists() ) {
+				if ( ! endpoint.renameTo(endpointTmp)) { // try to protect the original if rename fails
+					throw new IOException("Failed to protect, via rename, original cache file " + endpoint.getAbsolutePath()
+							+ " -> " + endpointTmp.getAbsolutePath());
+				}
+			}
+			if ( ! tempfile.renameTo(endpoint) ) {
+				if ( endpointTmp.exists() ) { // try to put original back
+					if ( ! endpointTmp.renameTo(endpoint) ) {
+						logger.warn("Failed to replace protected file, via rename, original cache file " 
+								+ endpointTmp.getAbsolutePath()
+							+ " -> " + endpoint.getAbsolutePath());
+					}
+				}
+				throw new IOException("Failed to move, via rename, file " + tempfile.getAbsolutePath()
+						+ " -> " + endpoint.getAbsolutePath());
+			}				
+			if ( endpointTmp.exists() ) { // try to remove original
+				if ( ! endpointTmp.delete() ) {
+					logger.warn("Failed to delete tmp cache file " + endpointTmp.getAbsolutePath() );
+				}
+			}
 			logger.info("Made tempfile permanent for {}", endpoint);
 		} catch (IOException e) {
 			logger.warn("Problem in closing tempfile for {}", endpoint);

@@ -1,4 +1,4 @@
-package gov.usgs.ngwmn.dm.io.executor;
+package gov.usgs.ngwmn.dm.io.aggregate;
 
 import gov.usgs.ngwmn.dm.io.SimpleSupplier;
 import gov.usgs.ngwmn.dm.io.Supplier;
@@ -9,34 +9,34 @@ import java.io.OutputStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class SequentialExec implements Executee {
+public class SequentialFlowAggregator implements Flow {
 
 	private Logger logger = LoggerFactory.getLogger(getClass());
 	
-	protected ExecFactory 		     factory;
+	protected FlowFactory 		     factory;
 	protected Iterable<Specifier>    specifiers;
 	protected Supplier<OutputStream> output;
     
-    public SequentialExec(ExecFactory fac, Iterable<Specifier> specs, Supplier<OutputStream> out) {
+    public SequentialFlowAggregator(FlowFactory fac, Iterable<Specifier> specs, Supplier<OutputStream> out) {
     	factory    = fac;
     	specifiers = specs;
     	output     = out;
     }
-    public SequentialExec(ExecFactory fac, Iterable<Specifier> specs, OutputStream out) {
+    public SequentialFlowAggregator(FlowFactory fac, Iterable<Specifier> specs, OutputStream out) {
     	this(fac,specs, new SimpleSupplier<OutputStream>(out));
     }
 
     
     @Override
     public Void call() throws Exception {
-    	Executee exec = null;
+    	Flow exec = null;
     	boolean threw = true;
     	try {
     		output.begin();
     		
 	        for (Specifier spec : specifiers) {
 	        	logger.info("Getting well data for {}", spec);
-	        	exec = factory.makeExecutor(spec, output.makeEntry(spec));
+	        	exec = factory.makeFlow(spec, output.makeEntry(spec));
 	        	exec.call();
 	        }
         	threw = false;
@@ -50,7 +50,7 @@ public class SequentialExec implements Executee {
         return null;
     }
     
-    public boolean handleErrors(Executee exec, Exception problem) {
+    public boolean handleErrors(Flow exec, Exception problem) {
     	// default error handler
     	return false;
     }

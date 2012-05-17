@@ -4,8 +4,8 @@ import gov.usgs.ngwmn.WellDataType;
 import gov.usgs.ngwmn.dm.io.HttpResponseSupplier;
 import gov.usgs.ngwmn.dm.io.Supplier;
 import gov.usgs.ngwmn.dm.io.SupplyZipOutput;
-import gov.usgs.ngwmn.dm.io.executor.Executee;
-import gov.usgs.ngwmn.dm.io.executor.SequentialExec;
+import gov.usgs.ngwmn.dm.io.aggregate.Flow;
+import gov.usgs.ngwmn.dm.io.aggregate.SequentialFlowAggregator;
 import gov.usgs.ngwmn.dm.spec.SpecResolver;
 import gov.usgs.ngwmn.dm.spec.Specification;
 import gov.usgs.ngwmn.dm.spec.Specifier;
@@ -69,15 +69,15 @@ public class DataManagerServlet extends HttpServlet {
 			Supplier<OutputStream> outs = new HttpResponseSupplier(spect, resp);
 					
 			try {
-				Executee exec = null;
+				Flow exec = null;
 				if ( spect.isBundled() ) {
 					SpecResolver resolver = new WellListResolver();
 					outs = new SupplyZipOutput(outs);
-					exec = new SequentialExec(db, resolver.specIterator(spect), outs);
+					exec = new SequentialFlowAggregator(db, resolver.specIterator(spect), outs);
 				} else {
 					// TODO initial impl of single unbundled request
 					// this is required because there is only one pipe and the seq exec calls begin unnecessarily
-					exec = db.makeExecutor(spect.getWellIDs().get(0), outs);
+					exec = db.makeFlow(spect.getWellIDs().get(0), outs);
 				}
 				exec.call();
 			} catch (SiteNotFoundException nse) {

@@ -1,6 +1,6 @@
 package gov.usgs.ngwmn.dm.io;
 
-import gov.usgs.ngwmn.dm.io.executor.Executee;
+import gov.usgs.ngwmn.dm.io.aggregate.Flow;
 import gov.usgs.ngwmn.dm.spec.Specifier;
 
 import java.io.IOException;
@@ -10,7 +10,7 @@ import java.io.OutputStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class Pipeline implements Executee {
+public class Pipeline implements Flow {
 	
 	private static Logger logger = LoggerFactory.getLogger(Pipeline.class);	
 
