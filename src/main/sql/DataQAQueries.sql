@@ -31,3 +31,20 @@ where
 not XMLExists('//*:CharacteristicName'
 passing qc.xml
 );
+
+-- have to figure out how to unpack the results of these queries...
+select qc.quality_cache_id,
+XMLQuery(
+'for $cn in //*:CharacteristicName return "count($cn)"'
+passing qc.xml
+returning content
+) cn_ct
+from quality_cache qc;
+
+select qc.quality_cache_id,
+XMLQuery(
+'count(//*:CharacteristicName)'
+passing qc.xml
+returning content
+) cn_ct
+from quality_cache qc;
