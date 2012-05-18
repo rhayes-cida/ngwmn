@@ -265,7 +265,7 @@ group by quality_cache_id;
 select 
 	qc.quality_cache_id,
 	xq.cn,
-	count(distinct (xq.dt)), 
+	count(xq.dt), 
 	min(xq.dt),
 	max(xq.dt)
 from 

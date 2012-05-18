@@ -8,9 +8,9 @@ public class CacheInfo {
 	private Date modified;
 	private long length;
 	private String md5;
+	private String published;
 	
-	
-	public CacheInfo(Date created, boolean exists, Date modified, long length, String hash) {
+	public CacheInfo(Date created, boolean exists, Date modified, long length, String hash, String published) {
 		super();
 		this.created = created;
 		this.exists = exists;
@@ -33,6 +33,11 @@ public class CacheInfo {
 	public String getMd5() {
 		return md5;
 	}
-	
+	public Boolean getPublished() {
+		if (published == null) {
+			return null;
+		}
+		return ("Y".equalsIgnoreCase(published));
+	}
 	
 }

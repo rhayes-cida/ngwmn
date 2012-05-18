@@ -14,6 +14,7 @@ import java.io.FilterOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.math.BigDecimal;
 import java.security.DigestOutputStream;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -40,6 +41,7 @@ public class DatabaseXMLCache implements Cache {
 	
 	private final String tablename;
 	private final WellDataType wdt;
+	private Inspector inspector;
 	
 	public DatabaseXMLCache(DataSource ds, WellDataType datatype, LobHandler h) {
 		this.ds = ds;
@@ -52,13 +54,30 @@ public class DatabaseXMLCache implements Cache {
 	// private PreparedStatement insert;
 	private LobHandler handler;
 	
-	
+	public Inspector getInspector() {
+		return inspector;
+	}
+	public void setInspector(Inspector inspector) {
+		this.inspector = inspector;
+	}
+
 	@Override
 	public WellDataType getDatatype() {
 		return wdt;
 	}
 
-
+	public void inspectAndRelease(int key) {
+		try {
+			if (inspector.acceptable(key)) {
+				publish(key);
+			} else {
+				withdraw(key);
+			}
+		} catch (Exception e) {
+			logger.error("Problem in inspectAndRelease " + key, e);
+		}
+	}
+	
 	@Override
 	public OutputStream destination(final Specifier well) throws IOException {
 		try {
@@ -95,15 +114,19 @@ public class DatabaseXMLCache implements Cache {
 							char[] hex = Hex.encodeHex(raw);
 							hash = new String(hex);
 						}
-						insert(conn, key, clob, hash);
+						int newkey = insert(conn, key, clob, hash);
 						conn.commit();
 						// TODO Clean up clob?
 						clob.free();
 						conn.close();
 						logger.info("saved data for {}, sz {}", well, length);
+						
+						// TODO should invoke this aysnchronously
+						inspectAndRelease(newkey);
 					} catch (SQLException sqle) {
 						throw new IOException(sqle);
 					}
+					
 				}
 			};
 			
@@ -115,8 +138,34 @@ public class DatabaseXMLCache implements Cache {
 		}
 	}
 
+	public void publish(int id) throws Exception {
+			setPublished(id, "Y");
+	}
+
+	public void withdraw(int id) throws Exception {
+		setPublished(id, "N");
+	}
 	
-	// TODO code review : the complexity on this method is too high such that the final return is not even called.
+	private void setPublished(int id, String flag) throws SQLException, Exception {
+		final Connection conn = ds.getConnection();
+		try {
+			PreparedStatement s = conn.prepareStatement("UPDATE GW_DATA_PORTAL." + tablename + " " +
+					"SET published = ? " +
+					"WHERE " + tablename+"_id = ? ");
+			
+			s.setString(1,flag);
+			s.setInt(2, id);
+			
+			int ct = s.executeUpdate();
+			if (ct != 1) {
+				throw new Exception("Unexpected update count");
+			}
+			
+		} finally {
+			conn.close();
+		}
+	}
+	
 	@Override
 	public boolean fetchWellData(final Specifier spec, Pipeline pipe)
 			throws IOException {
@@ -124,7 +173,12 @@ public class DatabaseXMLCache implements Cache {
 		try {
 			final Connection conn = ds.getConnection();
 			// To use the getCLOBVal function, the table alias must be explicit; use of the implicit alias fails with error ORA-00904
-			String query = "SELECT cachetable.fetch_date, cachetable.xml.getCLOBVal() FROM GW_DATA_PORTAL."+tablename+" cachetable WHERE cachetable.agency_cd = ? and cachetable.site_no = ? order by cachetable.fetch_date DESC";
+			String query = "SELECT cachetable.fetch_date, cachetable.xml.getCLOBVal() " +
+					"FROM GW_DATA_PORTAL."+tablename+" cachetable " +
+					"WHERE cachetable.agency_cd = ? and cachetable.site_no = ? " +
+					"AND cachetable.published = 'Y' " +
+					"AND cachetable.xml IS NOT NULL " +
+					"ORDER BY cachetable.fetch_date DESC ";
 			PreparedStatement ps = conn.prepareStatement(query);
 			ps.setMaxRows(1);
 			ps.setString(1, spec.getAgencyID());
@@ -186,7 +240,8 @@ public class DatabaseXMLCache implements Cache {
 		try {
 			conn = ds.getConnection();
 			try {
-				String query = "SELECT count(*) FROM GW_DATA_PORTAL."+tablename+" WHERE agency_cd = ? and site_no = ? ";
+				String query = "SELECT count(*) FROM GW_DATA_PORTAL."+tablename+" WHERE agency_cd = ? and site_no = ? " +
+						"AND published = 'Y' AND xml IS NOT NULL ";
 				PreparedStatement ps = conn.prepareStatement(query);
 				try {
 					ps.setString(1, spec.getAgencyID());
@@ -218,6 +273,7 @@ public class DatabaseXMLCache implements Cache {
 		boolean exists = false;
 		long length = 0;
 		String md5 = null;
+		String published = null;
 		
 		try {
 		Connection conn = ds.getConnection();
@@ -227,6 +283,7 @@ public class DatabaseXMLCache implements Cache {
 						" fetch_date " +
 						",dbms_lob.getlength(xmltype.getclobval(xml)) sz " +
 						",md5 " +
+						",published " +
 						"from GW_DATA_PORTAL."+tablename+" " +
 						"where agency_cd = ? and site_no = ? " +
 						"order by fetch_date ASC ");
@@ -242,6 +299,7 @@ public class DatabaseXMLCache implements Cache {
 					modified = rs.getTimestamp(1);
 					length = rs.getLong(2);
 					md5 = rs.getString(3);
+					published = rs.getString(4);
 					logger.trace("Row fetch_date {}, length {}", modified, length);
 				}
 			} finally {
@@ -251,12 +309,12 @@ public class DatabaseXMLCache implements Cache {
 			throw new RuntimeException(sqle);
 		}
 		
-		CacheInfo val = new CacheInfo(created, exists, modified, length, md5);
+		CacheInfo val = new CacheInfo(created, exists, modified, length, md5, published);
 		return val;
 	}
 
 	// Cannot do the insert until the Clob has been filled up
-	private void insert(Connection conn, WellRegistryKey key, Clob clob, String hash) 
+	private int insert(Connection conn, WellRegistryKey key, Clob clob, String hash) 
 			throws SQLException
 	{
 		String SQLTEXT = "INSERT INTO GW_DATA_PORTAL."+tablename+"(agency_cd,site_no,fetch_date,xml,md5) VALUES (" +
@@ -274,10 +332,12 @@ public class DatabaseXMLCache implements Cache {
 		s.executeUpdate();
 		
 		ResultSet gkrs = s.getGeneratedKeys();
+		BigDecimal newkey = null;
 		while (gkrs.next()) {
-			logger.info("Generated key {}", gkrs.getBigDecimal(1));
+			newkey = gkrs.getBigDecimal(1);
+			logger.info("Generated key {}", newkey);
 		}
-		
+		return newkey.intValueExact();
 	}
 
 	public int cleanCache(WellRegistryKey key) throws Exception {

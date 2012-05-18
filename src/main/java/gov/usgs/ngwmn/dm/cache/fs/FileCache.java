@@ -190,7 +190,7 @@ public class FileCache implements Cache {
 			sz = f.length();
 		}
 		
-		return new CacheInfo(created, exists, modified, sz, null);
+		return new CacheInfo(created, exists, modified, sz, null,"Y");
 	}
 
 	@Override
