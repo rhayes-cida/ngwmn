@@ -23,6 +23,8 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.sql.DataSource;
 
@@ -260,7 +262,8 @@ public class DatabaseXMLCache implements Cache {
 		String SQLTEXT = "INSERT INTO GW_DATA_PORTAL."+tablename+"(agency_cd,site_no,fetch_date,xml,md5) VALUES (" +
 				"?, ?, ?, XMLType(?), ?)";
 		
-		PreparedStatement s = conn.prepareStatement(SQLTEXT);
+		int[] pkColumns = {1};
+		PreparedStatement s = conn.prepareStatement(SQLTEXT, pkColumns);
 		
 		s.setString(1, key.getAgencyCd());
 		s.setString(2, key.getSiteNo());
@@ -268,31 +271,56 @@ public class DatabaseXMLCache implements Cache {
 		s.setClob(4, clob);
 		s.setString(5, hash);
 				
-		s.execute();
+		s.executeUpdate();
+		
+		ResultSet gkrs = s.getGeneratedKeys();
+		while (gkrs.next()) {
+			logger.info("Generated key {}", gkrs.getBigDecimal(1));
+		}
 		
 	}
 
-	public int cleanCache() throws Exception {
-		// TODO This cauese Oracle problems when there is nothing to clean.
-		// TODO re-write to operate per-well, and do the iteration in Java
-		// not as a SQL operation (thanks, Oracle).
-		String update = 
-"update GW_DATA_PORTAL."+tablename+" set xml = null " +
-"where "+tablename+"_id in " +
-"(select t1."+tablename+"_id from GW_DATA_PORTAL."+tablename+" t1"+
-" where fetch_date < (select max(fetch_date) from GW_DATA_PORTAL."+tablename+" t2"+
-"                     where t2.md5 = t1.md5"+
-"                     and t2.agency_cd = t1.agency_cd"+
-"                     and t2.site_no = t1.site_no)"+
-" AND xml is not null)";
+	public int cleanCache(WellRegistryKey key) throws Exception {
 		
-		logger.debug("sql is {}", update);
+		String cleanable = 
+				"select t1."+tablename+"_id from GW_DATA_PORTAL."+tablename+" t1 "+
+				" where t1.fetch_date < (select max(t2.fetch_date) from GW_DATA_PORTAL."+tablename+" t2"+
+				"                     where t2.md5 = t1.md5"+
+				"                     and t2.agency_cd = t1.agency_cd"+
+				"                     and t2.site_no = t1.site_no)"+
+				" AND t1.xml is not null " +
+				" AND t1.agency_cd = ? " +
+				" AND t1.site_no = ? ";
+		
+		String update = 
+				"update GW_DATA_PORTAL."+tablename+" " +
+				"set xml = null " +
+				"where "+tablename+"_id = ? ";
+		
+		logger.debug("query is {}", cleanable);
 		int ct = 0;
 		Connection conn = ds.getConnection();
 		try {
-			PreparedStatement pstmt = conn.prepareStatement(update);
+			PreparedStatement pstmt = conn.prepareStatement(cleanable);
 			
-			ct = pstmt.executeUpdate();
+			pstmt.setString(1, key.getAgencyCd());
+			pstmt.setString(2, key.getSiteNo());
+			
+			List<Integer> killist = new ArrayList<Integer>();
+			
+			ResultSet rs = pstmt.executeQuery();
+			while (rs.next()) {
+				killist.add(rs.getInt(1));
+			}
+			pstmt.close();
+			
+			PreparedStatement killer = conn.prepareStatement(update);
+			for (Integer i : killist) {
+				killer.setInt(1, i);
+				int uct = killer.executeUpdate();
+				logger.info("cleaned {} result {}", i, uct);
+				ct += uct;
+			}
 		} finally {
 			conn.close();
 		}

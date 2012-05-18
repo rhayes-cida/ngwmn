@@ -36,7 +36,7 @@ public class LogDBCacheTest extends ContextualTest {
 	private static final WellDataType TYPE = WellDataType.LOG;
 	private static final String SITE = "P408750";
 	private static final String AGENCY = "IL EPA";
-	private static final String filename = AGENCY+ "_" + SITE + "_" + TYPE;
+	private static final String filename = AGENCY+ "_" + SITE + "_" + TYPE + ".xml";
 
 	private DatabaseXMLCache victim;
 	
@@ -97,7 +97,8 @@ public class LogDBCacheTest extends ContextualTest {
 	
 	@Test
 	public void testClean() throws Exception {
-		int ct = victim.cleanCache();
+		Specifier spec = makeSpecifier();
+		int ct = victim.cleanCache(spec.getWellRegistryKey());
 		
 		System.out.printf("Cleaned cache, count %d\n", ct);
 		assertTrue("should not have a lot of cruft", ct <= 1);

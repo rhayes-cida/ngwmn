@@ -36,7 +36,7 @@ public class WaterlevelDBCacheTest extends ContextualTest {
 	private static final WellDataType TYPE = WellDataType.WATERLEVEL;
 	private static final String SITE = "402734087033401";
 	private static final String AGENCY = "USGS";
-	private static final String filename = AGENCY+ "_" + SITE + "_" + TYPE;
+	private static final String filename = AGENCY+ "_" + SITE + "_" + TYPE + ".xml";
 
 	private DatabaseXMLCache victim;
 	
@@ -97,7 +97,8 @@ public class WaterlevelDBCacheTest extends ContextualTest {
 	
 	@Test
 	public void testClean() throws Exception {
-		int ct = victim.cleanCache();
+		Specifier spec = makeSpecifier();
+		int ct = victim.cleanCache(spec.getWellRegistryKey());
 		
 		System.out.printf("Cleaned cache, count %d\n", ct);
 		assertTrue("should not have a lot of cruft", ct <= 1);
