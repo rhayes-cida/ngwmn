@@ -21,6 +21,8 @@ import org.apache.commons.codec.digest.DigestUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.io.ByteStreams;
+
 public class FileCache implements Cache {
 	private Logger logger = LoggerFactory.getLogger(FileCache.class);
 	
@@ -108,22 +110,9 @@ public class FileCache implements Cache {
 	private static long copyTo(InputStream is, OutputStream os) 
 			throws IOException 
 	{
-		// TODO: measure performance, see if nio might be worthwhile.
+		long ct = ByteStreams.copy(is, os);
 		
-		byte[] buf = new byte[1024];
-		
-		long ops = 0;
-		while (true) {
-			int ict = is.read(buf);
-			if (ict <= 0) {
-				break;
-			}
-			os.write(buf,0,ict);
-			ops += ict;
-		}
-		
-		//os.close();
-		return ops;
+		return ct;
 	}
 
 	public static long copyStream(InputStream is, OutputStream os) 
@@ -190,7 +179,7 @@ public class FileCache implements Cache {
 			sz = f.length();
 		}
 		
-		return new CacheInfo(created, exists, modified, sz, null,"Y");
+		return new CacheInfo(created, exists, modified, sz, md5,"Y");
 	}
 
 	@Override

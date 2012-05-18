@@ -140,6 +140,9 @@
     	</property>
     </bean>
 
+	<bean id="WaterQualityInspector"  class="gov.usgs.ngwmn.dm.cache.qw.WaterQualityInspector">
+		<property name="dataSource" ref="dataSource"/>
+	</bean>
 </beans>
 
        
