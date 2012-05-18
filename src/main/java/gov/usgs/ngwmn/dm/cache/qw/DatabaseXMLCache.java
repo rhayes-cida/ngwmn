@@ -14,6 +14,9 @@ import java.io.FilterOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.security.DigestOutputStream;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.sql.Clob;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -23,6 +26,7 @@ import java.sql.Timestamp;
 
 import javax.sql.DataSource;
 
+import org.apache.commons.codec.binary.Hex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.support.lob.LobHandler;
@@ -62,7 +66,18 @@ public class DatabaseXMLCache implements Cache {
 			final Connection conn = ds.getConnection();
 			
 			final Clob clob = conn.createClob();
+			// TODO Ascii?
 			OutputStream bos = clob.setAsciiStream(1);
+			
+			MessageDigest md5 = null;
+			try {
+				md5 = MessageDigest.getInstance("MD5");
+				OutputStream digested = new DigestOutputStream(bos, md5);
+				bos = digested;
+			} catch (NoSuchAlgorithmException e) {
+				logger.warn("Problem getting MD5 digest, will not record hash for " + well, e);
+			}
+			final MessageDigest md5final = md5; // Wow, now I feel so threadsafe. Not.
 			
 			OutputStream fos = new FilterOutputStream(bos) {
 
@@ -72,7 +87,13 @@ public class DatabaseXMLCache implements Cache {
 					try {
 						long length = clob.length();
 						logger.debug("About to insert, clob.length={}", length);
-						insert(conn, key, clob);
+						String hash = null;
+						if (md5final != null) {
+							byte[] raw = md5final.digest();
+							char[] hex = Hex.encodeHex(raw);
+							hash = new String(hex);
+						}
+						insert(conn, key, clob, hash);
 						conn.commit();
 						// TODO Clean up clob?
 						clob.free();
@@ -194,13 +215,16 @@ public class DatabaseXMLCache implements Cache {
 		Timestamp modified = null;
 		boolean exists = false;
 		long length = 0;
+		String md5 = null;
 		
 		try {
 		Connection conn = ds.getConnection();
 			try {
 				// TODO Do not really need to fetch all rows.
-				PreparedStatement ps = conn.prepareStatement("SELECT fetch_date, " +
-						"dbms_lob.getlength(xmltype.getclobval(xml)) sz " +
+				PreparedStatement ps = conn.prepareStatement("SELECT " +
+						" fetch_date " +
+						",dbms_lob.getlength(xmltype.getclobval(xml)) sz " +
+						",md5 " +
 						"from GW_DATA_PORTAL."+tablename+" " +
 						"where agency_cd = ? and site_no = ? " +
 						"order by fetch_date ASC ");
@@ -215,6 +239,7 @@ public class DatabaseXMLCache implements Cache {
 					}
 					modified = rs.getTimestamp(1);
 					length = rs.getLong(2);
+					md5 = rs.getString(3);
 					logger.trace("Row fetch_date {}, length {}", modified, length);
 				}
 			} finally {
@@ -224,16 +249,16 @@ public class DatabaseXMLCache implements Cache {
 			throw new RuntimeException(sqle);
 		}
 		
-		CacheInfo val = new CacheInfo(created, exists, modified, length);
+		CacheInfo val = new CacheInfo(created, exists, modified, length, md5);
 		return val;
 	}
 
 	// Cannot do the insert until the Clob has been filled up
-	private void insert(Connection conn, WellRegistryKey key, Clob clob) 
+	private void insert(Connection conn, WellRegistryKey key, Clob clob, String hash) 
 			throws SQLException
 	{
-		String SQLTEXT = "INSERT INTO GW_DATA_PORTAL."+tablename+"(agency_cd,site_no,fetch_date,xml) VALUES (" +
-				"?, ?, ?, XMLType(?))";
+		String SQLTEXT = "INSERT INTO GW_DATA_PORTAL."+tablename+"(agency_cd,site_no,fetch_date,xml,md5) VALUES (" +
+				"?, ?, ?, XMLType(?), ?)";
 		
 		PreparedStatement s = conn.prepareStatement(SQLTEXT);
 		
@@ -241,11 +266,100 @@ public class DatabaseXMLCache implements Cache {
 		s.setString(2, key.getSiteNo());
 		s.setTimestamp(3, new java.sql.Timestamp(System.currentTimeMillis()));
 		s.setClob(4, clob);
+		s.setString(5, hash);
 				
 		s.execute();
 		
 	}
 
+	public int cleanCache() throws Exception {
+		// TODO This cauese Oracle problems when there is nothing to clean.
+		// TODO re-write to operate per-well, and do the iteration in Java
+		// not as a SQL operation (thanks, Oracle).
+		String update = 
+"update GW_DATA_PORTAL."+tablename+" set xml = null " +
+"where "+tablename+"_id in " +
+"(select t1."+tablename+"_id from GW_DATA_PORTAL."+tablename+" t1"+
+" where fetch_date < (select max(fetch_date) from GW_DATA_PORTAL."+tablename+" t2"+
+"                     where t2.md5 = t1.md5"+
+"                     and t2.agency_cd = t1.agency_cd"+
+"                     and t2.site_no = t1.site_no)"+
+" AND xml is not null)";
+		
+		logger.debug("sql is {}", update);
+		int ct = 0;
+		Connection conn = ds.getConnection();
+		try {
+			PreparedStatement pstmt = conn.prepareStatement(update);
+			
+			ct = pstmt.executeUpdate();
+		} finally {
+			conn.close();
+		}
+		
+		return ct;
+	}
+	
+	public int fixMD5() throws Exception {
+		String select = "SELECT cachetable."+tablename+"_id id, cachetable.xml.getCLOBVal() "+
+				"FROM GW_DATA_PORTAL."+tablename+" cachetable " +
+				"WHERE cachetable.md5 IS NULL " +
+				"AND cachetable.xml IS NOT NULL ";
+		String update = "UPDATE GW_DATA_PORTAL."+tablename+" " +
+				"SET md5 = ? " +
+				"WHERE "+tablename+"_id = ? " +
+						"AND md5 IS NULL ";
+
+		int ct = 0;
+		Connection conn = ds.getConnection();
+		try {
+			PreparedStatement query = conn.prepareStatement(select);
+			PreparedStatement setter = conn.prepareStatement(update);
+
+			ResultSet rs = query.executeQuery();
+			while (rs.next()) {
+				int idx = rs.getInt(1);
+				InputStream xis = rs.getAsciiStream(2);
+
+				logger.info("Working on {}", idx);
+				
+				String md5 = null;
+				try {
+					md5 = md5digest(xis);
+				} finally {
+					xis.close();
+				}
+				setter.setString(1, md5);
+				setter.setInt(2, idx);
+
+				logger.info("Updating md5 of {} to {}", idx, md5);
+				int uc = setter.executeUpdate();
+				logger.debug("update count is {}", uc);
+				ct += uc;
+			}
+		} finally {
+			conn.close();
+		}
+		return ct;
+	}
+
+	protected String md5digest(InputStream xis)
+			throws NoSuchAlgorithmException, IOException {
+		MessageDigest digest = MessageDigest.getInstance("MD5");
+		byte[] buf = new byte[1024];
+		while (true) {
+			int bct = xis.read(buf);
+			if (bct <= 0) {
+				break;
+			}
+			digest.update(buf, 0, bct);
+		}
+
+		byte[] raw = digest.digest();
+		char[] hex = Hex.encodeHex(raw);
+		String md5 = new String(hex);
+		return md5;
+	}
 
 	@Override
 	public String toString() {

@@ -181,6 +181,7 @@ public class FileCache implements Cache {
 		Date created = null;
 		long sz = -1;
 		Date modified = null;
+		String md5 = null;
 		
 		if (exists) {
 			modified = new Date( f.lastModified() );
@@ -189,7 +190,7 @@ public class FileCache implements Cache {
 			sz = f.length();
 		}
 		
-		return new CacheInfo(created, exists, modified, sz);
+		return new CacheInfo(created, exists, modified, sz, null);
 	}
 
 	@Override

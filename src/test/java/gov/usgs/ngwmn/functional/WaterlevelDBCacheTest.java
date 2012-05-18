@@ -87,7 +87,22 @@ public class WaterlevelDBCacheTest extends ContextualTest {
 	@After
 	public void tearDown() throws Exception {
 	}
-
+	
+	@Test
+	public void testUpdateMD5() throws Exception {
+		int ct = victim.fixMD5();
+		
+		assertEquals("none to fix", 0, ct);
+	}
+	
+	@Test
+	public void testClean() throws Exception {
+		int ct = victim.cleanCache();
+		
+		System.out.printf("Cleaned cache, count %d\n", ct);
+		assertTrue("should not have a lot of cruft", ct <= 1);
+	}
+		
 	@Test
 	public void testSaveAndFetch() throws Exception {
 		testSave();

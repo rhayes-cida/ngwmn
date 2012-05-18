@@ -4,18 +4,13 @@ import gov.usgs.ngwmn.WellDataType;
 import gov.usgs.ngwmn.dm.DataLoader;
 import gov.usgs.ngwmn.dm.io.Pipeline;
 import gov.usgs.ngwmn.dm.io.Supplier;
-import gov.usgs.ngwmn.dm.io.SupplyChain;
 import gov.usgs.ngwmn.dm.spec.Specifier;
 
 import java.io.IOException;
 import java.io.OutputStream;
-import java.security.DigestOutputStream;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.util.Collection;
 import java.util.Map;
 
-import org.apache.commons.codec.binary.Hex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -79,42 +74,9 @@ implements DataLoader {
 	@Override
 	public boolean configureOutput(final Specifier spec, Pipeline pipe) throws IOException {
 			
-		final CacheSavingSupplier saver = new CacheSavingSupplier(spec);
-		pipe.addOutputSupplier(saver);
+		pipe.addOutputSupplier(new CacheSavingSupplier(spec));
 		// TODO can inject more outputsuppliers for stats and whatnot
 			
-		pipe.chainOutputSupplier(new SupplyChain<OutputStream>(saver) {
-
-			private MessageDigest md5;
-			
-			@Override
-			public OutputStream initialize() throws IOException {
-				OutputStream os = super.initialize();
-				try {
-					md5 = MessageDigest.getInstance("MD5");
-					DigestOutputStream dos = new DigestOutputStream(os, md5);
-					return dos;
-				} catch (NoSuchAlgorithmException e) {
-					logger.warn("Problem getting MD5 digest, giving up", e);
-					return os;
-				}
-			}
-
-			@Override
-			public void end(boolean threw) throws IOException {
-				super.end(threw);
-				
-				if ( ! threw && md5!=null) {
-					byte[] hash = md5.digest();
-					char[] hex = Hex.encodeHex(hash);
-					
-					String whatIgot = new String(hex);
-					
-					logger.info("MD5 of fetch for {} is {}", spec,  whatIgot);
-				}
-			}
-			
-		});
 		return true;
 	}
 

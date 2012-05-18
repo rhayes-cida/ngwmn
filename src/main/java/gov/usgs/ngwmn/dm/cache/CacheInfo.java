@@ -7,14 +7,16 @@ public class CacheInfo {
 	private boolean exists;
 	private Date modified;
 	private long length;
+	private String md5;
 	
 	
-	public CacheInfo(Date created, boolean exists, Date modified, long length) {
+	public CacheInfo(Date created, boolean exists, Date modified, long length, String hash) {
 		super();
 		this.created = created;
 		this.exists = exists;
 		this.modified = modified;
 		this.length = length;
+		this.md5 = hash;
 	}
 	public Date getCreated() {
 		return created;
@@ -27,6 +29,9 @@ public class CacheInfo {
 	}
 	public long getLength() {
 		return length;
+	}
+	public String getMd5() {
+		return md5;
 	}
 	
 	

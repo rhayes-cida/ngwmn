@@ -89,6 +89,21 @@ public class LogDBCacheTest extends ContextualTest {
 	}
 
 	@Test
+	public void testUpdateMD5() throws Exception {
+		int ct = victim.fixMD5();
+		
+		assertEquals("none to fix", 0, ct);
+	}
+	
+	@Test
+	public void testClean() throws Exception {
+		int ct = victim.cleanCache();
+		
+		System.out.printf("Cleaned cache, count %d\n", ct);
+		assertTrue("should not have a lot of cruft", ct <= 1);
+	}
+	
+	@Test
 	public void testSaveAndFetch() throws Exception {
 		testSave();
 		testFetchWellData();
@@ -162,6 +177,7 @@ public class LogDBCacheTest extends ContextualTest {
 		// assertEquals(SIZE, info.getLength());
 		assertTrue("expect size no smaller than inpout file", info.getLength() >= SIZE);
 		assertTrue("expect cache exists",info.isExists());
+		assertNotNull("md5", info.getMd5());
 		
 		assertTrue("expect created before now", info.getCreated().before(new Date()));
 		assertFalse("expect create time after modify time", info.getCreated().after(info.getModified()));
