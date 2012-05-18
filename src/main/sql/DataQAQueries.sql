@@ -287,3 +287,26 @@ columns
 
 group by quality_cache_id, xq.cn;
 
+-- constituent query without intermdiate XML
+select 
+	qc.quality_cache_id,
+	xq.cn,
+	count(xq.dt), 
+	min(xq.dt),
+	max(xq.dt)
+from 
+	quality_cache qc,
+	
+XMLTable(
+'for $r in /*:Results/Result 
+return $r
+'
+passing qc.xml
+columns 
+"CN" varchar(80) path '*:ResultDescription/*:CharacteristicName',
+"DT" date path 'date'
+) xq
+
+group by quality_cache_id, xq.cn;
+
+

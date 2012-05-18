@@ -54,3 +54,4 @@ columns
 "VAL" varchar(40) path 'wml2:value/swe:Quantity/swe:value',
 "UNITS" varchar(40) path 'wml2:value/swe:Quantity/swe:uom/@code'
 ) xq;
+
