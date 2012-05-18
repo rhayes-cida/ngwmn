@@ -101,7 +101,7 @@ public class QualityDBCacheTest extends ContextualTest {
 		int ct = victim.cleanCache(spec.getWellRegistryKey());
 		
 		System.out.printf("Cleaned cache, count %d\n", ct);
-		assertTrue("should not have a lot of cruft", ct <= 1);
+		assertTrue("should not have a lot of cruft", ct <= 4);
 	}
 		
 	@Test
