@@ -14,7 +14,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-public class WaterQualityInspectorTest extends ContextualTest {
+public class WaterQualityInspectorIntegrationTest extends ContextualTest {
 
 	private WaterQualityInspector victim;
 	private Connection conn;

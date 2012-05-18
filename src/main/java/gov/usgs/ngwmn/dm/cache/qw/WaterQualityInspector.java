@@ -12,6 +12,9 @@ import org.slf4j.LoggerFactory;
 
 public class WaterQualityInspector implements Inspector {
 
+	// TODO Should the query be moved to a stored proc, that would either return saved results for the 
+	// matched MD5 or generated, save, and return new ones?
+	
 	private DataSource ds;
 	private transient Logger logger = LoggerFactory.getLogger(this.getClass());
 	

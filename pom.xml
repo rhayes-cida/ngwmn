@@ -200,6 +200,7 @@
 						<excludes>
 							<exclude>**/integration/**</exclude>
 		        			<exclude>**/functional/**</exclude>
+		        			<exclude>**/*IntegrationTest</exclude>
 						</excludes>
 					</configuration>
 				</plugin>
@@ -224,6 +225,7 @@
 		        	<includes>
 		        		<include>**/integration/**</include>
 		        		<include>**/functional/**</include>
+		        		<include>**/*IntegrationTest</include>
 		        	</includes>
 		        	<testFailureIgnore>true</testFailureIgnore>
 		        </configuration>
