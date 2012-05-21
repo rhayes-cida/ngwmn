@@ -1,11 +1,15 @@
 package gov.usgs.ngwmn.dm.dao;
 
+import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.ibatis.annotations.Delete;
 import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Options;
 import org.apache.ibatis.annotations.Param;
+import org.apache.ibatis.annotations.Result;
 import org.apache.ibatis.annotations.ResultMap;
 import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.SelectKey;
@@ -142,5 +146,15 @@ public interface FetchLogMapper {
 		""})
 	@ResultMap("BaseResultMap")
 	FetchLog selectLatestByWell(@Param("agency_cd") String agency_cd, @Param("site_no") String site_no);
+	
+	@Select({
+		"select agency_cd, data_stream, status, count(*) ct, avg(elapsed_sec) avg",
+		"from gw_data_portal.fetch_log",
+		"where fetcher = 'WebRetriever' and data_source is not null",
+		"and started_at between (#{day,jdbcType=DATE} - 12/24) and (#{day,jdbcType=DATE} + 12/24)",
+		"group by agency_cd, data_stream, status",
+		"order by agency_cd, data_stream, status",
+		""})
+	List<Map<String,Object>> statisticsByDay(@Param("day") Date day);
 
 }

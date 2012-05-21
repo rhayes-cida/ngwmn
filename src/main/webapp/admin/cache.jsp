@@ -21,6 +21,9 @@ th { text-align: left; }
 
 <h1>National Ground Water Monitoring Network</h1>
 <h2>Data Cache</h2>
+<p>
+(<a href="cachestats.jsp">Daily data fetch statistics</a>)
+</p>
 
 <%
 org.springframework.context.ApplicationContext

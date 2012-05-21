@@ -1,6 +1,9 @@
 package gov.usgs.ngwmn.dm.dao;
 
+import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class FetchLogDAO {
 	private FetchLogMapper mapper;
@@ -36,6 +39,10 @@ public class FetchLogDAO {
 	public int update(FetchLog record) {
 		return mapper.updateByPrimaryKey(record);
 	}
-	
-	
+
+	public List<Map<String, Object>> statisticsByDay(Date day) {
+		List<Map<String,Object>> v = mapper.statisticsByDay(day);
+		return v;
+	}
+
 }
