@@ -112,9 +112,9 @@ public class DataBrokerIntegrationTest extends ContextualTest {
 		assertEquals("cached size", ct, info.getLength());
 	}
 
-	@Test
+	// @Test
 	public void testPrefetch_fail() throws Exception {
-		// need a valid well that will return an HTTPO error when we try to prefetch.
+		// need a valid well that will return an HTTP error when we try to prefetch.
 		Specifier spec = makeSpec(AGENCY_CD,SILLY_SITE_NO, WellDataType.QUALITY);
 
 		long ct = dataBroker.prefetchWellData(spec);
