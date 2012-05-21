@@ -2,6 +2,7 @@ package gov.usgs.ngwmn.dm.io;
 
 import gov.usgs.ngwmn.WellDataType;
 import gov.usgs.ngwmn.dm.cache.PipeStatistics;
+import gov.usgs.ngwmn.dm.cache.PipeStatistics.Status;
 import gov.usgs.ngwmn.dm.spec.Specifier;
 
 public class StatsMaker {
@@ -16,6 +17,7 @@ public class StatsMaker {
 		PipeStatistics stats = new PipeStatistics();
 		stats.setCalledBy(clazz);
 		stats.setSpecifier(spec);
+		stats.setStatus(Status.OPEN);
 		stats.markStart();
 		return stats;
 	}

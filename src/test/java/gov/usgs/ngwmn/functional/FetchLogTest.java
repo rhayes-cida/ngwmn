@@ -1,7 +1,11 @@
 package gov.usgs.ngwmn.functional;
 
 import gov.usgs.ngwmn.dm.cache.PipeStatistics;
+import gov.usgs.ngwmn.dm.cache.PipeStatistics.Status;
 import gov.usgs.ngwmn.dm.dao.ContextualTest;
+import gov.usgs.ngwmn.dm.dao.FetchLog;
+import gov.usgs.ngwmn.dm.dao.FetchLogDAO;
+import gov.usgs.ngwmn.dm.dao.WellRegistryKey;
 import gov.usgs.ngwmn.dm.io.FetchRecorder;
 import gov.usgs.ngwmn.dm.io.StatsMaker;
 import gov.usgs.ngwmn.dm.spec.Specifier;
@@ -9,15 +13,17 @@ import gov.usgs.ngwmn.dm.spec.Specifier;
 import org.junit.Before;
 import org.junit.Test;
 
+import static org.junit.Assert.*;
+
 public class FetchLogTest extends ContextualTest {
 	
 	private FetchRecorder victim;
-	//private FetchLogDAO dao;
+	private FetchLogDAO dao;
 
 	@Before
 	public void setUp() throws Exception {
 		victim = ctx.getBean("FetchRecorder", FetchRecorder.class);
-		//dao = ctx.getBean("FetchLogDAO", FetchLogDAO.class);
+		dao = ctx.getBean("FetchLogDAO", FetchLogDAO.class);
 	}
 	
 	@Override
@@ -31,21 +37,33 @@ public class FetchLogTest extends ContextualTest {
 	@Test
 	public void testSUCCESS() {
 		PipeStatistics stats = StatsMaker.makeStats(getClass());
+		WellRegistryKey key = stats.getSpecifier().getWellRegistryKey();
 		
 		victim.notifySuccess(stats);
 		
-		// TODO Check dao for fetch log with self as fetcher
+		FetchLog latest = dao.mostRecent(key);
+		assertNotNull("Got a result", latest);
+		assertEquals("fetcher name", this.getClass().getSimpleName(), latest.getFetcher());
+		assertNull("no problem", latest.getProblem());
 	}
 
 	@Test
-	public void testFAIL() {
+	public void testFAIL() throws Exception {
+		// ensure we have the latest start time
+		Thread.currentThread().sleep(10);
+		
 		PipeStatistics stats = StatsMaker.makeStats(getClass());
+		WellRegistryKey key = stats.getSpecifier().getWellRegistryKey();
 		
 		Exception npe = new NullPointerException();
+		stats.setStatus(Status.FAIL);
 		victim.notifyException(stats, npe);
 		
-		// TODO check dao for item with recent time, self as fetcher, status fail
+		FetchLog latest = dao.mostRecent(key);
+		assertNotNull("Got a result", latest);
+		assertEquals("fetcher name", this.getClass().getSimpleName(), latest.getFetcher());
 		
+		assertEquals("Problem report", npe.getMessage(), latest.getProblem());
 	}
 	
 

@@ -125,7 +125,7 @@ public interface CacheMetaDataMapper {
 		"AGENCY_CD, DATA_TYPE, SITE_NO, SUCCESS_CT, FAIL_CT, FIRST_DATA_DT, LAST_DATA_DT, ",
 		"MOST_RECENT_FETCH_DT", 
 		"from GW_DATA_PORTAL.CACHE_META_DATA",
-		"WHERE MOST_RECENT_FETCH_DT is not null",
+		"WHERE SUCCESS_CT > 0 OR FAIL_CT > 0 ",
 		"order by AGENCY_CD, SITE_NO, DATA_TYPE"
 	})
 	@ResultMap("BaseResultMap")

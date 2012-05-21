@@ -5,6 +5,7 @@ import static org.junit.Assert.*;
 import java.io.ByteArrayOutputStream;
 import java.io.OutputStream;
 import java.util.Date;
+import java.util.List;
 
 import gov.usgs.ngwmn.WellDataType;
 import gov.usgs.ngwmn.dm.DataBroker;
@@ -12,6 +13,9 @@ import gov.usgs.ngwmn.dm.SiteNotFoundException;
 import gov.usgs.ngwmn.dm.cache.Cache;
 import gov.usgs.ngwmn.dm.cache.CacheInfo;
 import gov.usgs.ngwmn.dm.dao.ContextualTest;
+import gov.usgs.ngwmn.dm.dao.FetchLog;
+import gov.usgs.ngwmn.dm.dao.FetchLogDAO;
+import gov.usgs.ngwmn.dm.io.FetchRecorder;
 import gov.usgs.ngwmn.dm.io.SimpleSupplier;
 import gov.usgs.ngwmn.dm.io.Supplier;
 import gov.usgs.ngwmn.dm.spec.Specifier;
@@ -23,10 +27,13 @@ public class DataBrokerIntegrationTest extends ContextualTest {
 
 	private static final String AGENCY_CD = "USGS";
 	private static final String SITE_NO = "402734087033401";
+	private static final String SILLY_SITE_NO = "007";
+	
 	private static final long TIMESLOP = 1000;
 	private DataBroker dataBroker;
 	private Cache qualityCache;
 	private Cache fileCache;
+	private FetchLogDAO fetchLogDAO;
 	
 	@Before
 	public void setUp() throws Exception {
@@ -34,6 +41,7 @@ public class DataBrokerIntegrationTest extends ContextualTest {
 		dataBroker  = ctx.getBean("DataBroker", DataBroker.class);		
 		qualityCache = ctx.getBean("QualityCache", Cache.class);
 		fileCache = ctx.getBean("FileCache", Cache.class);
+		fetchLogDAO = ctx.getBean("FetchLogDAO", FetchLogDAO.class);
 	}
 
 	private Specifier makeSpec(String agency, String site, WellDataType dt) {
@@ -102,6 +110,20 @@ public class DataBrokerIntegrationTest extends ContextualTest {
 		System.out.printf("now %s, modified %s\n", bot, info.getModified());
 		assertTrue("is recent",  ! info.getModified().before(bot));
 		assertEquals("cached size", ct, info.getLength());
+	}
+
+	@Test
+	public void testPrefetch_fail() throws Exception {
+		// need a valid well that will return an HTTPO error when we try to prefetch.
+		Specifier spec = makeSpec(AGENCY_CD,SILLY_SITE_NO, WellDataType.QUALITY);
+
+		long ct = dataBroker.prefetchWellData(spec);
+		
+		// fetch log should show error
+		
+		FetchLog mr = fetchLogDAO.mostRecent(spec.getWellRegistryKey());
+		
+		assertNotNull("reported problem", mr.getProblem());
 	}
 
 	@Test
