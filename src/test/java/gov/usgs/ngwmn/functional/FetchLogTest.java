@@ -35,7 +35,10 @@ public class FetchLogTest extends ContextualTest {
 	}
 
 	@Test
-	public void testSUCCESS() {
+	public void testSUCCESS() throws Exception {
+		// ensure we have the latest start time
+		Thread.currentThread().sleep(100);
+
 		PipeStatistics stats = StatsMaker.makeStats(getClass());
 		WellRegistryKey key = stats.getSpecifier().getWellRegistryKey();
 		
@@ -50,7 +53,7 @@ public class FetchLogTest extends ContextualTest {
 	@Test
 	public void testFAIL() throws Exception {
 		// ensure we have the latest start time
-		Thread.currentThread().sleep(10);
+		Thread.currentThread().sleep(100);
 		
 		PipeStatistics stats = StatsMaker.makeStats(getClass());
 		WellRegistryKey key = stats.getSpecifier().getWellRegistryKey();

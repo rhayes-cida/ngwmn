@@ -136,10 +136,10 @@ public interface FetchLogMapper {
 		"FETCHLOG_ID, AGENCY_CD, SITE_NO, DATA_SOURCE, STARTED_AT, STATUS, PROBLEM, CT, ",
 		"ELAPSED_SEC, SPECIFIER, FETCHER, DATA_STREAM",
 		"from GW_DATA_PORTAL.FETCH_LOG",
-		"where AGENCY_CD = #{agency_cd} and SITE_NO = #{site_no} " +
+		"where AGENCY_CD = #{agency_cd} and SITE_NO = #{site_no} ",
 		"AND ROWNUM = 1 ",
 		"ORDER BY STARTED_AT DESC ",
-		})
+		""})
 	@ResultMap("BaseResultMap")
 	FetchLog selectLatestByWell(@Param("agency_cd") String agency_cd, @Param("site_no") String site_no);
 
