@@ -20,7 +20,7 @@ th { text-align: left; }
 </head>
 <body>
 
-<h1>National Ground Water Monitoring Network</h1>
+<h1><a href="/ngwmn">National Ground Water Monitoring Network</a></h1>
 <h2>Data Cache</h2>
 
 <%
@@ -62,7 +62,7 @@ day_s = sdf.format(day);
 	<td><c:out value="${r.DATA_STREAM}"/></td>
 	<td><c:out value="${r.STATUS}"/></td>
 	<td><c:out value="${r.CT}"/></td>
-	<td><fmt:formatNumber value="${r.AVG.doubleValue()}" pattern="0.00"/></td>
+	<td><c:out value="${r.AVG}"/></td>
 </tr>
 </c:forEach>
 </table>
