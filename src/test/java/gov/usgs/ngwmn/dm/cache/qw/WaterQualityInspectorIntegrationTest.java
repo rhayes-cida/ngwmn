@@ -5,6 +5,9 @@ import static org.junit.Assert.*;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.sql.DataSource;
 
@@ -59,6 +62,26 @@ public class WaterQualityInspectorIntegrationTest extends ContextualTest {
 		boolean ok = victim.acceptable(id);
 		
 		assertTrue("is ok", ok);
+	}
+	
+	@Test
+	public void testLots() throws Exception {
+		Statement s = conn.createStatement();
+		ResultSet rs = s.executeQuery("SELECT QUALITY_CACHE_ID from gw_data_portal.quality_cache " +
+				"where xml IS NOT NULL ");
+		
+		List<Integer> ii = new ArrayList<Integer>();
+		
+		while (rs.next()) {
+			ii.add(rs.getInt(1));
+		}
+		s.close();
+		
+		for (Integer i : ii) {
+			boolean ok = victim.acceptable(i);
+			
+			System.out.printf("%d -> %s\n", i, ok);
+		}
 	}
 
 }

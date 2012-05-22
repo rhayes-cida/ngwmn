@@ -1,5 +1,6 @@
 package gov.usgs.ngwmn.dm.cache.qw;
 
+import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.Date;
 import java.sql.PreparedStatement;
@@ -12,45 +13,29 @@ import org.slf4j.LoggerFactory;
 
 public class WaterQualityInspector implements Inspector {
 
-	// TODO Should the query be moved to a stored proc, that would either return saved results for the 
-	// matched MD5 or generated, save, and return new ones?
-	
 	private DataSource ds;
 	private transient Logger logger = LoggerFactory.getLogger(this.getClass());
 	
-	String bhq = 
-			"select " +
-			"   qc.md5," +
-			"	xq.cn," +
-			"	count(xq.dt)," +
-			" 	min(xq.dt)," +
-			"	max(xq.dt) " +
-			"from " +
-			" 	quality_cache qc," +
-			"	XMLTable(" +
-			"'for $r in /*:Results/Result " +
-			" return " +
-			"   <r>" +
-			"      <cn>{$r/*:ResultDescription/*:CharacteristicName}</cn>" +
-			"      <dt>{$r/date}</dt>" +
-			"   </r>' " +
-			" passing qc.xml" +
-			" columns " +
-			"  \"CN\" varchar(80) path 'cn', " +
-			"  \"DT\" date path 'dt'" +
-			") xq " +
-			"WHERE quality_cache_id = ? " +
-			"group by md5, xq.cn ";
 	
 	@Override
 	public boolean acceptable(int cachekey) throws Exception {
 		Connection conn = ds.getConnection();
 		try {
-			PreparedStatement stat = conn.prepareStatement(bhq);
+			CallableStatement stat = conn.prepareCall("{call GW_DATA_PORTAL.INSPECT_QUALITY_DATA(?)}");
 			stat.setInt(1, cachekey);
 			
+			boolean did = stat.execute();
+			logger.debug("finished update, got {}", did);
+			
+			// TODO would be convenient if stored proc contained a select to supply this result set
+			PreparedStatement ps = conn.prepareStatement(
+					"SELECT qdq.md5,qdq.consituent,qdq.ct,qdq.firstDate,qdq.lastDate " +
+					"FROM GW_DATA_PORTAL.QUALITY_DATA_QUALITY qdq, GW_DATA_PORTAL.quality_cache qc " +
+					"WHERE qdq.md5 = qc.md5 AND qc.quality_cache_id = ?");
+			ps.setInt(1, cachekey);
+			
 			int totct = 0;
-			ResultSet rs = stat.executeQuery();
+			ResultSet rs = ps.executeQuery();
 			while (rs.next()) {
 				String md5= rs.getString(1);
 				String name = rs.getString(2);
