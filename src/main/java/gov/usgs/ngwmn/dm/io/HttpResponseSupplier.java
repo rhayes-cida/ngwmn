@@ -35,13 +35,13 @@ public class HttpResponseSupplier extends Supplier<OutputStream> {
 		// TODO however it is no longer the data type domain - it is the full request 
 		if ( spect.isBundled() || spect.getWellIDs().get(0).getTypeID().contentType.contains("zip") ) {
 			hsr.setContentType(ZIP_CONTENT_TYPE);
+			// TODO need to name the bundle some how
+			logger.debug("send as attachment with file name {}", filename);
+			hsr.setHeader("content-disposition", "attachment;filename=" + filename);
 		} else {
 			hsr.setContentType(XML_CONTENT_TYPE);
 		}
 		
-		// TODO need to name the bundle some how
-		logger.debug("send as attachment with file name {}", filename);
-		hsr.setHeader("content-disposition", "attachment;filename=" + filename);
 		// ensure that buffer size is greater than magic lower limit for non-extant sites
 		if (hsr.getBufferSize() < MIN_BUFFER_SIZE) {
 			hsr.setBufferSize(MAX_BUFFER_SIZE); 
