@@ -143,6 +143,12 @@
 	<bean id="WaterQualityInspector"  class="gov.usgs.ngwmn.dm.cache.qw.WaterQualityInspector">
 		<property name="dataSource" ref="dataSource"/>
 	</bean>
+	<bean id="WaterLevelInspector"  class="gov.usgs.ngwmn.dm.cache.qw.WaterLevelInspector">
+		<property name="dataSource" ref="dataSource"/>
+	</bean>
+	<bean id="WellLogInspector"  class="gov.usgs.ngwmn.dm.cache.qw.WellLogInspector">
+		<property name="dataSource" ref="dataSource"/>
+	</bean>
 </beans>
 
        

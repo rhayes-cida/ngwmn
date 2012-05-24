@@ -30,6 +30,7 @@ import java.util.List;
 import javax.sql.DataSource;
 
 import org.apache.commons.codec.binary.Hex;
+import org.apache.tomcat.dbcp.dbcp.DelegatingConnection;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.support.lob.LobHandler;
@@ -84,7 +85,14 @@ public class DatabaseXMLCache implements Cache {
 			// TODO This is a rather ugly.
 			
 			final WellRegistryKey key = new WellRegistryKey(well.getAgencyID(), well.getFeatureID());
-			final Connection conn = ds.getConnection();
+			
+			// Ugly code to work around Tomcat 6 pooled connection, which does not have createClob method.
+			final Connection pooledConn = ds.getConnection();
+			Connection dconn = pooledConn;
+			if (pooledConn instanceof DelegatingConnection) {
+				dconn = ((DelegatingConnection) pooledConn).getInnermostDelegate();
+			}
+			final Connection conn = dconn;
 			
 			final Clob clob = conn.createClob();
 			// TODO Ascii?
@@ -118,7 +126,7 @@ public class DatabaseXMLCache implements Cache {
 						conn.commit();
 						// TODO Clean up clob?
 						clob.free();
-						conn.close();
+						pooledConn.close();
 						logger.info("saved data for {}, sz {}", well, length);
 						
 						// TODO should invoke this aysnchronously
@@ -139,10 +147,12 @@ public class DatabaseXMLCache implements Cache {
 	}
 
 	public void publish(int id) throws Exception {
-			setPublished(id, "Y");
+		logger.info("publishing {}[{}]", tablename, id);
+		setPublished(id, "Y");
 	}
 
 	public void withdraw(int id) throws Exception {
+		logger.warn("fetched data was found unacceptable, {}[{}]", tablename, id);
 		setPublished(id, "N");
 	}
 	
