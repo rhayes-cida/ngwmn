@@ -32,9 +32,10 @@ public class PrefetcherTest extends ContextualTest {
 	
 	@Test
 	public void test_count() {
-		victim.setFetchLimit(100);
 		ct = 0;
 		delay = 0;
+		victim.setTimeLimit(null);
+		victim.setFetchLimit(100);
 		PrefetchOutcome outcome = 
 				victim.call();
 		assertTrue("tried lots", ct > 99);

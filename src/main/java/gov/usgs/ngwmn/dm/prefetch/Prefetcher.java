@@ -23,6 +23,7 @@ import java.util.concurrent.Callable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+// TODO Abstract well list, make a per-agency version
 public class Prefetcher implements Callable<PrefetchOutcome> {
 
 	private int fetchLimit = 0;
