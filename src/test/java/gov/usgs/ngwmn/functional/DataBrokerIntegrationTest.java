@@ -5,7 +5,6 @@ import static org.junit.Assert.*;
 import java.io.ByteArrayOutputStream;
 import java.io.OutputStream;
 import java.util.Date;
-import java.util.List;
 
 import gov.usgs.ngwmn.WellDataType;
 import gov.usgs.ngwmn.dm.DataBroker;
@@ -15,7 +14,6 @@ import gov.usgs.ngwmn.dm.cache.CacheInfo;
 import gov.usgs.ngwmn.dm.dao.ContextualTest;
 import gov.usgs.ngwmn.dm.dao.FetchLog;
 import gov.usgs.ngwmn.dm.dao.FetchLogDAO;
-import gov.usgs.ngwmn.dm.io.FetchRecorder;
 import gov.usgs.ngwmn.dm.io.SimpleSupplier;
 import gov.usgs.ngwmn.dm.io.Supplier;
 import gov.usgs.ngwmn.dm.spec.Specifier;
@@ -117,7 +115,7 @@ public class DataBrokerIntegrationTest extends ContextualTest {
 		// need a valid well that will return an HTTP error when we try to prefetch.
 		Specifier spec = makeSpec(AGENCY_CD,SILLY_SITE_NO, WellDataType.QUALITY);
 
-		long ct = dataBroker.prefetchWellData(spec);
+		dataBroker.prefetchWellData(spec);
 		
 		// fetch log should show error
 		

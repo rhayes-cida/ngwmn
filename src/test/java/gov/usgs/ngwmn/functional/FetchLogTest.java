@@ -3,7 +3,6 @@ package gov.usgs.ngwmn.functional;
 import java.math.BigDecimal;
 import java.util.Date;
 import java.util.GregorianCalendar;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -44,7 +43,7 @@ public class FetchLogTest extends ContextualTest {
 	@Test
 	public void testSUCCESS() throws Exception {
 		// ensure we have the latest start time
-		Thread.currentThread().sleep(100);
+		Thread.sleep(100);
 
 		PipeStatistics stats = StatsMaker.makeStats(getClass());
 		WellRegistryKey key = stats.getSpecifier().getWellRegistryKey();
@@ -60,7 +59,7 @@ public class FetchLogTest extends ContextualTest {
 	@Test
 	public void testFAIL() throws Exception {
 		// ensure we have the latest start time
-		Thread.currentThread().sleep(100);
+		Thread.sleep(100);
 		
 		PipeStatistics stats = StatsMaker.makeStats(getClass());
 		WellRegistryKey key = stats.getSpecifier().getWellRegistryKey();
