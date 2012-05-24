@@ -15,7 +15,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 
-public class DataBroker implements FlowFactory {
+public class DataBroker implements FlowFactory, PrefetchI {
 
 	private DataFetcher harvester;
 	private DataFetcher retriever;
@@ -32,6 +32,7 @@ public class DataBroker implements FlowFactory {
 		logger.info("Completed request operation for {}", spec);
 	}
 	
+	@Override
 	public long prefetchWellData(Specifier spec) throws Exception {
 		Pipeline pipe = (Pipeline) makeFlow(spec, null);
 		long ct = invokePipe(pipe);

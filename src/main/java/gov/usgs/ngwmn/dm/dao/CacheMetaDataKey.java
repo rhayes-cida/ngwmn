@@ -71,4 +71,46 @@ public class CacheMetaDataKey {
 	public void setSiteNo(String siteNo) {
 		this.siteNo = siteNo;
 	}
+
+	
+	// Primary keys should always have equals.
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result
+				+ ((agencyCd == null) ? 0 : agencyCd.hashCode());
+		result = prime * result
+				+ ((dataType == null) ? 0 : dataType.hashCode());
+		result = prime * result + ((siteNo == null) ? 0 : siteNo.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		CacheMetaDataKey other = (CacheMetaDataKey) obj;
+		if (agencyCd == null) {
+			if (other.agencyCd != null)
+				return false;
+		} else if (!agencyCd.equals(other.agencyCd))
+			return false;
+		if (dataType == null) {
+			if (other.dataType != null)
+				return false;
+		} else if (!dataType.equals(other.dataType))
+			return false;
+		if (siteNo == null) {
+			if (other.siteNo != null)
+				return false;
+		} else if (!siteNo.equals(other.siteNo))
+			return false;
+		return true;
+	}
+	
 }
