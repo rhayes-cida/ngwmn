@@ -1,4 +1,4 @@
-package gov.usgs.ngwmn.dm.parse;
+package gov.usgs.ngwmn.dm.io.parse;
 
 import java.io.IOException;
 import java.util.List;

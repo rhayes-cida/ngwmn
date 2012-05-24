@@ -3,6 +3,8 @@ package gov.usgs.ngwmn.dm.parse;
 import static gov.usgs.ngwmn.dm.parse.DataFlatteningFormatterTest.*;
 import static org.junit.Assert.*;
 
+import gov.usgs.ngwmn.dm.io.parse.USGS_StAXUtils;
+
 import java.io.IOException;
 import java.io.StringReader;
 

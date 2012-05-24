@@ -1,13 +1,13 @@
-package gov.usgs.ngwmn.dm.parse;
+package gov.usgs.ngwmn.dm.io.parse;
 
 
-class Element {
+public class Element {
 	public static final char SEPARATOR = '/';
 
-	final String  fullName;
-	final String  localName;
-	      String  displayName;
-	      boolean hasChildren;
+	public final String  fullName;
+	public final String  localName;
+	public       String  displayName;
+	public       boolean hasChildren;
 
 	public Element(String full, String local, String displayName) {
 		this.fullName    = full;

@@ -1,4 +1,4 @@
-package gov.usgs.ngwmn.dm.parse;
+package gov.usgs.ngwmn.dm.io.parse;
 
 import java.util.HashMap;
 import java.util.LinkedHashSet;
@@ -8,20 +8,20 @@ import java.util.Stack;
 
 import javax.xml.stream.XMLStreamReader;
 
-class ParseState {
+public class ParseState {
 	
 	public static final String        EMPTY_STRING            = "";
 	public static final int           DEFAULT_ROW_DEPTH_LEVEL = 3;
 	public static final String        NONSENSE_ROW_ELEMENT_IDENTIFIER = "!";
 	
 	// row state fields
-	boolean isInTarget;
-	boolean isProcessingHeaders;
-	boolean isKeepElders;             // true if elder element information is used to determine nestings
-	boolean isDoCopyDown;
-	boolean ignoreRowElement;         // false for backward compatibility
-	int     maxRowDepthLevel;
-	String  rowElementIdentifier;	// nonsense value by default so nothing can be matched
+	public boolean isInTarget;
+	public boolean isProcessingHeaders;
+	public boolean isKeepElders;             // true if elder element information is used to determine nestings
+	public boolean isDoCopyDown;
+	public boolean ignoreRowElement;         // false for backward compatibility
+	public int     maxRowDepthLevel;
+	public String  rowElementIdentifier;	// nonsense value by default so nothing can be matched
 	
 	// output fields - final protects them from being null
 	public final Set<Element> targetColumnList;
@@ -53,7 +53,7 @@ class ParseState {
 	/**
 	 * @param dataFlatteningFormatter
 	 */
-	ParseState() {
+	public ParseState() {
 		isDoCopyDown           = true;
 		targetElementContext   = EMPTY_STRING;
 		maxRowDepthLevel       = DEFAULT_ROW_DEPTH_LEVEL;
@@ -80,7 +80,7 @@ class ParseState {
 	 *
 	 * @param localName
 	 */
-	protected String startElementBeginUpdate( XMLStreamReader in) {
+	public String startElementBeginUpdate( XMLStreamReader in) {
 		String localName   = in.getLocalName();
 		String displayName = localName;
 		if ( isCurrentElementContentDefined(in) ) {
@@ -115,7 +115,7 @@ class ParseState {
 		return (displayName.equals(localName))? null: displayName;
 	}
 	
-	protected boolean isCurrentElementContentDefined(XMLStreamReader in) {
+	public boolean isCurrentElementContentDefined(XMLStreamReader in) {
 		String localName = in.getLocalName();
 		String contentAttribute = contentDefinedElements.get(localName);
 		if (contentAttribute != null) {
@@ -130,7 +130,7 @@ class ParseState {
 	 * Updates the state at the end of a StAX EndElement event
 	 * @param onTargetEnd
 	 */
-	protected void finishEndElement(boolean onTargetEnd) {
+	public void finishEndElement(boolean onTargetEnd) {
 		String current = context.pop();
 		boolean isElderElement = !isInTarget;
 		if (isElderElement && isKeepElders) {
@@ -150,7 +150,7 @@ class ParseState {
 	// ----------------
 	// STATE INDICATORS
 	// ----------------
-	protected boolean isOnTargetRowStartOrEnd(String localName) {
+	public boolean isOnTargetRowStartOrEnd(String localName) {
 		return context.size() == maxRowDepthLevel 
 			|| rowElementIdentifier.equals(localName);
 	}
@@ -164,7 +164,7 @@ class ParseState {
 	 *
 	 * @return
 	 */
-	protected boolean isTargetFound() {
+	public boolean isTargetFound() {
 		return (row > 0);
 	}
 
@@ -186,7 +186,7 @@ class ParseState {
 	 * @param localName
 	 * @param displayName
 	 */
-	protected void addHeaderOrColumn(String localName, String displayName) {
+	public void addHeaderOrColumn(String localName, String displayName) {
 		if (isInTarget) {
 			Element element = makeElement(localName, displayName);
 			boolean isNew = targetColumnList.add(element);
@@ -219,7 +219,7 @@ class ParseState {
 	 *
 	 * @param localName
 	 */
-	protected void addElderHeaderOrColumn(String localName) {
+	public void addElderHeaderOrColumn(String localName) {
 		if ( ! isTargetFound() ) {
 			if (isKeepElders) {
 				// TODO need to see if this needs a display name, and test
@@ -236,7 +236,7 @@ class ParseState {
 		}
 	}
 
-	protected boolean hasTargetContent() {
+	public boolean hasTargetContent() {
 		for (String value: targetColumnValues.values()) {
 			if (hasEncounteredTargetContent) return hasEncounteredTargetContent;
 			hasEncounteredTargetContent = (value != null && value.length() > 0);
@@ -271,7 +271,7 @@ class ParseState {
 	 * Store the character text using the current element name as key
 	 * @param value
 	 */
-	protected void putChars(String value) {
+	public void putChars(String value) {
 		if (isInTarget) {
 			targetColumnValues.put(current(), value);
 		} else if (isKeepElders) {
@@ -280,15 +280,15 @@ class ParseState {
 	}
 
 
-	protected String current() {
+	public String current() {
 		return context.peek();
 	}
 
-	protected boolean isFirstRow() {
+	public boolean isFirstRow() {
 		return row == 1;
 	}
 	
-	protected String makeFullName(String context, String name) {
+	public String makeFullName(String context, String name) {
 		return (context.length() > 0)? context + Element.SEPARATOR + name: name;
 	}
 
