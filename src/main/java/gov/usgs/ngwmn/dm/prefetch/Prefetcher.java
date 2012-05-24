@@ -23,11 +23,12 @@ import java.util.concurrent.Callable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class Prefetcher {
+public class Prefetcher implements Callable<PrefetchOutcome> {
 
 	private int fetchLimit = 0;
+	private Long timeLimit = null;
 	
-	private Map<String,ExecutorService> agencyExecutorMap = new HashMap<String, ExecutorService>();
+	private ExecutorService executor = Executors.newSingleThreadExecutor();
 	
 	private final Logger logger = LoggerFactory.getLogger(this.getClass());
 	
@@ -36,6 +37,8 @@ public class Prefetcher {
 	private WellRegistryDAO wellDAO;
 	private CacheMetaDataDAO cacheDAO;
 	
+	private PrefetchOutcome outcome = PrefetchOutcome.UNSTARTED;
+
 	public int getFetchLimit() {
 		return fetchLimit;
 	}
@@ -43,10 +46,12 @@ public class Prefetcher {
 		this.fetchLimit = fetchLimit;
 	}
 
-	public void setAgencyExecutorMap(Map<String, ExecutorService> agencyExecutorMap) {
-		this.agencyExecutorMap = agencyExecutorMap;
+	public Long getTimeLimit() {
+		return timeLimit;
 	}
-
+	public void setTimeLimit(Long timeLimit) {
+		this.timeLimit = timeLimit;
+	}
 	public void setBroker(PrefetchI broker) {
 		this.broker = broker;
 	}
@@ -65,34 +70,78 @@ public class Prefetcher {
 			WellDataType.LOG
 	};
 	
-	public void run() {
+	public PrefetchOutcome call() {
 		int tried = 0;
 		
-		while (tried < fetchLimit) {
-			WellStatus well = nextWell();
-			if (well == null) {
-				logger.info("Done");
+		outcome = PrefetchOutcome.RUNNING;
+		
+		// make sure we're working with fresh statistics
+		try {
+			cacheDAO.updateStatistics();
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+		
+		Iterable<WellStatus> wellQueue = populateWellQeue();
+		
+		// start timer after the prelims are done
+		Long endTime = null;
+		if (timeLimit != null) {
+			endTime = System.currentTimeMillis() + timeLimit;
+		}
+		
+		for (WellStatus well : wellQueue) {
+			if (fetchLimit > 0 && tried >= fetchLimit) {
+				logger.info("hit fetch limit {}", tried);
+				outcome = PrefetchOutcome.LIMIT_COUNT;
 				break;
 			}
 			
-			// TODO check to see if well is marked in appropriate network
-			Specifier spec = makeSpec(well.well, well.type);
-			
-			logger.info("pre-fetch of {}", spec);
-			Future<Long> f = dispatch(spec);
-						
-			try {
-				Long ct =  f.get();
-				logger.info("pre-fetched {} bytes for {}", ct, spec);
-			} catch (Exception x) {
-				logger.warn("Failed pre-fetch for " + spec, x);
+			if (endTime != null && System.currentTimeMillis() > endTime) {
+				logger.info("hit time limit after {} of {}", tried, fetchLimit);
+				outcome = PrefetchOutcome.LIMIT_TIME;
+				break;
 			}
-			tried++;
+			
+			// check to see if well is marked in appropriate network
+			if (claimsToHaveData(well.well, well.type)) {
+				Specifier spec = makeSpec(well.well, well.type);
+				
+				logger.debug("pre-fetch of {}", spec);
+				Future<Long> f = dispatch(spec);
+							
+				try {
+					Long ct =  f.get();
+					logger.info("pre-fetched {} bytes for {}", ct, spec);
+				} catch (Exception x) {
+					logger.warn("Failed pre-fetch for " + spec, x);
+				}
+				tried++;
+			} else {
+				logger.info("Skipping well {} type {} due to flag", well.well.getMySiteid(), well.type);
+			}
+			
 		}
 		
-		logger.info("hit fetch limit {}", tried);
+		if (outcome == PrefetchOutcome.RUNNING) {
+			outcome = PrefetchOutcome.FINISHED;
+		}
+		logger.info("Done");
+		
+		return outcome;
 	}
 	
+	private boolean claimsToHaveData(WellRegistry well, WellDataType dt) {
+		switch (dt) {
+		case LOG:
+			return "1".equals(well.getWlSnFlag());
+		case QUALITY:
+			return "1".equals(well.getQwSnFlag());
+		case WATERLEVEL:
+			return "1".equals(well.getWlSnFlag());
+		}
+		return true;
+	}
 	private Specifier makeSpec(WellRegistry well, WellDataType wdt) {
 		Specifier spec = new Specifier(
 				well.getAgencyCd(),
@@ -102,13 +151,7 @@ public class Prefetcher {
 	}
 
 	private Future<Long> dispatch(final Specifier spec) {
-		ExecutorService exec = agencyExecutorMap.get(spec.getAgencyID());
-		if (exec == null) {
-			exec = Executors.newSingleThreadExecutor();
-			agencyExecutorMap.put(spec.getAgencyID(), exec);
-		}
-		
-		Future<Long> f = exec.submit(new Callable<Long>() {
+		Future<Long> f = executor.submit(new Callable<Long>() {
 			public Long call() throws Exception {
 				long count = 
 					broker.prefetchWellData(spec);
@@ -123,21 +166,6 @@ public class Prefetcher {
 		WellRegistry well;
 		CacheMetaData cacheInfo;
 		WellDataType type;
-	}
-
-	PriorityQueue<WellStatus> wellQueue;
-	
-	private WellStatus nextWell() {
-		if (wellQueue == null) {
-			wellQueue = populateWellQeue();
-		}
-		if (wellQueue != null) {
-			WellStatus ws = wellQueue.poll();
-			if (ws != null) {
-				return ws;
-			}
-		}
-		return null;
 	}
 
 	private static Comparator<WellStatus> wellCompare = new Comparator<WellStatus>() {
@@ -162,7 +190,9 @@ public class Prefetcher {
 			int v = 0;
 			
 			if (c1 != null && c2 != null) {
-				v = compareDates(c1.getMostRecentFetchDt(), c2.getMostRecentFetchDt());
+				if (v == 0) {
+					v = compareDates(c1.getMostRecentFetchDt(), c2.getMostRecentFetchDt());
+				}
 				if (v == 0) {
 					v = compareDates(c1.getLastDataDt(), c2.getLastDataDt());
 				}
@@ -187,7 +217,7 @@ public class Prefetcher {
 		
 	};
 	
-	private PriorityQueue<WellStatus> populateWellQeue() {
+	private Iterable<WellStatus> populateWellQeue() {
 		List<WellRegistry> allWells = wellDAO.selectAll();
 		PriorityQueue<WellStatus> pq = new PriorityQueue<WellStatus>(allWells.size(), wellCompare);
 		
