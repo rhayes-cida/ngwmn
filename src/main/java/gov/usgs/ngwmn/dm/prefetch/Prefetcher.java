@@ -143,6 +143,7 @@ public class Prefetcher implements Callable<PrefetchOutcome> {
 		}
 		return true;
 	}
+	
 	private Specifier makeSpec(WellRegistry well, WellDataType wdt) {
 		Specifier spec = new Specifier(
 				well.getAgencyCd(),
@@ -163,12 +164,16 @@ public class Prefetcher implements Callable<PrefetchOutcome> {
 		return f;
 	}
 	
-	private static class WellStatus {
+	public static class WellStatus {
 		WellRegistry well;
 		CacheMetaData cacheInfo;
 		WellDataType type;
 	}
 
+	public Comparator<WellStatus> getWellComparator() {
+		return wellCompare;
+	}
+	
 	private static Comparator<WellStatus> wellCompare = new Comparator<WellStatus>() {
 
 		private int compareDates(Date d1, Date d2) {
@@ -191,11 +196,13 @@ public class Prefetcher implements Callable<PrefetchOutcome> {
 			int v = 0;
 			
 			if (c1 != null && c2 != null) {
+				// TODO This is most recent success date -- should use most recent attempt date instead
 				if (v == 0) {
 					v = compareDates(c1.getMostRecentFetchDt(), c2.getMostRecentFetchDt());
 				}
 				if (v == 0) {
-					v = compareDates(c1.getLastDataDt(), c2.getLastDataDt());
+					// sense reversed, well with more recent data gets re-fetched
+					v = compareDates(c2.getLastDataDt(), c1.getLastDataDt());
 				}
 				// Could compare other dates etc. etc. etc.
 			}

@@ -1,8 +1,15 @@
 package gov.usgs.ngwmn.dm.prefetch;
 
 import static org.junit.Assert.*;
+
+import java.util.Comparator;
+import java.util.Date;
+import java.util.PriorityQueue;
+
 import gov.usgs.ngwmn.dm.PrefetchI;
+import gov.usgs.ngwmn.dm.dao.CacheMetaData;
 import gov.usgs.ngwmn.dm.dao.ContextualTest;
+import gov.usgs.ngwmn.dm.prefetch.Prefetcher.WellStatus;
 import gov.usgs.ngwmn.dm.spec.Specifier;
 
 import org.junit.Before;
@@ -66,4 +73,32 @@ public class PrefetcherTest extends ContextualTest {
 		assertEquals(PrefetchOutcome.FINISHED, outcome);
 	}
 
+	@Test
+	public void testComparator() {
+		Comparator<Prefetcher.WellStatus> comp = victim.getWellComparator();
+		
+		long now = System.currentTimeMillis();
+		
+		Prefetcher.WellStatus ws1 = new Prefetcher.WellStatus();
+		ws1.cacheInfo = new CacheMetaData();
+		ws1.cacheInfo.setMostRecentFetchDt(new Date(now - 2134));
+		
+		Prefetcher.WellStatus ws2 = new Prefetcher.WellStatus();
+		ws2.cacheInfo = new CacheMetaData();
+		ws2.cacheInfo.setMostRecentFetchDt(new Date(now));
+		
+		PriorityQueue<WellStatus> pq = new PriorityQueue<Prefetcher.WellStatus>(4,comp);
+		pq.add(ws2);
+		pq.add(ws1);
+		
+		Prefetcher.WellStatus ows1 = pq.poll();
+		Prefetcher.WellStatus ows2 = pq.poll();
+		Prefetcher.WellStatus ows3 = pq.poll();
+		
+		assertNotNull(ows1);
+		assertNotNull(ows2);
+		assertNull(ows3);
+		
+		assertTrue(ows1.cacheInfo.getMostRecentFetchDt().before(ows2.cacheInfo.getMostRecentFetchDt()));
+	}
 }
