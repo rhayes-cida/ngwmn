@@ -1,6 +1,8 @@
-package gov.usgs.ngwmn.dm.io.xl;
+package gov.usgs.ngwmn.dm.io.transform;
 
 import static org.junit.Assert.*;
+
+import gov.usgs.ngwmn.dm.io.transform.ExcelXssfOutputStream;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
