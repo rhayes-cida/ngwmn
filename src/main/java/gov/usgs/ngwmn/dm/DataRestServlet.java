@@ -1,9 +1,7 @@
 package gov.usgs.ngwmn.dm;
 
 import gov.usgs.ngwmn.WellDataType;
-import gov.usgs.ngwmn.dm.cache.Cache;
 import gov.usgs.ngwmn.dm.io.HttpResponseSupplier;
-import gov.usgs.ngwmn.dm.io.SimpleSupplier;
 import gov.usgs.ngwmn.dm.spec.Specification;
 import gov.usgs.ngwmn.dm.spec.Specifier;
 
@@ -14,7 +12,6 @@ import java.util.List;
 
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
-import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
