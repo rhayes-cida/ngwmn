@@ -3,6 +3,8 @@ package gov.usgs.ngwmn.dm.parse;
 
 import static org.junit.Assert.*;
 
+import gov.usgs.ngwmn.dm.io.parse.USGS_StAXUtils;
+
 import java.io.StringReader;
 import java.util.regex.Pattern;
 

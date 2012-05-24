@@ -1,6 +1,7 @@
-package gov.usgs.ngwmn.dm.parse;
+package gov.usgs.ngwmn.dm.io.parse;
 
 import static org.junit.Assert.*;
+import gov.usgs.ngwmn.dm.io.parse.Element;
 
 import org.junit.Test;
 

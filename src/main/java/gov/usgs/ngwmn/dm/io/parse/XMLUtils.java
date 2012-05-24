@@ -1,4 +1,4 @@
-package gov.usgs.ngwmn.dm.parse;
+package gov.usgs.ngwmn.dm.io.parse;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;

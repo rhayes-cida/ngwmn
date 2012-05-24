@@ -2,6 +2,10 @@ package gov.usgs.ngwmn.dm.parse;
 
 import static gov.usgs.ngwmn.dm.parse.MimeType.*;
 
+import gov.usgs.ngwmn.dm.io.parse.Element;
+import gov.usgs.ngwmn.dm.io.parse.ParseState;
+import gov.usgs.ngwmn.dm.io.parse.XMLUtils;
+
 import java.io.IOException;
 import java.io.Writer;
 import java.util.Date;
@@ -68,7 +72,7 @@ public class DataFlatteningFormatter extends AbstractFormatter implements IForma
 	protected boolean isSilent;                 // set true to not output error messages
 	protected int     depthLevel;
 
-	ParseState state;
+	private ParseState state;
 	
 	// ============
 	// CONSTRUCTORS
