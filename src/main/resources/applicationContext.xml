@@ -152,11 +152,7 @@
 		<property name="dataSource" ref="dataSource"/>
 	</bean>
 	
-	<bean id="Prefetcher" class="gov.usgs.ngwmn.dm.prefetch.Prefetcher">
-		<property name="fetchLimit" value="100"/>
-		<property name="wellDAO" ref="WellRegistryDAO"/>
-		<property name="cacheDAO" ref="CacheMetaDataDAO"/>
-	</bean>
+	<import resource="prefetchContext.xml"/>
 </beans>
 
        
