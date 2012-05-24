@@ -113,31 +113,33 @@
 		<property name="streamAsLob" value="true"/>
 	</bean>
 	
+	<!-- shared among all three XML caches -->
+	<bean id="singleThreadExecutor" 
+        class="java.util.concurrent.Executors"
+        factory-method="newSingleThreadExecutor" destroy-method="shutdown" />
+        
     <bean id="QualityCache" class="gov.usgs.ngwmn.dm.cache.qw.DatabaseXMLCache">
     	<constructor-arg ref="dataSource"/>
     	<constructor-arg value="QUALITY"/>
     	<constructor-arg ref="lobHandler"/>    	
-    	<property name="inspector">
-    		<bean class="gov.usgs.ngwmn.dm.cache.qw.NullInspector"/>
-    	</property>
+    	<property name="inspector" ref="WaterQualityInspector"/>
+    	<property name="executorService" ref="singleThreadExecutor"/>
     </bean>
     
     <bean id="LogCache" class="gov.usgs.ngwmn.dm.cache.qw.DatabaseXMLCache">
     	<constructor-arg ref="dataSource"/>
     	<constructor-arg value="LOG"/>
     	<constructor-arg ref="lobHandler"/>
-    	<property name="inspector">
-    		<bean class="gov.usgs.ngwmn.dm.cache.qw.NullInspector"/>
-    	</property>
+    	<property name="inspector" ref="WellLogInspector"/>
+    	<property name="executorService" ref="singleThreadExecutor"/>
     </bean>
     
     <bean id="WaterlevelCache" class="gov.usgs.ngwmn.dm.cache.qw.DatabaseXMLCache">
     	<constructor-arg ref="dataSource"/>
     	<constructor-arg value="WATERLEVEL"/>
     	<constructor-arg ref="lobHandler"/>
-    	<property name="inspector">
-    		<bean class="gov.usgs.ngwmn.dm.cache.qw.NullInspector"/>
-    	</property>
+    	<property name="inspector" ref="WaterLevelInspector"/>
+    	<property name="executorService" ref="singleThreadExecutor"/>
     </bean>
 
 	<bean id="WaterQualityInspector"  class="gov.usgs.ngwmn.dm.cache.qw.WaterQualityInspector">

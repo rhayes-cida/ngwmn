@@ -26,6 +26,7 @@ import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
 
 import javax.sql.DataSource;
 
@@ -43,6 +44,7 @@ public class DatabaseXMLCache implements Cache {
 	private final String tablename;
 	private final WellDataType wdt;
 	private Inspector inspector;
+	private ExecutorService xService;
 	
 	public DatabaseXMLCache(DataSource ds, WellDataType datatype, LobHandler h) {
 		this.ds = ds;
@@ -59,14 +61,37 @@ public class DatabaseXMLCache implements Cache {
 		return inspector;
 	}
 	public void setInspector(Inspector inspector) {
+		WellDataType iwdt = inspector.forDataType();
+		if (iwdt != null && ! iwdt.equals(getDatatype())) {
+			throw new RuntimeException("Inspector data type does not agree  with mine, " + iwdt);
+		}
 		this.inspector = inspector;
 	}
-
+	
+	public void setExecutorService(ExecutorService x) {
+		this.xService = x;
+	}
+	
 	@Override
 	public WellDataType getDatatype() {
 		return wdt;
 	}
 
+	private void invokeInspect(final int key) {
+		if (xService == null) {
+			inspectAndRelease(key);
+		} else {
+			xService.execute(new Runnable() {
+
+				@Override
+				public void run() {
+					inspectAndRelease(key);
+				}
+				
+			});
+		}
+	}
+	
 	public void inspectAndRelease(int key) {
 		try {
 			if (inspector.acceptable(key)) {
@@ -129,8 +154,8 @@ public class DatabaseXMLCache implements Cache {
 						pooledConn.close();
 						logger.info("saved data for {}, sz {}", well, length);
 						
-						// TODO should invoke this aysnchronously
-						inspectAndRelease(newkey);
+						// may invoke this aysnchronously
+						invokeInspect(newkey);
 					} catch (SQLException sqle) {
 						throw new IOException(sqle);
 					}
