@@ -196,7 +196,9 @@ public class Prefetcher implements Callable<PrefetchOutcome> {
 			int v = 0;
 			
 			if (c1 != null && c2 != null) {
-				// TODO This is most recent success date -- should use most recent attempt date instead
+				if (v == 0) {
+					v = c1.getFetchPriority().compareTo(c2.getFetchPriority());
+				}
 				if (v == 0) {
 					v = compareDates(c1.getMostRecentAttemptDt(), c2.getMostRecentAttemptDt());
 				}
@@ -237,6 +239,9 @@ public class Prefetcher implements Callable<PrefetchOutcome> {
 		}
 
 		List<CacheMetaData> cmd = cacheDAO.listAll();
+		
+		updateFetchPriorities(cmd);
+		
 		Map<CacheMetaDataKey,CacheMetaData> mdMap = new HashMap<CacheMetaDataKey, CacheMetaData>(cmd.size());
 		for (CacheMetaData c : cmd) {
 			mdMap.put(c, c);
@@ -259,5 +264,36 @@ public class Prefetcher implements Callable<PrefetchOutcome> {
 		}
 		
 		return pq;
+	}
+	
+	/**
+	 * Set cache priorities -- this overrides any other ranking.
+	 * Lower comes first, default is 100.
+	 * @param cmd
+	 */
+	private void updateFetchPriorities(List<CacheMetaData> cmd) {
+		Date now = new Date();
+		for (CacheMetaData c : cmd) {
+			populateFetchPriority(c, now);
+		}
+		
+	}
+	private static final long HOURS = 1000L*60*60;
+	private static final long DAYS = HOURS*24;
+	
+	private void populateFetchPriority(CacheMetaData c, Date now) {
+		if (c.getMostRecentAttemptDt() == null) {
+			c.setFetchPriority(1);
+		}
+		else if (c.getSuccessCt() == 0 && c.getFailCt() > 3) {
+			c.setFetchPriority(200);
+		} 
+		else if (c.getMostRecentSuccessDt() != null && c.getMostRecentSuccessDt().getTime() < (now.getTime() - 10*DAYS)) {
+			c.setFetchPriority(4);
+		}
+		else {
+			c.setFetchPriority(100);
+		}
+		
 	}
 }

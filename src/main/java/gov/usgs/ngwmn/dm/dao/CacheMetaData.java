@@ -177,6 +177,9 @@ public class CacheMetaData extends CacheMetaDataKey {
 	 * @mbggenerated  Fri May 25 11:07:09 CDT 2012
 	 */
 	public Integer getFetchPriority() {
+		if (fetchPriority == null) {
+			fetchPriority = Integer.valueOf(100);
+		}
 		return fetchPriority;
 	}
 

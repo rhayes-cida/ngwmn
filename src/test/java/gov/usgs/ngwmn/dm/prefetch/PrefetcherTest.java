@@ -87,18 +87,27 @@ public class PrefetcherTest extends ContextualTest {
 		ws2.cacheInfo = new CacheMetaData();
 		ws2.cacheInfo.setMostRecentAttemptDt(new Date(now));
 		
+		Prefetcher.WellStatus ws3 = new Prefetcher.WellStatus();
+		ws3.cacheInfo = new CacheMetaData();
+		ws3.cacheInfo.setMostRecentAttemptDt(new Date(now));
+		ws3.cacheInfo.setFetchPriority(87);
+
 		PriorityQueue<WellStatus> pq = new PriorityQueue<Prefetcher.WellStatus>(4,comp);
-		pq.add(ws2);
 		pq.add(ws1);
+		pq.add(ws2);
+		pq.add(ws3);
 		
 		Prefetcher.WellStatus ows1 = pq.poll();
 		Prefetcher.WellStatus ows2 = pq.poll();
 		Prefetcher.WellStatus ows3 = pq.poll();
+		Prefetcher.WellStatus ows4 = pq.poll();
 		
 		assertNotNull(ows1);
+		assertEquals(ws3, ows1);
 		assertNotNull(ows2);
-		assertNull(ows3);
+		assertNotNull(ows3);
+		assertNull(ows4);
 		
-		assertTrue(ows1.cacheInfo.getMostRecentAttemptDt().before(ows2.cacheInfo.getMostRecentAttemptDt()));
+		assertTrue(ows2.cacheInfo.getMostRecentAttemptDt().before(ows3.cacheInfo.getMostRecentAttemptDt()));
 	}
 }
