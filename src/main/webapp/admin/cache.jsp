@@ -51,7 +51,7 @@ Loader loader = ctx.getBean("Loader", Loader.class);
 <th>Data Type</th>
 <th>Success<br/>Count</th>
 <th>Fail<br/>Count</th>
-<th>Last Success</th>
+<th>Last Attempt</th>
 </tr>
 
 <%
@@ -64,7 +64,7 @@ dao.updateStatistics();
 <td>${cmd.dataType }</td>
 <td>${cmd.successCt}</td>
 <td>${cmd.failCt}</td>
-<td>${cmd.mostRecentFetchDt}</td>
+<td>${cmd.mostRecentAttemptDt}</td>
 </tr>
 
 </c:forEach>
