@@ -229,6 +229,13 @@ public class Prefetcher implements Callable<PrefetchOutcome> {
 		List<WellRegistry> allWells = wellDAO.selectAll();
 		PriorityQueue<WellStatus> pq = new PriorityQueue<WellStatus>(allWells.size(), wellCompare);
 		
+		// make sure we're working with fresh statistics
+		try {
+			cacheDAO.updateCacheMetaData();
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+
 		List<CacheMetaData> cmd = cacheDAO.listAll();
 		Map<CacheMetaDataKey,CacheMetaData> mdMap = new HashMap<CacheMetaDataKey, CacheMetaData>(cmd.size());
 		for (CacheMetaData c : cmd) {

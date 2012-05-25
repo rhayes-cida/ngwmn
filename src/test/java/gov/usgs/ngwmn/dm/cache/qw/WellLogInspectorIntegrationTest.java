@@ -62,7 +62,7 @@ public class WellLogInspectorIntegrationTest extends ContextualTest {
 		System.out.printf("testing log data for log id %d\n", id);
 		boolean ok = victim.acceptable(id);
 		
-		assertTrue("got a result", true);
+		assertTrue("got a result", ok || true);
 	}
 	
 	@Test

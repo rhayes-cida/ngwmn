@@ -142,4 +142,6 @@ public interface CacheMetaDataMapper {
 	})
 	@ResultMap("BaseResultMap")
 	List<CacheMetaData> listAll();
+	
+	void updateCacheMetaData();
 }

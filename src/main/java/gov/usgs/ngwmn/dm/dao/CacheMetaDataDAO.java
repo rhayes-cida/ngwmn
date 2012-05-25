@@ -52,6 +52,10 @@ public class CacheMetaDataDAO {
 			conn.close();
 		}
 	}
+	
+	public void updateCacheMetaData() {
+		mapper.updateCacheMetaData();
+	}
 
 	public CacheMetaData get(WellRegistryKey well, WellDataType type) {
 		CacheMetaDataKey key = new CacheMetaDataKey();

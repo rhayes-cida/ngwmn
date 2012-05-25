@@ -320,4 +320,8 @@
       and DATA_TYPE = #{dataType,jdbcType=VARCHAR}
       and SITE_NO = #{siteNo,jdbcType=VARCHAR}
   </update>
+  
+  <select id="updateCacheMetaData" statementType="CALLABLE" resultMap="BaseResultMap">
+  	{call GW_DATA_PORTAL.UPDATE_CACHE_META_DATA}
+  </select>
 </mapper>

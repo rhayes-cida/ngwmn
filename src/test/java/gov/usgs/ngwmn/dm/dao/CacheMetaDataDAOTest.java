@@ -1,9 +1,6 @@
 package gov.usgs.ngwmn.dm.dao;
 
 import static org.junit.Assert.*;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
 
 import gov.usgs.ngwmn.WellDataType;
 
@@ -42,6 +39,12 @@ public class CacheMetaDataDAOTest extends ContextualTest {
 		assertTrue("made it", true);
 	}
 	
+	@Test
+	public void testUpdateCacheMetaData() throws Exception {
+		dao.updateCacheMetaData();
+		assertTrue("survived", true);
+	}
+
 	@Test
 	public void testGet() {
 		// checkSiteIsVisible("USGS", "402734087033401");
