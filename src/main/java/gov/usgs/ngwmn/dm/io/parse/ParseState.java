@@ -80,7 +80,7 @@ public class ParseState {
 	 *
 	 * @param localName
 	 */
-	public String startElementBeginUpdate( XMLStreamReader in) {
+	public String startElementBeginUpdate(XMLStreamReader in) {
 		String localName   = in.getLocalName();
 		String displayName = localName;
 		if ( isCurrentElementContentDefined(in) ) {

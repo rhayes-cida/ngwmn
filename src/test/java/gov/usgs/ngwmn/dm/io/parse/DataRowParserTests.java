@@ -103,7 +103,8 @@ public class DataRowParserTests {
 	}
 	
 	void makeParser(String xml) {
-		parser = new DataRowParser( new ByteArrayInputStream( xml.getBytes() ) );
+		parser = new DataRowParser();
+		parser.setInputStream( new ByteArrayInputStream( xml.getBytes() ) );
 	}
 	
 	@Test
@@ -270,6 +271,53 @@ public class DataRowParserTests {
 		firstTwoRecordsWithMissingElements(5);
 		secondRecordNewElements();
 		thirdRecordWithMissingElements();
+	}
+	@Test
+	public void test_bytesReadFew() throws Exception {
+		String xml = "<get><Site>2172257</Site></get>";
+		makeParser(xml);
+
+		parser.nextRow();
+		assertEquals(25, parser.bytesParsed());
+		
+		Object result = parser.nextRow();
+		assertEquals(31, parser.bytesParsed());
+		assertNull(result);
+	}
+	@Test
+	public void test_bytesReadMany() throws Exception {
+		String xml = TRIPLE_ROW_MULTIPLE_ORG;
+		
+//		String a = "<get>"
+//		+ "<Org><OrgID>5</OrgID>"
+//		+ "<Site><Identification code='01'><agency></agency><Id level='admin'>2172257</Id></Identification><Type>water</Type></Site>"
+//		+ "<Site><Identification code='02'><agency new='yes'>USGS2</agency></Identification><Type>clay</Type><Result>good</Result></Site>";
+//		
+//		String b = "</Org>"
+//		+ "<Org><OrgID>6</OrgID>"
+//		+ "<Site><Identification code='03'><agency></agency><Id level='user'>2172258</Id></Identification><Type>stream</Type></Site>";
+//		
+//		String c = "</Org>"
+//		+ "</get>";		
+
+//		<get>
+//		<Org><OrgID>5</OrgID>
+//		<Site><Identification code="01"><agency></agency><Id level="admin">2172257</Id></Identification><Type>water</Type></Site>
+//		<Site><Identification code="02"><agency new="yes">USGS2</agency></Identification><Type>clay</Type><Result>good</Result></Site>
+		
+		makeParser(xml);
+		parser.setKeepElderInfo(false);
+		parser.setRowElementName("Site");
+		firstTwoRecordsWithMissingElements(5);
+		assertEquals(273, parser.bytesParsed());
+		
+		secondRecordNewElements();
+		thirdRecordWithMissingElements();
+		assertEquals(273+148, parser.bytesParsed());
+
+		Object result = parser.nextRow();
+		assertEquals(433, parser.bytesParsed());
+		assertNull(result);
 	}
 	
 	@Test
