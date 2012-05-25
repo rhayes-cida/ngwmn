@@ -92,7 +92,9 @@ public aspect PipeStatisticsAspect {
 		logger.debug("started in webfetch {}", pipe);
 	}
 	
-	after(WebRetriever.WebInputSupplier s) throwing(Exception e): webfetch(s) {
+	after(WebRetriever.WebInputSupplier s) throwing(Exception e): 
+		webfetch(s) && ! cflow(call(* Pipeline.invoke())) 
+	{
 		Pipeline pipe = s.getPipeline();
 		logger.debug("stopped in webfetch {} throw", pipe);
 		pipe.stats.markEnd(Status.FAIL);
