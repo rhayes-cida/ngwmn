@@ -3,6 +3,7 @@ package gov.usgs.ngwmn.dm.io.transform;
 
 import gov.usgs.ngwmn.dm.io.parse.Element;
 import gov.usgs.ngwmn.dm.io.parse.Parser;
+import gov.usgs.ngwmn.dm.spec.Specifier;
 
 import java.io.FilterOutputStream;
 import java.io.IOException;
@@ -11,6 +12,11 @@ import java.io.PipedInputStream;
 import java.io.PipedOutputStream;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 import org.apache.commons.lang.math.RandomUtils;
 import org.slf4j.Logger;
@@ -23,7 +29,7 @@ public abstract class OutputStreamTransform extends FilterOutputStream {
 	
 	protected final Logger logger = LoggerFactory.getLogger(getClass());
 	
-	private Parser parser;
+	private Future<Parser> fparser;
 	private PipedInputStream   pin = new PipedInputStream();
 	private PipedOutputStream  pout;
 	
@@ -32,7 +38,9 @@ public abstract class OutputStreamTransform extends FilterOutputStream {
 	private long byteBufferSize;
 	
 	private Thread parserInit;
-
+	private ExecutorService executor = Executors.newSingleThreadExecutor();
+	
+	
 	public abstract String formatRow(List<Element> headers, Map<String, String> rowData);
 	
 	public OutputStreamTransform(OutputStream out) throws IOException {
@@ -42,23 +50,19 @@ public abstract class OutputStreamTransform extends FilterOutputStream {
 	}
 
 	public void setParser(final Parser parser) {
-		this.parser = parser;
 		
-		parserInit = new Thread(
-			new Runnable(){
-		        public void run(){
-		        	synchronized (OutputStreamTransform.this) {
-			    		logger.debug("started  constructing parser");
-			    		parser.setInputStream(pin);
-			    		logger.debug("finished constructing parser");
-			    		parserInit = null; // indicate the parser is finished
-					}
-		        }
-		    },
-		"Parser Init - " + RandomUtils.nextInt(9999)); // looks like same name threads is a problem
-		parserInit.setDaemon(true); // if something goes wrong allow jvm to exit
-		parserInit.start();
+		Future<Parser> f = executor.submit(new Callable<Parser>() {
+			public Parser call() throws Exception {
+	    		logger.debug("InputStream parser setting");
+	    		parser.setInputStream(pin);
+	    		logger.debug("InputStream parser finished");
+				return parser;
+			}
+		});
+		
+		fparser = f;
 	}
+
 	
 	public void setBufferSize(long size) {
 		byteBufferSize = size;
@@ -80,37 +84,28 @@ public abstract class OutputStreamTransform extends FilterOutputStream {
     private synchronized boolean processBytes() throws IOException {
     	logger.debug("processing bytes");
     	
-    	ensureParserReady();
-    	
-    	Map<String, String> row = parser.nextRow();
+    	try {
+			Map<String, String> row = fparser.get().nextRow();
 
-    	if (row == null) return false;
-		
-    	List<Element> headers   = parser.headers();
-    	
-    	if (bytesProcessed == 0) {
-    		writeRow(headers, null);
-    	}
-    	bytesProcessed = parser.bytesParsed();
+			if (row == null) return false;
+			
+			List<Element> headers   = fparser.get().headers();
+			
+			if (bytesProcessed == 0) {
+				writeRow(headers, null);
+			}
+			bytesProcessed = fparser.get().bytesParsed();
 
-    	writeRow(headers, row);
+			writeRow(headers, row);
+		} catch (InterruptedException e) {
+			throw new IOException(e);
+		} catch (ExecutionException e) {
+			throw new IOException(e);
+		}
     	return true;
 	}
 
-	private void ensureParserReady() {
-		if (parserInit != null) { // if parser is not finished
-    		try {
-    			logger.debug("waiting on parser init");
-    			// lets make sure the parser is read to process bytes
-    			parserInit.join();
-    		} catch (Exception e) {
-    			// even though we null check the thread we cannot be sure that it might finish between check and join
-    			logger.info("NullPointer or Interrupted Exceptions are not a problem for parser init");
-    			// log this occurrence in case it happens too much and we want to re-fator
-    		}
-    	}
-	}
-
+    
 	private void writeRow(List<Element> headers, Map<String, String> rowData) throws IOException {
 		String rowText = formatRow(headers, rowData);
 		writeRow(rowText);
