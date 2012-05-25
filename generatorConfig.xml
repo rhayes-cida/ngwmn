@@ -39,6 +39,17 @@
     <table schema="GW_DATA_PORTAL" tableName="CACHE_META_DATA">
     	<columnOverride column="SUCCESS_CT" javaType="java.lang.Integer"/>
     	<columnOverride column="FAIL_CT" javaType="java.lang.Integer"/>
+    	<columnOverride column="FETCH_PRIORITY" javaType="java.lang.Integer"/>
+    </table>
+    <table schema="GW_DATA_PORTAL" tableName="LOG_DATA_QUALITY">
+    	<columnOverride column="lithologyCount" javaType="java.lang.Integer"/>
+    	<columnOverride column="constructionCount" javaType="java.lang.Integer"/>
+    </table>
+    <table schema="GW_DATA_PORTAL" tableName="QUALITY_DATA_QUALITY">
+    	<columnOverride column="CT" javaType="java.lang.Integer"/>
+    </table>
+    <table schema="GW_DATA_PORTAL" tableName="WATERLEVEL_DATA_QUALITY">
+    	<columnOverride column="CT" javaType="java.lang.Integer"/>
     </table>
   </context>
 </generatorConfiguration>

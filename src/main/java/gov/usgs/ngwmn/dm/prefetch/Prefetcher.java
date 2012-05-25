@@ -198,7 +198,7 @@ public class Prefetcher implements Callable<PrefetchOutcome> {
 			if (c1 != null && c2 != null) {
 				// TODO This is most recent success date -- should use most recent attempt date instead
 				if (v == 0) {
-					v = compareDates(c1.getMostRecentFetchDt(), c2.getMostRecentFetchDt());
+					v = compareDates(c1.getMostRecentAttemptDt(), c2.getMostRecentAttemptDt());
 				}
 				if (v == 0) {
 					// sense reversed, well with more recent data gets re-fetched

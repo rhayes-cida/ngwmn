@@ -49,8 +49,8 @@ public class CacheMetaDataDAOTest extends ContextualTest {
 		WellDataType type = WellDataType.WATERLEVEL;
 		CacheMetaData cmd = dao.get(well, type);
 		
-		System.out.printf("Got %s\n", cmd);
-		assertNotNull(cmd);
+		assertNotNull("expected some meta data",cmd);
+		System.out.printf("Got successCt=%d, failCt=%d, last attempt=%s\n", cmd.getSuccessCt(), cmd.getFailCt(), cmd.getMostRecentAttemptDt());
 		assertEquals("Agency code", "USGS", cmd.getAgencyCd());
 		assertEquals("Site no", "007", cmd.getSiteNo());
 		assertTrue("non-negative fail count", cmd.getFailCt() >= 0);

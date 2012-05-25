@@ -81,11 +81,11 @@ public class PrefetcherTest extends ContextualTest {
 		
 		Prefetcher.WellStatus ws1 = new Prefetcher.WellStatus();
 		ws1.cacheInfo = new CacheMetaData();
-		ws1.cacheInfo.setMostRecentFetchDt(new Date(now - 2134));
+		ws1.cacheInfo.setMostRecentAttemptDt(new Date(now - 2134));
 		
 		Prefetcher.WellStatus ws2 = new Prefetcher.WellStatus();
 		ws2.cacheInfo = new CacheMetaData();
-		ws2.cacheInfo.setMostRecentFetchDt(new Date(now));
+		ws2.cacheInfo.setMostRecentAttemptDt(new Date(now));
 		
 		PriorityQueue<WellStatus> pq = new PriorityQueue<Prefetcher.WellStatus>(4,comp);
 		pq.add(ws2);
@@ -99,6 +99,6 @@ public class PrefetcherTest extends ContextualTest {
 		assertNotNull(ows2);
 		assertNull(ows3);
 		
-		assertTrue(ows1.cacheInfo.getMostRecentFetchDt().before(ows2.cacheInfo.getMostRecentFetchDt()));
+		assertTrue(ows1.cacheInfo.getMostRecentAttemptDt().before(ows2.cacheInfo.getMostRecentAttemptDt()));
 	}
 }
