@@ -9,29 +9,36 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamConstants;
+import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
 
 public class DataRowParser implements Parser {
 	
-	protected final XMLStreamReader     reader;
 	protected final ParseState          state;
 	protected final List<Element>       headers;
 	protected final Set<String>         ignoredAttributes;
 	protected final Map<String, String> contentDefinedElements;
-
+	
+	protected XMLStreamReader     reader;
+	protected long bytesRead;
 	protected boolean eof;
 	
-	public DataRowParser(InputStream is) {
+	public DataRowParser() {
 		state                  = new ParseState();
 		ignoredAttributes      = new HashSet<String>();
 		headers				   = new LinkedList<Element>();
 		contentDefinedElements = new HashMap<String, String>();
-//		reader 				   = new XMLStreamReader(is);
+	}
+	
+	public void setInputStream(InputStream is) {
 		try {
-			reader = USGS_StAXUtils.getXMLInputFactory().createXMLStreamReader(is);
-		} catch (Exception e) {
+			XMLInputFactory factory = USGS_StAXUtils.getXMLInputFactory();
+			reader = factory.createXMLStreamReader(is);
+		} catch (XMLStreamException e) {
+			// TODO we might want this to be an IOExecption instead
 			throw new RuntimeException(e);
 		}
 	}
@@ -52,6 +59,10 @@ public class DataRowParser implements Parser {
 		state.isDoCopyDown = copyDown;
 	}
 	
+	@Override
+	public long bytesParsed() {
+		return bytesRead;
+	}
 	public List<Element> headers() {
 		if ( headers.isEmpty() ) {
 			for (Element element : state.targetColumnList) {
@@ -72,11 +83,15 @@ public class DataRowParser implements Parser {
 			while ( ! done && reader.hasNext() ) {
 				int event = reader.next();
 				
+				if (event != XMLStreamConstants.END_DOCUMENT) {
+					updateBytes(event);
+				}
+				
 				switch (event) {
 					case XMLStreamConstants.START_DOCUMENT:
 						break; // no start document handling needed
 					case XMLStreamConstants.START_ELEMENT:
-						startElement(reader, state);
+						startElement(state);
 						break;
 					case XMLStreamConstants.CHARACTERS:
 						state.putChars(reader.getText().trim());
@@ -92,7 +107,7 @@ public class DataRowParser implements Parser {
 						break;
 					case XMLStreamConstants.END_DOCUMENT:
 						eof = true;
-						break;
+						return null;
 					// TODO no default
 				}
 			}
@@ -103,6 +118,35 @@ public class DataRowParser implements Parser {
 		return  currentRow();
 	}
 	
+	
+	// TODO this is not accurate. I could not find access to accurate counts
+	// this will miss XML headers and whitespace to name just a couple
+	private void updateBytes(int event) {
+		
+		StringBuilder text = new StringBuilder();
+		
+		if ( reader.isCharacters() ) {
+			text.append(reader.getText());
+		} else {
+			text.append('<');
+			if ( reader.isEndElement() ) {
+				text.append('/');
+			}
+			text.append(reader.getLocalName());
+			if ( reader.isStartElement() ) {
+				for (int a=0; a<reader.getAttributeCount(); a++) {
+					text.append(' ')
+						.append(reader.getAttributeLocalName(a))
+						.append("=\"")
+						.append(reader.getAttributeValue(a))
+						.append('"');
+				}
+			}
+			text.append('>');
+		}
+		bytesRead  += text.length();
+	}
+
 	@SuppressWarnings("unchecked")
 	private boolean endElement() {
 		String localName = reader.getLocalName();
@@ -157,11 +201,11 @@ public class DataRowParser implements Parser {
 			}
 		}
 	}
-	protected void startElement(XMLStreamReader in, ParseState state) {
+	protected void startElement(ParseState state) {
 		
 
-		String  localName   = in.getLocalName();
-		String  displayName = state.startElementBeginUpdate(in);
+		String  localName   = reader.getLocalName();
+		String  displayName = state.startElementBeginUpdate(reader);
 
 		if ( state.isTargetFound() && state.isInTarget ) {
 			// PROCESS THE ELEMENT HEADERS
@@ -169,42 +213,39 @@ public class DataRowParser implements Parser {
 			// Add columns for later rows, but they don't get headers because
 			// we're streaming and can't go back to the column headers.
 			state.addHeaderOrColumn(localName, displayName);
-			processAttributeHeadersNamesValues(in, state.current(), 
-					state.targetColumnList, state.targetColumnValues);
+			processAttributeHeadersNamesValues(state.current(), state.targetColumnList, state.targetColumnValues);
 			
 		} else if ( state.isKeepElders && ! state.isInTarget ) {
 			state.addElderHeaderOrColumn(localName);
-			processAttributeHeadersNamesValues(in, state.current(), 
-					state.elderColumnList, state.elderColumnValues);
+			processAttributeHeadersNamesValues(state.current(), state.elderColumnList, state.elderColumnValues);
 		}
 	}
 	
-	protected void processAttributeHeadersNamesValues(XMLStreamReader in, String currentState, 
-			Set<Element> elements, Map<String,String> values) {
+	protected void processAttributeHeadersNamesValues(String currentState, Set<Element> elements, Map<String,String> values) {
 		
-		String  localName            = in.getLocalName();
-		boolean isContentDefined     = isCurrentElementContentDefined(in);
+		String  localName            = reader.getLocalName();
+		boolean isContentDefined     = isCurrentElementContentDefined();
 		String  contentAttributeName = isContentDefined ? contentDefinedElements.get(localName) : null;
 		
 		// PROCESS/STORE ATTRIBUTE HEADERS AND NAME/VALUES
-		for (int i=0; i<in.getAttributeCount(); i++) {
-			String attLocalName = in.getAttributeLocalName(i);
+		for (int i=0; i<reader.getAttributeCount(); i++) {
+			String attLocalName = reader.getAttributeLocalName(i);
 			
 			if ( ! ignoredAttributes.contains(attLocalName) 
 			  && ! (isContentDefined && attLocalName.equals(contentAttributeName)) ) {
 				String fullName = makeFullName(currentState, attLocalName);
 				elements.add( new Element(fullName, attLocalName, null) );
-				values.put(fullName, in.getAttributeValue(i).trim());
+				values.put(fullName, reader.getAttributeValue(i).trim());
 			}
 		}
 	}
-	protected boolean isCurrentElementContentDefined(XMLStreamReader in) {
-		String localName = in.getLocalName();
+	protected boolean isCurrentElementContentDefined() {
+		String localName = reader.getLocalName();
 		String contentAttribute = contentDefinedElements.get(localName);
 		if (contentAttribute != null) {
 			// This is a content defined element only if it
 			// matches the local name and has a corresponding attribute value;
-			return in.getAttributeValue(null, contentAttribute) != null;
+			return reader.getAttributeValue(null, contentAttribute) != null;
 		}
 		return false;
 	}
