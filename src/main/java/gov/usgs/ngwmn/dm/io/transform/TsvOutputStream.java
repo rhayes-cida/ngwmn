@@ -8,22 +8,22 @@ import java.util.List;
 import java.util.Map;
 
 
-public class CsvOutputStream extends OutputStreamTransform {
+public class TsvOutputStream extends OutputStreamTransform {
 
 	
-	public CsvOutputStream(OutputStream out) throws IOException {
+	public TsvOutputStream(OutputStream out) throws IOException {
 		super(out);
 	}
 
 	public String formatRow(List<Element> headers, Map<String, String> rowData) {
-		logger.debug("CSV Format Row");
+		logger.debug("TSV Format Row");
 		
 		StringBuilder rowText = new StringBuilder(); 
 		
 		for (Element header : headers) {
 			String data = (rowData==null) ? header.displayName : rowData.get(header.fullName);
 			data = (data==null) ? "" : data;
-			rowText.append(data).append(',');
+			rowText.append(data).append('\t');
 		}
 		return rowText.toString();
 	}
