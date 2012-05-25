@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans 
+	xmlns="http://www.springframework.org/schema/beans" 
+	xmlns:task="http://www.springframework.org/schema/task"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="
+    	http://www.springframework.org/schema/beans 	http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+		http://www.springframework.org/schema/task 		http://www.springframework.org/schema/task/spring-task-3.1.xsd
+    ">
+
+	<bean id="Prefetcher" class="gov.usgs.ngwmn.dm.prefetch.Prefetcher">
+		<property name="fetchLimit" value="200"/>
+		<property name="timeLimit" 	value="10800000"/> <!-- 1000*60*60*3, 3 hours -->
+		<property name="wellDAO" 	ref="WellRegistryDAO"/>
+		<property name="cacheDAO" 	ref="CacheMetaDataDAO"/>
+		<property name="broker" 	ref="DataBroker"/>
+	</bean>
+    
+    <task:scheduled-tasks scheduler="scheduler">
+    	<task:scheduled ref="Prefetcher" method="call" cron="0 0 1 * * ?"/>
+    </task:scheduled-tasks>
+    
+    <task:scheduler id="scheduler" pool-size="1"/>
+   
+</beans>

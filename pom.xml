@@ -168,6 +168,12 @@
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
+        <groupId>org.apache.tomcat</groupId>
+        	<artifactId>dbcp</artifactId>
+        	<version>6.0.35</version>
+			<scope>provided</scope>
+      	</dependency>
+		<dependency>
 			<groupId>com.oracle</groupId>
 			<artifactId>ojdbc6</artifactId>
 			<version>11.2.0.2.0-1</version>
@@ -216,7 +222,7 @@
 						<excludes>
 							<exclude>**/integration/**</exclude>
 		        			<exclude>**/functional/**</exclude>
-		        			<exclude>**/*IntegrationTest</exclude>
+		        			<exclude>**/*IntegrationTest.java</exclude>
 						</excludes>
 					</configuration>
 				</plugin>
@@ -241,7 +247,7 @@
 		        	<includes>
 		        		<include>**/integration/**</include>
 		        		<include>**/functional/**</include>
-		        		<include>**/*IntegrationTest</include>
+		        		<include>**/*IntegrationTest.java</include>
 		        	</includes>
 		        	<testFailureIgnore>true</testFailureIgnore>
 		        </configuration>

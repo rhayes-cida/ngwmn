@@ -1,5 +1,7 @@
 package gov.usgs.ngwmn.dm.dao;
 
+import gov.usgs.ngwmn.WellDataType;
+
 import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.util.List;
@@ -49,5 +51,17 @@ public class CacheMetaDataDAO {
 		} finally {
 			conn.close();
 		}
+	}
+	
+	public void updateCacheMetaData() {
+		mapper.updateCacheMetaData();
+	}
+
+	public CacheMetaData get(WellRegistryKey well, WellDataType type) {
+		CacheMetaDataKey key = new CacheMetaDataKey();
+		key.setAgencyCd(well.getAgencyCd());
+		key.setSiteNo(well.getSiteNo());
+		key.setDataType(type.name());
+		return mapper.selectByPrimaryKey(key);
 	}
 }

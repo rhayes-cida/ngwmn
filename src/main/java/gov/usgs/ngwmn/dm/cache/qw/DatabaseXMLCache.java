@@ -26,10 +26,12 @@ import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
 
 import javax.sql.DataSource;
 
 import org.apache.commons.codec.binary.Hex;
+import org.apache.tomcat.dbcp.dbcp.DelegatingConnection;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.support.lob.LobHandler;
@@ -42,6 +44,7 @@ public class DatabaseXMLCache implements Cache {
 	private final String tablename;
 	private final WellDataType wdt;
 	private Inspector inspector;
+	private ExecutorService xService;
 	
 	public DatabaseXMLCache(DataSource ds, WellDataType datatype, LobHandler h) {
 		this.ds = ds;
@@ -58,14 +61,37 @@ public class DatabaseXMLCache implements Cache {
 		return inspector;
 	}
 	public void setInspector(Inspector inspector) {
+		WellDataType iwdt = inspector.forDataType();
+		if (iwdt != null && ! iwdt.equals(getDatatype())) {
+			throw new RuntimeException("Inspector data type does not agree  with mine, " + iwdt);
+		}
 		this.inspector = inspector;
 	}
-
+	
+	public void setExecutorService(ExecutorService x) {
+		this.xService = x;
+	}
+	
 	@Override
 	public WellDataType getDatatype() {
 		return wdt;
 	}
 
+	private void invokeInspect(final int key) {
+		if (xService == null) {
+			inspectAndRelease(key);
+		} else {
+			xService.execute(new Runnable() {
+
+				@Override
+				public void run() {
+					inspectAndRelease(key);
+				}
+				
+			});
+		}
+	}
+	
 	public void inspectAndRelease(int key) {
 		try {
 			if (inspector.acceptable(key)) {
@@ -84,7 +110,14 @@ public class DatabaseXMLCache implements Cache {
 			// TODO This is a rather ugly.
 			
 			final WellRegistryKey key = new WellRegistryKey(well.getAgencyID(), well.getFeatureID());
-			final Connection conn = ds.getConnection();
+			
+			// Ugly code to work around Tomcat 6 pooled connection, which does not have createClob method.
+			final Connection pooledConn = ds.getConnection();
+			Connection dconn = pooledConn;
+			if (pooledConn instanceof DelegatingConnection) {
+				dconn = ((DelegatingConnection) pooledConn).getInnermostDelegate();
+			}
+			final Connection conn = dconn;
 			
 			final Clob clob = conn.createClob();
 			// TODO Ascii?
@@ -118,11 +151,11 @@ public class DatabaseXMLCache implements Cache {
 						conn.commit();
 						// TODO Clean up clob?
 						clob.free();
-						conn.close();
+						pooledConn.close();
 						logger.info("saved data for {}, sz {}", well, length);
 						
-						// TODO should invoke this aysnchronously
-						inspectAndRelease(newkey);
+						// may invoke this aysnchronously
+						invokeInspect(newkey);
 					} catch (SQLException sqle) {
 						throw new IOException(sqle);
 					}
@@ -139,10 +172,12 @@ public class DatabaseXMLCache implements Cache {
 	}
 
 	public void publish(int id) throws Exception {
-			setPublished(id, "Y");
+		logger.info("publishing {}[{}]", tablename, id);
+		setPublished(id, "Y");
 	}
 
 	public void withdraw(int id) throws Exception {
+		logger.warn("fetched data was found unacceptable, {}[{}]", tablename, id);
 		setPublished(id, "N");
 	}
 	

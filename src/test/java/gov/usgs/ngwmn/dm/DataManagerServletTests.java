@@ -404,6 +404,19 @@ public class DataManagerServletTests {
 }
 
 abstract class MockRequest implements HttpServletRequest {	
+	
+	public String getLocalAddr() {
+		throw new NotImplementedException();
+	}
+	public String getLocalName() {
+		throw new NotImplementedException();
+	}
+	public int getLocalPort() {
+		throw new NotImplementedException();
+	}
+	public int getRemotePort() {
+		throw new NotImplementedException();
+	}
 	@Override
 	public void setCharacterEncoding(String arg0)
 			throws UnsupportedEncodingException {

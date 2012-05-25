@@ -309,4 +309,7 @@ columns
 
 group by quality_cache_id, xq.cn;
 
+-- TODO Look into use of type constructor functions like xs:date(...)
+-- TODO Look into doing the aggregation in XQuery
+-- TODO Look into performance -- query plan, xml indexes, see http://docs.oracle.com/cd/B28359_01/appdev.111/b28369/xdb_xquery.htm#autoId22
 
