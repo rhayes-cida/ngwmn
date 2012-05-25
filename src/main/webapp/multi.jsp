@@ -22,7 +22,7 @@
 		<input type="submit" value="download" />
 		<table>
 			<tr>
-			
+			<td>
 
 		<%
 		Connection connection = null;
