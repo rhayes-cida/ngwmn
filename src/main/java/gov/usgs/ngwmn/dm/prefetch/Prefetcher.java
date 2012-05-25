@@ -135,7 +135,7 @@ public class Prefetcher implements Callable<PrefetchOutcome> {
 	private boolean claimsToHaveData(WellRegistry well, WellDataType dt) {
 		switch (dt) {
 		case LOG:
-			return "1".equals(well.getWlSnFlag());
+			return true; // All wells should provide well log data
 		case QUALITY:
 			return "1".equals(well.getQwSnFlag());
 		case WATERLEVEL:
