@@ -27,6 +27,7 @@ public class SupplyZipEntry extends Supplier<OutputStream> {
 					.append('.')
 					.append(spec.getTypeID().suffix)
 					.toString();
+		logger.debug("initialize : zip entry {}", name);
 		
 		return new ZipEntryOutputStream( parent.getZip(), name );
 	}

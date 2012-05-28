@@ -24,7 +24,7 @@ public class SupplyZipOutput extends Supplier<OutputStream> {
 	
 	@Override
 	public OutputStream initialize() throws IOException {
-		logger.debug("getOutputStream : making zip output stream");
+		logger.debug("initialize : zip output stream");
 		return oz = new ZipOutputStream( os.begin() );
 	}
 
