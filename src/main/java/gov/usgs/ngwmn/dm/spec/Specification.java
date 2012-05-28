@@ -11,6 +11,8 @@ import java.util.List;
  *
  */
 public class Specification {
+	
+	private Encoding encode;
 
 	private boolean bundled;
 	
@@ -55,6 +57,14 @@ public class Specification {
 	
 	
 	
+	public Encoding getEncode() {
+		return encode;
+	}
+	public void setEncode(Encoding encode) {
+		this.encode = encode;
+	}
+
+
 	public boolean isBundled() {
 		return bundled;
 	}
