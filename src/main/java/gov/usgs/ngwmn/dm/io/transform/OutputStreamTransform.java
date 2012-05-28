@@ -4,6 +4,7 @@ package gov.usgs.ngwmn.dm.io.transform;
 import gov.usgs.ngwmn.dm.io.parse.Element;
 import gov.usgs.ngwmn.dm.io.parse.Parser;
 
+import java.io.BufferedInputStream;
 import java.io.FilterOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -23,17 +24,17 @@ import org.slf4j.LoggerFactory;
 
 public abstract class OutputStreamTransform extends FilterOutputStream {
 
-	private static final long DEFAULT_BUFFER_SIZE = 1024<<10; //1mb
+	private static final int DEFAULT_BUFFER_SIZE = 1024<<10; //1mb
 	
 	protected final Logger logger = LoggerFactory.getLogger(getClass());
 	
-	private Future<Parser> fparser;
-	private PipedInputStream   pin = new PipedInputStream();
-	private PipedOutputStream  pout;
+	private Future<Parser> fParser;
+	private final PipedInputStream   pin;
+	private final PipedOutputStream  pout;
 	
 	private long bytesRecieved;
 	private long bytesProcessed;
-	private long byteBufferSize;
+	private int byteBufferSize;
 	
 	private ExecutorService executor = Executors.newSingleThreadExecutor();
 	
@@ -43,30 +44,33 @@ public abstract class OutputStreamTransform extends FilterOutputStream {
 	public OutputStreamTransform(OutputStream out) throws IOException {
 		super(out);
 		byteBufferSize = DEFAULT_BUFFER_SIZE;
-		pout   = new PipedOutputStream(pin);
+		pin  = new PipedInputStream();
+		pout = new PipedOutputStream(pin);
 	}
 
-	public void setParser(final Parser parser) {
-		
+	public void setParser(final Parser parser) {		
 		Future<Parser> f = executor.submit(new Callable<Parser>() {
 			public Parser call() throws Exception {
-	    		logger.debug("InputStream parser setting");
-	    		parser.setInputStream(pin);
-	    		logger.debug("InputStream parser finished");
+	    		logger.debug("InputStream parser init started  {}", this);
+	    		parser.setInputStream( new BufferedInputStream(pin,byteBufferSize) );
+	    		logger.debug("InputStream parser init finished {}", this);
 				return parser;
 			}
 		});
 		
-		fparser = f;
+		fParser = f;
 	}
 
 	
-	public void setBufferSize(long size) {
+	public void setBufferSize(int size) {
 		byteBufferSize = size;
 	}
 	
 
     public void write(int b) throws IOException {
+		logger.debug("Transform a byte {}", (char)b);
+		logger.debug("Transform a byte {}", bytesRecieved);
+		    	
     	bytesRecieved++;
     	pout.write(b);
 
@@ -78,20 +82,20 @@ public abstract class OutputStreamTransform extends FilterOutputStream {
     	}
     }
     
-    private synchronized boolean processBytes() throws IOException {
+    private boolean processBytes() throws IOException {
     	logger.debug("processing bytes");
     	
     	try {
-			Map<String, String> row = fparser.get().nextRow();
+			Map<String, String> row = fParser.get().nextRow();
 
 			if (row == null) return false;
 			
-			List<Element> headers   = fparser.get().headers();
+			List<Element> headers   = fParser.get().headers();
 			
 			if (bytesProcessed == 0) {
 				writeRow(headers, null);
 			}
-			bytesProcessed = fparser.get().bytesParsed();
+			bytesProcessed = fParser.get().bytesParsed();
 
 			writeRow(headers, row);
 		} catch (InterruptedException e) {
