@@ -2,6 +2,8 @@ package gov.usgs.ngwmn.dm.io.transform;
 
 import gov.usgs.ngwmn.NotImplementedException;
 import gov.usgs.ngwmn.dm.io.Supplier;
+import gov.usgs.ngwmn.dm.io.parse.DataRowParser;
+import gov.usgs.ngwmn.dm.io.parse.Parser;
 import gov.usgs.ngwmn.dm.spec.Encoding;
 import gov.usgs.ngwmn.dm.spec.Specifier;
 
@@ -17,6 +19,7 @@ public class TransformSupplier extends Supplier<OutputStream> {
 	public TransformSupplier(Supplier<OutputStream> output, Encoding encode) {
 		upstream = output;
 		encoding = encode;
+		if (encoding==null) encoding = Encoding.NONE;
 	}
 	
 	@Override
@@ -30,19 +33,24 @@ public class TransformSupplier extends Supplier<OutputStream> {
 		
 		OutputStream os = upstream.begin();
 		
-		if (encoding==null) return os;
+		OutputStreamTransform ost;
 		
 		switch (encoding) {
 			case NONE:
 				return os;
 			case TSV:
-				return new TsvOutputStream(os);
+				ost = new TsvOutputStream(os);
+				break;
 			case XLSX: // TODO need to impl
 				throw new NotImplementedException();
 			default:   // Default to CSV
 			case CSV:
-				return new CsvOutputStream(os);
+				ost = new CsvOutputStream(os);
 		}
+		// TODO this might be a bit too tightly coupled
+		Parser parser = new DataRowParser();
+		ost.setParser(parser);
+		return ost;
 	}
 
 }
