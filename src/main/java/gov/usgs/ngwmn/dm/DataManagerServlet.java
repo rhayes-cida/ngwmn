@@ -6,6 +6,8 @@ import gov.usgs.ngwmn.dm.io.Supplier;
 import gov.usgs.ngwmn.dm.io.SupplyZipOutput;
 import gov.usgs.ngwmn.dm.io.aggregate.Flow;
 import gov.usgs.ngwmn.dm.io.aggregate.SequentialFlowAggregator;
+import gov.usgs.ngwmn.dm.io.transform.TransformSupplier;
+import gov.usgs.ngwmn.dm.spec.Encoding;
 import gov.usgs.ngwmn.dm.spec.SpecResolver;
 import gov.usgs.ngwmn.dm.spec.Specification;
 import gov.usgs.ngwmn.dm.spec.Specifier;
@@ -39,6 +41,7 @@ public class DataManagerServlet extends HttpServlet {
 	public static final String PARAM_TYPE       = "type";
 	public static final String PARAM_WELLS_LIST = "listOfWells";
 	public static final String PARAM_BUNDLED    = "bundled";
+	public static final String PARAM_ENCODING   = "encode";
 	
 	private  final Logger logger = LoggerFactory.getLogger(getClass());
 	
@@ -69,10 +72,15 @@ public class DataManagerServlet extends HttpServlet {
 			Supplier<OutputStream> outs = new HttpResponseSupplier(spect, resp);
 					
 			try {
+				if ( spect.isBundled() ) {
+					outs = new SupplyZipOutput(outs);
+				}
+				
+				outs = new TransformSupplier(outs, spect.getEncode());
+				
 				Flow exec = null;
 				if ( spect.isBundled() ) {
 					SpecResolver resolver = new WellListResolver();
-					outs = new SupplyZipOutput(outs);
 					exec = new SequentialFlowAggregator(db, resolver.specIterator(spect), outs);
 				} else {
 					// TODO initial impl of single unbundled request
@@ -80,6 +88,7 @@ public class DataManagerServlet extends HttpServlet {
 					exec = db.makeFlow(spect.getWellIDs().get(0), outs);
 				}
 				exec.call();
+				
 			} catch (SiteNotFoundException nse) {
 				// this may fail, if detected after output buffer has been flushed
 				resp.resetBuffer();
@@ -114,7 +123,12 @@ public class DataManagerServlet extends HttpServlet {
 			// a list of wells will be bundled as one file for now
 			spec.setBundled(true);
 		}
-
+		
+		String encoding = req.getParameter(PARAM_ENCODING);
+		if (encoding != null) {
+			spec.setEncode( Encoding.valueOf(encoding) );
+		}
+		
 		// allow the empty wells list to remain null
 		if ( ! wells.isEmpty() ) {
 			spec.setWellIDs(wells);
