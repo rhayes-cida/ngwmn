@@ -3,7 +3,6 @@ package gov.usgs.ngwmn.dm.io.transform;
 
 import gov.usgs.ngwmn.dm.io.parse.Element;
 import gov.usgs.ngwmn.dm.io.parse.Parser;
-import gov.usgs.ngwmn.dm.spec.Specifier;
 
 import java.io.FilterOutputStream;
 import java.io.IOException;
@@ -18,7 +17,6 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
-import org.apache.commons.lang.math.RandomUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -37,7 +35,6 @@ public abstract class OutputStreamTransform extends FilterOutputStream {
 	private long bytesProcessed;
 	private long byteBufferSize;
 	
-	private Thread parserInit;
 	private ExecutorService executor = Executors.newSingleThreadExecutor();
 	
 	
