@@ -313,3 +313,50 @@ group by quality_cache_id, xq.cn;
 -- TODO Look into doing the aggregation in XQuery
 -- TODO Look into performance -- query plan, xml indexes, see http://docs.oracle.com/cd/B28359_01/appdev.111/b28369/xdb_xquery.htm#autoId22
 
+-- transforming between xs:date and oracle time&date data types
+select
+		qc.md5,
+		cast(to_timestamp_tz(xq.dtdt,'YYYY-MM-DDTZH:TZM') as date),
+		xq.*
+from 
+		quality_cache qc,
+	
+		XMLTable(
+			'for $r in /*:Results/Result 
+			 return $r
+			'
+			passing qc.xml
+			
+			columns 
+			"CN" varchar2(80) path '*:ResultDescription/*:CharacteristicName',
+			"RDT" varchar2(40) path 'date',
+			"DTDT" varchar2(20) path 'xs:date(date)',
+			"DT" varchar2(40) path 'adjust-date-to-timezone(xs:date(date))',
+			"TZ" varchar(20) path 'timezone-from-date(xs:date(date))'
+		) xq;
+		
+-- use xquery min and max
+-- which is no use for quality data since we want to group by the characteristic name...
+select
+		qc.quality_cache_id,
+		qc.md5,
+		xq.ct,
+		cast(to_timestamp_tz(xq.mindt,'YYYY-MM-DDTZH:TZM') as date) mindate,
+		cast(to_timestamp_tz(xq.maxdt,'YYYY-MM-DDTZH:TZM') as date) maxdate
+from 
+		quality_cache qc,
+	
+		XMLTable(
+			'for $r in /*:Results/Result 
+			 return $r
+			'
+			passing qc.xml
+			
+			columns 
+			"CN" varchar2(80) path '*:ResultDescription/*:CharacteristicName',
+			"CT" number path 'count(date)',
+			"MINDT" varchar2(20) path 'min(xs:date(date))',
+			"MAXDT" varchar2(40) path 'max(xs:date(date))'
+		) xq
+where qc.quality_cache_id = 187;
+
