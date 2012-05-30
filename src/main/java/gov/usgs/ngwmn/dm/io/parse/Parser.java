@@ -24,4 +24,6 @@ public interface Parser {
 	// separate thread - if it was done in the constructor then then FormatingOuputStream cannot
 	// receive a parser for polymorphism
 	void setInputStream(InputStream is);
+	
+	boolean done();
 }

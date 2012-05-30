@@ -20,6 +20,7 @@ public class DataRowParser implements Parser {
 	protected final ParseState          state;
 	protected final List<Element>       headers;
 	protected final Set<String>         ignoredAttributes;
+	protected final Set<String>         ignoredElements;
 	protected final Map<String, String> contentDefinedElements;
 	
 	protected XMLStreamReader     reader;
@@ -29,6 +30,7 @@ public class DataRowParser implements Parser {
 	public DataRowParser() {
 		state                  = new ParseState();
 		ignoredAttributes      = new HashSet<String>();
+		ignoredElements        = new HashSet<String>();
 		headers				   = new LinkedList<Element>();
 		contentDefinedElements = new HashMap<String, String>();
 	}
@@ -42,6 +44,11 @@ public class DataRowParser implements Parser {
 			throw new RuntimeException(e);
 		}
 	}
+	
+	@Override
+	public boolean done() {
+		return eof;
+	};
 	
 	/**
 	 * Set true to keep the information from elder elements when flattening
@@ -58,6 +65,9 @@ public class DataRowParser implements Parser {
 	public void setCopyDown(boolean copyDown) {
 		state.isDoCopyDown = copyDown;
 	}
+	public void addIgnoreName(String name){
+		ignoredElements.add(name);
+	}
 	
 	@Override
 	public long bytesParsed() {
@@ -66,7 +76,7 @@ public class DataRowParser implements Parser {
 	public List<Element> headers() {
 		if ( headers.isEmpty() ) {
 			for (Element element : state.targetColumnList) {
-				if ( ! element.hasChildren ) {
+				if ( ! element.hasChildren && ! ignoredElements.contains(element.localName)) {
 					headers.add( element );
 				}
 			}
@@ -113,6 +123,9 @@ public class DataRowParser implements Parser {
 			}
 		} catch (Exception e) {
 			throw new RuntimeException(e);
+		}
+		for (String name : ignoredElements) {
+			state.targetColumnValues.remove(name);
 		}
 		// if currentRow is last Row then returns empty set
 		return  currentRow();

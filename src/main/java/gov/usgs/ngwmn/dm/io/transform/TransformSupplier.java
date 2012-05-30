@@ -3,7 +3,6 @@ package gov.usgs.ngwmn.dm.io.transform;
 import gov.usgs.ngwmn.NotImplementedException;
 import gov.usgs.ngwmn.dm.io.Supplier;
 import gov.usgs.ngwmn.dm.io.parse.DataRowParser;
-import gov.usgs.ngwmn.dm.io.parse.Parser;
 import gov.usgs.ngwmn.dm.spec.Encoding;
 import gov.usgs.ngwmn.dm.spec.Specifier;
 
@@ -16,11 +15,12 @@ public class TransformSupplier extends Supplier<OutputStream> {
 	protected Supplier<OutputStream> upstream;
 	protected Encoding encoding;
 	
+	
 	public TransformSupplier(Supplier<OutputStream> output, Encoding encode) {
 		upstream = output;
-		encoding = encode;
-		if (encoding==null) encoding = Encoding.NONE;
+		encoding = (encode==null) ? Encoding.NONE : encode;
 	}
+	
 	
 	@Override
 	public Supplier<OutputStream> makeEntry(Specifier spec) {
@@ -48,7 +48,12 @@ public class TransformSupplier extends Supplier<OutputStream> {
 				ost = new CsvOutputStream(os);
 		}
 		// TODO this might be a bit too tightly coupled
-		Parser parser = new DataRowParser();
+		DataRowParser parser = new DataRowParser();
+		
+		// TODO specific to water level
+		parser.setRowElementName("TimeValuePair");
+		parser.addIgnoreName("uom");
+		
 		ost.setParser(parser);
 		return ost;
 	}
