@@ -28,11 +28,12 @@ public class WaterQualityInspector implements Inspector {
 	public boolean acceptable(int cachekey) throws Exception {
 		Connection conn = ds.getConnection();
 		try {
+			logger.debug("inspecting data for {}", cachekey);
 			CallableStatement stat = conn.prepareCall("{call GW_DATA_PORTAL.INSPECT_QUALITY_DATA(?)}");
 			stat.setInt(1, cachekey);
 			
 			boolean did = stat.execute();
-			logger.debug("finished update, got {}", did);
+			logger.debug("finished update for {}, got {}", cachekey, did);
 			
 			// TODO would be convenient if stored proc contained a select to supply this result set
 			PreparedStatement ps = conn.prepareStatement(
