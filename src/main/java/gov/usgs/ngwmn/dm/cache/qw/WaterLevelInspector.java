@@ -34,7 +34,8 @@ public class WaterLevelInspector implements Inspector {
 			boolean did = stat.execute();
 			logger.debug("finished update, got {}", did);
 			
-			// TODO would be convenient if stored proc contained a select to supply this result set
+			// It would be convenient if stored proc contained a select to supply this result set,
+			// except that's not easy in Oracle.
 			PreparedStatement ps = conn.prepareStatement(
 					"SELECT wldq.md5,wldq.firstDate,wldq.lastDate,wldq.ct " +
 					"FROM GW_DATA_PORTAL.WATERLEVEL_DATA_QUALITY wldq, GW_DATA_PORTAL.waterlevel_cache wlc " +
@@ -55,10 +56,6 @@ public class WaterLevelInspector implements Inspector {
 				totct += ct;
 			}
 			
-			if (totct == 0) {
-				// record abject failure
-				ps = conn.prepareStatement(sql)
-			}
 			return totct > 0;
 		} finally {
 			conn.close();
