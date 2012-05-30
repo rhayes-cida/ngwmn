@@ -54,6 +54,11 @@ public class WaterLevelInspector implements Inspector {
 				
 				totct += ct;
 			}
+			
+			if (totct == 0) {
+				// record abject failure
+				ps = conn.prepareStatement(sql)
+			}
 			return totct > 0;
 		} finally {
 			conn.close();

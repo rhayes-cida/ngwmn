@@ -15,7 +15,7 @@ import gov.usgs.ngwmn.dm.spec.Specifier;
 import org.junit.Before;
 import org.junit.Test;
 
-public class PrefetcherTest extends ContextualTest {
+public class PrefetcherIntegrationTest extends ContextualTest {
 
 	private Prefetcher victim;
 	private int ct = 0;

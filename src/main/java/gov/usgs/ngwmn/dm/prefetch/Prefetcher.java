@@ -76,13 +76,6 @@ public class Prefetcher implements Callable<PrefetchOutcome> {
 		
 		outcome = PrefetchOutcome.RUNNING;
 		
-		// make sure we're working with fresh statistics
-		try {
-			cacheDAO.updateStatistics();
-		} catch (Exception e) {
-			throw new RuntimeException(e);
-		}
-		
 		Iterable<WellStatus> wellQueue = populateWellQeue();
 		
 		// start timer after the prelims are done
@@ -122,6 +115,13 @@ public class Prefetcher implements Callable<PrefetchOutcome> {
 				logger.info("Skipping well {} type {} due to flag", well.well.getMySiteid(), well.type);
 			}
 			
+		}
+		
+		// update stats for other users
+		try {
+			cacheDAO.updateStatistics();
+		} catch (Exception e) {
+			throw new RuntimeException(e);
 		}
 		
 		if (outcome == PrefetchOutcome.RUNNING) {
@@ -281,15 +281,38 @@ public class Prefetcher implements Callable<PrefetchOutcome> {
 	private static final long HOURS = 1000L*60*60;
 	private static final long DAYS = HOURS*24;
 	
+	// try for waterlevel first, log next, then water quality
+	private int levelForType(String dt) {
+		try {
+			WellDataType wdt = WellDataType.valueOf(dt);
+			
+			switch (wdt) {
+			case WATERLEVEL:
+				return 1;
+			case LOG:
+				return 2;
+			case QUALITY:
+				return 3;
+			}
+			return 100;
+		} catch (IllegalArgumentException iae) {
+			logger.warn("unknown well data type {}", dt);
+			return 100;
+		}
+	}
+	
 	private void populateFetchPriority(CacheMetaData c, Date now) {
 		if (c.getMostRecentAttemptDt() == null) {
-			c.setFetchPriority(1);
+			c.setFetchPriority(levelForType(c.getDataType()));
 		}
 		else if (c.getSuccessCt() == 0 && c.getFailCt() > 3) {
+			// failures get moved to the end
+			// TODO Should re-try every so often even for these
 			c.setFetchPriority(200);
 		} 
 		else if (c.getMostRecentSuccessDt() != null && c.getMostRecentSuccessDt().getTime() < (now.getTime() - 10*DAYS)) {
-			c.setFetchPriority(4);
+			// try to fetch every 10 days
+			c.setFetchPriority(10);
 		}
 		else {
 			c.setFetchPriority(100);
