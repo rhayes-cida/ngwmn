@@ -7,6 +7,7 @@ import java.sql.Connection;
 import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLIntegrityConstraintViolationException;
 
 import javax.sql.DataSource;
 
@@ -32,7 +33,13 @@ public class WaterQualityInspector implements Inspector {
 			CallableStatement stat = conn.prepareCall("{call GW_DATA_PORTAL.INSPECT_QUALITY_DATA(?)}");
 			stat.setInt(1, cachekey);
 			
-			boolean did = stat.execute();
+			boolean did = false;
+			try {
+				did = stat.execute();
+			} catch (SQLIntegrityConstraintViolationException ix) {
+				logger.warn("integrity constraint violated, assuming no quality data in this sample");
+				return false;
+			}
 			logger.debug("finished update for {}, got {}", cachekey, did);
 			
 			// TODO would be convenient if stored proc contained a select to supply this result set
