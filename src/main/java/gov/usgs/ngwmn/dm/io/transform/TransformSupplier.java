@@ -15,35 +15,23 @@ public class TransformSupplier extends Supplier<OutputStream> {
 	protected Supplier<OutputStream> upstream;
 	protected Encoding encoding;
 	
-	// this is not necessary, but it is more accurate.
-	// when upstream is zipped we should not really encode the main stream - entires only.
-	// it does not hurt because no data is sent to the main stream.
-	// data is only sent along entries
-	protected boolean  entriesOnly;
-
-
+	
 	public TransformSupplier(Supplier<OutputStream> output, Encoding encode) {
-		this(output,encode,false);
-	}
-	public TransformSupplier(Supplier<OutputStream> output, Encoding encode, boolean entriesOnly) {
 		upstream = output;
 		encoding = (encode==null) ? Encoding.NONE : encode;
-		this.entriesOnly = entriesOnly;
 	}
-
-
+	
+	
 	@Override
 	public Supplier<OutputStream> makeEntry(Specifier spec) {
 		Supplier<OutputStream> entry = upstream.makeEntry(spec);
 		return new TransformSupplier(entry, encoding);
 	}
-
+	
 	@Override
 	public OutputStream initialize() throws IOException {
 		
 		OutputStream os = upstream.begin();
-		
-		if (entriesOnly) return os;
 		
 		OutputStreamTransform ost;
 		
