@@ -80,7 +80,13 @@ public abstract class OutputStreamTransform extends FilterOutputStream {
 		parserResult = executor.submit(exec);
 	}
 
+	@Override
+    public void write(byte b[], int off, int len) throws IOException {
+    	pout.write(b, off, len);
+    	processRow();
+    }
 
+	@Override
     public void write(int b) throws IOException {
     	pout.write(b);
     	processRow();
