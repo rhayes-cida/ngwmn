@@ -7,11 +7,27 @@
 	  </encoder>
   </appender>
   
-  <root level="debug">
-    <appender-ref ref="STDOUT" />
-  </root>
-  
+  <appender name="NGWMN" class="ch.qos.logback.core.rolling.RollingFileAppender">
+  	<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+      <fileNamePattern>${catalina.base:-.}/logs/ngwmn/ngwmn.%d.log</fileNamePattern>
+    </rollingPolicy>
+    
+  	  <encoder>
+	    <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
+	  </encoder>
+  </appender>
+
   <logger level="DEBUG" name="gov.usgs.ngwmn.dm.DataManagerServlet"/>
   <logger name="com.base22" level="TRACE"/>
   <logger name="httpclient.wire.content" level="WARN"/>
+  
+  <root level="debug">
+  	<if condition=' ! p("user.name").equals("tomcat")'>
+  		<then>
+    		<appender-ref ref="STDOUT" />
+    	</then>
+    </if>
+    <appender-ref ref="NGWMN"/>
+  </root>
+  
 </configuration>

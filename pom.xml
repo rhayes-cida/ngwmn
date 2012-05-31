@@ -124,13 +124,13 @@
 		<dependency>
 			<groupId>org.mybatis</groupId>
 			<artifactId>mybatis</artifactId>
-			<version>3.1.0</version>
+			<version>3.1.1</version>
 		</dependency>
 		<dependency>
 			<groupId>org.mybatis</groupId>
 			<artifactId>mybatis-spring</artifactId>
 			<!--  Isn't this version skew annoying... -->
-			<version>1.1.0</version>
+			<version>1.1.1</version>
 		</dependency>
             
 		<!-- Testing dependencies -->
@@ -208,6 +208,14 @@
 				</exclusion>
 			</exclusions>
 		</dependency>
+		
+		<!--  for run-time conditionals in Logback configuration -->
+		<dependency>
+			<groupId>janino</groupId>
+			<artifactId>janino</artifactId>
+			<version>2.5.10</version>
+		</dependency>
+            
 	</dependencies>
 
 	<build>

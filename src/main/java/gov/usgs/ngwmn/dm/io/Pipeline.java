@@ -3,6 +3,7 @@ package gov.usgs.ngwmn.dm.io;
 import gov.usgs.ngwmn.dm.io.aggregate.Flow;
 import gov.usgs.ngwmn.dm.spec.Specifier;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -90,7 +91,14 @@ public class Pipeline implements Flow {
 				OutputStream os = oss.begin();
 				logger.debug("began oss={}, oss.source={}", oss, oss.getSource());
 				ct = invoker.invoke(is,os);
-				logger.debug("done with invoke, oss={}, oss.source={}", oss, oss.getSource());
+				if (logger.isDebugEnabled()) {
+					Object oss_source = oss.getSource();
+					// ByteArrayOutputStream has an unfortunate implementation of toString....
+					if (oss_source instanceof ByteArrayOutputStream) {
+						oss_source = oss_source.getClass().toString();
+					}
+					logger.debug("done with invoke, oss={}, oss.source={}", oss, oss_source);
+				}
 				threw = false;
 			} catch (IOException ioe) {
 				setException(ioe);

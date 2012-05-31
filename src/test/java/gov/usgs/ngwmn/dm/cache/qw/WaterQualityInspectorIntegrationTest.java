@@ -78,6 +78,7 @@ public class WaterQualityInspectorIntegrationTest extends ContextualTest {
 		s.close();
 		
 		for (Integer i : ii) {
+			System.out.println("checking " + i);
 			boolean ok = victim.acceptable(i);
 			
 			System.out.printf("%d -> %s\n", i, ok);

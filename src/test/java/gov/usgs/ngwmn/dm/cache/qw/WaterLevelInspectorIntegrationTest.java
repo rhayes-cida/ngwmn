@@ -68,7 +68,8 @@ public class WaterLevelInspectorIntegrationTest extends ContextualTest {
 	public void testLots() throws Exception {
 		Statement s = conn.createStatement();
 		ResultSet rs = s.executeQuery("SELECT WATERLEVEL_CACHE_ID from gw_data_portal.waterlevel_cache " +
-				"where xml IS NOT NULL ");
+				"where xml IS NOT NULL " +
+				"ORDER BY WATERLEVEL_CACHE_ID ASC ");
 		
 		List<Integer> ii = new ArrayList<Integer>();
 		
@@ -78,6 +79,7 @@ public class WaterLevelInspectorIntegrationTest extends ContextualTest {
 		s.close();
 		
 		for (Integer i : ii) {
+			System.out.println("? " + i);
 			boolean ok = victim.acceptable(i);
 			
 			System.out.printf("%d -> %s\n", i, ok);
