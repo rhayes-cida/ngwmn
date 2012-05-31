@@ -38,7 +38,7 @@ public class TransformSupplierTests {
 	public void test_returnTsvTransformer() throws Exception {
 		OutputStream os = new FilterOutputStream(null);
 		Supplier<OutputStream> upstream = new SimpleSupplier<OutputStream>(os);
-		Supplier<OutputStream> s = new TransformSupplier(upstream, Encoding.CSV);
+		Supplier<OutputStream> s = new TransformSupplier(upstream, Encoding.TSV);
 		
 		OutputStream result = s.begin();
 		assertTrue( result instanceof TsvOutputStream );
