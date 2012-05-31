@@ -94,7 +94,7 @@ public abstract class OutputStreamTransform extends FilterOutputStream {
 				writeRow(headList);
 				writtenHeaders=true;
 			}
-	    	logger.debug("processing bytes");
+	    	logger.trace("processing bytes");
 			writeRow(headList, row);
 		}
 	}
@@ -102,13 +102,13 @@ public abstract class OutputStreamTransform extends FilterOutputStream {
     
 	private void writeRow(List<Element> headers, Map<String, String> rowData) throws IOException {
 		String rowText = formatRow(headers, rowData);
-		logger.debug("writeRow: {}", rowText);
+		logger.trace("writeRow: {}", rowText);
 		out.write( rowText.toString().getBytes() );
 	}
 
 	private void writeRow(List<Element> headers) throws IOException {
 		String rowText = formatRow(headers, null); // TODO add method without the row data formatHeaders
-		logger.debug("writeRow: {}", rowText);
+		logger.trace("writeRow: {}", rowText);
 		out.write( rowText.toString().getBytes() );
 	}
 
