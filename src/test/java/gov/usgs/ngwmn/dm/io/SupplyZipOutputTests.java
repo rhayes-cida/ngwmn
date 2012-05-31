@@ -30,7 +30,7 @@ public class SupplyZipOutputTests {
 		ByteArrayOutputStream os    = new ByteArrayOutputStream(10);
 		Supplier<OutputStream> outs = new SimpleSupplier<OutputStream>(os);
 		SupplyZipOutput oz          = new SupplyZipOutput(outs);
-		Supplier<OutputStream> ze   = oz.makeEntry(spec);
+		Supplier<OutputStream> ze   = oz.makeEntry( new SpecifierEntry(spec) );
 
 		byte buffer[] = PipelineTest.makeBytes(10, 1);
 		ByteArrayInputStream bais = new ByteArrayInputStream(buffer){

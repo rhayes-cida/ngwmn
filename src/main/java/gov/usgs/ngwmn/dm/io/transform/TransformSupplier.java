@@ -1,10 +1,10 @@
 package gov.usgs.ngwmn.dm.io.transform;
 
 import gov.usgs.ngwmn.NotImplementedException;
+import gov.usgs.ngwmn.dm.io.EntryName;
 import gov.usgs.ngwmn.dm.io.Supplier;
 import gov.usgs.ngwmn.dm.io.parse.DataRowParser;
 import gov.usgs.ngwmn.dm.spec.Encoding;
-import gov.usgs.ngwmn.dm.spec.Specifier;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -23,8 +23,10 @@ public class TransformSupplier extends Supplier<OutputStream> {
 	
 	
 	@Override
-	public Supplier<OutputStream> makeEntry(Specifier spec) {
-		Supplier<OutputStream> entry = upstream.makeEntry(spec);
+	public Supplier<OutputStream> makeEntry(EntryName entryName) {
+		entryName.setExtension(encoding.extension());
+		
+		Supplier<OutputStream> entry = upstream.makeEntry(entryName);
 		return new TransformSupplier(entry, encoding);
 	}
 	

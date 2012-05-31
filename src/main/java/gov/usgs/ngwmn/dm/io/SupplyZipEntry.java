@@ -1,35 +1,25 @@
 package gov.usgs.ngwmn.dm.io;
 
-import gov.usgs.ngwmn.dm.spec.Specifier;
-
 import java.io.IOException;
 import java.io.OutputStream;
 
 public class SupplyZipEntry extends Supplier<OutputStream> {
 
-	private Specifier spec;
+	private EntryName entryName;
 	private SupplyZipOutput parent;
 	
-	public SupplyZipEntry(SupplyZipOutput supplyZipOutput, Specifier specifier) {
-		spec   = specifier;
+	public SupplyZipEntry(SupplyZipOutput supplyZipOutput, EntryName name) {
 		parent = supplyZipOutput;
+		entryName = name;
 	}
 
 	@Override
 	public ZipEntryOutputStream initialize() throws IOException {
 			
-		String name = new StringBuilder()
-					.append(spec.getAgencyID())
-					.append('_')
-					.append(spec.getFeatureID()) 
-					.append('_')
-					.append(spec.getTypeID())
-					.append('.')
-					.append(spec.getTypeID().suffix)
-					.toString();
+		String name = entryName.name();
 		logger.debug("initialize : zip entry {}", name);
 		
-		return new ZipEntryOutputStream( parent.getZip(), name );
+		return new ZipEntryOutputStream( parent.getZip(), entryName.name() );
 	}
 	
 }

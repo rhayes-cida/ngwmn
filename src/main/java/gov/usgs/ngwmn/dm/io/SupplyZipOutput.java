@@ -1,6 +1,5 @@
 package gov.usgs.ngwmn.dm.io;
 
-import gov.usgs.ngwmn.dm.spec.Specifier;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -38,8 +37,8 @@ public class SupplyZipOutput extends Supplier<OutputStream> {
 	}
 	
 	
-	public Supplier<OutputStream> makeEntry(Specifier spec) {
-		return new SupplyZipEntry(this, spec);
+	public Supplier<OutputStream> makeEntry(EntryName entryName) {
+		return new SupplyZipEntry(this, entryName);
 	}
 	
 	protected ZipOutputStream getZip() {
