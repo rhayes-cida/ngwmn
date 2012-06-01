@@ -1,6 +1,6 @@
 package gov.usgs.ngwmn.dm.io.aggregate;
 
-import gov.usgs.ngwmn.dm.io.EntryName;
+import gov.usgs.ngwmn.dm.io.EntryDescription;
 import gov.usgs.ngwmn.dm.io.SimpleSupplier;
 import gov.usgs.ngwmn.dm.io.SpecifierEntry;
 import gov.usgs.ngwmn.dm.io.Supplier;
@@ -38,8 +38,8 @@ public class SequentialFlowAggregator implements Flow {
     		
 	        for (Specifier spec : specifiers) {
 	        	logger.info("Getting well data for {}", spec);
-	        	EntryName name = new SpecifierEntry(spec);
-	        	exec = factory.makeFlow(spec, output.makeEntry(name));
+	        	EntryDescription entryDesc = new SpecifierEntry(spec);
+	        	exec = factory.makeFlow(spec, output.makeEntry(entryDesc));
 	        	exec.call();
 	        }
         	threw = false;

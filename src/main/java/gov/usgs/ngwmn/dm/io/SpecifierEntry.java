@@ -1,8 +1,11 @@
 package gov.usgs.ngwmn.dm.io;
 
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 import gov.usgs.ngwmn.dm.spec.Specifier;
 
-public class SpecifierEntry implements EntryName {
+public class SpecifierEntry implements EntryDescription {
 
 	private Specifier spec;
 	private String ext;
@@ -12,7 +15,7 @@ public class SpecifierEntry implements EntryName {
 	}
 	
 	@Override
-	public String name() {
+	public String getName() {
 		String suffix = (ext==null) ? spec.getTypeID().suffix : ext;
 		
 		String name = new StringBuilder()
@@ -33,4 +36,11 @@ public class SpecifierEntry implements EntryName {
 		ext = extension;
 	}
 
+	@Override
+	public Map<String, String> getConstColumns() {
+		Map<String,String> data = new LinkedHashMap<String,String>();
+		data.put("agency", spec.getAgencyID());
+		data.put("site",   spec.getFeatureID());
+		return data;
+	}
 }

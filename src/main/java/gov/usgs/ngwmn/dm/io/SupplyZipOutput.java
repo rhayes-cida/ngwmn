@@ -37,8 +37,8 @@ public class SupplyZipOutput extends Supplier<OutputStream> {
 	}
 	
 	
-	public Supplier<OutputStream> makeEntry(EntryName entryName) {
-		return new SupplyZipEntry(this, entryName);
+	public Supplier<OutputStream> makeEntry(EntryDescription entryDesc) {
+		return new SupplyZipEntry(this, entryDesc);
 	}
 	
 	protected ZipOutputStream getZip() {

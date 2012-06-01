@@ -5,21 +5,21 @@ import java.io.OutputStream;
 
 public class SupplyZipEntry extends Supplier<OutputStream> {
 
-	private EntryName entryName;
+	private EntryDescription entryDesc;
 	private SupplyZipOutput parent;
 	
-	public SupplyZipEntry(SupplyZipOutput supplyZipOutput, EntryName name) {
+	public SupplyZipEntry(SupplyZipOutput supplyZipOutput, EntryDescription name) {
 		parent = supplyZipOutput;
-		entryName = name;
+		entryDesc = name;
 	}
 
 	@Override
 	public ZipEntryOutputStream initialize() throws IOException {
 			
-		String name = entryName.name();
+		String name = entryDesc.getName();
 		logger.debug("initialize : zip entry {}", name);
 		
-		return new ZipEntryOutputStream( parent.getZip(), entryName.name() );
+		return new ZipEntryOutputStream( parent.getZip(), entryDesc.getName() );
 	}
 	
 }

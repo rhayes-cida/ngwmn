@@ -64,7 +64,7 @@ public abstract class Supplier<T extends Closeable> implements InputSupplier<T>,
 	}
 	
 	
-	public Supplier<T> makeEntry(EntryName entryName) {
+	public Supplier<T> makeEntry(EntryDescription entryDesc) {
 		return this;
 	}
 	
