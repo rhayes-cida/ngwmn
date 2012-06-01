@@ -1,5 +1,7 @@
 package gov.usgs.ngwmn.dm.aspect;
 
+import java.util.concurrent.TimeUnit;
+
 import gov.usgs.ngwmn.dm.DataFetcher;
 import gov.usgs.ngwmn.dm.cache.PipeStatistics;
 import gov.usgs.ngwmn.dm.cache.PipeStatisticsWithProblem;
@@ -16,7 +18,7 @@ import com.google.common.eventbus.EventBus;
 
 public aspect PipeStatisticsAspect {
 	private PipeStatistics Pipeline.stats = new PipeStatistics();
-	private FetchLog Specifier.fetchLog = null;
+	private PipeStatistics Specifier.stats = null;
 	
 	private Logger logger = LoggerFactory.getLogger(this.getClass());
 		
@@ -59,8 +61,10 @@ public aspect PipeStatisticsAspect {
 	after(Pipeline p) returning (long ct): invoke(p) {
 		p.stats.incrementCount(ct);
 		logger.debug("stopped in invoke {} returning {}", p, ct);
-		// System.out.println("returning tjp=" + thisJointPoint);
+		logger.debug("stats in invoke is {}", p.stats);
+
 		p.stats.markEnd(Status.DONE);
+
 		if (null == p.stats.getSpecifier()) {
 			// presume it was an aggregate, have to use some generalized recording mechanism
 			logger.info("after invoke of aggregate {}", p);
@@ -76,22 +80,37 @@ public aspect PipeStatisticsAspect {
 	
 	before(Pipeline p, int cacheKey, Specifier spec):
 		inspect(p,cacheKey,spec) {
-		// pass fetch log (if it exists) through to inspector
-		spec.fetchLog = p.stats.getFetchLog();
+		// pass pipe stats through to inspector
+		spec.stats = p.stats;
 		// launching inspection of cache entry
 		logger.debug("inspecting {} for spec {}", cacheKey, p.getSpecifier());
+		logger.debug("stats in inspect is {}", p.stats);
 	}
 	
-	// use recorded fetch log, as inspection may be asynchronous
+	// use recorded pipe stats, as inspection may be asynchronous
 	pointcut withdraw(int ck, Specifier spec):
 		call(* gov.usgs.ngwmn.dm.cache.qw.DatabaseXMLCache.withdraw(int,Specifier)) &&
 		args(ck,spec);
 	
 	after(int ck, Specifier spec):withdraw(ck,spec) {
 		// record that this fetch was inspected and found empty
-		logger.debug("record withdraw for {} with fetchlog={}", spec, spec.fetchLog);
-		
-		
+		if (spec.stats == null) {
+			return;
+		}
+		try {
+			// this waits until the FetchRecorder sets the fetch log on the PipeStatistics
+			FetchLog fl = spec.stats.getFetchLog(15, TimeUnit.SECONDS);
+			if (fl != null) {
+				fl.setStatus("EMPY");
+				
+				// TODO save the revised fetch log
+				logger.warn("Need to record the revised fetch log {}", fl);
+			}
+		} catch (InterruptedException ie) {
+			// oh well, the fetch did not get recorded in time, give up
+			logger.warn("Abandoned wait for fetchlog in withdraw");
+		}
+		logger.debug("note withdraw for {} with pipe stats={}", spec, spec.stats);		
 	}
 	
 	// use recorded fetch log, as inspection may be asynchronous
@@ -101,7 +120,7 @@ public aspect PipeStatisticsAspect {
 	
 	after(int ck, Specifier spec):publish(ck,spec) {
 		// record that this fetch was inspected and found OK
-		logger.debug("record publish for {} with fetchlog={}", spec, spec.fetchLog);
+		logger.debug("record publish for {} with pipe stats={}", spec, spec.stats);
 		
 	}
 

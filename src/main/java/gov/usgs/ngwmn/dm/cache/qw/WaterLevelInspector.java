@@ -50,7 +50,7 @@ public class WaterLevelInspector implements Inspector {
 				Date lst = rs.getDate(3);
 				int ct = rs.getInt(4);
 				
-				logger.debug("Stats for quality, id={} md5={}: nm {} ct {} min {} max {}",
+				logger.debug("Stats for waterlevel, id={} md5={}: ct {} min {} max {}",
 						new Object[] {cachekey, md5, ct, frst, lst});
 				
 				totct += ct;

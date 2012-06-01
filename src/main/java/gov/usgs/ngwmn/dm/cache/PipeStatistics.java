@@ -6,6 +6,10 @@ import gov.usgs.ngwmn.dm.spec.Specifier;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
 
 import javax.annotation.concurrent.ThreadSafe;
 
@@ -62,7 +66,7 @@ public class PipeStatistics {
 	private Specifier specifier;
 	private String source;
 	private String digest;
-	private FetchLog myLog;
+	private BlockingQueue<FetchLog> myLog = new ArrayBlockingQueue<FetchLog>(1);
 	
 	public synchronized long getCount() {
 		return count;
@@ -192,12 +196,21 @@ public class PipeStatistics {
 	}
 
 	public FetchLog getFetchLog() {
-		return myLog;
+		return myLog.poll();
 	}
 
-	public void setFetchLog(FetchLog myLog) {
-		this.myLog = myLog;
+	public FetchLog getFetchLog(long t, TimeUnit tu) throws InterruptedException {
+		return myLog.poll(t,tu);
 	}
 	
+	public void setFetchLog(FetchLog myLog) {
+		this.myLog.add(myLog);
+	}
+	
+	public synchronized Status overrideStatus(Status nv) {
+		Status ov = this.status;
+		this.status = nv;
+		return ov;
+	}
 	
 }
