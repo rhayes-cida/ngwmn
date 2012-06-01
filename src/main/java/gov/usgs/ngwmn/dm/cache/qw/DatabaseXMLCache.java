@@ -77,27 +77,27 @@ public class DatabaseXMLCache implements Cache {
 		return wdt;
 	}
 
-	private void invokeInspect(final int key) {
+	private void invokeInspect(final int key, final Specifier spec) {
 		if (xService == null) {
-			inspectAndRelease(key);
+			inspectAndRelease(key, spec);
 		} else {
 			xService.execute(new Runnable() {
 
 				@Override
 				public void run() {
-					inspectAndRelease(key);
+					inspectAndRelease(key, spec);
 				}
 				
 			});
 		}
 	}
 	
-	public void inspectAndRelease(int key) {
+	public void inspectAndRelease(int key, Specifier spec) {
 		try {
 			if (inspector.acceptable(key)) {
-				publish(key);
+				publish(key,spec);
 			} else {
-				withdraw(key);
+				withdraw(key, spec);
 			}
 		} catch (Exception e) {
 			logger.error("Problem in inspectAndRelease " + key, e);
@@ -154,8 +154,8 @@ public class DatabaseXMLCache implements Cache {
 						pooledConn.close();
 						logger.info("saved data for {}, sz {}", well, length);
 						
-						// may invoke this aysnchronously
-						invokeInspect(newkey);
+						// this may end up as an aysnchronous invocation
+						invokeInspect(newkey, well);
 					} catch (SQLException sqle) {
 						throw new IOException(sqle);
 					}
@@ -171,12 +171,13 @@ public class DatabaseXMLCache implements Cache {
 		}
 	}
 
-	public void publish(int id) throws Exception {
+	public void publish(int id,Specifier spec) throws Exception {
 		logger.info("publishing {}[{}]", tablename, id);
+		logger.debug("for specifier {}", spec);
 		setPublished(id, "Y");
 	}
 
-	public void withdraw(int id) throws Exception {
+	public void withdraw(int id, Specifier spec) throws Exception {
 		logger.warn("fetched data was found unacceptable, {}[{}]", tablename, id);
 		setPublished(id, "N");
 	}

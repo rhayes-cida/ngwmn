@@ -1,5 +1,6 @@
 package gov.usgs.ngwmn.dm.cache;
 
+import gov.usgs.ngwmn.dm.dao.FetchLog;
 import gov.usgs.ngwmn.dm.spec.Specifier;
 
 import java.util.Date;
@@ -18,7 +19,8 @@ public class PipeStatistics {
 		OPEN(false),
 		STARTED(false),
 		FAIL(true),
-		DONE(true);
+		DONE(true),
+		EMPY(true);
 	
 		private boolean done;
 		private boolean isDone() {
@@ -60,6 +62,7 @@ public class PipeStatistics {
 	private Specifier specifier;
 	private String source;
 	private String digest;
+	private FetchLog myLog;
 	
 	public synchronized long getCount() {
 		return count;
@@ -186,6 +189,14 @@ public class PipeStatistics {
 
 	public synchronized void setDigest(String digest) {
 		this.digest = digest;
+	}
+
+	public FetchLog getFetchLog() {
+		return myLog;
+	}
+
+	public void setFetchLog(FetchLog myLog) {
+		this.myLog = myLog;
 	}
 	
 	

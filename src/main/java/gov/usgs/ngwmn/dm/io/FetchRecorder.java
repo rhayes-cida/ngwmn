@@ -1,5 +1,8 @@
 package gov.usgs.ngwmn.dm.io;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import gov.usgs.ngwmn.dm.cache.PipeStatistics;
 import gov.usgs.ngwmn.dm.cache.PipeStatisticsWithProblem;
 import gov.usgs.ngwmn.dm.dao.FetchLog;
@@ -10,7 +13,7 @@ import com.google.common.eventbus.Subscribe;
 
 public class FetchRecorder {
 	
-	//private Logger logger = LoggerFactory.getLogger(this.getClass());
+	private Logger logger = LoggerFactory.getLogger(this.getClass());
 	
 	private FetchLogDAO dao;
 	
@@ -56,6 +59,9 @@ public class FetchRecorder {
 		}
 		
 		dao.insertId(item);
+		
+		logger.debug("recorded fetch log {} for specifier {}", item, stats.getSpecifier());
+		stats.setFetchLog(item);
 		
 		return item;
 	}
