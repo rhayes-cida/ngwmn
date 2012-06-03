@@ -107,6 +107,14 @@ public class FileCache implements Cache {
 		return true;
 	}
 	
+	
+	@Override
+	public InputStream retrieve(String id) throws IOException {
+		File f = new File(basedir,id);
+		
+		return new FileInputStream(f);
+	}
+
 	private static long copyTo(InputStream is, OutputStream os) 
 			throws IOException 
 	{

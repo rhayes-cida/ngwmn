@@ -72,6 +72,15 @@
     <url-pattern>/data/*</url-pattern>
   </servlet-mapping>
 
+  <servlet>
+    <servlet-name>CacheSnoopServlet</servlet-name>
+    <servlet-class>gov.usgs.ngwmn.dm.CacheSnoopServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>CacheSnoopServlet</servlet-name>
+    <url-pattern>/cache/*</url-pattern>
+  </servlet-mapping>
+
  	<security-constraint>
       <display-name>Diagnostics Security Constraint</display-name>
       <web-resource-collection>

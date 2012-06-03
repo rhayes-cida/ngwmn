@@ -5,6 +5,7 @@ import gov.usgs.ngwmn.dm.io.Pipeline;
 import gov.usgs.ngwmn.dm.spec.Specifier;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 
 public interface Cache {
@@ -25,5 +26,7 @@ public interface Cache {
 	public CacheInfo getInfo(Specifier spec);
 	
 	public WellDataType getDatatype();
+
+	InputStream retrieve(String id) throws IOException;
 }
 

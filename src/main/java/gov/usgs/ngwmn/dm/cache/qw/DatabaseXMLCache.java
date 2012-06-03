@@ -123,6 +123,7 @@ public class DatabaseXMLCache implements Cache {
 			// TODO Ascii?
 			OutputStream bos = clob.setAsciiStream(1);
 			
+			// TODO Defer MD5 calculation until quality inspection step
 			MessageDigest md5 = null;
 			try {
 				md5 = MessageDigest.getInstance("MD5");
@@ -220,32 +221,66 @@ public class DatabaseXMLCache implements Cache {
 			ps.setString(1, spec.getAgencyID());
 			ps.setString(2, spec.getFeatureID());
 
-			Timestamp fetch_date = null;
-			InputStream stream = null;
-
-			ResultSet rs = ps.executeQuery();
-			while (rs.next()) {
-				fetch_date = rs.getTimestamp(1);
-				stream = handler.getClobAsAsciiStream(rs, 2);
-			}
-
-			logger.debug("got stream for specifier {}, fetch_date={}, length={}", new Object[]{spec, fetch_date, (stream==null)?-1:stream.available()});
-
-			if (stream == null) {
-				conn.close();
-				return false;
-			}
-
-			stream = new ConnectionClosingInputStream(conn, stream);
-			Supplier<InputStream> supply = new SimpleSupplier<InputStream>(stream);
-
-			pipe.setInputSupplier(supply);
-
-			return true;
+			return fetchDataAndClose(conn, ps, pipe);
 		} catch (SQLException e1) {
 			throw new IOException(e1);
 		}
 	}
+	
+	private boolean fetchDataAndClose(final Connection conn, PreparedStatement ps,
+			Pipeline pipe) throws SQLException, IOException {
+		InputStream stream = getConnectionClosingInputStream(conn, ps);
+		
+		Supplier<InputStream> supply = new SimpleSupplier<InputStream>(stream);
+
+		pipe.setInputSupplier(supply);
+
+		return true;
+	}
+
+	private InputStream getConnectionClosingInputStream(final Connection conn,
+			PreparedStatement ps) throws SQLException, IOException {
+		Timestamp fetch_date = null;
+		InputStream stream = null;
+
+		ResultSet rs = ps.executeQuery();
+		while (rs.next()) {
+			fetch_date = rs.getTimestamp(1);
+			stream = handler.getClobAsAsciiStream(rs, 2);
+		}
+
+		logger.debug("got stream, fetch_date={}, length={}", new Object[]{fetch_date, (stream==null)?-1:stream.available()});
+
+		if (stream == null) {
+			conn.close();
+			return null;
+		}
+
+		stream = new ConnectionClosingInputStream(conn, stream);
+		return stream;
+	}
+
+	
+	@Override
+	public InputStream retrieve(String id) throws IOException {
+
+		try {
+			final Connection conn = ds.getConnection();
+			// To use the getCLOBVal function, the table alias must be explicit; use of the implicit alias fails with error ORA-00904
+			String query = "SELECT cachetable.fetch_date, cachetable.xml.getCLOBVal() " +
+					"FROM GW_DATA_PORTAL."+tablename+" cachetable " +
+					"WHERE cachetable." + tablename + "_ID = ? ";
+			
+			PreparedStatement ps = conn.prepareStatement(query);
+			ps.setMaxRows(1);
+			ps.setString(1, id);
+
+			return getConnectionClosingInputStream(conn, ps);
+		} catch (SQLException e1) {
+			throw new IOException(e1);
+		}
+	}
+
 
 	private static class ConnectionClosingInputStream extends FilterInputStream {
 
