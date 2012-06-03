@@ -27,6 +27,11 @@ public class FetchRecorder {
 		notify(pswp.getStats(), pswp.getProblem());		
 	}
 
+	@Subscribe
+	public void updateLog(FetchLog fl) {
+		dao.update(fl);
+	}
+	
 	public void notifyException(PipeStatistics stats, Throwable problem) {
 		notify(stats, problem);
 	}

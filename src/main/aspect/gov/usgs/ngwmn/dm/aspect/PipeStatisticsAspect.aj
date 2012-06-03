@@ -101,10 +101,10 @@ public aspect PipeStatisticsAspect {
 			// this waits until the FetchRecorder sets the fetch log on the PipeStatistics
 			FetchLog fl = spec.stats.getFetchLog(15, TimeUnit.SECONDS);
 			if (fl != null) {
-				fl.setStatus("EMPY");
+				fl.setStatus(PipeStatistics.Status.EMPY.as4Char());
 				
-				// TODO save the revised fetch log
-				logger.warn("Need to record the revised fetch log {}", fl);
+				// let the event bus update the fetch log
+				fetchEventBus.post(fl);
 			}
 		} catch (InterruptedException ie) {
 			// oh well, the fetch did not get recorded in time, give up

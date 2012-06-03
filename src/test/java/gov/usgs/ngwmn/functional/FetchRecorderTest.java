@@ -125,5 +125,30 @@ public class FetchRecorderTest extends ContextualTest {
 
 	}
 	
+	@Test
+	public void testUpdate() {
+		EventBus eb = ctx.getBean("FetchEventBus", EventBus.class);
+
+		Specifier spec = StatsMaker.makeStats(getClass()).getSpecifier();
+		WellRegistryKey well = spec.getWellRegistryKey();
+
+		FetchLog fl = dao.mostRecent(well);
+		String st = fl.getStatus();
+		
+		fl.setStatus("TEST");
+		try {
+
+			eb.post(fl);
+
+			FetchLog fl2 = dao.mostRecent(well);
+			System.out.printf("status was %s, changed to %s\n", st, fl2.getStatus());
+			assertEquals("TEST", fl2.getStatus());
+		} finally {
+			fl.setStatus(st);
+			
+			dao.update(fl);
+		}
+	}
+	
 
 }
