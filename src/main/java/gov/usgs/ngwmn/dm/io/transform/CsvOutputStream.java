@@ -16,15 +16,19 @@ public class CsvOutputStream extends OutputStreamTransform {
 	}
 
 	public String formatRow(List<Element> headers, Map<String, String> rowData) {
-		logger.debug("CSV Format Row");
+		logger.trace("CSV Format Row");
 		
 		StringBuilder rowText = new StringBuilder(); 
 		
+		String sep = "";
 		for (Element header : headers) {
 			String data = (rowData==null) ? header.displayName : rowData.get(header.fullName);
 			data = (data==null) ? "" : data;
-			rowText.append(data).append(',');
+			rowText.append(sep).append(data);
+			sep = ",";
 		}
+		rowText.append('\n');
+		
 		return rowText.toString();
 	}
 }

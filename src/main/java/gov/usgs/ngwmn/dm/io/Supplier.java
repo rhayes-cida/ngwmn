@@ -1,6 +1,5 @@
 package gov.usgs.ngwmn.dm.io;
 
-import gov.usgs.ngwmn.dm.spec.Specifier;
 
 import java.io.Closeable;
 import java.io.IOException;
@@ -65,7 +64,7 @@ public abstract class Supplier<T extends Closeable> implements InputSupplier<T>,
 	}
 	
 	
-	public Supplier<T> makeEntry(Specifier spec) {
+	public Supplier<T> makeEntry(EntryDescription entryDesc) {
 		return this;
 	}
 	

@@ -47,7 +47,7 @@ public class CacheMetaDataDAOTest extends ContextualTest {
 
 	@Test
 	public void testGet() {
-		// checkSiteIsVisible("USGS", "402734087033401");
+		// checkSiteIsVisible("USGS", "402734087033401"); // 400204074145401
 		WellRegistryKey well = new WellRegistryKey("USGS", "007");
 		WellDataType type = WellDataType.WATERLEVEL;
 		CacheMetaData cmd = dao.get(well, type);

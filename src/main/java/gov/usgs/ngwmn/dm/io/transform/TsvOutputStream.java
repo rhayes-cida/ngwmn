@@ -16,15 +16,19 @@ public class TsvOutputStream extends OutputStreamTransform {
 	}
 
 	public String formatRow(List<Element> headers, Map<String, String> rowData) {
-		logger.debug("TSV Format Row");
+		logger.trace("TSV Format Row");
 		
 		StringBuilder rowText = new StringBuilder(); 
 		
+		String sep = "";
 		for (Element header : headers) {
 			String data = (rowData==null) ? header.displayName : rowData.get(header.fullName);
 			data = (data==null) ? "" : data;
-			rowText.append(data).append('\t');
+			rowText.append(sep).append(data);
+			sep = "\t";
 		}
+		rowText.append('\n');
+		
 		return rowText.toString();
 	}
 }
