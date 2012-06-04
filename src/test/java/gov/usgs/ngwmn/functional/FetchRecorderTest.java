@@ -135,12 +135,22 @@ public class FetchRecorderTest extends ContextualTest {
 		FetchLog fl = dao.mostRecent(well);
 		String st = fl.getStatus();
 		
+		System.out.printf("fl 1 id = $d, status = %s\n", fl.getFetchlogId(), fl.getStatus());
+		
 		fl.setStatus("TEST");
 		try {
 
 			eb.post(fl);
 
 			FetchLog fl2 = dao.mostRecent(well);
+			System.out.printf("fl 2 id = $d, status = %s\n", fl2.getFetchlogId(), fl2.getStatus());
+			if ( ! fl2.getFetchlogId().equals(fl.getFetchlogId())) {
+				// something is happening on another thread -- get the one we expect to have changed
+				fl2 = dao.select(fl.getFetchlogId());
+				System.err.println("Replacing with exact fetch log entry");
+				System.out.printf("fl 2 id = $d, status = %s\n", fl2.getFetchlogId(), fl2.getStatus());
+			}
+
 			System.out.printf("status was %s, changed to %s\n", st, fl2.getStatus());
 			assertEquals("TEST", fl2.getStatus());
 		} finally {
