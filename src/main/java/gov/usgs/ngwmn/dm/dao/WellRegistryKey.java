@@ -68,6 +68,16 @@ public class WellRegistryKey {
 		return true;
 	}
 
+	@Override
+	public String toString() {
+		StringBuilder builder = new StringBuilder();
+		builder.append("WellRegistryKey")
+				.append("[agencyCd=").append(agencyCd)
+				.append(", siteNo=").append(siteNo)
+				.append("]");
+		return builder.toString();
+	}
+
 	
 	
 }

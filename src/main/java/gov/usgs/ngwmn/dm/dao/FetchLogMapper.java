@@ -136,13 +136,15 @@ public interface FetchLogMapper {
 	int insertId(FetchLog record);
 	
 	@Select({
-		"select",
-		"FETCHLOG_ID, AGENCY_CD, SITE_NO, DATA_SOURCE, STARTED_AT, STATUS, PROBLEM, CT, ",
-		"ELAPSED_SEC, SPECIFIER, FETCHER, DATA_STREAM",
-		"from GW_DATA_PORTAL.FETCH_LOG",
-		"where AGENCY_CD = #{agency_cd} and SITE_NO = #{site_no} ",
-		"AND ROWNUM = 1 ",
-		"ORDER BY STARTED_AT DESC ",
+		"select * from ",
+		"(SELECT FETCHLOG_ID, AGENCY_CD, SITE_NO, DATA_SOURCE, STARTED_AT, STATUS, PROBLEM, CT, ",
+		" ELAPSED_SEC, SPECIFIER, FETCHER, DATA_STREAM",
+		" from GW_DATA_PORTAL.FETCH_LOG",
+		" where AGENCY_CD = #{agency_cd} and SITE_NO = #{site_no} ",
+		" AND STARTED_AT IS NOT NULL ",
+		" ORDER BY STARTED_AT DESC ",
+		") ",
+		"WHERE ROWNUM = 1 ",
 		""})
 	@ResultMap("BaseResultMap")
 	FetchLog selectLatestByWell(@Param("agency_cd") String agency_cd, @Param("site_no") String site_no);

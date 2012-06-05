@@ -279,6 +279,19 @@ public class FetchLog {
 	public void setDataStream(String dataStream) {
 		this.dataStream = dataStream;
 	}
+	
+	
+
+	@Override
+	public String toString() {
+		StringBuilder builder = new StringBuilder();
+		builder.append("FetchLog [fetchlogId=").append(fetchlogId)
+				.append(", startedAt=").append(startedAt)
+				.append(", well=").append(getWell())
+				.append(", datatype=").append(dataStream)
+				.append("]");
+		return builder.toString();
+	}
 
 	public void setWell(WellRegistryKey key) {
 		setAgencyCd(key.getAgencyCd());

@@ -17,4 +17,5 @@
   <logger level="info" name="gov.usgs.ngwmn.dm.DataManagerServlet"/>
   <logger level="info" name="gov.usgs.ngwmn.dm.cache"/>
   <logger level="debug" name="gov.usgs.ngwmn.dm.io"/>
+  <logger name="gov.usgs.ngwmn.dm.dao.FetchLogMapper" level="TRACE"/>
 </configuration>

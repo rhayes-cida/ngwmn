@@ -51,6 +51,7 @@ public class FetchLogTest extends ContextualTest {
 		victim.notifySuccess(stats);
 		
 		FetchLog latest = dao.mostRecent(key);
+		System.out.println("Got latest = " + latest);
 		assertNotNull("Got a result", latest);
 		assertEquals("fetcher name", this.getClass().getSimpleName(), latest.getFetcher());
 		assertNull("no problem", latest.getProblem());
@@ -69,10 +70,11 @@ public class FetchLogTest extends ContextualTest {
 		victim.notifyException(stats, npe);
 		
 		FetchLog latest = dao.mostRecent(key);
+		System.out.println("Got latest = " + latest);
 		assertNotNull("Got a result", latest);
 		assertEquals("fetcher name", this.getClass().getSimpleName(), latest.getFetcher());
 		
-		assertEquals("Problem report", npe.getMessage(), latest.getProblem());
+		assertEquals("Problem report", npe.toString(), latest.getProblem());
 	}
 	
 
