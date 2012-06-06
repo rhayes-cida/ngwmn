@@ -101,6 +101,7 @@ public aspect PipeStatisticsAspect {
 			// this waits until the FetchRecorder sets the fetch log on the PipeStatistics
 			FetchLog fl = spec.stats.getFetchLog(15, TimeUnit.SECONDS);
 			if (fl != null) {
+				// TODO is withdraw really the same as EMPY?
 				fl.setStatus(PipeStatistics.Status.EMPY.as4Char());
 				
 				// let the event bus update the fetch log
