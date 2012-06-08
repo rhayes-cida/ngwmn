@@ -12,6 +12,8 @@ import gov.usgs.ngwmn.dm.spec.Specifier;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.security.InvalidParameterException;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -85,14 +87,35 @@ public class DataManagerServlet extends HttpServlet {
 				resp.sendError(HttpServletResponse.SC_GATEWAY_TIMEOUT, nda.getLocalizedMessage());
 			} catch (Exception e) {
 				logger.error("Problem getting well data", e);
+				if (logger.isDebugEnabled()) {
+					dumpParameters(req);
+				}
 				// TODO this message should not be rendered to the request
 				// TODO it could reveal too much detail to the user
 				throw new ServletException(e);
 			}
-		} finally {
+		}
+		catch (InvalidParameterException ivp) {
+			dumpParameters(req);
+			throw ivp;
+		} 
+		finally {
 			// TODO identify the request
 			logger.info("Done with request for specifier");
 		}
+	}
+
+	private void dumpParameters(HttpServletRequest req) {
+		
+		List<String> names = Collections.list(req.getParameterNames());
+		for (String pn : names) {
+			logger.debug("param {}", pn);
+			String[] vv = req.getParameterValues(pn);
+			for (String v : vv) {
+				logger.debug("{}: {}", pn, v);
+			}
+		}
+		
 	}
 
 	protected Specification makeSpecification(HttpServletRequest req) {
