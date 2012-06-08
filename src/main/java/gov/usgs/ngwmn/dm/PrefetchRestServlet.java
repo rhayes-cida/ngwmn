@@ -18,9 +18,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class PrefetchRestServlet extends HttpServlet {
+	protected final transient Logger logger = LoggerFactory.getLogger(getClass());
 	
 	private static final long serialVersionUID = 1L;
-	private Logger logger = LoggerFactory.getLogger(PrefetchRestServlet.class);
 	
 	@Override
 	public void init(ServletConfig config) throws ServletException {

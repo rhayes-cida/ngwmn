@@ -38,8 +38,7 @@ import org.springframework.jdbc.support.lob.LobHandler;
 
 
 public class DatabaseXMLCache implements Cache {
-
-	private static Logger logger = LoggerFactory.getLogger(DatabaseXMLCache.class);
+	protected final transient Logger logger = LoggerFactory.getLogger(getClass());
 	
 	private final String tablename;
 	private final WellDataType wdt;

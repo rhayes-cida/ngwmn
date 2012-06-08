@@ -16,6 +16,7 @@ import org.slf4j.LoggerFactory;
 
 
 public class DataBroker implements FlowFactory, PrefetchI {
+	protected final transient Logger logger = LoggerFactory.getLogger(getClass());
 
 	private DataFetcher harvester;
 	private DataFetcher retriever;
@@ -24,7 +25,6 @@ public class DataBroker implements FlowFactory, PrefetchI {
 	
 	private WellRegistryDAO wellDAO;
 	
-	private Logger logger = LoggerFactory.getLogger(this.getClass());
 	
 	public void fetchWellData(Specifier spec, final Supplier<OutputStream> out) throws Exception {
 		Pipeline pipe = (Pipeline) makeFlow(spec, out);

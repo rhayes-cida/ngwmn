@@ -11,13 +11,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class TempfileOutputStream extends OutputStream {
+	protected final transient Logger logger = LoggerFactory.getLogger(getClass());
+
 	private File endpoint;
 	private File tempfile;
 	private Status status;
 	
 	private FileOutputStream delegate;
-	
-	private static Logger logger = LoggerFactory.getLogger(TempfileOutputStream.class);
 	
 	public TempfileOutputStream(File ep, File tmp) {
 		endpoint = ep;

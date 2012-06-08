@@ -29,8 +29,6 @@ public class BasicServletTest extends ContextualTest {
 	private static final String WELL_WITH_DATA = "http://localhost:8080/ngwmn/data?"+PARAM_AGENCY+"=USGS&"+PARAM_FEATURE+"=402734087033401";
 	private static final String WELL_NO_DATA   = "http://localhost:8080/ngwmn/data?"+PARAM_AGENCY+"=NJGS&"+PARAM_FEATURE+"=2288614";
 
-//	private final Logger logger = LoggerFactory.getLogger(getClass());	
-	
 	@BeforeClass
 	public static void clearCache() {
 		// TODO on windows this is not the final destination for the cache. it is relative to the working dir

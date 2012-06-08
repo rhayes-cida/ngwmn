@@ -22,9 +22,9 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
 public class DataRestServlet extends HttpServlet {
+	protected final transient Logger logger = LoggerFactory.getLogger(getClass());
 	
 	private static final long serialVersionUID = 1L;
-	private Logger logger = LoggerFactory.getLogger(DataRestServlet.class);
 	
 	protected DataBroker db;
 	protected ApplicationContext ctx;

@@ -10,8 +10,7 @@ import org.slf4j.LoggerFactory;
 
 
 public class SupplyZipOutput extends Supplier<OutputStream> {
-	
-	private final Logger logger = LoggerFactory.getLogger(getClass());
+	protected final transient Logger logger = LoggerFactory.getLogger(getClass());
 	
 	private Supplier<OutputStream> os;
 	private ZipOutputStream oz;

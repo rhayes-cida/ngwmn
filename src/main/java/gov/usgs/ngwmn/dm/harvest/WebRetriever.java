@@ -17,6 +17,7 @@ import org.slf4j.LoggerFactory;
 import com.google.common.base.Strings;
 
 public class WebRetriever implements DataFetcher {
+	protected final transient Logger logger = LoggerFactory.getLogger(getClass());
 	
 	public static class WebInputSupplier extends Supplier<InputStream> {
 		private final Pipeline pipe;
@@ -53,7 +54,6 @@ public class WebRetriever implements DataFetcher {
 		}
 	}
 
-	private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
 	protected UrlFactory urlFactory = new UrlFactory();
 	protected Harvester  harvester  = new Harvester();

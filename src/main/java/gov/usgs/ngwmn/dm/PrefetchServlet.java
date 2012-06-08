@@ -21,9 +21,9 @@ import org.slf4j.LoggerFactory;
  * Sample invocation: http://localhost:8080/ngwmn/prefetch?featureID=402734087033401&agencyID=USGS
  */
 public class PrefetchServlet extends DataManagerServlet {
+	protected final transient Logger logger = LoggerFactory.getLogger(getClass());
 	
 	private static final long serialVersionUID = 1L;
-	private Logger logger = LoggerFactory.getLogger(PrefetchServlet.class);
 	
 	@Override
 	public void init(ServletConfig config) throws ServletException {

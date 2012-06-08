@@ -12,8 +12,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class Harvester {
-	
-	private final Logger logger = LoggerFactory.getLogger(this.getClass());
+	protected final transient Logger logger = LoggerFactory.getLogger(getClass());
 	
 	private InputStream    is;
 	private int    statusCode;

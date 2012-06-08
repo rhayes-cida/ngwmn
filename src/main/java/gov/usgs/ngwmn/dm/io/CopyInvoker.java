@@ -11,8 +11,7 @@ import org.slf4j.LoggerFactory;
 import com.google.common.io.ByteStreams;
 
 public class CopyInvoker implements Invoker {
-
-	protected Logger logger = LoggerFactory.getLogger(this.getClass());
+	protected final transient Logger logger = LoggerFactory.getLogger(getClass());
 
 	@Override
 	public long invoke(InputStream is, OutputStream os) throws IOException {

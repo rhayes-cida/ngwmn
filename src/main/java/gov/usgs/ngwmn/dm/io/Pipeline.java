@@ -12,8 +12,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class Pipeline implements Flow {
-	
-	private static Logger logger = LoggerFactory.getLogger(Pipeline.class);	
+	protected final transient Logger logger = LoggerFactory.getLogger(getClass());
 
 	private Supplier<InputStream>  iss;
 	private Supplier<OutputStream> oss;

@@ -8,7 +8,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class SupplyChain<T extends Closeable> extends Supplier<T> {
-	private final Logger logger = LoggerFactory.getLogger(getClass());
+	protected final transient Logger logger = LoggerFactory.getLogger(getClass());
 
 	private Supplier<T> link;
 	

@@ -14,8 +14,7 @@ import org.slf4j.LoggerFactory;
 
 
 class TransformEntrySupplier extends Supplier<OutputStream> {
-	
-	protected final Logger logger = LoggerFactory.getLogger(getClass());
+	protected final transient Logger logger = LoggerFactory.getLogger(getClass());
 
 	protected Supplier<OutputStreamTransform> upstream;
 	protected EntryDescription entryDesc;

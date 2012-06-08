@@ -12,10 +12,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class CacheMetaDataDAO {
+	protected final transient Logger logger = LoggerFactory.getLogger(getClass());
+	
 	private CacheMetaDataMapper mapper;
 	private DataSource dataSource;
 	
-	private static Logger logger = LoggerFactory.getLogger(CacheMetaDataDAO.class);
 	
 	public CacheMetaDataDAO(CacheMetaDataMapper mapper) {
 		super();

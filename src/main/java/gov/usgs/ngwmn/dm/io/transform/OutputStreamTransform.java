@@ -25,8 +25,7 @@ import org.slf4j.LoggerFactory;
 
 
 public abstract class OutputStreamTransform extends FilterOutputStream {
-
-	protected final Logger logger = LoggerFactory.getLogger(getClass());
+	protected final transient Logger logger = LoggerFactory.getLogger(getClass());
 	
 	private OutputStream    pout;
 	protected boolean 		writtenHeaders;

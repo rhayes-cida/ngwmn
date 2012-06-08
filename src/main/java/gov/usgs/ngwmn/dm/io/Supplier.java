@@ -12,8 +12,7 @@ import com.google.common.io.InputSupplier;
 import com.google.common.io.OutputSupplier;
 
 public abstract class Supplier<T extends Closeable> implements InputSupplier<T>, OutputSupplier<T> {
-
-	protected final transient Logger logger = LoggerFactory.getLogger( getClass() );
+	protected final transient Logger logger = LoggerFactory.getLogger(getClass());
 	
 	private T source;
 	

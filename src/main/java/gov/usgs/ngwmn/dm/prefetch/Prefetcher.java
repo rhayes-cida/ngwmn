@@ -25,13 +25,13 @@ import org.slf4j.LoggerFactory;
 
 // TODO Abstract well list, make a per-agency version
 public class Prefetcher implements Callable<PrefetchOutcome> {
+	protected final transient Logger logger = LoggerFactory.getLogger(getClass());
 
 	private int fetchLimit = 0;
 	private Long timeLimit = null;
 	
 	private ExecutorService executor = Executors.newSingleThreadExecutor();
 	
-	private final Logger logger = LoggerFactory.getLogger(this.getClass());
 	
 	private PrefetchI broker;
 	

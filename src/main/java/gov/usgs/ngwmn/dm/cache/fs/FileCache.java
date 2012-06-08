@@ -24,7 +24,7 @@ import org.slf4j.LoggerFactory;
 import com.google.common.io.ByteStreams;
 
 public class FileCache implements Cache {
-	private Logger logger = LoggerFactory.getLogger(FileCache.class);
+	protected final transient Logger logger = LoggerFactory.getLogger(getClass());
 	
 	private File basedir;
 

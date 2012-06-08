@@ -12,8 +12,7 @@ import gov.usgs.ngwmn.dm.spec.Specifier;
 import com.google.common.eventbus.Subscribe;
 
 public class FetchRecorder {
-	
-	private Logger logger = LoggerFactory.getLogger(this.getClass());
+	protected final transient Logger logger = LoggerFactory.getLogger(getClass());
 	
 	private FetchLogDAO dao;
 	

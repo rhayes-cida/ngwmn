@@ -9,8 +9,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class ZipEntryOutputStream extends FilterOutputStream {
-	
-	protected final Logger logger = LoggerFactory.getLogger(getClass());
+	protected final transient Logger logger = LoggerFactory.getLogger(getClass());
 	
 	private ZipOutputStream parent;
 	private String name;

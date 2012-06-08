@@ -15,9 +15,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class WaterQualityInspector implements Inspector {
+	protected final transient Logger logger = LoggerFactory.getLogger(getClass());
 
 	private DataSource ds;
-	private transient Logger logger = LoggerFactory.getLogger(this.getClass());
 	
 	
 	@Override

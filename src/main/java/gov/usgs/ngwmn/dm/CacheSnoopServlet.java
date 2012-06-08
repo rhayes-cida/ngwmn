@@ -22,9 +22,9 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
 import com.google.common.io.ByteStreams;
 
 public class CacheSnoopServlet extends HttpServlet {
+	protected final transient Logger logger = LoggerFactory.getLogger(getClass());
 	
 	private static final long serialVersionUID = 1L;
-	private Logger logger = LoggerFactory.getLogger(CacheSnoopServlet.class);
 	
 	protected Loader ldr;
 	protected ApplicationContext ctx;

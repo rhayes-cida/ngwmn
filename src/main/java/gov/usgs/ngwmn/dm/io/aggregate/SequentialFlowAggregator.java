@@ -12,8 +12,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class SequentialFlowAggregator implements Flow {
-
-	protected final Logger logger = LoggerFactory.getLogger(getClass());
+	protected final transient Logger logger = LoggerFactory.getLogger(getClass());
 	
 	protected FlowFactory 		     factory;
 	protected Iterable<Specifier>    specifiers;

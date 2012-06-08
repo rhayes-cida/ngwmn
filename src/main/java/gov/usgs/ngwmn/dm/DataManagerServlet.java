@@ -32,6 +32,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
 public class DataManagerServlet extends HttpServlet {
+	protected final transient Logger logger = LoggerFactory.getLogger(getClass());
 
 	private   static final long   serialVersionUID = 2L;
 	
@@ -42,7 +43,6 @@ public class DataManagerServlet extends HttpServlet {
 	public static final String PARAM_BUNDLED    = "bundled";
 	public static final String PARAM_ENCODING   = "encode";
 	
-	private  final Logger logger = LoggerFactory.getLogger(getClass());
 	
 	protected DataBroker db;
 	protected ApplicationContext ctx;

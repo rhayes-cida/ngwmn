@@ -19,8 +19,7 @@ import org.slf4j.LoggerFactory;
  * Stream an Excel 2007 (xlsx) file.  These are xml documents inside a zip file.
  */
 public class XlsxOutputStream extends SXSSFWorkbook implements Closeable {
-	
-	private final Logger logger = LoggerFactory.getLogger(getClass());
+	protected final transient Logger logger = LoggerFactory.getLogger(getClass());
 	
 	private static final String DATE_FORMAT = "m/d/yy h:mm";
 

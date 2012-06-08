@@ -19,6 +19,7 @@ import com.google.common.collect.ImmutableSortedMap;
 
 public class Loader 
 implements DataLoader {
+	protected final transient Logger logger = LoggerFactory.getLogger(getClass());
 
 	private class CacheSavingSupplier extends Supplier<OutputStream> {
 		private final Specifier spec;
@@ -40,8 +41,6 @@ implements DataLoader {
 	}
 
 	private Map<WellDataType, Cache> caches;
-	
-	protected transient Logger logger = LoggerFactory.getLogger(this.getClass());
 	
 	public OutputStream makeDestination(Specifier spec) 
 			throws IOException
