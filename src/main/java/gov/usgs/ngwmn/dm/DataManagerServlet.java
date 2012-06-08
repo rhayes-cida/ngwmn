@@ -6,7 +6,6 @@ import gov.usgs.ngwmn.dm.io.Supplier;
 import gov.usgs.ngwmn.dm.io.SupplyZipOutput;
 import gov.usgs.ngwmn.dm.io.aggregate.Flow;
 import gov.usgs.ngwmn.dm.io.aggregate.SequentialFlowAggregator;
-import gov.usgs.ngwmn.dm.io.transform.TransformSupplier;
 import gov.usgs.ngwmn.dm.spec.Encoding;
 import gov.usgs.ngwmn.dm.spec.SpecResolver;
 import gov.usgs.ngwmn.dm.spec.Specification;
@@ -72,14 +71,10 @@ public class DataManagerServlet extends HttpServlet {
 			Supplier<OutputStream> outs = new HttpResponseSupplier(spect, resp);
 					
 			try {
-				if ( spect.isBundled() ) {
-					outs = new SupplyZipOutput(outs);
-				}
-				
-				outs = new TransformSupplier(outs, spect.getEncode());
 				
 				Flow exec = null;
 				if ( spect.isBundled() ) {
+					outs = new SupplyZipOutput(outs);
 					SpecResolver resolver = new WellListResolver();
 					exec = new SequentialFlowAggregator(db, resolver.specIterator(spect), outs);
 				} else {

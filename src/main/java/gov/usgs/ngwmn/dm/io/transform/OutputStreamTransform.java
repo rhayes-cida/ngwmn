@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PipedInputStream;
 import java.io.PipedOutputStream;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -28,27 +29,35 @@ public abstract class OutputStreamTransform extends FilterOutputStream {
 	protected final Logger logger = LoggerFactory.getLogger(getClass());
 	
 	private OutputStream    pout;
+	protected boolean 		writtenHeaders;
 	private Future<Long>    parserResult;
-	private ExecutorService executor;
+	private ExecutorService executor; // TODO this should be Spring-ed
 	private final AtomicReference<List<Element>> headers;
-	private LinkedBlockingQueue<Map<String,String>> rows;
+	private final LinkedBlockingQueue<Map<String,String>> rows;
+	public int id;
 
-	private boolean writtenHeaders;
-	
 	public abstract String formatRow(List<Element> headers, Map<String, String> rowData);
 	
 	
 	public OutputStreamTransform(OutputStream out) throws IOException {
 		super(out);
+		logger.trace("transform upstream: {}", out.toString());
 		executor = Executors.newSingleThreadExecutor();
 		headers  = new AtomicReference<List<Element>>();
 		rows     = new LinkedBlockingQueue<Map<String,String>>();
 	}
+	
+	public void skipHeaders() {
+		writtenHeaders = true;
+	}
 
 	public void setParser(Parser parser) {
-		init(parser);
+		initParser(parser);
 	}
-	private void init(final Parser parser) {
+	private void initParser(final Parser parser) {
+		logger.trace("initParser rows from {}", System.identityHashCode(rows));
+		logger.trace("initParser transformer {}",  System.identityHashCode(OutputStreamTransform.this));
+		
 		final PipedInputStream pin  = new PipedInputStream();
 		try {
 			pout = new PipedOutputStream(pin);
@@ -58,7 +67,7 @@ public abstract class OutputStreamTransform extends FilterOutputStream {
 		
 		Callable<Long> exec = new Callable<Long>() {
 			public Long call() throws Exception {
-	    		logger.trace("InputStream parser init started  {}", this);
+	    		logger.trace("InputStream parser init started id-{} {}", id, OutputStreamTransform.this);
 	    		parser.setInputStream(pin);
 	    		logger.trace("InputStream parser init finished {}", this);
 	    		
@@ -66,13 +75,16 @@ public abstract class OutputStreamTransform extends FilterOutputStream {
 	    		long count=0;
 	    		Map<String,String> row;
 				while ( (row=parser.nextRow()) != null ) {
-					headers.set( parser.headers() );
+					headers.set( new ArrayList<Element>( parser.headers() ) );
 					Map<String,String> newRow = new HashMap<String,String>();
 					newRow.putAll(row);
 					rows.add(newRow);
 					count++;
-		    		logger.trace("parser row {} ", count);
+		    		logger.trace("parser rows {}",  System.identityHashCode(rows));
+		    		logger.trace("parser transformer {}",  System.identityHashCode(OutputStreamTransform.this));
+		    		logger.trace("parser row {}:{} ", count, newRow);
 				}
+	    		logger.trace("parser rows final {}",  rows);
 	    		logger.trace("parser finished {} {}", count, this);
 	    		return count;
 			}
@@ -82,6 +94,7 @@ public abstract class OutputStreamTransform extends FilterOutputStream {
 
 	@Override
     public void write(byte b[], int off, int len) throws IOException {
+		logger.trace( new String(b) );
     	pout.write(b, off, len);
     	processRow();
     }
@@ -93,14 +106,15 @@ public abstract class OutputStreamTransform extends FilterOutputStream {
     }
     
     private void processRow() throws IOException {
+
 		Map<String, String> row = rows.poll();
 		if (row != null) {
 			List<Element> headList = headers.get();
-			if (!writtenHeaders) {
+			if ( ! writtenHeaders ) {
 				writeRow(headList);
 				writtenHeaders=true;
 			}
-	    	logger.trace("processing bytes");
+	    	logger.trace("processing row");
 			writeRow(headList, row);
 		}
 	}
@@ -120,21 +134,25 @@ public abstract class OutputStreamTransform extends FilterOutputStream {
 
 
 	private void finish() throws IOException {
-		logger.trace("finish up processing bytes");
+		logger.trace("finish up processing rows");
+		logger.trace("processRow rows from {}", System.identityHashCode(rows));
+		logger.trace("processRow transformer id-{} {}", id,
+				System.identityHashCode(OutputStreamTransform.this));
 
     	while ( ! rows.isEmpty() || ! parserResult.isDone() ) {
     		processRow();
     	}
 		
-		logger.trace("finished processing cached bytes");
+		logger.trace("finished processing cached rows");
 	}
 	
 	@Override
     public void close() throws IOException {
+		logger.trace("closing transformer");
 		pout.close(); // this must be done before flushing
 		// so that the pin knows that it no longer has to wait for more bytes
 		finish();
-		out.close();
+//		out.close(); // TODO see if we can reactivate this line
     }
 }
 

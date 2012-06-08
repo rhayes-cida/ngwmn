@@ -4,9 +4,21 @@ import java.util.Map;
 
 public interface EntryDescription {
 	
-	String getName();
-	
-	void setExtension(String ext);
+	// return entry name for file or bundle naming
+	// for ngwmn this is used for zip entry and file names
+	String entryName();
 
-	Map<String,String> getConstColumns();
+	// return entry name for file or bundle naming
+	// for ngwmn this is used for zip entry and file names
+	String baseName();
+	
+	// allow the makeEntry (esp transformers) to change the file extension
+	// this should override any default name extension
+	// for nqwmn the data starts out as XML and become CSV or XLSX files
+	void extension(String ext);
+
+	// return a possible collection of default value constants
+	// when joining data into one file, it is useful to add tagging data columns
+	// for ngwmn the agency and site are not extracted from the files
+	Map<String,String> constColumns();
 }

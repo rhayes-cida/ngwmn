@@ -1,45 +1,54 @@
 package gov.usgs.ngwmn.dm.io.transform;
 
 import gov.usgs.ngwmn.NotImplementedException;
+import gov.usgs.ngwmn.WellDataType;
 import gov.usgs.ngwmn.dm.io.EntryDescription;
+import gov.usgs.ngwmn.dm.io.SimpleSupplier;
 import gov.usgs.ngwmn.dm.io.Supplier;
-import gov.usgs.ngwmn.dm.io.parse.DataRowParser;
 import gov.usgs.ngwmn.dm.spec.Encoding;
 
 import java.io.IOException;
 import java.io.OutputStream;
-import java.util.Map;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 public class TransformSupplier extends Supplier<OutputStream> {
+	
+	protected final Logger logger = LoggerFactory.getLogger(getClass());
 
 	protected Supplier<OutputStream> upstream;
-	protected Encoding encoding;
 	protected EntryDescription entryDesc;
+	protected Encoding encoding;
+	protected OutputStreamTransform ost;
+	protected boolean skipHeaders;
+	protected WellDataType dataType;
 	
-	public TransformSupplier(Supplier<OutputStream> output, Encoding encode) {
+	public TransformSupplier(Supplier<OutputStream> output, WellDataType type, Encoding encode) {
 		upstream = output;
+		dataType = type;
 		encoding = (encode==null) ? Encoding.NONE : encode;
 	}
 	
 	
 	@Override
 	public Supplier<OutputStream> makeEntry(EntryDescription entryDesc) {
-		entryDesc.setExtension(encoding.extension());
+		logger.trace("making entry for {}",entryDesc);
+		entryDesc.extension( encoding.extension() );
 		
-		Supplier<OutputStream> entry = upstream.makeEntry(entryDesc);
-		
-		TransformSupplier transformer = new TransformSupplier(entry, encoding);
-		transformer.entryDesc = entryDesc;
+		if (ost == null) {
+			throw new RuntimeException("Cannot makeEntry on a uninitialized supplier.");
+		}
+		Supplier<OutputStreamTransform> sos = new SimpleSupplier<OutputStreamTransform>(ost);
+		TransformEntrySupplier transformer  = new TransformEntrySupplier(sos, entryDesc, dataType, skipHeaders);
+		skipHeaders = true;
 		return transformer;
 	}
 	
 	@Override
 	public OutputStream initialize() throws IOException {
-		
 		OutputStream os = upstream.begin();
-		
-		OutputStreamTransform ost;
 		
 		switch (encoding) {
 			case NONE:
@@ -53,33 +62,7 @@ public class TransformSupplier extends Supplier<OutputStream> {
 			case CSV:
 				ost = new CsvOutputStream(os);
 		}
-		DataRowParser parser = makeParser();
-		ost.setParser(parser);
 		return ost;
-	}
-
-
-	public DataRowParser makeParser() {
-		// TODO this might be a bit too tightly coupled
-		DataRowParser parser = new DataRowParser();
-		
-		// TODO specific to water level
-		parser.setRowElementName("TimeValuePair");
-		parser.addIgnoreName("uom");
-		
-		appendIdentifierColumns(parser);
-		
-		return parser;
-	}
-
-
-	public void appendIdentifierColumns(DataRowParser parser) {
-		if (entryDesc==null) return; // if null than there are no cols
-		
-		Map<String,String> cols = entryDesc.getConstColumns();
-		for (String col : cols.keySet()) {
-			parser.addConstColumn(col, cols.get(col));
-		}
 	}
 
 }

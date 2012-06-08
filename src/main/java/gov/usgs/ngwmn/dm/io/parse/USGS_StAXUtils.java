@@ -239,12 +239,12 @@ public abstract class USGS_StAXUtils {
 					try {
 						writer.writeCharacters( charText, i,1 );
 					} catch (XMLStreamException ex) {
-						System.err.println("FUBAR, ERROR: " + charText[i]);
+						System.err.println("ERROR: " + charText[i]);
 						ex.printStackTrace();
 						writer.writeCharacters(upsideDownQuestionMark);
 					}
 				}
-				System.err.println("YO YO MA, ERROR: " + content);
+				System.err.println("ERROR: " + content);
 				e.printStackTrace();
 			}
 		} else {

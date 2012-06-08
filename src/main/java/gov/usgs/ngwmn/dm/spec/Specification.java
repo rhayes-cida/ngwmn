@@ -1,5 +1,7 @@
 package gov.usgs.ngwmn.dm.spec;
 
+import gov.usgs.ngwmn.WellDataType;
+
 import java.util.List;
 
 
@@ -54,7 +56,7 @@ public class Specification {
 	// QW_WELL_TYPE
 	private String qwType;
 	
-	
+	private WellDataType dataType;
 	
 	
 	public Encoding getEncode() {
@@ -182,6 +184,14 @@ public class Specification {
 	}
 	public void setQwType(String qwType) {
 		this.qwType = qwType;
+	}
+	
+	
+	public WellDataType getDataType() {
+		return dataType;
+	}
+	public void setDataType(WellDataType dataType) {
+		this.dataType = dataType;
 	}
 	
 	

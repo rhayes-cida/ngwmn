@@ -199,7 +199,9 @@ public class ParseState {
 				currentTargetColumn = element; // update
 
 				// special case
-				if (ignoreRowElement && localName.equals(rowElementIdentifier)) {
+				// this used to be if (ignoreRowElement && localName.equals(rowElementIdentifier)) {
+				// not sure if that is important but it seems to work better this way
+				if (localName.equals(rowElementIdentifier)) {
 					element.hasChildren = true;
 				}
 			}
@@ -295,6 +297,12 @@ public class ParseState {
 
 	public String pop() {
 		return context.pop();
+	}
+
+	// called on endElement to check if the endElement is the root element end
+	// size must be one because of the insert of the empty string on commence
+	public boolean isContextEmpty() {
+		return context.size()==1;
 	}
 
 

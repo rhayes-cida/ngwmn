@@ -18,7 +18,7 @@ public interface Parser {
 	// nearest approximation to the number of bytes parsed - the more accurate the better
 	// it is used to manage data between PipedInputStream and PipedOutputStream.
 	// In order for a StAX reader to be ready to read it must read a few bytes from the XML stream
-	long bytesParsed();
+	//long bytesParsed();
 	
 	// differed setting (removed from constructor) so that the OutputStream can set it on a
 	// separate thread - if it was done in the constructor then then FormatingOuputStream cannot

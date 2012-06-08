@@ -7,22 +7,32 @@ import gov.usgs.ngwmn.dm.spec.Specifier;
 
 public class SpecifierEntry implements EntryDescription {
 
-	private Specifier spec;
-	private String ext;
+	protected Specifier spec;
+	protected String ext;
 	
 	public SpecifierEntry(Specifier specifier) {
 		spec   = specifier;
 	}
 	
 	@Override
-	public String getName() {
-		String suffix = (ext==null) ? spec.getTypeID().suffix : ext;
+	public String entryName() {
+		String suffix = baseName();
 		
 		String name = new StringBuilder()
 		.append(spec.getAgencyID())
 		.append('_')
 		.append(spec.getFeatureID()) 
 		.append('_')
+		.append(suffix)
+		.toString();
+		
+		return name;
+	}
+	@Override
+	public String baseName() {
+		String suffix = (ext==null) ? spec.getTypeID().suffix : ext;
+		
+		String name = new StringBuilder()
 		.append(spec.getTypeID())
 		.append('.')
 		.append(suffix)
@@ -32,15 +42,15 @@ public class SpecifierEntry implements EntryDescription {
 	}
 
 	@Override
-	public void setExtension(String extension) {
+	public void extension(String extension) {
 		ext = extension;
 	}
 
 	@Override
-	public Map<String, String> getConstColumns() {
+	public Map<String, String> constColumns() {
 		Map<String,String> data = new LinkedHashMap<String,String>();
-		data.put("agency", spec.getAgencyID());
-		data.put("site",   spec.getFeatureID());
+		data.put("Agency", spec.getAgencyID());
+		data.put("Site",   spec.getFeatureID());
 		return data;
 	}
 }

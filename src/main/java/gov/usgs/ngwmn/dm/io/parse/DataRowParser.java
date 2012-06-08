@@ -26,8 +26,9 @@ public class DataRowParser implements Parser {
 	protected final Map<String, String> constAdditionalCols;
 	
 	protected XMLStreamReader     reader;
-	protected long bytesRead;
+//	protected long bytesRead;
 	protected boolean eof;
+	protected int rowCount;
 	
 	public DataRowParser() {
 		state                  = new ParseState();
@@ -68,14 +69,16 @@ public class DataRowParser implements Parser {
 	public void setCopyDown(boolean copyDown) {
 		state.isDoCopyDown = copyDown;
 	}
-	public void addIgnoreName(String name){
-		ignoredElements.add(name);
+	public void addIgnoreNames(Set<String> names) {
+		if (names==null) return;
+		ignoredElements.addAll(names);
 	}
-	
+/*	
 	@Override
 	public long bytesParsed() {
 		return bytesRead;
 	}
+*/
 	public List<Element> headers() {
 		if ( headers.isEmpty() ) {
 			for (String constCol : constAdditionalCols.keySet()) {
@@ -96,12 +99,14 @@ public class DataRowParser implements Parser {
 		boolean done = eof;
 		
 		try {
+			state.targetColumnValues.clear();
+			
 			while ( ! done && reader.hasNext() ) {
 				int event = reader.next();
 				
-				if (event != XMLStreamConstants.END_DOCUMENT) {
-					updateBytes(event);
-				}
+//				if (event != XMLStreamConstants.END_DOCUMENT) {
+//					updateBytes(event);
+//				}
 				
 				switch (event) {
 					case XMLStreamConstants.START_DOCUMENT:
@@ -119,10 +124,12 @@ public class DataRowParser implements Parser {
 						// this is where writing to the stream happens
 						// before this it was all setup
 						done = endElement(); // the end elements for elders will be handled on nextRow
+						eof  = state.isContextEmpty();
+						done = done || eof;
 	//					endElement(in, out, state, checker);
 						break;
 					case XMLStreamConstants.END_DOCUMENT:
-						eof = true;
+						done = eof = true;
 						return null;
 					// TODO no default
 				}
@@ -130,8 +137,14 @@ public class DataRowParser implements Parser {
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
+		if (state.targetColumnValues.size()==0 && eof) {
+			return null;
+		}
+		
 		removeIngnoreElements();
 		appendConstElements();
+		rowCount++;
+
 		// if currentRow is last Row then returns empty set
 		return  currentRow();
 	}
@@ -153,6 +166,7 @@ public class DataRowParser implements Parser {
 		constAdditionalCols.put(column,value);
 	}
 	
+/*	
 	// TODO this is not accurate. I could not find access to accurate counts
 	// this will miss XML headers and whitespace to name just a couple
 	private void updateBytes(int event) {
@@ -180,10 +194,11 @@ public class DataRowParser implements Parser {
 		}
 		bytesRead  += text.length();
 	}
-
+*/
 	@SuppressWarnings("unchecked")
 	private boolean endElement() {
 		String localName = reader.getLocalName();
+		System.err.println("</"+localName+">");
 		boolean onTargetEnd = state.isOnTargetRowStartOrEnd(localName);
 		state.finishEndElement(onTargetEnd);
 
@@ -235,10 +250,10 @@ public class DataRowParser implements Parser {
 			}
 		}
 	}
+	
 	protected void startElement(ParseState state) {
-		
-
 		String  localName   = reader.getLocalName();
+		System.err.println("<"+localName+">");
 		String  displayName = state.startElementBeginUpdate(reader);
 
 		if ( state.isTargetFound() && state.isInTarget ) {

@@ -12,9 +12,10 @@ import com.google.common.io.InputSupplier;
 import com.google.common.io.OutputSupplier;
 
 public abstract class Supplier<T extends Closeable> implements InputSupplier<T>, OutputSupplier<T> {
+
+	protected final transient Logger logger = LoggerFactory.getLogger( getClass() );
 	
 	private T source;
-	protected transient Logger logger = LoggerFactory.getLogger(this.getClass());
 	
 	@Override
 	public final T getInput() throws IOException {
@@ -54,7 +55,7 @@ public abstract class Supplier<T extends Closeable> implements InputSupplier<T>,
 	 *  and all streams will need to closed eventually the streams
 	 */
 	public void end(boolean threw) throws IOException {
-		if (source == null) {
+		if ( ! threw && source == null) {
 			throw new IOException("call to end prior to source begin.");
 		}
 		Closeables.close(source, threw);

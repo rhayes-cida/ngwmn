@@ -4,7 +4,6 @@ import static org.junit.Assert.*;
 
 import gov.usgs.ngwmn.dm.io.parse.DataRowParser;
 import gov.usgs.ngwmn.dm.io.parse.Element;
-import gov.usgs.ngwmn.dm.parse.LoggingPrintStream;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -91,16 +90,8 @@ public class DataRowParserTests {
 	
 
 	private DataRowParser parser;
-	protected LoggingPrintStream out;
 	
 	
-	
-	@Before
-	public void setUp() throws Exception {
-		out = new LoggingPrintStream();
-		//out.disable();
-		// out.enable(); uncomment this line to print the output
-	}
 	
 	void makeParser(String xml) {
 		parser = new DataRowParser();
@@ -272,6 +263,7 @@ public class DataRowParserTests {
 		secondRecordNewElements();
 		thirdRecordWithMissingElements();
 	}
+/*
 	@Test
 	public void test_bytesReadFew() throws Exception {
 		String xml = "<get><Site>2172257</Site></get>";
@@ -284,6 +276,9 @@ public class DataRowParserTests {
 		assertEquals(31, parser.bytesParsed());
 		assertNull(result);
 	}
+*/
+	
+/*
 	@Test
 	public void test_bytesReadMany() throws Exception {
 		String xml = TRIPLE_ROW_MULTIPLE_ORG;
@@ -319,7 +314,8 @@ public class DataRowParserTests {
 		assertEquals(433, parser.bytesParsed());
 		assertNull(result);
 	}
-	
+*/
+
 	@Test
 	public void test_TripleRowTwoElementsUsingElementNameUnevenDepth() throws Exception {
 		String xml = TRIPLE_ROW_UNEVEN_DEPTH;

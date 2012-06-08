@@ -15,11 +15,15 @@ public class SupplyZipEntry extends Supplier<OutputStream> {
 
 	@Override
 	public ZipEntryOutputStream initialize() throws IOException {
-			
-		String name = entryDesc.getName();
+		// TODO this allows for concatenation - it might be better to handle this with a JoiningSupplier
+		if ( ! parent.isInitialized() ) {
+			parent.begin();
+		}
+		
+		String name = entryDesc.entryName();
 		logger.debug("initialize : zip entry {}", name);
 		
-		return new ZipEntryOutputStream( parent.getZip(), entryDesc.getName() );
+		return new ZipEntryOutputStream( parent.getZip(), name );
 	}
 	
 }

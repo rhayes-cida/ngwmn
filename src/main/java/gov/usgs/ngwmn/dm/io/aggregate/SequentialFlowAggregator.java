@@ -13,7 +13,7 @@ import org.slf4j.LoggerFactory;
 
 public class SequentialFlowAggregator implements Flow {
 
-	private Logger logger = LoggerFactory.getLogger(getClass());
+	protected final Logger logger = LoggerFactory.getLogger(getClass());
 	
 	protected FlowFactory 		     factory;
 	protected Iterable<Specifier>    specifiers;
@@ -39,10 +39,14 @@ public class SequentialFlowAggregator implements Flow {
 	        for (Specifier spec : specifiers) {
 	        	logger.info("Getting well data for {}", spec);
 	        	EntryDescription entryDesc = new SpecifierEntry(spec);
-	        	exec = factory.makeFlow(spec, output.makeEntry(entryDesc));
+	        	Supplier<OutputStream> substream = output.makeEntry(entryDesc);
+	        	
+	        	exec = factory.makeFlow(spec, substream);
 	        	exec.call();
 	        }
+    		
         	threw = false;
+    		
 		} catch (Exception problem) {
 			if ( ! handleErrors(exec, problem) ) {
 				throw problem;
@@ -53,9 +57,10 @@ public class SequentialFlowAggregator implements Flow {
         return null;
     }
     
+    
     public boolean handleErrors(Flow exec, Exception problem) {
-    	// default error handler
-    	return false;
+    	logger.error("Error processing sequential joined flows", problem);
+    	return false; // false means "not handled" and should be re-thrown
     }
     
 }
