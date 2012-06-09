@@ -107,7 +107,9 @@ public class DataManagerServlet extends HttpServlet {
 
 	private void dumpParameters(HttpServletRequest req) {
 		
+		@SuppressWarnings("unchecked")
 		List<String> names = Collections.list(req.getParameterNames());
+		
 		for (String pn : names) {
 			logger.debug("param {}", pn);
 			String[] vv = req.getParameterValues(pn);
