@@ -48,7 +48,7 @@ public class WebRetrieverTests {
 				return HttpStatus.SC_OK;
 			}
 		};
-		spec = new Specifier("A","F",WellDataType.ALL);
+		spec = new Specifier("A","F",WellDataType.LOG);
 		pipe = new Pipeline(spec) {
 			@Override
 			public void setInputSupplier(Supplier<InputStream> in) {

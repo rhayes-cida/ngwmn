@@ -1,6 +1,7 @@
 package gov.usgs.ngwmn.dm.spec;
 
 import static org.junit.Assert.assertEquals;
+import gov.usgs.ngwmn.WellDataType;
 import gov.usgs.ngwmn.dm.dao.WellRegistry;
 
 import java.util.LinkedList;
@@ -13,12 +14,12 @@ import org.junit.Test;
 public class LatLongResolverTests {
 
 	private List<WellRegistry> wellsList;
-	private Specification spec;
+	private Specification spect;
 
 	
 	@Before
 	public void setUp() throws Exception {
-		spec      = new Specification();
+		spect      = new Specification();
 		
 		wellsList = new LinkedList<WellRegistry>();
 		WellRegistry well;
@@ -30,7 +31,7 @@ public class LatLongResolverTests {
 
 	@After
 	public void tearDown() throws Exception {
-		spec      = null;
+		spect     = null;
 		wellsList = null;
 	}
 
@@ -43,7 +44,7 @@ public class LatLongResolverTests {
 		};
 		
 		int count =0;
-		for (Specifier sp : resolver.specIterator(spec)) {
+		for (Specifier sp : resolver.specIterator(spect, WellDataType.LOG)) {
 			assertEquals("a"+count, sp.getAgencyID());
 			count++;
 		}

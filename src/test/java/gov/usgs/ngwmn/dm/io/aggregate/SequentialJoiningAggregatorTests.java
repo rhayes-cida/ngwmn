@@ -1,5 +1,6 @@
 package gov.usgs.ngwmn.dm.io.aggregate;
 
+
 import static org.junit.Assert.*;
 
 import gov.usgs.ngwmn.WellDataType;
@@ -19,9 +20,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
@@ -82,26 +81,18 @@ public class SequentialJoiningAggregatorTests {
 			}
 		};
 		
-		List<Specification> specifications = new ArrayList<Specification>();
-		Specification specification;
+		Specification spect;
 		
-		specification = new Specification();
-		specification.setDataType(WellDataType.QUALITY);
-		List<Specifier> specs = new ArrayList<Specifier>();
-		specs.add( new Specifier("a","1234567a",WellDataType.QUALITY) );
-		specs.add( new Specifier("a","1234567b",WellDataType.QUALITY) );
-		specification.setWellIDs(specs);
-		specifications.add(specification);
+		spect = new Specification();
+		spect.setEncode( Encoding.CSV );
 		
-		specification = new Specification();
-		specification.setDataType(WellDataType.LOG);
-		specs = new ArrayList<Specifier>();
-		specs.add( new Specifier("a","1234567c",WellDataType.LOG) );
-		specs.add( new Specifier("a","1234567d",WellDataType.LOG) );
-		specification.setWellIDs(specs);
-		specifications.add(specification);
+		spect.addWell( new Specifier("a","1234567a",WellDataType.QUALITY) );
+		spect.addWell( new Specifier("a","1234567b",WellDataType.QUALITY) );
 		
-		new SequentialJoiningAggregator(fac,specifications,upstream, Encoding.CSV).call();
+		spect.addWell( new Specifier("a","1234567c",WellDataType.LOG) );
+		spect.addWell( new Specifier("a","1234567d",WellDataType.LOG) );
+		
+		new SequentialJoiningAggregator(fac,spect,upstream).call();
 		
 		File file = new File("/tmp","dataSJA.zip");
 		FileOutputStream fos = new FileOutputStream(file);

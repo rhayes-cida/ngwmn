@@ -21,7 +21,7 @@ public class SupplyZipOutputTests {
 
 	@Before
 	public void setUp() {
-		spec = new Specifier("USGS","1234",WellDataType.ALL);
+		spec = new Specifier("USGS","1234",WellDataType.LOG);
 	}
 	
 	@Test

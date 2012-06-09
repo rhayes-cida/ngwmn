@@ -30,7 +30,14 @@ public class FileCache implements Cache {
 
 	public static final String BASEDIR_JNDI_NAME = "java:comp/env/GWDP/FileCache/basedir";
 	
-	private final WellDataType wdt = WellDataType.ALL;
+	private final WellDataType wdt;
+	
+	public FileCache() {
+		this(WellDataType.LOG);
+	}
+	public FileCache(WellDataType type) {
+		wdt = type;
+	}
 	
 	@Override
 	public WellDataType getDatatype() {

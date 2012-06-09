@@ -1,6 +1,7 @@
 package gov.usgs.ngwmn.functional;
 
 import static org.junit.Assert.assertTrue;
+import gov.usgs.ngwmn.WellDataType;
 import gov.usgs.ngwmn.dm.dao.ContextualTest;
 import gov.usgs.ngwmn.dm.spec.LatLongResolver;
 import gov.usgs.ngwmn.dm.spec.Specification;
@@ -13,11 +14,11 @@ import org.junit.Test;
 public class LatLongResolverIntegrationTests  extends ContextualTest {
 
 	private LatLongResolver resolver;
-	private Specification   spec;
+	private Specification   spect;
 	
 	@Before
 	public void setUp() throws Exception {
-		spec = new Specification();
+		spect = new Specification();
 		
 		resolver = ctx.getBean("LatLongResolver", LatLongResolver.class);
 	}
@@ -34,13 +35,13 @@ public class LatLongResolverIntegrationTests  extends ContextualTest {
 			Longitude values range from -65 to -124 degrees.
 			Alaska Latitude values range from 50 to 71 and Longitude from -129 to -168.
 */
-		spec.setLatitudeNorth(49);
-		spec.setLatitudeSouth(24);
-		spec.setLongitudeEast(-65);
-		spec.setLongitudeWest(-124);
+		spect.setLatitudeNorth(49);
+		spect.setLatitudeSouth(24);
+		spect.setLongitudeEast(-65);
+		spect.setLongitudeWest(-124);
 		
 		int count =0;
-		for (Specifier sp : resolver.specIterator(spec)) {
+		for (Specifier sp : resolver.specIterator(spect, WellDataType.LOG)) {
 			count += (sp != null) ? 1 : 0;
 		}
 		assertTrue(1 < count);

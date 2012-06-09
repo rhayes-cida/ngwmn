@@ -8,8 +8,7 @@ import java.util.Set;
 public enum WellDataType {
 	LOG("text/xml", "xml", "TimeValuePair", "uom"),        // TODO correct rowElementName and ignoreElementNames
 	WATERLEVEL("text/xml", "xml", "TimeValuePair", "uom"),
-	QUALITY("text/xml", "xml", "TimeValuePair", "uom"),    // TODO correct rowElementName and ignoreElementNames
-	ALL("application/zip", "zip", "TimeValuePair", "uom"); // TODO correct rowElementName and ignoreElementNames
+	QUALITY("text/xml", "xml", "TimeValuePair", "uom");    // TODO correct rowElementName and ignoreElementNames
 	
 	public final String contentType;
 	public final String suffix;

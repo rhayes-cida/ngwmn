@@ -48,7 +48,7 @@ public class DataBrokerIntegrationTest extends ContextualTest {
 	}
 	
 	private Specifier makeSpec(String agency, String site) {
-		return makeSpec(agency, site, WellDataType.ALL);
+		return makeSpec(agency, site, WellDataType.WATERLEVEL);
 	}
 
 	@Test
@@ -126,7 +126,7 @@ public class DataBrokerIntegrationTest extends ContextualTest {
 
 	@Test
 	public void testFetchWellData() throws Exception {
-		Specifier spec = new Specifier(AGENCY_CD,SITE_NO,WellDataType.ALL);
+		Specifier spec = new Specifier(AGENCY_CD,SITE_NO,WellDataType.WATERLEVEL);
 		
 		ByteArrayOutputStream bos = new ByteArrayOutputStream();
 		

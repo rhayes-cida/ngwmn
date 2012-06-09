@@ -24,7 +24,7 @@ public class FileCache_FilenameTest extends FileCache {
 	
 	@Test
 	public void testBaseContentFile() throws IOException {
-		Specifier spec = new Specifier("SAFE","safe",WellDataType.ALL);
+		Specifier spec = new Specifier("SAFE","safe",WellDataType.LOG);
 		
 		File f = super.contentFile(spec);
 		assertTrue("pre-existing condition", f.createNewFile()||f.exists());
@@ -32,7 +32,7 @@ public class FileCache_FilenameTest extends FileCache {
 
 	@Test
 	public void testUnsafeFeatureID() throws IOException {
-		Specifier spec = new Specifier("SAFE",":very/unsafe/Feature!ID",WellDataType.ALL);
+		Specifier spec = new Specifier("SAFE",":very/unsafe/Feature!ID",WellDataType.LOG);
 		
 		File f = super.contentFile(spec);
 		f.createNewFile();
@@ -41,7 +41,7 @@ public class FileCache_FilenameTest extends FileCache {
 	
 	@Test
 	public void testUnsafeAgencyID() throws IOException {
-		Specifier spec = new Specifier("un/safe/\u0003Agency/ID","safe",WellDataType.ALL);
+		Specifier spec = new Specifier("un/safe/\u0003Agency/ID","safe",WellDataType.LOG);
 		
 		File f = super.contentFile(spec);
 		f.createNewFile();
@@ -50,7 +50,7 @@ public class FileCache_FilenameTest extends FileCache {
 	
 	@Test
 	public void testRepeatable() {
-		Specifier spec = new Specifier("AGID","safe",WellDataType.ALL);
+		Specifier spec = new Specifier("AGID","safe",WellDataType.LOG);
 		
 		File f1 = super.contentFile(spec);
 		File f2 = super.contentFile(spec);
@@ -60,10 +60,10 @@ public class FileCache_FilenameTest extends FileCache {
 
 	@Test
 	public void testUsesAgency() {
-		Specifier spec = new Specifier("ONE","safe",WellDataType.ALL);
+		Specifier spec = new Specifier("ONE","safe",WellDataType.LOG);
 		File f1 = super.contentFile(spec);
 		
-		spec = new Specifier("TWO","safe",WellDataType.ALL);
+		spec = new Specifier("TWO","safe",WellDataType.LOG);
 		File f2 = super.contentFile(spec);
 		
 		assertFalse("should not be same cache file", f1.equals(f2));
@@ -71,10 +71,10 @@ public class FileCache_FilenameTest extends FileCache {
 	
 	@Test
 	public void testUsesFeature() {
-		Specifier spec = new Specifier("AGID","feature",WellDataType.ALL);
+		Specifier spec = new Specifier("AGID","feature",WellDataType.LOG);
 		File f1 = super.contentFile(spec);
 		
-		spec = new Specifier("AGID","creature",WellDataType.ALL);
+		spec = new Specifier("AGID","creature",WellDataType.LOG);
 		File f2 = super.contentFile(spec);
 		
 		assertFalse("should not be same cache file", f1.equals(f2));

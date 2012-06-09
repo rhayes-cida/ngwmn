@@ -20,7 +20,7 @@ public class LatLongResolver implements SpecResolver {
 	}
 	
 		
-	public Iterable<Specifier> specIterator(Specification spec) {
+	public Iterable<Specifier> specIterator(Specification spec, final WellDataType type) {
 		
 		final List<WellRegistry> wellList = fetchWells(spec);
 		
@@ -45,7 +45,7 @@ public class LatLongResolver implements SpecResolver {
 						// if we do not check the hasNext here then the error on next call
 						// will be transmitted to the caller. Note that if a null is returned
 						// then we will throw an NPE because of the specifier constructor.
-						Specifier spec = new Specifier( wells.next(), WellDataType.ALL );
+						Specifier spec = new Specifier( wells.next(), type );
 						return spec;
 					}
 		

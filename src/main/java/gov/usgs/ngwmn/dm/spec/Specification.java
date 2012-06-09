@@ -2,7 +2,13 @@ package gov.usgs.ngwmn.dm.spec;
 
 import gov.usgs.ngwmn.WellDataType;
 
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 
 /**
@@ -16,10 +22,7 @@ public class Specification {
 	
 	private Encoding encode;
 
-	private boolean bundled;
-	
-	// Delineated list of agency well IDs
-	private List<Specifier> wellIDs;
+	private boolean bundled = true; // TODO true by default for now until we decide we would like offer unbundled
 	
 	// TODO actual fields required - these are just brainstorm examples.
 	// DEC_LAT_VA
@@ -56,7 +59,48 @@ public class Specification {
 	// QW_WELL_TYPE
 	private String qwType;
 	
-	private WellDataType dataType;
+	private final Set<WellDataType> dataTypes;
+	// Delineated list of agency well IDs
+	private final Map<WellDataType,List<Specifier>> wellIDs;
+	
+	
+	public Specification() {
+		dataTypes = new HashSet<WellDataType>();
+		wellIDs   = new HashMap<WellDataType, List<Specifier>>();
+		for (WellDataType type : WellDataType.values()) {
+			wellIDs.put(type, new LinkedList<Specifier>());
+		}
+	}
+	
+	public List<Specifier> getWellIDs(WellDataType type) {
+		return wellIDs.get(type);
+	}
+	public void addWell(Specifier spec) {
+		WellDataType type = spec.getTypeID();
+		dataTypes.add(type);
+		wellIDs.get(type).add(spec);
+	}
+	public Collection<WellDataType> getDataTypes() {
+		return dataTypes;
+	}
+	
+	public int size() {
+		int size = 0;
+		for (WellDataType type : dataTypes) {
+			size += wellIDs.get(type).size();
+		}
+		return size; 
+	}
+	public boolean isEmpty() {
+		boolean empty = true;
+		
+		for (WellDataType type : dataTypes) {
+			empty &= wellIDs.get(type).isEmpty();
+		}
+		
+		return empty;
+	}
+	
 	
 	
 	public Encoding getEncode() {
@@ -109,12 +153,6 @@ public class Specification {
 	}
 	
 	
-	public List<Specifier> getWellIDs() {
-		return wellIDs;
-	}
-	public void setWellIDs(List<Specifier> wellIDs) {
-		this.wellIDs = wellIDs;
-	}
 	public String getAquiferID() {
 		return aquiferID;
 	}
@@ -184,14 +222,6 @@ public class Specification {
 	}
 	public void setQwType(String qwType) {
 		this.qwType = qwType;
-	}
-	
-	
-	public WellDataType getDataType() {
-		return dataType;
-	}
-	public void setDataType(WellDataType dataType) {
-		this.dataType = dataType;
 	}
 	
 	

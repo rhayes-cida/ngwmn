@@ -8,7 +8,6 @@ import gov.usgs.ngwmn.dm.spec.Specifier;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.Enumeration;
-import java.util.List;
 
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
@@ -100,13 +99,8 @@ public class DataRestServlet extends HttpServlet {
 
 	protected Specification makeSpecification(Specifier well) {
 		Specification spec = new Specification();
-
-		List<Specifier> wells = Collections.singletonList(well);
-		
 		spec.setBundled(false);
-
-		spec.setWellIDs(wells);
-		
+		spec.addWell(well);
 		return spec;
 	}
 

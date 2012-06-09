@@ -8,7 +8,7 @@ import gov.usgs.ngwmn.dm.spec.Specifier;
 public class StatsMaker {
 
 	public static PipeStatistics makeStats(Class<?> clazz) {
-		Specifier spec = new Specifier("USGS","007",WellDataType.ALL);
+		Specifier spec = new Specifier("USGS","007",WellDataType.LOG);
 		
 		return makeStats(clazz, spec);
 	}

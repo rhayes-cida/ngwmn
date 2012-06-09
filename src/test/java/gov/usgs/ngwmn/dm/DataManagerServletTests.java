@@ -7,14 +7,14 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.security.InvalidParameterException;
 import java.security.Principal;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletInputStream;
@@ -43,18 +43,18 @@ public class DataManagerServletTests {
 
 	@Test(expected=RuntimeException.class)
 	public void test_precheckWells_duplicateWellInList() {
-		List<Specifier> specs = new ArrayList<Specifier>();
-		specs.add( new Specifier("USGS", "007", WellDataType.LOG));
-		specs.add( new Specifier("USGS", "007", WellDataType.LOG));
+		Specification spect = new Specification();
+		spect.addWell( new Specifier("USGS", "007", WellDataType.LOG));
+		spect.addWell( new Specifier("USGS", "007", WellDataType.LOG));
 		
-		dms.precheckWells(specs);
+		dms.precheckWells(spect);
 	}
 	
 	@Test
 	public void test_precheckWells_checksWellsInList() {
-		List<Specifier> specs = new ArrayList<Specifier>();
-		specs.add( new Specifier("USGS", "007", WellDataType.LOG));
-		specs.add( new Specifier("USGS", "006", WellDataType.LOG));
+		Specification spect = new Specification();
+		spect.addWell( new Specifier("USGS", "007", WellDataType.LOG));
+		spect.addWell( new Specifier("USGS", "006", WellDataType.LOG));
 		
 		final Map<String,Integer> called = new HashMap<String,Integer>();
 		called.put("check",0);
@@ -64,7 +64,7 @@ public class DataManagerServletTests {
 				called.put("check", called.get("check")+1);
 			}
 		};
-		dms.precheckWells(specs);
+		dms.precheckWells(spect);
 		assertEquals("DataBroker.check must be called in precheck for each spec",
 				Integer.valueOf(2),called.get("check"));
 	}
@@ -72,8 +72,8 @@ public class DataManagerServletTests {
 	@Test
 	@SuppressWarnings("serial")
 	public void test_makeSpecification_successfullSingle_notBundled() {
-		final List<Specifier> specsList = new ArrayList<Specifier>();
-		specsList.add( new Specifier("AGRA", "007", WellDataType.LOG));
+		final Specification spect = new Specification();
+		spect.addWell( new Specifier("AGRA", "007", WellDataType.LOG));
 		
 		final Map<String,String> params = new HashMap<String, String>();
 		params.put(PARAM_AGENCY, "AGRA");
@@ -81,15 +81,15 @@ public class DataManagerServletTests {
 
 		dms = new DataManagerServlet() {
 			@Override
-			protected List<Specifier> parseListOfWells(HttpServletRequest req) {
-				return Collections.emptyList();
+			protected Specification parseListOfWells(HttpServletRequest req) {
+				return new Specification();
 			}
 			@Override
-			protected List<Specifier> parseSpecifier(HttpServletRequest req) {
-				return specsList;
+			protected Specification parseSpecifier(HttpServletRequest req) {
+				return spect;
 			}
 			@Override
-			protected void precheckWells(List<Specifier> specs) {
+			protected void precheckWells(Specification spect) {
 			}
 		};
 		
@@ -100,15 +100,16 @@ public class DataManagerServletTests {
 			}
 		};
 		
-		Specification spect = dms.makeSpecification(req);
-		assertFalse("expect that a single well req will not be bundled by default",spect.isBundled());
+		Specification spect2 = dms.makeSpecification(req);
+		assertTrue("expect that a single well req will be bundled by default",
+				spect2.isBundled());
 	}
 	
 	@Test
 	@SuppressWarnings("serial")
 	public void test_makeSpecification_successfullSingle_bundled() {
-		final List<Specifier> specsList = new ArrayList<Specifier>();
-		specsList.add( new Specifier("AGRA", "007", WellDataType.LOG));
+		final Specification spect = new Specification();
+		spect.addWell( new Specifier("AGRA", "007", WellDataType.LOG));
 		
 		final Map<String,String> params = new HashMap<String, String>();
 		params.put(PARAM_AGENCY, "AGRA");
@@ -117,15 +118,15 @@ public class DataManagerServletTests {
 
 		dms = new DataManagerServlet() {
 			@Override
-			protected List<Specifier> parseListOfWells(HttpServletRequest req) {
-				return Collections.emptyList();
+			protected Specification parseListOfWells(HttpServletRequest req) {
+				return new Specification();
 			}
 			@Override
-			protected List<Specifier> parseSpecifier(HttpServletRequest req) {
-				return specsList;
+			protected Specification parseSpecifier(HttpServletRequest req) {
+				return spect;
 			}
 			@Override
-			protected void precheckWells(List<Specifier> specs) {
+			protected void precheckWells(Specification spect) {
 			}
 		};
 		
@@ -136,16 +137,17 @@ public class DataManagerServletTests {
 			}
 		};
 		
-		Specification spect = dms.makeSpecification(req);
-		assertTrue("expect that a single well req will be bundled on request",spect.isBundled());
+		Specification spect2 = dms.makeSpecification(req);
+		assertTrue("expect that a single well req will be bundled on request",
+				spect2.isBundled());
 	}
 	
 	@Test
 	@SuppressWarnings("serial")
 	public void test_makeSpecification_successfullList() {
-		final List<Specifier> specsList = new ArrayList<Specifier>();
-		specsList.add( new Specifier("AGRA", "007", WellDataType.LOG));
-		specsList.add( new Specifier("USGS", "006", WellDataType.LOG));
+		final Specification spect = new Specification();
+		spect.addWell( new Specifier("AGRA", "007", WellDataType.LOG));
+		spect.addWell( new Specifier("USGS", "006", WellDataType.LOG));
 		
 		final Map<String,String> params = new HashMap<String, String>();
 		params.put(PARAM_AGENCY, "AGRA");
@@ -153,15 +155,15 @@ public class DataManagerServletTests {
 
 		dms = new DataManagerServlet() {
 			@Override
-			protected List<Specifier> parseListOfWells(HttpServletRequest req) {
-				return specsList;
+			protected Specification parseListOfWells(HttpServletRequest req) {
+				return spect;
 			}
 			@Override
-			protected List<Specifier> parseSpecifier(HttpServletRequest req) {
+			protected Specification parseSpecifier(HttpServletRequest req) {
 				throw new RuntimeException("Should not be called for list of wells.");
 			}
 			@Override
-			protected void precheckWells(List<Specifier> specs) {
+			protected void precheckWells(Specification spect) {
 			}
 		};
 		
@@ -172,88 +174,94 @@ public class DataManagerServletTests {
 			}
 		};
 		
-		Specification spect = dms.makeSpecification(req);
-		assertTrue("expect that a list of wells req will be bundled",spect.isBundled());
+		Specification spect2 = dms.makeSpecification(req);
+		assertTrue("expect that a list of wells req will be bundled", spect2.isBundled());
 	}
 
 	
 	@Test
 	@SuppressWarnings("serial")
 	public void test_parseListOfWells_successfully_multiAgency() {
-		final Map<String,String> params = new HashMap<String, String>();
-		params.put(PARAM_TYPE,   "LOG");
+		final Map<String,String[]> params = new HashMap<String, String[]>();
+		params.put(PARAM_TYPE,   new String[] {"LOG"} );
 		final String[] arrayOfWells = new String[] {"AGRA:007","FOOG:123","BARG:ABC"};
 		
 		dms = new DataManagerServlet() {
 			@Override
-			protected Specifier makeSpec(String agency, String featureID, String type) {
+			protected Specifier makeSpec(String agency, String featureID, WellDataType type) {
 				assertNotNull(agency);
 				assertNotNull(featureID);
-				assertEquals("LOG",  type);
+				assertEquals(WellDataType.LOG,  type);
 				assertTrue("expect agency IDs to be members of the array",
 						Arrays.toString(arrayOfWells).contains(agency));
 				assertTrue("expect feature IDs to be members of the array",
 						Arrays.toString(arrayOfWells).contains(featureID));
 				
-				return new Specifier(agency, featureID, WellDataType.valueOf(type));
+				return new Specifier(agency, featureID, type);
 			}
 		};
 		
 		HttpServletRequest req = new MockRequest() {
 			@Override
 			public String getParameter(String param) {
-				return params.get(param);
+				return null;
 			}
 			@Override
 			public String[] getParameterValues(String param) {
-				if ("listOfWells".equals(param)) {
+				if (DataManagerServlet.PARAM_WELLS_LIST.equals(param)) {
 					return arrayOfWells;
+				}
+				if (PARAM_TYPE.equals(param)) {
+					return (String[]) params.get(PARAM_TYPE);
 				}
 				return null;
 			}
 		};
 		
-		List<Specifier> list = dms.parseListOfWells(req);
-		assertEquals(arrayOfWells.length, list.size());
+		Specification spect = dms.parseListOfWells(req);
+		assertEquals(arrayOfWells.length, spect.getWellIDs(WellDataType.LOG).size());
 	}
 	
 	@Test
 	@SuppressWarnings("serial")
 	public void test_parseListOfWells_successfully_singleAgency() {
-		final Map<String,String> params = new HashMap<String, String>();
+		final Map<String,Object> params = new HashMap<String, Object>();
 		params.put(PARAM_AGENCY, "AGRA");
-		params.put(PARAM_TYPE,   "LOG");
+		params.put(PARAM_TYPE,   new String[]{"LOG"});
 		final String[] arrayOfWells = new String[] {"007","123","ABC"};
 		
 		dms = new DataManagerServlet() {
 			@Override
-			protected Specifier makeSpec(String agency, String featureID, String type) {
+			protected Specifier makeSpec(String agency, String featureID, WellDataType type) {
 				assertEquals("AGRA", agency);
 				assertNotNull(featureID);
-				assertEquals("LOG",  type);
+				assertEquals(WellDataType.LOG,  type);
 				assertTrue("expect feature IDs to be members of the array",
 						Arrays.toString(arrayOfWells).contains(featureID));
 				
-				return new Specifier(agency, featureID, WellDataType.valueOf(type));
+				return new Specifier(agency, featureID, type);
 			}
 		};
 		
 		HttpServletRequest req = new MockRequest() {
 			@Override
 			public String getParameter(String param) {
-				return params.get(param);
+				return (String) params.get(param);
 			}
 			@Override
 			public String[] getParameterValues(String param) {
-				if ("listOfWells".equals(param)) {
+				if (DataManagerServlet.PARAM_WELLS_LIST.equals(param)) {
 					return arrayOfWells;
+				}
+				if (PARAM_TYPE.equals(param)) {
+					return (String[]) params.get(PARAM_TYPE);
 				}
 				return null;
 			}
 		};
 		
-		List<Specifier> list = dms.parseListOfWells(req);
-		assertEquals(arrayOfWells.length, list.size());
+		Specification spect = dms.parseListOfWells(req);
+		assertEquals(arrayOfWells.length, spect.getWellIDs(WellDataType.LOG).size());
 	}
 	
 	@Test
@@ -269,15 +277,16 @@ public class DataManagerServletTests {
 			}
 			@Override
 			public String[] getParameterValues(String param) {
-				if ("listOfWells".equals(param)) {
+				if (DataManagerServlet.PARAM_WELLS_LIST.equals(param)) {
 					return arrayOfWells;
 				}
 				return null;
 			}
 		};
 		
-		List<Specifier> list = dms.parseListOfWells(req);
-		assertEquals("expect one less well spec than the supplied list", arrayOfWells.length-1, list.size());
+		Specification spect = dms.parseListOfWells(req);
+		assertEquals("expect one less well spec than the supplied list", 
+				arrayOfWells.length-1, spect.getWellIDs(WellDataType.LOG).size());
 	}
 	
 	@Test(expected=InvalidParameterException.class)
@@ -293,7 +302,7 @@ public class DataManagerServletTests {
 			}
 			@Override
 			public String[] getParameterValues(String param) {
-				if ("listOfWells".equals(param)) {
+				if (DataManagerServlet.PARAM_WELLS_LIST.equals(param)) {
 					return arrayOfWells;
 				}
 				return null;
@@ -306,30 +315,68 @@ public class DataManagerServletTests {
 	
 	@Test
 	public void test_parseDataType_successful_notNull() {
+		final Map<String,String[]> params = new HashMap<String, String[]>();
+		params.put(PARAM_TYPE, new String[]{"LOG"});
+		
+		HttpServletRequest req = new MockRequest() {
+			@Override
+			public String[] getParameterValues(String param) {
+				return params.get(param);
+			}
+		};
+		
+		WellDataType[] typeIDs = dms.parseDataTypes(req);
+		assertEquals(1, typeIDs.length);
+		assertEquals(WellDataType.LOG, typeIDs[0]);
+	}
+	@Test
+	public void test_parseDataType_successful_multiple() {
 		final Map<String,String> params = new HashMap<String, String>();
-		params.put(PARAM_TYPE,   "LOG");
+		
+		final String[] arrayOfTypes = new String[] {"LOG","QUALITY"};
 		
 		HttpServletRequest req = new MockRequest() {
 			@Override
 			public String getParameter(String param) {
 				return params.get(param);
 			}
+			@Override
+			public String[] getParameterValues(String param) {
+				if (DataManagerServlet.PARAM_TYPE.equals(param)) {
+					return arrayOfTypes;
+				}
+				return null;
+			}
 		};
 		
-		String typeID = dms.parseDataType(req);
-		assertEquals("LOG", typeID);
+		WellDataType[] typeIDs = dms.parseDataTypes(req);
+		assertEquals(2, typeIDs.length);
+
+		Set<WellDataType> unique = new HashSet<WellDataType>(
+				Arrays.asList(typeIDs)
+			);
+		assertEquals(2, unique.size());
+		
+		assertTrue(unique.contains(WellDataType.QUALITY));
+		assertTrue(unique.contains(WellDataType.LOG));
 	}
 	
 	@Test
 	public void test_parseDataType_defaultAll() {
 		HttpServletRequest req = new MockRequest() {
 			@Override
-			public String getParameter(String param) {
+			public String[] getParameterValues(String param) {
 				return null;
 			}
 		};
-		String typeID = dms.parseDataType(req);
-		assertEquals("ALL", typeID);
+		WellDataType[] typeIDs = dms.parseDataTypes(req);
+		assertEquals(WellDataType.values().length, typeIDs.length);
+		
+		Set<WellDataType> unique = new HashSet<WellDataType>(
+					Arrays.asList(typeIDs)
+				);
+		assertEquals(WellDataType.values().length, unique.size());
+		
 	}
 	
 	
@@ -339,31 +386,39 @@ public class DataManagerServletTests {
 		final Specifier spec = new Specifier("AGRA", "007", WellDataType.LOG);
 		dms = new DataManagerServlet() {
 			@Override
-			protected Specifier makeSpec(String agency, String featureID, String type) {
+			protected Specifier makeSpec(String agency, String featureID, WellDataType type) {
 				
 				// we are not testing makeSpec here so the mock is testing req parsing.
 				
 				assertEquals("AGRA", agency);
 				assertEquals("007",  featureID);
-				assertEquals("LOG",  type);
+				assertEquals(WellDataType.LOG,  type);
 				
 				return spec;
 			}
 		};
 		
-		final Map<String,String> params = new HashMap<String, String>();
+		final Map<String,Object> params = new HashMap<String, Object>();
 		params.put(PARAM_AGENCY,  "AGRA");
 		params.put(PARAM_FEATURE, "007");
-		params.put(PARAM_TYPE,    "LOG");
+		params.put(PARAM_TYPE,    new String[]{"LOG"});
 		
 		HttpServletRequest req = new MockRequest() {
 			@Override
+			public String[] getParameterValues(String param) {
+				if (PARAM_TYPE.equals(param)) {
+					return (String[]) params.get(PARAM_TYPE);
+				}
+				return null;
+			}
+			@Override
 			public String getParameter(String param) {
-				return params.get(param);
+				return (String) params.get(param);
 			}
 		};
 		
-		List<Specifier> list = dms.parseSpecifier(req);
+		Specification spect  = dms.parseSpecifier(req);
+		List<Specifier> list = spect.getWellIDs(WellDataType.LOG);
 		assertEquals(1, list.size());
 		assertEquals(spec, list.get(0));
 	}
@@ -373,7 +428,7 @@ public class DataManagerServletTests {
 	
 	@Test
 	public void test_makeSpec_successfully() {
-		Specifier spec = dms.makeSpec("AGRA", "007", "LOG");
+		Specifier spec = dms.makeSpec("AGRA", "007", WellDataType.LOG);
 
 		assertEquals("AGRA", spec.getAgencyID());
 		assertEquals("007",  spec.getFeatureID());
@@ -386,21 +441,14 @@ public class DataManagerServletTests {
 
 		assertEquals("USGS", spec.getAgencyID());
 		assertEquals("007",  spec.getFeatureID());
-		assertEquals(WellDataType.ALL, spec.getTypeID());
+		assertEquals(WellDataType.LOG, spec.getTypeID());
 	}
 
 	@Test(expected=IllegalArgumentException.class)
 	public void test_makeSpec_badSiteId() {
-		dms.makeSpec("USGS", null, "LOG");
+		dms.makeSpec("USGS", null, WellDataType.LOG);
 		assertTrue(false); // if we get here the method did not throw
 	}
-
-	@Test(expected=IllegalArgumentException.class)
-	public void test_makeSpec_badWellType() {
-		dms.makeSpec("USGS", "007", "NONE");
-		assertTrue(false); // if we get here the method did not throw
-	}
-
 }
 
 abstract class MockRequest implements HttpServletRequest {	
