@@ -33,7 +33,7 @@ public class FileCache implements Cache {
 	private final WellDataType wdt;
 	
 	public FileCache() {
-		this(WellDataType.LOG);
+		this(WellDataType.ALL); // TODO ALL asdf
 	}
 	public FileCache(WellDataType type) {
 		wdt = type;

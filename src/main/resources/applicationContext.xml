@@ -90,7 +90,7 @@
 		class="gov.usgs.ngwmn.dm.cache.Loader">
 		<constructor-arg>
 			<list>
-				<ref bean="FileCache"/>
+				<ref bean="FileCache"/> <!--  TODO ALL asdf -->
 				<ref bean="QualityCache"/>
 				<ref bean="LogCache"/>
 				<ref bean="WaterlevelCache"/>

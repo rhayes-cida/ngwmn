@@ -71,10 +71,16 @@ public class DataManagerServlet extends HttpServlet {
 			try {
 				
 				Flow exec = null;
-				if ( spect.isBundled() ) {
+				if ( ! spect.getDataTypes().contains(WellDataType.ALL)  // TODO ALL asdf
+						&& spect.isBundled() ) {
 					outs = new SupplyZipOutput(outs);
+					exec = new SequentialJoiningAggregator(db, spect, outs);
+				// TODO ALL asdf
+				} else {
+					// TODO initial impl of single unbundled request
+					// this is required because there is only one pipe and the seq exec calls begin unnecessarily
+					exec = db.makeFlow(spect.getWellIDs(WellDataType.ALL).get(0), outs);
 				}
-				exec = new SequentialJoiningAggregator(db, spect, outs);
 				exec.call();
 				
 			} catch (SiteNotFoundException nse) {
@@ -152,8 +158,8 @@ public class DataManagerServlet extends HttpServlet {
 		
 		String typeIDs[] = req.getParameterValues(PARAM_TYPE);
 		
-		if (typeIDs==null || (typeIDs.length==1 
-				&& "ALL".equalsIgnoreCase(typeIDs[0]) ) ) {
+		// TODO ALL asdf
+		if (typeIDs==null) { // || (typeIDs.length==1 && "ALL".equalsIgnoreCase(typeIDs[0]) ) ) {
 			return WellDataType.values();
 		}
 		

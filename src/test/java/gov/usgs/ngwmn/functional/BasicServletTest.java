@@ -26,8 +26,8 @@ public class BasicServletTest extends ContextualTest {
 	private static final String WELL_LIST_CSV  = "http://localhost:8080/ngwmn/data?"+PARAM_ENCODING+"=CSV&"+PARAM_AGENCY+"=USGS&"+PARAM_WELLS_LIST+"=402734087033401&"+PARAM_WELLS_LIST+"=402431075020801&"+PARAM_TYPE+"="+WellDataType.WATERLEVEL;
 	private static final String WELL_LIST_DATA = "http://localhost:8080/ngwmn/data?"+PARAM_WELLS_LIST+"=USGS:402734087033401&"+PARAM_WELLS_LIST+"=NJGS:2288614&"+PARAM_TYPE+"="+WellDataType.WATERLEVEL;
 //	private static final String WELL_LIST_CSV  = "http://localhost:8080/ngwmn/data?"+PARAM_ENCODING+"=CSV&"+PARAM_WELLS_LIST+"=USGS:402734087033401&"+PARAM_WELLS_LIST+"=NJGS:2288614&"+PARAM_TYPE+"="+WellDataType.WATERLEVEL;
-	private static final String WELL_WITH_DATA = "http://localhost:8080/ngwmn/data?"+PARAM_AGENCY+"=USGS&"+PARAM_FEATURE+"=402734087033401&"+PARAM_TYPE+"="+WellDataType.WATERLEVEL;
-	private static final String WELL_NO_DATA   = "http://localhost:8080/ngwmn/data?"+PARAM_AGENCY+"=NJGS&"+PARAM_FEATURE+"=2288614&"+PARAM_TYPE+"="+WellDataType.WATERLEVEL;
+	private static final String WELL_WITH_DATA = "http://localhost:8080/ngwmn/data?"+PARAM_AGENCY+"=USGS&"+PARAM_FEATURE+"=402734087033401&"+PARAM_TYPE+"="+WellDataType.ALL; // TODO ALL asdf
+	private static final String WELL_NO_DATA   = "http://localhost:8080/ngwmn/data?"+PARAM_AGENCY+"=NJGS&"+PARAM_FEATURE+"=2288614&"+PARAM_TYPE+"="+WellDataType.LOG;
 
 	@BeforeClass
 	public static void clearCache() {
@@ -203,12 +203,12 @@ public class BasicServletTest extends ContextualTest {
 */
 
 	// Now repeat the tests; we expect to get cached results
-	@Test(timeout=1500)
+	@Test(timeout=1500) // TODO why is this sometime this slow on Windows
 	public void testWithData_fromCacheShouldBeFast() throws Exception {
 		testWithData();
 	}
 	
-	@Test(timeout=1500)
+	@Test(timeout=1500) // TODO why is this sometime this slow on Windows
 	public void testWithNoData_fromCacheShouldBeFast() throws Exception {
 		testWithNoData();
 	}

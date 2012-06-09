@@ -86,13 +86,13 @@ public class DataBrokerIntegrationTest extends ContextualTest {
 		// allow for some slop in the clock
 		Date bot = new Date(System.currentTimeMillis() - TIMESLOP);
 		
-		Specifier spec = makeSpec(AGENCY_CD,SITE_NO);
+		Specifier spec = makeSpec(AGENCY_CD,SITE_NO,WellDataType.ALL); // TODO ALL asdf
 
 		long ct = dataBroker.prefetchWellData(spec);
 		
 		assertTrue("got bytes", ct > 100);
 		
-		CacheInfo info = logCache.getInfo(spec);
+		CacheInfo info = fileCache.getInfo(spec);
 		assertTrue("cache exists", info.isExists());
 		assertTrue("Cache was not updated - expect the entry to have a modified time after test commenced.",  ! info.getModified().before(bot));
 		assertEquals("cached size", ct, info.getLength());
