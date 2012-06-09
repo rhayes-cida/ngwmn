@@ -198,7 +198,7 @@ public class DataRowParser implements Parser {
 	@SuppressWarnings("unchecked")
 	private boolean endElement() {
 		String localName = reader.getLocalName();
-		System.err.println("</"+localName+">");
+//		System.err.println("</"+localName+">");
 		boolean onTargetEnd = state.isOnTargetRowStartOrEnd(localName);
 		state.finishEndElement(onTargetEnd);
 
@@ -253,7 +253,7 @@ public class DataRowParser implements Parser {
 	
 	protected void startElement(ParseState state) {
 		String  localName   = reader.getLocalName();
-		System.err.println("<"+localName+">");
+//		System.err.println("<"+localName+">");
 		String  displayName = state.startElementBeginUpdate(reader);
 
 		if ( state.isTargetFound() && state.isInTarget ) {

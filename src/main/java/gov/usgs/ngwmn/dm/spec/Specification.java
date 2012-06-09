@@ -20,7 +20,7 @@ import java.util.Set;
  */
 public class Specification {
 	
-	private Encoding encode;
+	private Encoding encode = Encoding.CSV; // TODO is this the default encoding for now?
 
 	private boolean bundled = true; // TODO true by default for now until we decide we would like offer unbundled
 	

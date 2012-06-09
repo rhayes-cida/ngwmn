@@ -147,11 +147,17 @@ public abstract class OutputStreamTransform extends FilterOutputStream {
 	
 	@Override
     public void close() throws IOException {
-		logger.trace("closing transformer");
-		pout.close(); // this must be done before flushing
-		// so that the pin knows that it no longer has to wait for more bytes
-		finish();
-//		out.close(); // TODO see if we can reactivate this line
+		try {
+			logger.trace("closing transformer");
+			pout.close(); // this must be done before flushing
+			// so that the pin knows that it no longer has to wait for more bytes
+			finish();
+	//		out.close(); // TODO see if we can reactivate this line
+		} catch (IOException e) {
+			throw e;
+		} catch (Exception e) {
+			throw new IOException(e);
+		}
     }
 }
 

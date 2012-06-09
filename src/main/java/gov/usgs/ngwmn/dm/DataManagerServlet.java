@@ -197,6 +197,7 @@ public class DataManagerServlet extends HttpServlet {
 		String agencyDefault = req.getParameter(PARAM_AGENCY);
 
 		String wells[] = req.getParameterValues(PARAM_WELLS_LIST);
+		if (wells == null) return spect; // TODO I would rather there be only featureId instead of listOfWells
 
 		RuntimeException re = null; // TODO should we allow one well to be bad or none?
 		

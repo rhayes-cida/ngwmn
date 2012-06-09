@@ -11,6 +11,8 @@ import gov.usgs.ngwmn.dm.DataBroker;
 import gov.usgs.ngwmn.dm.SiteNotFoundException;
 import gov.usgs.ngwmn.dm.cache.Cache;
 import gov.usgs.ngwmn.dm.cache.CacheInfo;
+import gov.usgs.ngwmn.dm.cache.fs.FileCache;
+import gov.usgs.ngwmn.dm.cache.qw.DatabaseXMLCache;
 import gov.usgs.ngwmn.dm.dao.ContextualTest;
 import gov.usgs.ngwmn.dm.dao.FetchLog;
 import gov.usgs.ngwmn.dm.dao.FetchLogDAO;
@@ -32,14 +34,17 @@ public class DataBrokerIntegrationTest extends ContextualTest {
 	private Cache qualityCache;
 	private Cache fileCache;
 	private FetchLogDAO fetchLogDAO;
+	private DatabaseXMLCache logCache;
 	
 	@Before
 	public void setUp() throws Exception {
 		//FileCache c = ctx.getBean("FileCache",  FileCache.class);
-		dataBroker  = ctx.getBean("DataBroker", DataBroker.class);		
+		dataBroker   = ctx.getBean("DataBroker",   DataBroker.class);		
 		qualityCache = ctx.getBean("QualityCache", Cache.class);
-		fileCache = ctx.getBean("FileCache", Cache.class);
-		fetchLogDAO = ctx.getBean("FetchLogDAO", FetchLogDAO.class);
+		fileCache    = ctx.getBean("FileCache",    FileCache.class);
+		fetchLogDAO  = ctx.getBean("FetchLogDAO",  FetchLogDAO.class);
+		
+		logCache     = ctx.getBean("LogCache",     DatabaseXMLCache.class);
 	}
 
 	private Specifier makeSpec(String agency, String site, WellDataType dt) {
@@ -87,7 +92,7 @@ public class DataBrokerIntegrationTest extends ContextualTest {
 		
 		assertTrue("got bytes", ct > 100);
 		
-		CacheInfo info = fileCache.getInfo(spec);
+		CacheInfo info = logCache.getInfo(spec);
 		assertTrue("cache exists", info.isExists());
 		assertTrue("Cache was not updated - expect the entry to have a modified time after test commenced.",  ! info.getModified().before(bot));
 		assertEquals("cached size", ct, info.getLength());
@@ -126,16 +131,14 @@ public class DataBrokerIntegrationTest extends ContextualTest {
 
 	@Test
 	public void testFetchWellData() throws Exception {
-		Specifier spec = new Specifier(AGENCY_CD,SITE_NO,WellDataType.WATERLEVEL);
+		Specifier spec = new Specifier(AGENCY_CD,SITE_NO,WellDataType.LOG);
 		
 		ByteArrayOutputStream bos = new ByteArrayOutputStream();
 		
 		Supplier<OutputStream> out = new SimpleSupplier<OutputStream>(bos);
 		dataBroker.fetchWellData(spec, out);
 		
-		Cache cache = ctx.getBean("FileCache", Cache.class);
-		
-		assertTrue("expect well data is cached", cache.contains(spec));
+		assertTrue("expect well data is cached", logCache.contains(spec));
 	}
 	
 
