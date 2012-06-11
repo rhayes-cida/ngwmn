@@ -34,9 +34,9 @@ public class SequentialJoiningAggregatorTests {
 	public static final String ELEMENTS2
 		= "<get><TimeValuePair><Id>8765</Id><Type>water</Type></TimeValuePair><TimeValuePair><Id>4321</Id><Type>sandstone</Type></TimeValuePair></get>";
 	public static final String ELEMENTS3
-		= "<get><TimeValuePair><Id>7777</Id><Type>H2O</Type></TimeValuePair><TimeValuePair><Id>8888</Id><Type>gray</Type></TimeValuePair></get>";
+		= "<get><Result><Id>7777</Id><Type>H2O</Type></Result><Result><Id>8888</Id><Type>gray</Type></Result></get>";
 	public static final String ELEMENTS4
-		= "<get><TimeValuePair><Id>6666</Id><Type>saltwater</Type></TimeValuePair><TimeValuePair><Id>9999</Id><Type>purple</Type></TimeValuePair></get>";
+		= "<get><Result><Id>6666</Id><Type>saltwater</Type></Result><Result><Id>9999</Id><Type>purple</Type></Result></get>";
 
 	@Test
 	public void test() throws Exception {
@@ -86,11 +86,11 @@ public class SequentialJoiningAggregatorTests {
 		spect = new Specification();
 		spect.setEncode( Encoding.CSV );
 		
-		spect.addWell( new Specifier("a","1234567a",WellDataType.QUALITY) );
-		spect.addWell( new Specifier("a","1234567b",WellDataType.QUALITY) );
+		spect.addWell( new Specifier("a","1234567a",WellDataType.WATERLEVEL) );
+		spect.addWell( new Specifier("a","1234567b",WellDataType.WATERLEVEL) );
 		
-		spect.addWell( new Specifier("a","1234567c",WellDataType.LOG) );
-		spect.addWell( new Specifier("a","1234567d",WellDataType.LOG) );
+		spect.addWell( new Specifier("a","1234567c",WellDataType.QUALITY) );
+		spect.addWell( new Specifier("a","1234567d",WellDataType.QUALITY) );
 		
 		new SequentialJoiningAggregator(fac,spect,upstream).call();
 		
@@ -100,10 +100,8 @@ public class SequentialJoiningAggregatorTests {
 		fos.flush();
 		fos.close();
 		
-		assertEquals(395, baos.toByteArray().length );
-		
 		Set<String> expectedNames = new HashSet<String>();
-		expectedNames.add("LOG.csv");
+		expectedNames.add("WATERLEVEL.csv");
 		expectedNames.add("QUALITY.csv");
 		ByteArrayInputStream bais = new ByteArrayInputStream(baos.toByteArray());
 		ZipInputStream zis = new ZipInputStream(bais);
@@ -115,5 +113,7 @@ public class SequentialJoiningAggregatorTests {
 		}
 		zis.close();
 
+		assertEquals(429, baos.toByteArray().length );
+		
 	}
 }

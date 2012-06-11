@@ -61,13 +61,13 @@ public class CsvOutputStreamTests {
 		String       line;
 		
 		line = lines.readLine();
-		assertEquals("Site", line);
+		assertEquals("\"Site\"", line);
 		
 		line = lines.readLine();
-		assertEquals("2172257", line);
+		assertEquals("\"2172257\"", line);
 		
 		line = lines.readLine();
-		assertEquals("2172258", line);
+		assertEquals("\"2172258\"", line);
 	}
 	
 	@Test
@@ -89,16 +89,16 @@ public class CsvOutputStreamTests {
 		String       line;
 		
 		line = lines.readLine();
-		assertEquals("code,agency,Id,level,Type", line);
+		assertEquals("\"code\",\"agency\",\"Id\",\"level\",\"Type\"", line);
 		
 		line = lines.readLine();
-		assertEquals("01,,2172257,admin,water", line);
+		assertEquals("\"01\",\"\",\"2172257\",\"admin\",\"water\"", line);
 		
 		line = lines.readLine();
-		assertEquals("02,USGS2,,,clay", line);
+		assertEquals("\"02\",\"USGS2\",\"\",\"\",\"clay\"", line);
 		
 		line = lines.readLine();
-		assertEquals("03,,2172258,user,stream", line);
+		assertEquals("\"03\",\"\",\"2172258\",\"user\",\"stream\"", line);
 	}
 	
 }

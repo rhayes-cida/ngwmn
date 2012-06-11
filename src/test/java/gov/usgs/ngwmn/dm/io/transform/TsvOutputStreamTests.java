@@ -61,13 +61,13 @@ public class TsvOutputStreamTests {
 		String       line;
 		
 		line = lines.readLine();
-		assertEquals("Site", line);
+		assertEquals("\"Site\"", line);
 		
 		line = lines.readLine();
-		assertEquals("2172257", line);
+		assertEquals("\"2172257\"", line);
 		
 		line = lines.readLine();
-		assertEquals("2172258", line);
+		assertEquals("\"2172258\"", line);
 	}
 	
 	@Test
@@ -89,16 +89,16 @@ public class TsvOutputStreamTests {
 		String       line;
 		
 		line = lines.readLine();
-		assertEquals("code\tagency\tId\tlevel\tType", line);
+		assertEquals("\"code\"\t\"agency\"\t\"Id\"\t\"level\"\t\"Type\"", line);
 		
 		line = lines.readLine();
-		assertEquals("01\t\t2172257\tadmin\twater", line);
+		assertEquals("\"01\"\t\"\"\t\"2172257\"\t\"admin\"\t\"water\"", line);
 		
 		line = lines.readLine();
-		assertEquals("02\tUSGS2\t\t\tclay", line);
+		assertEquals("\"02\"\t\"USGS2\"\t\"\"\t\"\"\t\"clay\"", line);
 		
 		line = lines.readLine();
-		assertEquals("03\t\t2172258\tuser\tstream", line);
+		assertEquals("\"03\"\t\"\"\t\"2172258\"\t\"user\"\t\"stream\"", line);
 	}
 	
 }
