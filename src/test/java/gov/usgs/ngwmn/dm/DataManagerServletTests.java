@@ -208,7 +208,7 @@ public class DataManagerServletTests {
 			}
 			@Override
 			public String[] getParameterValues(String param) {
-				if (DataManagerServlet.PARAM_WELLS_LIST.equals(param)) {
+				if (DataManagerServlet.PARAM_FEATURE.equals(param)) {
 					return arrayOfWells;
 				}
 				if (PARAM_TYPE.equals(param)) {
@@ -250,7 +250,7 @@ public class DataManagerServletTests {
 			}
 			@Override
 			public String[] getParameterValues(String param) {
-				if (DataManagerServlet.PARAM_WELLS_LIST.equals(param)) {
+				if (DataManagerServlet.PARAM_FEATURE.equals(param)) {
 					return arrayOfWells;
 				}
 				if (PARAM_TYPE.equals(param)) {
@@ -277,7 +277,7 @@ public class DataManagerServletTests {
 			}
 			@Override
 			public String[] getParameterValues(String param) {
-				if (DataManagerServlet.PARAM_WELLS_LIST.equals(param)) {
+				if (DataManagerServlet.PARAM_FEATURE.equals(param)) {
 					return arrayOfWells;
 				}
 				return null;
@@ -302,7 +302,7 @@ public class DataManagerServletTests {
 			}
 			@Override
 			public String[] getParameterValues(String param) {
-				if (DataManagerServlet.PARAM_WELLS_LIST.equals(param)) {
+				if (DataManagerServlet.PARAM_FEATURE.equals(param)) {
 					return arrayOfWells;
 				}
 				return null;
