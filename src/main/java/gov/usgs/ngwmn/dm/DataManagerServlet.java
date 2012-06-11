@@ -134,10 +134,9 @@ public class DataManagerServlet extends HttpServlet {
 //			String bundled = req.getParameter(PARAM_BUNDLED);
 //			spect.setBundled(bundled != null);
 			spect = parseSpecifier(req);
-		} else {
-			// a list of wells will be bundled as one file for now
-			spect.setBundled(true);
 		}
+		
+		parserBundling(req, spect);
 		
 		String encoding = req.getParameter(PARAM_ENCODING);
 		if (encoding != null) {
@@ -149,6 +148,16 @@ public class DataManagerServlet extends HttpServlet {
 		precheckWells(spect);
 		
 		return spect;
+	}
+
+	protected void parserBundling(HttpServletRequest req, Specification spect) {
+		
+		boolean bundled
+			=  ( null != req.getParameter(PARAM_BUNDLED) ) // specifically requested
+			|| ( 1 < spect.getWellTotalSize() )
+			|| ( 1 < spect.getDataTypes().size() );        // must bundle if multiple data elements
+		
+		spect.setBundled(bundled);
 	}
 
 	protected WellDataType[] parseDataTypes(HttpServletRequest req) {

@@ -35,12 +35,83 @@ import static gov.usgs.ngwmn.dm.DataManagerServlet.*;
 public class DataManagerServletTests {
 
 	DataManagerServlet dms;
+	Specification spc;
 
 	@Before
 	public void setUp() {
 		dms = new DataManagerServlet();
+		spc = new Specification();
 	}
 
+	@Test
+	public void test_parseBundling_trueIfParamSet() {
+		final Map<String,String> params = new HashMap<String, String>();
+		params.put(DataManagerServlet.PARAM_BUNDLED, "");
+		
+		HttpServletRequest req = new MockRequest() {
+			@Override
+			public String getParameter(String param) {
+				return params.get(param);
+			}
+		};
+		
+		dms.parserBundling(req, spc);
+		
+		assertTrue( spc.isBundled() );
+	}
+	
+	@Test
+	public void test_parseBundling_falseIfParamNotSet() {
+		final Map<String,String> params = new HashMap<String, String>();
+		
+		HttpServletRequest req = new MockRequest() {
+			@Override
+			public String getParameter(String param) {
+				return params.get(param);
+			}
+		};
+		
+		dms.parserBundling(req, spc);
+		
+		assertFalse( spc.isBundled() );
+	}
+	
+	@Test
+	public void test_parseBundling_trueIfParamDataTypeCountMoreThanOne() {
+		final Map<String,String> params = new HashMap<String, String>();
+		
+		HttpServletRequest req = new MockRequest() {
+			@Override
+			public String getParameter(String param) {
+				return params.get(param);
+			}
+		};
+		
+		spc.addWell( new Specifier("a", "b", WellDataType.LOG) );
+		spc.addWell( new Specifier("a", "b", WellDataType.QUALITY) );
+		dms.parserBundling(req, spc);
+		
+		assertTrue( spc.isBundled() );
+	}
+	
+	@Test
+	public void test_parseBundling_trueIfParamWellCountMoreThanOne() {
+		final Map<String,String> params = new HashMap<String, String>();
+		
+		HttpServletRequest req = new MockRequest() {
+			@Override
+			public String getParameter(String param) {
+				return params.get(param);
+			}
+		};
+		
+		spc.addWell( new Specifier("a", "b", WellDataType.LOG) );
+		spc.addWell( new Specifier("a", "c", WellDataType.LOG) );
+		dms.parserBundling(req, spc);
+		
+		assertTrue( spc.isBundled() );
+	}
+	
 	@Test(expected=RuntimeException.class)
 	public void test_precheckWells_duplicateWellInList() {
 		Specification spect = new Specification();
@@ -101,7 +172,7 @@ public class DataManagerServletTests {
 		};
 		
 		Specification spect2 = dms.makeSpecification(req);
-		assertTrue("expect that a single well req will be bundled by default",
+		assertFalse("expect that a single well req will NOT be bundled by default",
 				spect2.isBundled());
 	}
 	
@@ -175,7 +246,8 @@ public class DataManagerServletTests {
 		};
 		
 		Specification spect2 = dms.makeSpecification(req);
-		assertTrue("expect that a list of wells req will be bundled", spect2.isBundled());
+		assertTrue("expect that a list of wells req will be bundled", 
+				spect2.isBundled());
 	}
 
 	

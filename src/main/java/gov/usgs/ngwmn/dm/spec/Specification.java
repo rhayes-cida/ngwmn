@@ -100,6 +100,16 @@ public class Specification {
 		
 		return empty;
 	}
+	public int getWellTotalSize() {
+		int size = 0;
+		
+		for (WellDataType type : dataTypes) {
+			size += wellIDs.get(type).size();
+		}
+		
+		return size;
+	}
+	
 	
 	
 	
@@ -232,5 +242,5 @@ public class Specification {
 			&&  longitudeWest != null
 		);
 	}
-	
+
 }
