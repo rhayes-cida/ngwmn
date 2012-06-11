@@ -24,7 +24,7 @@ public class CsvOutputStream extends OutputStreamTransform {
 		for (Element header : headers) {
 			String data = (rowData==null) ? header.displayName : rowData.get(header.fullName);
 			data = (data==null) ? "" : data;
-			data = data.replaceAll("\"", "'");
+			data = data.trim().replaceAll("\"", "'");
 			rowText.append(sep).append('\"').append(data).append('\"');
 			sep = getSeparator();
 		}
