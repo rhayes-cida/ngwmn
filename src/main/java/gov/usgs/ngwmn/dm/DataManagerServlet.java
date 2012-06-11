@@ -37,7 +37,6 @@ public class DataManagerServlet extends HttpServlet {
 	public static final String PARAM_AGENCY     = "agencyID";
 	public static final String PARAM_FEATURE    = "featureID";
 	public static final String PARAM_TYPE       = "type";
-	public static final String PARAM_WELLS_LIST = "listOfWells";
 	public static final String PARAM_BUNDLED    = "bundled";
 	public static final String PARAM_ENCODING   = "encode";
 	
@@ -202,7 +201,7 @@ public class DataManagerServlet extends HttpServlet {
 		// TODO this is how we can enforce one agency?
 		String agencyDefault = req.getParameter(PARAM_AGENCY);
 
-		String wells[] = req.getParameterValues(PARAM_WELLS_LIST);
+		String wells[] = req.getParameterValues(PARAM_FEATURE);
 		if (wells == null) return spect; // TODO I would rather there be only featureId instead of listOfWells
 
 		RuntimeException re = null; // TODO should we allow one well to be bad or none?
