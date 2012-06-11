@@ -6,9 +6,11 @@ import java.util.HashSet;
 import java.util.Set;
 
 public enum WellDataType {
-	LOG("text/xml", "xml", "TimeValuePair", "uom"),        // TODO correct rowElementName and ignoreElementNames
-	WATERLEVEL("text/xml", "xml", "TimeValuePair", "uom"),
-	QUALITY("text/xml", "xml", "TimeValuePair", "uom"),    // TODO correct rowElementName and ignoreElementNames
+	LOG         ("text/xml", "xml", "logElement|construction", "uom"),
+	LITHOLOGY   ("text/xml", "xml", "logElement", "uom"),
+	CONSTRUCTION("text/xml", "xml", "construction", "uom"),
+	WATERLEVEL  ("text/xml", "xml", "TimeValuePair", "uom"),
+	QUALITY     ("text/xml", "xml", "Result", "uom"),
 	ALL("application/zip", "zip", "TimeValuePair", "uom"); // TODO ALL asdf
 	
 	public final String contentType;

@@ -23,7 +23,7 @@ import com.meterware.servletunit.ServletUnitClient;
 public class BasicServletTest extends ContextualTest {
 	
 	private static final String WELL_LIST_AGENCY_DATA = "http://localhost:8080/ngwmn/data?"+PARAM_AGENCY+"=USGS&"+PARAM_FEATURE+"=402734087033401&"+PARAM_FEATURE+"=402431075020801&"+PARAM_TYPE+"="+WellDataType.WATERLEVEL;
-	private static final String WELL_LIST_CSV  = "http://localhost:8080/ngwmn/data?"+PARAM_ENCODING+"=CSV&"+PARAM_AGENCY+"=USGS&"+PARAM_FEATURE+"=402734087033401&"+PARAM_FEATURE+"=402431075020801&"+PARAM_TYPE+"="+WellDataType.WATERLEVEL;
+	private static final String WELL_LIST_CSV  = "http://localhost:8080/ngwmn/data?"+PARAM_ENCODING+"=CSV&"+PARAM_AGENCY+"=USGS&"+PARAM_FEATURE+"=402431075020801&"+PARAM_FEATURE+"=402734087033401&"+PARAM_TYPE+"="+WellDataType.WATERLEVEL+"&"+PARAM_TYPE+"="+WellDataType.LOG+"&"+PARAM_TYPE+"="+WellDataType.QUALITY;
 	private static final String WELL_LIST_DATA = "http://localhost:8080/ngwmn/data?"+PARAM_FEATURE+"=USGS:402734087033401&"+PARAM_FEATURE+"=NJGS:2288614&"+PARAM_TYPE+"="+WellDataType.WATERLEVEL;
 //	private static final String WELL_LIST_CSV  = "http://localhost:8080/ngwmn/data?"+PARAM_ENCODING+"=CSV&"+PARAM_FEATURE+"=USGS:402734087033401&"+PARAM_FEATURE+"=NJGS:2288614&"+PARAM_TYPE+"="+WellDataType.WATERLEVEL;
 	private static final String WELL_WITH_DATA = "http://localhost:8080/ngwmn/data?"+PARAM_AGENCY+"=USGS&"+PARAM_FEATURE+"=402734087033401&"+PARAM_TYPE+"="+WellDataType.ALL; // TODO ALL asdf

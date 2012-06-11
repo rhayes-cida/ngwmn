@@ -27,6 +27,9 @@ public class UrlFactory {
 		String baseUrl = (String)props.get("BASE");
 		for (WellDataType type : WellDataType.values()) {
 			String url = (String) props.get( type.toString() );
+			if (url == null) {
+				throw new Error("Missing URL mapping in " + urlFile + " for data type " + type);
+			}
 			url = url.replace("<BASE>",baseUrl);
 			urls.put(type, url);
 		}
