@@ -16,7 +16,7 @@ public class CsvOutputStream extends OutputStreamTransform {
 	}
 
 	public String formatRow(List<Element> headers, Map<String, String> rowData) {
-		logger.trace("CSV Format Row");
+		logEntry();
 		
 		StringBuilder rowText = new StringBuilder(); 
 		
@@ -26,10 +26,18 @@ public class CsvOutputStream extends OutputStreamTransform {
 			data = (data==null) ? "" : data;
 			data = data.replaceAll("\"", "'");
 			rowText.append(sep).append('\"').append(data).append('\"');
-			sep = ",";
+			sep = getSeparator();
 		}
 		rowText.append('\n');
 		
 		return rowText.toString();
+	}
+	
+	public String getSeparator() {
+		return ",";
+	}
+	
+	protected void logEntry() {
+		logger.trace("CSV Format Row");
 	}
 }
