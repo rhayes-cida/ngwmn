@@ -93,6 +93,8 @@
 				<ref bean="FileCache"/> <!--  TODO ALL asdf -->
 				<ref bean="QualityCache"/>
 				<ref bean="LogCache"/>
+				<ref bean="LithologyCache"/>
+				<ref bean="ConstructionCache"/>
 				<ref bean="WaterlevelCache"/>
 			</list>
 		</constructor-arg>
@@ -133,6 +135,23 @@
     	<property name="inspector" ref="WellLogInspector"/>
     	<property name="executorService" ref="singleThreadExecutor"/>
     </bean>
+    
+    <bean id="LithologyCache" class="gov.usgs.ngwmn.dm.cache.qw.DatabaseXMLCache">
+    	<constructor-arg ref="dataSource"/>
+    	<constructor-arg value="LITHOLOGY"/>
+    	<constructor-arg ref="lobHandler"/>
+    	<property name="inspector" ref="WellLogInspector"/>
+    	<property name="executorService" ref="singleThreadExecutor"/>
+    </bean>
+    
+    <bean id="ConstructionCache" class="gov.usgs.ngwmn.dm.cache.qw.DatabaseXMLCache">
+    	<constructor-arg ref="dataSource"/>
+    	<constructor-arg value="CONSTRUCTION"/>
+    	<constructor-arg ref="lobHandler"/>
+    	<property name="inspector" ref="WellLogInspector"/>
+    	<property name="executorService" ref="singleThreadExecutor"/>
+    </bean>
+    
     
     <bean id="WaterlevelCache" class="gov.usgs.ngwmn.dm.cache.qw.DatabaseXMLCache">
     	<constructor-arg ref="dataSource"/>

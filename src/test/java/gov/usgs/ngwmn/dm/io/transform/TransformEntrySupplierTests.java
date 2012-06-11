@@ -58,7 +58,8 @@ public class TransformEntrySupplierTests {
 		assertNotNull(parser);
 		
 		ParseState state = (ParseState) PrivateField.getPrivateField(parser, "state");
-		assertEquals(WellDataType.WATERLEVEL.rowElementName, state.rowElementIdentifier);
+		assertEquals(1, state.rowElementIds.size());
+		assertTrue( state.rowElementIds.contains( WellDataType.WATERLEVEL.rowElementName ) );
 		
 		@SuppressWarnings("unchecked")
 		Set<String> set = (Set<String>) PrivateField.getPrivateField(parser, "ignoredElements");

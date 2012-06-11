@@ -48,7 +48,7 @@ public class DatabaseXMLCache implements Cache {
 	public DatabaseXMLCache(DataSource ds, WellDataType datatype, LobHandler h) {
 		this.ds = ds;
 		wdt = datatype;
-		this.tablename = wdt.name() + "_CACHE";
+		this.tablename = getDatatype().aliasFor.name() + "_CACHE";
 		this.handler = h;
 	}
 
@@ -61,7 +61,7 @@ public class DatabaseXMLCache implements Cache {
 	}
 	public void setInspector(Inspector inspector) {
 		WellDataType iwdt = inspector.forDataType();
-		if (iwdt != null && ! iwdt.equals(getDatatype())) {
+		if (iwdt != null && ! iwdt.equals(getDatatype().aliasFor)) {
 			throw new RuntimeException("Inspector data type does not agree  with mine, " + iwdt);
 		}
 		this.inspector = inspector;

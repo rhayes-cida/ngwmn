@@ -104,6 +104,10 @@ public class DataManagerServlet extends HttpServlet {
 			dumpParameters(req);
 			throw ivp;
 		} 
+		catch (Throwable e) {
+			logger.error("server error",e);
+			throw new RuntimeException(e);
+		}
 		finally {
 			// TODO identify the request
 			logger.info("Done with request for specifier");

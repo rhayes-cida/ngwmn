@@ -1,6 +1,7 @@
 package gov.usgs.ngwmn.dm.io.parse;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
@@ -21,7 +22,7 @@ public class ParseState {
 	public boolean isDoCopyDown;
 	public boolean ignoreRowElement;         // false for backward compatibility
 	public int     maxRowDepthLevel;
-	public String  rowElementIdentifier;	// nonsense value by default so nothing can be matched
+	public Set<String> rowElementIds;	// nonsense value by default so nothing can be matched
 	
 	// output fields - final protects them from being null
 	public final Set<Element> targetColumnList;
@@ -57,12 +58,13 @@ public class ParseState {
 		isDoCopyDown           = true;
 		targetElementContext   = EMPTY_STRING;
 		maxRowDepthLevel       = DEFAULT_ROW_DEPTH_LEVEL;
-		rowElementIdentifier   = NONSENSE_ROW_ELEMENT_IDENTIFIER;
 		targetColumnList       = new LinkedHashSet<Element>();
 		elderColumnList        = new LinkedHashSet<Element>();
 		targetColumnValues     = new HashMap<String, String>();
 		elderColumnValues      = new HashMap<String, String>();
 		contentDefinedElements = new HashMap<String, String>();
+		rowElementIds          = new HashSet<String>();
+		rowElementIds.add(NONSENSE_ROW_ELEMENT_IDENTIFIER);
 		
 		// initialize the context stack to avoid empty stack errors
 		context = new Stack<String>();
@@ -152,7 +154,7 @@ public class ParseState {
 	// ----------------
 	public boolean isOnTargetRowStartOrEnd(String localName) {
 		return context.size() == maxRowDepthLevel 
-			|| rowElementIdentifier.equals(localName);
+			|| rowElementIds.contains(localName);
 	}
 
 	/**
@@ -201,7 +203,7 @@ public class ParseState {
 				// special case
 				// this used to be if (ignoreRowElement && localName.equals(rowElementIdentifier)) {
 				// not sure if that is important but it seems to work better this way
-				if (localName.equals(rowElementIdentifier)) {
+				if ( rowElementIds.contains(localName) ) {
 					element.hasChildren = true;
 				}
 			}

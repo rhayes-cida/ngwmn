@@ -2,6 +2,7 @@ package gov.usgs.ngwmn.dm.io.parse;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -64,7 +65,11 @@ public class DataRowParser implements Parser {
 	}
 	public void setRowElementName(String name) {
 		state.maxRowDepthLevel = 1000; // set the ROW_DEPTH_LEVEL so deep that it never triggers
-		state.rowElementIdentifier = name;
+		name = (name==null) ? "" : name;
+		String names[] = name.split("\\|");
+		List<String> ids = Arrays.asList(names);
+		state.rowElementIds.clear();
+		state.rowElementIds.addAll(ids);
 	}
 	public void setCopyDown(boolean copyDown) {
 		state.isDoCopyDown = copyDown;
