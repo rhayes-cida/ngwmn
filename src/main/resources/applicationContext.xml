@@ -83,7 +83,16 @@
 	
 	<bean id="Retriever"
 		class="gov.usgs.ngwmn.dm.cache.Retriever">
-		<constructor-arg ref="FileCache"></constructor-arg>
+		<constructor-arg>
+			<list>
+				<ref bean="FileCache"/> <!--  TODO ALL asdf -->
+				<ref bean="QualityCache"/>
+				<ref bean="LogCache"/>
+				<ref bean="LithologyCache"/>
+				<ref bean="ConstructionCache"/>
+				<ref bean="WaterlevelCache"/>
+			</list>
+		</constructor-arg>
 	</bean>
 		
 	<bean id="Loader"
