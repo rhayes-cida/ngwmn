@@ -27,7 +27,7 @@ public class BasicServletTest extends ContextualTest {
 	private static final String WELL_LIST_DATA = "http://localhost:8080/ngwmn/data?"+PARAM_FEATURE+"=USGS:402734087033401&"+PARAM_FEATURE+"=NJGS:2288614&"+PARAM_TYPE+"="+WellDataType.WATERLEVEL;
 //	private static final String WELL_LIST_CSV  = "http://localhost:8080/ngwmn/data?"+PARAM_ENCODING+"=CSV&"+PARAM_FEATURE+"=USGS:402734087033401&"+PARAM_FEATURE+"=NJGS:2288614&"+PARAM_TYPE+"="+WellDataType.WATERLEVEL;
 	private static final String WELL_WITH_DATA = "http://localhost:8080/ngwmn/data?"+PARAM_AGENCY+"=USGS&"+PARAM_FEATURE+"=402734087033401&"+PARAM_TYPE+"="+WellDataType.ALL; // TODO ALL asdf
-	private static final String WELL_NO_DATA   = "http://localhost:8080/ngwmn/data?"+PARAM_AGENCY+"=NJGS&"+PARAM_FEATURE+"=2288614&"+PARAM_TYPE+"="+WellDataType.LOG;
+	private static final String WELL_NO_DATA   = "http://localhost:8080/ngwmn/data?"+PARAM_AGENCY+"=NJGS&"+PARAM_FEATURE+"=2288614&"+PARAM_TYPE+"="+WellDataType.ALL; // TODO ALL asdf
 
 	@BeforeClass
 	public static void clearCache() {
