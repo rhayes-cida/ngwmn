@@ -1,5 +1,6 @@
 package gov.usgs.ngwmn.dm.io;
 
+import gov.usgs.ngwmn.WellDataType;
 import gov.usgs.ngwmn.dm.spec.Specification;
 
 import java.io.IOException;
@@ -32,7 +33,8 @@ public class HttpResponseSupplier extends Supplier<OutputStream> {
 		logger.info("initialize http stream");
 		// TODO this is not ideal - not as elegant as the enum solution
 		// TODO however it is no longer the data type domain - it is the full request 
-		if ( spect.isBundled() ) { // TODO for now we assume that bundling is zip
+		if ( spect.isBundled() 
+				||  spect.getDataTypes().contains(WellDataType.ALL) ) { // TODO for now we assume that bundling is zip
 			hsr.setContentType(ZIP_CONTENT_TYPE);
 			// TODO need to name the bundle some how
 			logger.debug("send as attachment with file name {}", filename);
