@@ -30,6 +30,15 @@
     <url-pattern>/data</url-pattern>
   </servlet-mapping>
   
+	<filter>
+		<filter-name>DownloadTokenFilter</filter-name>
+		<filter-class>gov.usgs.DownloadTokenFilter</filter-class>
+	</filter>
+	<filter-mapping>
+		<filter-name>DownloadTokenFilter</filter-name>
+		<servlet-name>DataManager</servlet-name>
+	</filter-mapping>
+  
   <servlet>
     <description></description>
     <display-name>WellListServlet</display-name>
