@@ -135,6 +135,7 @@ public class LogDBCacheTest extends ContextualTest {
 		
 		Pipeline pip = new Pipeline(spec);
 		
+		System.out.printf("gov.usgs.ngwmn.functional.LogDBCacheTest.testFetchWellData fetching data for %s\n", spec);
 		victim.fetchWellData(spec, pip);
 		InputSupplier<InputStream> iss = pip.getInputSupplier();
 		
@@ -142,6 +143,7 @@ public class LogDBCacheTest extends ContextualTest {
 		ByteStreams.copy(iss, dest);
 		
 		// Contents may have expanded in shipping, due to pretty printing
+		System.out.printf("testFetchWellData got %d bytes, expecting at least %d\n", dest.size(), SIZE);
 		assertTrue("expect byte count has not shrunk", dest.size() >= SIZE);
 	}
 
