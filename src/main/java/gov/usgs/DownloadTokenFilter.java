@@ -26,7 +26,18 @@ public class DownloadTokenFilter implements Filter {
 		if (token != null) {
 			if (response instanceof HttpServletResponse) {
 				HttpServletResponse hresp = (HttpServletResponse) response;
-				hresp.addCookie(new Cookie(TOKEN_NAME, token));
+				Cookie cookie = new Cookie(TOKEN_NAME, token);
+				cookie.setPath("/");
+				
+				String server = request.getServerName();
+				logger.trace("server name {}", server);
+				
+				if (server.contains(".er.usgs.gov")) {
+					cookie.setDomain(".er.usgs.gov");
+				}
+				cookie.setVersion(1);
+
+				hresp.addCookie(cookie);
 				logger.debug("replayed token {}={}", TOKEN_NAME, token);
 			} else {
 				logger.warn("got token, but not HttpServletResponse, actual type = {}", response.getClass().getName());
