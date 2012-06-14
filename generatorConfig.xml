@@ -3,11 +3,6 @@
 <generatorConfiguration>
 <classPathEntry location="/home/rhayes/Programs/eclipse/plugins/oracle.database.driver.jdk50_11.1.0.7/ojdbc5.jar"/>
   <context id="GWDP" targetRuntime="MyBatis3">
-    <!--  
-    <jdbcConnection driverClass="oracle.jdbc.OracleDriver" 
-    				connectionURL="jdbc:oracle:thin:@//widev.er.usgs.gov:1521/widev.er.usgs.gov" 
-    				userId="gw_data_portal" password="A4lj3_pf" >
-   	-->
     <jdbcConnection driverClass="oracle.jdbc.OracleDriver" 
     				connectionURL="jdbc:oracle:thin:@192.168.56.10:1521:orcl" 
     				userId="gw_data_portal" password="oracle" >
