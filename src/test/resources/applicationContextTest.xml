@@ -13,8 +13,8 @@
 	        <!--  <property name="driverClassName" value="oracle.jdbc.driver.OracleDriver" /> -->
 			<property name="URL"
 	                  value="jdbc:oracle:thin:@//widev.er.usgs.gov:1521/widev.er.usgs.gov" />
-	        <property name="user" value="gw_data_portal" />
-	        <property name="password" value="${gw_data_portal_pw}" />
+	        <property name="user" value="ngwmn_cache" />
+	        <property name="password" value="${ngwmn_cache_pw}" />
 	    </bean>
     </beans>
     
@@ -26,7 +26,7 @@
 			<property name="URL"
 	                  value="jdbc:oracle:thin:@192.168.56.10:1521:orcl" />
 	        <property name="user" value="ngwmn_cache" />
-	        <property name="password" value="tiger" />
+	        <property name="password" value="${ngwmn_cache_pw}" />
 	    </bean>
     </beans>
     
