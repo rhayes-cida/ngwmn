@@ -111,6 +111,9 @@ public class DatabaseXMLCache implements Cache {
 			final WellRegistryKey key = new WellRegistryKey(well.getAgencyID(), well.getFeatureID());
 			
 			// Ugly code to work around Tomcat 6 pooled connection, which does not have createClob method.
+			// Could avoid this by using handler.getLobCreator, but that has only set from InputStream or from
+			// Reader, so we'd have to copy the bytes; the created clob provides an output stream so we can
+			// stream straight to the destination clob, rather than copying the bytes.
 			final Connection pooledConn = ds.getConnection();
 			Connection dconn = pooledConn;
 			if (pooledConn instanceof DelegatingConnection) {
