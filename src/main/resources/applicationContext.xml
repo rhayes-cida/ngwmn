@@ -1,19 +1,38 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans" 
-		xmlns:jee="http://www.springframework.org/schema/jee"
+	   xmlns:jee="http://www.springframework.org/schema/jee"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xsi:schemaLocation="http://www.springframework.org/schema/beans 
-           http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
-           http://www.springframework.org/schema/jee http://www.springframework.org/schema/jee/spring-jee-3.1.xsd">
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="
+           http://www.springframework.org/schema/beans              http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+           http://www.springframework.org/schema/jee                http://www.springframework.org/schema/jee/spring-jee-3.1.xsd
+           http://www.springframework.org/schema/context            http://www.springframework.org/schema/context/spring-context-3.1.xsd
+           ">
 
+	<!-- 
 	<bean id="dataSource" 
-      class="org.springframework.jndi.JndiObjectFactoryBean">
+      		class="org.springframework.jndi.JndiObjectFactoryBean">
       <property name="jndiName" 
                   value="java:comp/env/jdbc/GW_DATA_PORTAL"/>    
       <property name="resourceRef" 
                   value="true" /> 
-                  
+	</bean> 
+	-->
+	
+	<context:property-placeholder location="file:${HOME}/ngwmn.properties" ignore-resource-not-found="true" />
+		
+	<!-- Note that the property reference ${gw_data_portal_pw} looks for a JNDI name java:comp/env/gw_data_portal_pw by default,
+		 it can be supplied in the above properties file instead if you wish.
+	 -->
+	<bean id="dataSource" 
+	        class="oracle.jdbc.pool.OracleConnectionPoolDataSource"
+	        destroy-method="close">
+			<property name="URL"
+	                  value="jdbc:oracle:thin:@//widev.er.usgs.gov:1521/widev.er.usgs.gov" />
+	        <property name="user" value="gw_data_portal" />
+	        <property name="password" value="${gw_data_portal_pw}" />
 	</bean>
+	
 	
     <bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
   		<property name="dataSource" ref="dataSource" />
