@@ -281,7 +281,7 @@
 							<propertyFile>src/test/resources/liquibase.properties</propertyFile>
 							<changeLogFile>src/test/resources/testChangeLog.xml</changeLogFile>							
 							<url>${liquibase.testdb.url}</url>
-							<password>${liquibase.testdb.password}</password>
+							<password>${gw_data_portal_pw}</password>
 							<promptOnNonLocalDatabase>${liquibase.testdb.prompt}</promptOnNonLocalDatabase>
 							<username>${liquibase.testdb.username}</username>
 						</configuration>
