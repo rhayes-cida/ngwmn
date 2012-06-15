@@ -25,12 +25,21 @@
 		 it can be supplied in the above properties file instead if you wish.
 	 -->
 	<bean id="dataSource" 
-	        class="oracle.jdbc.pool.OracleConnectionPoolDataSource"
+	        class="oracle.jdbc.pool.OracleDataSource"
 	        destroy-method="close">
 			<property name="URL"
-	                  value="jdbc:oracle:thin:@//widev.er.usgs.gov:1521/widev.er.usgs.gov" />
-	        <property name="user" value="ngwmn_cache" />
+	                  value="${ngwmn_cache_url}" />
+	        <property name="user" value="${ngwmn_cache_user}" />
 	        <property name="password" value="${ngwmn_cache_pw}" />
+	        <property name="connectionCachingEnabled" value="true" />
+	        <property name="connectionCacheProperties">
+      			<props merge="default">
+         			<prop key="MinLimit">3</prop>
+         			<prop key="MaxLimit">20</prop>
+         			<prop key="InitialLimit">1</prop>
+         			<prop key="InactivityTimeout">30</prop>
+      			</props>
+ 			</property>
 	</bean>
 	
 	
