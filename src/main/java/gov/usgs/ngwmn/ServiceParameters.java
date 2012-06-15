@@ -9,6 +9,8 @@ import com.google.common.base.Objects;
  * @author ilinkuo
  *
  */
+
+// TODO not referenced - possible dead code
 public enum ServiceParameters {
 	SERVLET_PATH("servlet", "data");
 	

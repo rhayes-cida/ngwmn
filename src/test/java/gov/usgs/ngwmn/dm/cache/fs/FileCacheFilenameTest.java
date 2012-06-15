@@ -12,7 +12,7 @@ import java.io.IOException;
 import org.junit.Before;
 import org.junit.Test;
 
-public class FileCache_FilenameTest extends FileCache {
+public class FileCacheFilenameTest extends FileCache {
 
 	@Before
 	public void setup() throws IOException {

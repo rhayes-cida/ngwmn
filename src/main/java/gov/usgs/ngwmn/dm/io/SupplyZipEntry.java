@@ -15,7 +15,10 @@ public class SupplyZipEntry extends Supplier<OutputStream> {
 
 	@Override
 	public ZipEntryOutputStream initialize() throws IOException {
-		// TODO this allows for concatenation - it might be better to handle this with a JoiningSupplier
+		// TODO this was to allow for concatenation
+		// TODO it seems it might be handled with a JoiningSupplier
+		// TODO the test suite does not call with parent requiring init
+		// TODO in other words this might be dead code
 		if ( ! parent.isInitialized() ) {
 			parent.begin();
 		}
