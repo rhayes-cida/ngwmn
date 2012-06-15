@@ -1,5 +1,6 @@
 package gov.usgs.ngwmn;
 
+import gov.usgs.DownloadTokenFilterTests;
 import gov.usgs.ngwmn.dm.DataManagerServletTests;
 import gov.usgs.ngwmn.dm.cache.PipeStatisticsTest;
 import gov.usgs.ngwmn.dm.cache.fs.FileCacheFilenameTest;
@@ -25,6 +26,7 @@ import org.junit.runners.Suite.SuiteClasses;
 
 @RunWith(Suite.class)
 @SuiteClasses({
+	DownloadTokenFilterTests.class,
     FileInputInvokerTest.class,
     CsvOutputStreamTests.class,
     ElementTests.class,

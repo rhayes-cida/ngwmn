@@ -16,6 +16,7 @@ import org.slf4j.LoggerFactory;
 public class DownloadTokenFilter implements Filter {
 
 	public static final String TOKEN_NAME = "downloadToken";
+	public static final String DOMAIN     = ".er.usgs.gov";
 
 	private Logger logger = LoggerFactory.getLogger(this.getClass());
 	
@@ -23,27 +24,33 @@ public class DownloadTokenFilter implements Filter {
 	public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
 		String token = request.getParameter(TOKEN_NAME);
 		logger.trace("noticed token {}", token);
+		
 		if (token != null) {
 			if (response instanceof HttpServletResponse) {
-				HttpServletResponse hresp = (HttpServletResponse) response;
-				Cookie cookie = new Cookie(TOKEN_NAME, token);
-				cookie.setPath("/");
-				
-				String server = request.getServerName();
-				logger.trace("server name {}", server);
-				
-				if (server.contains(".er.usgs.gov")) {
-					cookie.setDomain(".er.usgs.gov");
-				}
-				cookie.setVersion(1);
-
-				hresp.addCookie(cookie);
-				logger.debug("replayed token {}={}", TOKEN_NAME, token);
+				processTokenParam(request,  (HttpServletResponse) response, token);
 			} else {
-				logger.warn("got token, but not HttpServletResponse, actual type = {}", response.getClass().getName());
+				String className = response==null ? "null" : response.getClass().getName();
+				logger.warn("got token, but not HttpServletResponse, actual type = {}", className);
 			}
 		}
 		chain.doFilter(request, response);
+	}
+
+	protected void processTokenParam(ServletRequest request, HttpServletResponse response, String token) {
+		
+			Cookie cookie = new Cookie(TOKEN_NAME, token);
+			cookie.setPath("/");
+			
+			String server = request.getServerName();
+			logger.trace("server name {}", server);
+			
+			if (server.contains(DOMAIN)) { // TODO maybe endsWith is better?
+				cookie.setDomain(DOMAIN);
+			}
+			cookie.setVersion(1);
+
+			response.addCookie(cookie);
+			logger.debug("replayed token {}={}", TOKEN_NAME, token);
 	}
 
 	@Override
