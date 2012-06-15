@@ -262,7 +262,7 @@ public class DatabaseXMLCache implements Cache {
 		return stream;
 	}
 
-	
+	// only called by the CacheSnoopServlet
 	@Override
 	public InputStream retrieve(String id) throws IOException {
 

@@ -28,22 +28,18 @@ public class DataBroker implements FlowFactory, PrefetchI {
 	
 	public void fetchWellData(Specifier spec, final Supplier<OutputStream> out) throws Exception {
 		Pipeline pipe = (Pipeline) makeFlow(spec, out);
-		invokePipe(pipe);
+		pipe.invoke();
 		logger.info("Completed request operation for {}", spec);
 	}
 	
 	@Override
 	public long prefetchWellData(Specifier spec) throws Exception {
 		Pipeline pipe = (Pipeline) makeFlow(spec, null);
-		long ct = invokePipe(pipe);
+		long ct = pipe.invoke();
 		logger.info("Completed prefetch operation for {}", spec);
 		return ct;
 	}
 
-	private long invokePipe(Pipeline pipe) throws IOException {
-		return pipe.invoke();
-	}
-	
 	public Pipeline makeFlow(Specifier spec, Supplier<OutputStream> out) throws IOException {	
 
 		check(spec);

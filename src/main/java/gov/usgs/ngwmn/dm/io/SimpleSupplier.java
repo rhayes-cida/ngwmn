@@ -20,11 +20,4 @@ public class SimpleSupplier<T extends Closeable> extends Supplier<T> {
 	public T initialize() throws IOException {
 		return source;
 	}
-
-	// had added this while working out multisite joining aggregation - it might not be needed
-//	@Override
-//	public void end(boolean threw) throws IOException {
-//		// should do nothing because the wrapping class opened this stream
-//	}
-
 }

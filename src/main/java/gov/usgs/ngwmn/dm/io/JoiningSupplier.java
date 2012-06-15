@@ -9,7 +9,6 @@ public class JoiningSupplier<T extends Closeable> extends Supplier<T> {
 
 	private T source; // the stream
 	private Supplier<T> supplier;
-//	private final EntryDescription desc; // desc for all entries
 
 	public JoiningSupplier(T supply) {
 		source = supply;
@@ -17,13 +16,6 @@ public class JoiningSupplier<T extends Closeable> extends Supplier<T> {
 	public JoiningSupplier(Supplier<T> supplier) {
 		this.supplier = supplier;
 	}
-//	public SimpleSupplier(T supply) {
-//		this(supply, null);
-//	}
-//	public SimpleSupplier(T supply, EntryDescription entryDesc) {
-//		source = supply;
-//		desc = entryDesc;
-//	}
 	
 	@Override
 	public T initialize() throws IOException {

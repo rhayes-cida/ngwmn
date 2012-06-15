@@ -41,6 +41,7 @@ public class SupplyZipOutput extends Supplier<OutputStream> {
 	}
 	
 	protected ZipOutputStream getZip() {
+		// TODO the test suites never call this with oz==null - it might be dead code
 		if (oz == null) {
 			throw new NullPointerException("call to getZip prior to source initialization.");
 		}

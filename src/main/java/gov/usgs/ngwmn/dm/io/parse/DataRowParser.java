@@ -42,7 +42,7 @@ public class DataRowParser implements Parser {
 	
 	public void setInputStream(InputStream is) {
 		try {
-			XMLInputFactory factory = USGS_StAXUtils.getXMLInputFactory();
+			XMLInputFactory factory = StAXFactory.getXMLInputFactory();
 			reader = factory.createXMLStreamReader(is);
 		} catch (XMLStreamException e) {
 			// TODO we might want this to be an IOExecption instead
