@@ -291,11 +291,12 @@
 							<!-- Removed this as this prevents war portability
 							<propertyFile>src/test/resources/liquibase.properties</propertyFile>
 							 -->
+							<driver>oracle.jdbc.OracleDriver</driver>
 							<changeLogFile>src/test/resources/testChangeLog.xml</changeLogFile>							
 							<url>${liquibase.testdb.url}</url>
-							<password>${gw_data_portal_pw}</password>
+							<password>${liquibase.testdb.setup.password}</password>
 							<promptOnNonLocalDatabase>${liquibase.testdb.prompt}</promptOnNonLocalDatabase>
-							<username>${liquibase.testdb.username}</username>
+							<username>${liquibase.testdb.setup.username}</username>
 						</configuration>
 						<goals>
 							<goal>update</goal>
