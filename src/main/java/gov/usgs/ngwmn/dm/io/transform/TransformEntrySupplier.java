@@ -4,6 +4,8 @@ import gov.usgs.ngwmn.WellDataType;
 import gov.usgs.ngwmn.dm.io.EntryDescription;
 import gov.usgs.ngwmn.dm.io.Supplier;
 import gov.usgs.ngwmn.dm.io.parse.DataRowParser;
+import gov.usgs.ngwmn.dm.io.parse.PostParser;
+import gov.usgs.ngwmn.dm.io.parse.WaterPortalPostParserFactory;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -44,19 +46,21 @@ class TransformEntrySupplier extends Supplier<OutputStream> {
 
 	protected DataRowParser makeParser() {
 		// TODO this might be a bit too tightly coupled
-		DataRowParser parser = new DataRowParser();
+		PostParser postParser = new WaterPortalPostParserFactory().make(dataType);
+		appendIdentifierColumns(postParser);
+		
+		// TODO this might be a bit too tightly coupled
+		DataRowParser parser = new DataRowParser(postParser);
 		
 		// TODO specific to water level
 		parser.setRowElementName( dataType.rowElementName );
-		parser.addIgnoreNames( dataType.getIgnoreElmentNames() );
 		
-		appendIdentifierColumns(parser);
 		
 		return parser;
 	}
 
 
-	protected void appendIdentifierColumns(DataRowParser parser) {
+	protected void appendIdentifierColumns(PostParser parser) {
 		if (entryDesc==null) return; // if null than there are no cols
 		
 		Map<String,String> cols = entryDesc.constColumns();

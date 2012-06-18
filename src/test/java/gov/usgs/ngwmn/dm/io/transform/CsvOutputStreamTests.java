@@ -3,10 +3,17 @@ package gov.usgs.ngwmn.dm.io.transform;
 import static org.junit.Assert.*;
 
 import gov.usgs.ngwmn.dm.io.parse.DataRowParser;
+import gov.usgs.ngwmn.dm.io.parse.Element;
+import gov.usgs.ngwmn.dm.io.parse.PostParser;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.StringReader;
+import java.util.Collection;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import org.junit.Test;
 
@@ -33,9 +40,32 @@ public class CsvOutputStreamTests {
 	DataRowParser psr;
 	
 	void makeCsv(String xml) throws Exception {
+		PostParser pp = new PostParser() {
+			
+			@Override
+			public List<Element> refineHeaderColumns(Collection<Element> headers) {
+				return new LinkedList<Element>(headers);
+			}
+			
+			@Override
+			public void refineDataColumns(Map<String, String> data) {
+				// do nothing
+			}
+			
+			@Override
+			public void addConstColumn(String col, String string) {
+				// do nothing
+			}
+			
+			@Override
+			public Set<String> getRemoveColumns() {
+				throw new RuntimeException("should not be called during this test");
+			}
+		};
+		
 		out = new ByteArrayOutputStream(1000);
 		csv = new CsvOutputStream(out);
-		psr = new DataRowParser();
+		psr = new DataRowParser(pp);
 		csv.setParser(psr);
 		inn = new ByteArrayInputStream( xml.getBytes() );
 	}
