@@ -45,7 +45,7 @@ import org.junit.runners.Suite.SuiteClasses;
     DataRowParserTests.class,
     PipeStatisticsTest.class,
     UrlFactoryTests.class,
-    TsvOutputStreamTests.class,
+    TsvOutputStreamTests.class
 })
 public class UnitTestSuite {
 
