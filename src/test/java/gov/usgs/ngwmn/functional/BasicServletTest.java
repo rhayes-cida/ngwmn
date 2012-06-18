@@ -23,11 +23,12 @@ import com.meterware.servletunit.ServletUnitClient;
 public class BasicServletTest extends ContextualTest {
 	
 	private static final String WELL_LIST_AGENCY_DATA = "http://localhost:8080/ngwmn/data?"+PARAM_AGENCY+"=USGS&"+PARAM_FEATURE+"=402734087033401&"+PARAM_FEATURE+"=402431075020801&"+PARAM_TYPE+"="+WellDataType.WATERLEVEL;
-	private static final String WELL_LIST_CSV  = "http://localhost:8080/ngwmn/data?"+PARAM_ENCODING+"=CSV&"+PARAM_AGENCY+"=USGS&"+PARAM_FEATURE+"=402734087033401&"+PARAM_FEATURE+"=402431075020801&"+PARAM_TYPE+"="+WellDataType.WATERLEVEL+"&"+PARAM_TYPE+"="+WellDataType.LITHOLOGY+"&"+PARAM_TYPE+"="+WellDataType.CONSTRUCTION+"&"+PARAM_TYPE+"="+WellDataType.QUALITY;
-	private static final String WELL_LIST_DATA = "http://localhost:8080/ngwmn/data?"+PARAM_FEATURE+"=USGS:402734087033401&"+PARAM_FEATURE+"=NJGS:2288614&"+PARAM_TYPE+"="+WellDataType.WATERLEVEL;
-//	private static final String WELL_LIST_CSV  = "http://localhost:8080/ngwmn/data?"+PARAM_ENCODING+"=CSV&"+PARAM_FEATURE+"=USGS:402734087033401&"+PARAM_FEATURE+"=NJGS:2288614&"+PARAM_TYPE+"="+WellDataType.WATERLEVEL;
-	private static final String WELL_WITH_DATA = "http://localhost:8080/ngwmn/data?"+PARAM_AGENCY+"=USGS&"+PARAM_FEATURE+"=402734087033401&"+PARAM_TYPE+"="+WellDataType.ALL; // TODO ALL asdf
-	private static final String WELL_NO_DATA   = "http://localhost:8080/ngwmn/data?"+PARAM_AGENCY+"=NJGS&"+PARAM_FEATURE+"=2288614&"+PARAM_TYPE+"="+WellDataType.ALL; // TODO ALL asdf
+	private static final String WELL_LIST_CSV_LOG     = "http://localhost:8080/ngwmn/data?"+PARAM_ENCODING+"=CSV&"+PARAM_AGENCY+"=USGS&"+PARAM_FEATURE+"=402734087033401&"+PARAM_FEATURE+"=402431075020801&"+PARAM_TYPE+"="+WellDataType.LOG;
+	private static final String WELL_LIST_CSV         = "http://localhost:8080/ngwmn/data?"+PARAM_ENCODING+"=CSV&"+PARAM_AGENCY+"=USGS&"+PARAM_FEATURE+"=402734087033401&"+PARAM_FEATURE+"=402431075020801&"+PARAM_TYPE+"="+WellDataType.WATERLEVEL+"&"+PARAM_TYPE+"="+WellDataType.LITHOLOGY+"&"+PARAM_TYPE+"="+WellDataType.CONSTRUCTION+"&"+PARAM_TYPE+"="+WellDataType.QUALITY;
+//	private static final String WELL_LIST_CSV         = "http://localhost:8080/ngwmn/data?"+PARAM_ENCODING+"=CSV&"+PARAM_FEATURE+"=USGS:402734087033401&"+PARAM_FEATURE+"=NJGS:2288614&"+PARAM_TYPE+"="+WellDataType.WATERLEVEL;
+	private static final String WELL_LIST_DATA        = "http://localhost:8080/ngwmn/data?"+PARAM_FEATURE+"=USGS:402734087033401&"+PARAM_FEATURE+"=NJGS:2288614&"+PARAM_TYPE+"="+WellDataType.WATERLEVEL;
+	private static final String WELL_WITH_DATA        = "http://localhost:8080/ngwmn/data?"+PARAM_AGENCY+"=USGS&"+PARAM_FEATURE+"=402734087033401&"+PARAM_TYPE+"="+WellDataType.ALL; // TODO ALL asdf
+	private static final String WELL_NO_DATA          = "http://localhost:8080/ngwmn/data?"+PARAM_AGENCY+"=NJGS&"+PARAM_FEATURE+"=2288614&"+PARAM_TYPE+"="+WellDataType.ALL; // TODO ALL asdf
 
 	@BeforeClass
 	public static void clearCache() {
@@ -60,6 +61,36 @@ public class BasicServletTest extends ContextualTest {
 		checkSiteIsVisible("USGS","402734087033401");
 	}
 	
+	@Test
+	public void test_listOfCsvLogEncodedData() throws Exception {
+		ServletRunner     sr = new ServletRunner( getClass().getResourceAsStream("/servlet-test-web.xml"), "/ngwmn");
+		
+		System.out.printf("URL: %s\n", WELL_LIST_CSV_LOG);
+		
+		ServletUnitClient sc = sr.newClient();
+		WebRequest       req = new GetMethodWebRequest(WELL_LIST_CSV_LOG);
+		System.out.printf("URL: %s\n", req.getURL());
+
+		WebResponse     resp = sc.getResponse(req);
+		assertNotNull("response", resp);
+		
+		for (String hn : resp.getHeaderFieldNames()) {
+			System.out.printf("Header %s:%s\n", hn, resp.getHeaderField(hn));
+		}
+		String body = resp.getText();
+		System.out.printf("contentLength=%d,size=%d\n", resp.getContentLength(), body.length());
+		assertTrue("response size too big", body.length() < 850);
+		assertTrue("response size too small", body.length() > 100);
+		
+		File file = new File("/tmp","dataCsvLOG.zip");
+		FileOutputStream fos = new FileOutputStream(file);
+		ByteStreams.copy(resp.getInputStream(), fos);
+		fos.flush();
+		fos.close();
+		int available = new FileInputStream(file).available();
+		int bodyLenth = body.length();
+		assertEquals("response size", available, bodyLenth);
+	}
 	
 	@Test
 	public void test_listOfCsvEncodedData() throws Exception {

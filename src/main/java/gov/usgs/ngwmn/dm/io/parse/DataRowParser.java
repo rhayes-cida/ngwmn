@@ -90,7 +90,11 @@ public class DataRowParser implements Parser {
 				headers.add( new Element(constCol, constCol, constCol) );
 			}
 			for (Element element : state.targetColumnList) {
-				if ( ! element.hasChildren && ! ignoredElements.contains(element.localName)) {
+				if ( ! element.hasChildren 
+						&& ! ignoredElements.contains(element.fullName)
+						&& ! ignoredElements.contains(element.displayName)
+						&& ! ignoredElements.contains(element.localName)
+						) {
 					headers.add( element );
 				}
 			}
@@ -157,6 +161,10 @@ public class DataRowParser implements Parser {
 	public void removeIngnoreElements() {
 		for (String name : ignoredElements) {
 			state.targetColumnValues.remove(name);
+//			String value = state.targetColumnValues.remove(name);
+//			if (value != null) {
+//				System.err.println("Removed key:'" +name+"' value:'"+value+"'");
+//			}
 		}
 	}
 	
