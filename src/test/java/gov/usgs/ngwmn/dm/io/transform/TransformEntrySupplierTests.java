@@ -1,6 +1,9 @@
 package gov.usgs.ngwmn.dm.io.transform;
 
 import static org.junit.Assert.*;
+import static gov.usgs.ngwmn.WellDataType.*;
+
+
 import gov.usgs.ngwmn.PrivateField;
 import gov.usgs.ngwmn.WellDataType;
 import gov.usgs.ngwmn.dm.io.EntryDescription;
@@ -8,14 +11,23 @@ import gov.usgs.ngwmn.dm.io.SimpleSupplier;
 import gov.usgs.ngwmn.dm.io.SpecifierEntry;
 import gov.usgs.ngwmn.dm.io.Supplier;
 import gov.usgs.ngwmn.dm.io.parse.DataRowParser;
+import gov.usgs.ngwmn.dm.io.parse.Element;
 import gov.usgs.ngwmn.dm.io.parse.ParseState;
+import gov.usgs.ngwmn.dm.io.parse.PostParser;
+import gov.usgs.ngwmn.dm.io.parse.WaterPortalPostParserFactory;
 import gov.usgs.ngwmn.dm.spec.Encoding;
 import gov.usgs.ngwmn.dm.spec.Specifier;
 
 import java.io.FilterOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.junit.Before;
@@ -61,23 +73,40 @@ public class TransformEntrySupplierTests {
 		assertEquals(1, state.rowElementIds.size());
 		assertTrue( state.rowElementIds.contains( WellDataType.WATERLEVEL.rowElementName ) );
 		
-		@SuppressWarnings("unchecked")
-		Set<String> set = (Set<String>) PrivateField.getPrivateField(parser, "ignoredElements");
-		assertEquals(WellDataType.WATERLEVEL.getIgnoreElmentNames(), set);
+		PostParser  pp  = (PostParser) PrivateField.getPrivateField(parser, "postParser");
+		Set<String> set = pp.getRemoveColumns();
+		Set<String> expected = new HashSet<String>( Arrays.asList(
+				WaterPortalPostParserFactory.exclusions.get(WATERLEVEL) ) );
+		assertEquals( expected, set);
 	}
 	
 	@Test
 	public void test_appendIdentifierColumns_withValues() {
 		final HashMap<String, String> values = new HashMap<String, String>();
 		
-		DataRowParser parser = new DataRowParser() {
+		PostParser pp = new PostParser() {
+			
+			@Override
+			public List<Element> refineHeaderColumns(Collection<Element> headers) {
+				return new LinkedList<Element>(headers);
+			}
+			
+			@Override
+			public void refineDataColumns(Map<String, String> data) {
+				// do nothing
+			}
+			
 			@Override
 			public void addConstColumn(String column, String value) {
 				values.put(column, value);
 			}
+			
+			@Override
+			public Set<String> getRemoveColumns() {
+				throw new RuntimeException("should not be called during this test");
+			}
 		};
-		
-		transformEntrySupplier.appendIdentifierColumns(parser);
+		transformEntrySupplier.appendIdentifierColumns(pp);
 		
 		assertEquals(2, values.size());
 		assertTrue(values.keySet().contains("Agency"));
@@ -90,15 +119,30 @@ public class TransformEntrySupplierTests {
 	public void test_appendIdentifierColumns_nullEntryDesc() {
 		final HashMap<String, String> values = new HashMap<String, String>();
 		
-		DataRowParser parser = new DataRowParser() {
+		PostParser pp = new PostParser() {
+			
+			@Override
+			public List<Element> refineHeaderColumns(Collection<Element> headers) {
+				return new LinkedList<Element>(headers);
+			}
+			
+			@Override
+			public void refineDataColumns(Map<String, String> data) {
+				// do nothing
+			}
+			
 			@Override
 			public void addConstColumn(String column, String value) {
 				throw new RuntimeException("This should not be called when entry description is null.");
 			}
+			
+			@Override
+			public Set<String> getRemoveColumns() {
+				throw new RuntimeException("should not be called during this test");
+			}
 		};
-		
 		transformEntrySupplier = new TransformEntrySupplier(null, null, null, true);
-		transformEntrySupplier.appendIdentifierColumns(parser);
+		transformEntrySupplier.appendIdentifierColumns(pp);
 		
 		assertEquals(0, values.size());
 	}

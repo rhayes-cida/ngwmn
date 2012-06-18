@@ -5,7 +5,6 @@ import java.io.InputStream;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -19,25 +18,24 @@ import javax.xml.stream.XMLStreamReader;
 
 public class DataRowParser implements Parser {
 	
+	protected final PostParser 			postParser;
 	protected final ParseState          state;
 	protected final List<Element>       headers;
 	protected final Set<String>         ignoredAttributes;
 	protected final Set<String>         ignoredElements;
 	protected final Map<String, String> contentDefinedElements;
-	protected final Map<String, String> constAdditionalCols;
 	
 	protected XMLStreamReader     reader;
-//	protected long bytesRead;
 	protected boolean eof;
 	protected int rowCount;
 	
-	public DataRowParser() {
+	public DataRowParser(PostParser postParser) {
+		this.postParser        = postParser;
 		state                  = new ParseState();
 		ignoredAttributes      = new HashSet<String>();
-		ignoredElements        = new HashSet<String>();
 		headers				   = new LinkedList<Element>();
+		ignoredElements        = new HashSet<String>();
 		contentDefinedElements = new HashMap<String, String>();
-		constAdditionalCols    = new LinkedHashMap<String, String>();
 	}
 	
 	public void setInputStream(InputStream is) {
@@ -74,28 +72,12 @@ public class DataRowParser implements Parser {
 	public void setCopyDown(boolean copyDown) {
 		state.isDoCopyDown = copyDown;
 	}
-	public void addIgnoreNames(Set<String> names) {
-		if (names==null) return;
-		ignoredElements.addAll(names);
-	}
-/*	
-	@Override
-	public long bytesParsed() {
-		return bytesRead;
-	}
-*/
 	public List<Element> headers() {
 		if ( headers.isEmpty() ) {
-			for (String constCol : constAdditionalCols.keySet()) {
-				headers.add( new Element(constCol, constCol, constCol) );
-			}
-			for (Element element : state.targetColumnList) {
-				if ( ! element.hasChildren 
-						&& ! ignoredElements.contains(element.fullName)
-						&& ! ignoredElements.contains(element.displayName)
-						&& ! ignoredElements.contains(element.localName)
-						) {
-					headers.add( element );
+			List<Element> refinedHeaders = postParser.refineHeaderColumns(state.targetColumnList);
+			for (Element element : refinedHeaders) {
+				if ( ! element.hasChildren ) {
+					headers.add(element);
 				}
 			}
 		}
@@ -112,10 +94,6 @@ public class DataRowParser implements Parser {
 			
 			while ( ! done && reader.hasNext() ) {
 				int event = reader.next();
-				
-//				if (event != XMLStreamConstants.END_DOCUMENT) {
-//					updateBytes(event);
-//				}
 				
 				switch (event) {
 					case XMLStreamConstants.START_DOCUMENT:
@@ -135,7 +113,6 @@ public class DataRowParser implements Parser {
 						done = endElement(); // the end elements for elders will be handled on nextRow
 						eof  = state.isContextEmpty();
 						done = done || eof;
-	//					endElement(in, out, state, checker);
 						break;
 					case XMLStreamConstants.END_DOCUMENT:
 						done = eof = true;
@@ -149,65 +126,16 @@ public class DataRowParser implements Parser {
 		if (state.targetColumnValues.size()==0 && eof) {
 			return null;
 		}
-		
-		removeIngnoreElements();
-		appendConstElements();
+
+		headers();  // TODO maybe do this once
+		postParser.refineDataColumns(state.targetColumnValues);
 		rowCount++;
 
 		// if currentRow is last Row then returns empty set
 		return  currentRow();
 	}
 
-	public void removeIngnoreElements() {
-		for (String name : ignoredElements) {
-			state.targetColumnValues.remove(name);
-//			String value = state.targetColumnValues.remove(name);
-//			if (value != null) {
-//				System.err.println("Removed key:'" +name+"' value:'"+value+"'");
-//			}
-		}
-	}
 	
-	public void appendConstElements() {
-		headers();
-		for (String constCol : constAdditionalCols.keySet()) {
-			state.targetColumnValues.put(constCol, constAdditionalCols.get(constCol));
-		}
-	}
-
-	public void addConstColumn(String column, String value) {
-		constAdditionalCols.put(column,value);
-	}
-	
-/*	
-	// TODO this is not accurate. I could not find access to accurate counts
-	// this will miss XML headers and whitespace to name just a couple
-	private void updateBytes(int event) {
-		
-		StringBuilder text = new StringBuilder();
-		
-		if ( reader.isCharacters() ) {
-			text.append(reader.getText());
-		} else {
-			text.append('<');
-			if ( reader.isEndElement() ) {
-				text.append('/');
-			}
-			text.append(reader.getLocalName());
-			if ( reader.isStartElement() ) {
-				for (int a=0; a<reader.getAttributeCount(); a++) {
-					text.append(' ')
-						.append(reader.getAttributeLocalName(a))
-						.append("=\"")
-						.append(reader.getAttributeValue(a))
-						.append('"');
-				}
-			}
-			text.append('>');
-		}
-		bytesRead  += text.length();
-	}
-*/
 	@SuppressWarnings("unchecked")
 	private boolean endElement() {
 		String localName = reader.getLocalName();

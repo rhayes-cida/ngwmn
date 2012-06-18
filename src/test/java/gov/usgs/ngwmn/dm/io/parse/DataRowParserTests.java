@@ -7,8 +7,11 @@ import gov.usgs.ngwmn.dm.io.parse.Element;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.util.Collection;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.regex.Pattern;
 
 import org.junit.*;
@@ -94,7 +97,29 @@ public class DataRowParserTests {
 	
 	
 	void makeParser(String xml) {
-		parser = new DataRowParser();
+		PostParser pp = new PostParser() {
+			
+			@Override
+			public List<Element> refineHeaderColumns(Collection<Element> headers) {
+				return new LinkedList<Element>(headers);
+			}
+			
+			@Override
+			public void refineDataColumns(Map<String, String> data) {
+				// do nothing
+			}
+			
+			@Override
+			public void addConstColumn(String col, String string) {
+				// do nothing
+			}
+			
+			@Override
+			public Set<String> getRemoveColumns() {
+				throw new RuntimeException("should not be called during this test");
+			}
+		};
+		parser = new DataRowParser(pp);
 		parser.setInputStream( new ByteArrayInputStream( xml.getBytes() ) );
 	}
 	
