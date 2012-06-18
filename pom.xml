@@ -227,6 +227,11 @@
 					<artifactId>maven-surefire-plugin</artifactId>
 					<version>2.12</version>
 					<configuration>
+			        	<systemPropertyVariables>
+			        	<ngwmn_cache_url>${liquibase.testdb.url}</ngwmn_cache_url>
+			        	<ngwmn_cache_username>${liquibase.testdb.username}</ngwmn_cache_username>
+		        		<ngwmn_cache_pw>${liquibase.testdb.password}</ngwmn_cache_pw>
+			        	</systemPropertyVariables>
 						<excludes>
 							<exclude>**/integration/**</exclude>
 		        			<exclude>**/functional/**</exclude>
@@ -252,6 +257,11 @@
 		        <artifactId>maven-failsafe-plugin</artifactId>
 		        <version>2.12</version>
 		        <configuration>
+		        	<systemPropertyVariables>
+			        	<ngwmn_cache_url>${liquibase.testdb.url}</ngwmn_cache_url>
+			        	<ngwmn_cache_username>${liquibase.testdb.username}</ngwmn_cache_username>
+		        		<ngwmn_cache_pw>${liquibase.testdb.password}</ngwmn_cache_pw>
+		        	</systemPropertyVariables>
 		        	<includes>
 		        		<include>**/integration/**</include>
 		        		<include>**/functional/**</include>
@@ -278,7 +288,9 @@
 						<id>liquibase-pre-integration-test</id>
 						<phase>pre-integration-test</phase>
 						<configuration>
+							<!-- Removed this as this prevents war portability
 							<propertyFile>src/test/resources/liquibase.properties</propertyFile>
+							 -->
 							<changeLogFile>src/test/resources/testChangeLog.xml</changeLogFile>							
 							<url>${liquibase.testdb.url}</url>
 							<password>${gw_data_portal_pw}</password>

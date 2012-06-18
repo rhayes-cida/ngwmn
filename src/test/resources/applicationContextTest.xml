@@ -6,17 +6,7 @@
            
 	<import resource="applicationContext.xml"/>
 	
-	<beans profile="default">
-	    <bean id="dataSource" 
-	        class="oracle.jdbc.pool.OracleDataSource"
-	        destroy-method="close">
-	        <!--  <property name="driverClassName" value="oracle.jdbc.driver.OracleDriver" /> -->
-			<property name="URL"
-	                  value="jdbc:oracle:thin:@//widev.er.usgs.gov:1521/widev.er.usgs.gov" />
-	        <property name="user" value="ngwmn_cache" />
-	        <property name="password" value="${ngwmn_cache_pw}" />
-	    </bean>
-    </beans>
+	<!-- REMOVED: beans profile="default" -->
     
     <beans profile="local">
 	    <bean id="dataSource"

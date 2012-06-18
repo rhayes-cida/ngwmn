@@ -23,13 +23,15 @@
 		
 	<!-- Note that the property reference ${gw_data_portal_pw} looks for a JNDI name java:comp/env/gw_data_portal_pw by default,
 		 it can be supplied in the above properties file instead if you wish.
+		 
+		 jdbc:oracle:thin:@//widev.er.usgs.gov:1521/widev.er.usgs.gov
 	 -->
 	<bean id="dataSource" 
 	        class="oracle.jdbc.pool.OracleDataSource"
 	        destroy-method="close">
 			<property name="URL"
 	                  value="${ngwmn_cache_url}" />
-	        <property name="user" value="${ngwmn_cache_user}" />
+	        <property name="user" value="${ngwmn_cache_username}" />
 	        <property name="password" value="${ngwmn_cache_pw}" />
 	        <property name="connectionCachingEnabled" value="true" />
 	        <property name="connectionCacheProperties">
