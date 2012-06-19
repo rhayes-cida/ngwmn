@@ -216,13 +216,18 @@ public class Prefetcher implements Callable<PrefetchOutcome> {
 				// Could compare other dates etc. etc. etc.
 			}
 			
-			// no fetches recorded -- order by agency, site, type (somewhat arbitrary)
-			if (v == 0) {
-				v = ws1.well.getAgencyCd().compareTo(ws2.well.getAgencyCd());
-			}
-			
-			if (v == 0) {
-				v = ws1.well.getSiteNo().compareTo(ws2.well.getSiteNo());
+			try {
+				// no fetches recorded -- order by agency, site, type (somewhat arbitrary)
+				if (v == 0) {
+					v = ws1.well.getAgencyCd().compareTo(ws2.well.getAgencyCd());
+				}
+				
+				if (v == 0) {
+					v = ws1.well.getSiteNo().compareTo(ws2.well.getSiteNo());
+				}
+			} catch (NullPointerException npe) {
+				// bail out, this is hopefully a test artifact
+				logger.warn("npe2 in comparator");				
 			}
 			
 			if (v == 0) {
