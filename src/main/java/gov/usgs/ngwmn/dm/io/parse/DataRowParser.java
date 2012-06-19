@@ -29,8 +29,11 @@ public class DataRowParser implements Parser {
 	protected boolean eof;
 	protected int rowCount;
 	
+	public DataRowParser() {
+		this(new DefaultPostParser());
+	}
 	public DataRowParser(PostParser postParser) {
-		this.postParser        = postParser;
+		this.postParser        = (postParser==null) ? new DefaultPostParser() : postParser;
 		state                  = new ParseState();
 		ignoredAttributes      = new HashSet<String>();
 		headers				   = new LinkedList<Element>();

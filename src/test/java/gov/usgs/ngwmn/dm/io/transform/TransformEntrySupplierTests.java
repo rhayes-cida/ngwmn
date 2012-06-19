@@ -11,7 +11,7 @@ import gov.usgs.ngwmn.dm.io.SimpleSupplier;
 import gov.usgs.ngwmn.dm.io.SpecifierEntry;
 import gov.usgs.ngwmn.dm.io.Supplier;
 import gov.usgs.ngwmn.dm.io.parse.DataRowParser;
-import gov.usgs.ngwmn.dm.io.parse.Element;
+import gov.usgs.ngwmn.dm.io.parse.DefaultPostParser;
 import gov.usgs.ngwmn.dm.io.parse.ParseState;
 import gov.usgs.ngwmn.dm.io.parse.PostParser;
 import gov.usgs.ngwmn.dm.io.parse.WaterPortalPostParserFactory;
@@ -22,12 +22,8 @@ import java.io.FilterOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import org.junit.Before;
@@ -84,18 +80,7 @@ public class TransformEntrySupplierTests {
 	public void test_appendIdentifierColumns_withValues() {
 		final HashMap<String, String> values = new HashMap<String, String>();
 		
-		PostParser pp = new PostParser() {
-			
-			@Override
-			public List<Element> refineHeaderColumns(Collection<Element> headers) {
-				return new LinkedList<Element>(headers);
-			}
-			
-			@Override
-			public void refineDataColumns(Map<String, String> data) {
-				// do nothing
-			}
-			
+		PostParser pp = new DefaultPostParser() {
 			@Override
 			public void addConstColumn(String column, String value) {
 				values.put(column, value);
@@ -119,18 +104,7 @@ public class TransformEntrySupplierTests {
 	public void test_appendIdentifierColumns_nullEntryDesc() {
 		final HashMap<String, String> values = new HashMap<String, String>();
 		
-		PostParser pp = new PostParser() {
-			
-			@Override
-			public List<Element> refineHeaderColumns(Collection<Element> headers) {
-				return new LinkedList<Element>(headers);
-			}
-			
-			@Override
-			public void refineDataColumns(Map<String, String> data) {
-				// do nothing
-			}
-			
+		PostParser pp = new DefaultPostParser() {
 			@Override
 			public void addConstColumn(String column, String value) {
 				throw new RuntimeException("This should not be called when entry description is null.");

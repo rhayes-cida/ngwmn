@@ -3,16 +3,12 @@ package gov.usgs.ngwmn.dm.io.transform;
 import static org.junit.Assert.*;
 
 import gov.usgs.ngwmn.dm.io.parse.DataRowParser;
-import gov.usgs.ngwmn.dm.io.parse.Element;
+import gov.usgs.ngwmn.dm.io.parse.DefaultPostParser;
 import gov.usgs.ngwmn.dm.io.parse.PostParser;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.StringReader;
-import java.util.Collection;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import org.junit.Test;
@@ -40,21 +36,10 @@ public class TsvOutputStreamTests {
 	DataRowParser psr;
 	
 	void makeTsv(String xml) throws Exception {
-		PostParser pp = new PostParser() {
-			
-			@Override
-			public List<Element> refineHeaderColumns(Collection<Element> headers) {
-				return new LinkedList<Element>(headers);
-			}
-			
-			@Override
-			public void refineDataColumns(Map<String, String> data) {
-				// do nothing
-			}
-			
+		PostParser pp = new DefaultPostParser() {
 			@Override
 			public void addConstColumn(String col, String string) {
-				// do nothing
+				throw new RuntimeException("should not be called during this test");
 			}
 			
 			@Override
