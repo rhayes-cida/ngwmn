@@ -162,4 +162,12 @@ public class MockResponse implements HttpServletResponse {
 		throw new NotImplementedException();
 	}
 
+	public String getContentType() {
+		throw new NotImplementedException();
+	}
+
+	public void setCharacterEncoding(String arg0) {
+		throw new NotImplementedException();
+	}
+
 }

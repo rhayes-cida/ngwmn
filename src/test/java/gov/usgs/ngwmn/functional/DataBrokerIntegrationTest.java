@@ -16,6 +16,7 @@ import gov.usgs.ngwmn.dm.cache.qw.DatabaseXMLCache;
 import gov.usgs.ngwmn.dm.dao.ContextualTest;
 import gov.usgs.ngwmn.dm.dao.FetchLog;
 import gov.usgs.ngwmn.dm.dao.FetchLogDAO;
+import gov.usgs.ngwmn.dm.io.Pipeline;
 import gov.usgs.ngwmn.dm.io.SimpleSupplier;
 import gov.usgs.ngwmn.dm.io.Supplier;
 import gov.usgs.ngwmn.dm.spec.Specifier;
@@ -141,5 +142,29 @@ public class DataBrokerIntegrationTest extends ContextualTest {
 		assertTrue("expect well data is cached", logCache.contains(spec));
 	}
 	
+	@Test
+	public void testEmpty_real_site() throws Exception {
+		Specifier spec = new Specifier(AGENCY_CD,SITE_NO,WellDataType.LITHOLOGY);
+		
+		Pipeline p = new Pipeline(spec);
+		
+		boolean v = dataBroker.checkForEmpty(spec, p);
+		System.out.printf("empty check of %s returns %s", spec, v);
+		
+		assertTrue("survived", true);
 
+	}
+	
+	@Test
+	public void testEmpty_silly_site() throws Exception {
+		Specifier spec = new Specifier(AGENCY_CD,SILLY_SITE_NO,WellDataType.LITHOLOGY);
+		
+		Pipeline p = new Pipeline(spec);
+		
+		boolean v = dataBroker.checkForEmpty(spec, p);
+		System.out.printf("empty check of %s returns %s", spec, v);
+		
+		assertTrue("survived", true);
+
+	}
 }

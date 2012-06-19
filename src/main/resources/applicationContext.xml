@@ -148,6 +148,7 @@
 		<property name="retriever" ref="Retriever"/>
 		<property name="loader" ref="Loader"/>
 		<property name="harvester" ref="WebRetriever"/>
+		<property name="cacheDAO" ref="CacheMetaDataDAO"/>
 	</bean>
 
 	<bean id="lobHandler" class="org.springframework.jdbc.support.lob.DefaultLobHandler">
