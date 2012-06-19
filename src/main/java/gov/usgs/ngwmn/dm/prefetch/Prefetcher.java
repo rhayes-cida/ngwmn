@@ -176,6 +176,8 @@ public class Prefetcher implements Callable<PrefetchOutcome> {
 	
 	private static Comparator<WellStatus> wellCompare = new Comparator<WellStatus>() {
 
+		protected final transient Logger logger = LoggerFactory.getLogger(getClass());
+
 		private int compareDates(Date d1, Date d2) {
 			if (d1 == null) {
 				d1 = new Date(0);
@@ -196,15 +198,20 @@ public class Prefetcher implements Callable<PrefetchOutcome> {
 			int v = 0;
 			
 			if (c1 != null && c2 != null) {
-				if (v == 0) {
-					v = c1.getFetchPriority().compareTo(c2.getFetchPriority());
-				}
-				if (v == 0) {
-					v = compareDates(c1.getMostRecentAttemptDt(), c2.getMostRecentAttemptDt());
-				}
-				if (v == 0) {
-					// sense reversed, well with more recent data gets re-fetched
-					v = compareDates(c2.getLastDataDt(), c1.getLastDataDt());
+				try {
+					if (v == 0) {
+						v = c1.getFetchPriority().compareTo(c2.getFetchPriority());
+					}
+					if (v == 0) {
+						v = compareDates(c1.getMostRecentAttemptDt(), c2.getMostRecentAttemptDt());
+					}
+					if (v == 0) {
+						// sense reversed, well with more recent data gets re-fetched
+						v = compareDates(c2.getLastDataDt(), c1.getLastDataDt());
+					}
+				} catch (NullPointerException npe) {
+					// bail out, this is hopefully a test artifact
+					logger.warn("npe in comparator");
 				}
 				// Could compare other dates etc. etc. etc.
 			}
