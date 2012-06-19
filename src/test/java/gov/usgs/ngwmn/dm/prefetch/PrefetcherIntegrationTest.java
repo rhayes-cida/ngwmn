@@ -43,10 +43,10 @@ public class PrefetcherIntegrationTest extends ContextualTest {
 		ct = 0;
 		delay = 0;
 		victim.setTimeLimit(null);
-		victim.setFetchLimit(100);
+		victim.setFetchLimit(10);
 		PrefetchOutcome outcome = 
 				victim.call();
-		assertTrue("tried lots", ct > 99);
+		assertTrue("tried lots", ct > 9);
 		assertEquals(PrefetchOutcome.LIMIT_COUNT, outcome);
 	}
 	
@@ -62,6 +62,7 @@ public class PrefetcherIntegrationTest extends ContextualTest {
 		assertEquals(PrefetchOutcome.LIMIT_TIME, outcome);
 	}
 
+	/* Too burdensome 
 	@Test
 	public void test_all() {
 		ct = 0;
@@ -73,6 +74,7 @@ public class PrefetcherIntegrationTest extends ContextualTest {
 		assertTrue("tried lots and lots", ct > 500);
 		assertEquals(PrefetchOutcome.FINISHED, outcome);
 	}
+	*/
 
 	@Test
 	public void testComparator() {
