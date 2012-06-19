@@ -6,6 +6,7 @@ import java.util.Comparator;
 import java.util.Date;
 import java.util.PriorityQueue;
 
+import gov.usgs.ngwmn.WellDataType;
 import gov.usgs.ngwmn.dm.PrefetchI;
 import gov.usgs.ngwmn.dm.dao.CacheMetaData;
 import gov.usgs.ngwmn.dm.dao.ContextualTest;
@@ -81,15 +82,18 @@ public class PrefetcherIntegrationTest extends ContextualTest {
 		
 		Prefetcher.WellStatus ws1 = new Prefetcher.WellStatus();
 		ws1.cacheInfo = new CacheMetaData();
+		ws1.type = WellDataType.CONSTRUCTION;
 		ws1.cacheInfo.setMostRecentAttemptDt(new Date(now - 2134));
 		
 		Prefetcher.WellStatus ws2 = new Prefetcher.WellStatus();
 		ws2.cacheInfo = new CacheMetaData();
+		ws2.type = WellDataType.LITHOLOGY;
 		ws2.cacheInfo.setMostRecentAttemptDt(new Date(now));
 		
 		Prefetcher.WellStatus ws3 = new Prefetcher.WellStatus();
 		ws3.cacheInfo = new CacheMetaData();
 		ws3.cacheInfo.setMostRecentAttemptDt(new Date(now));
+		ws3.type = WellDataType.LOG;
 		ws3.cacheInfo.setFetchPriority(87);
 
 		PriorityQueue<WellStatus> pq = new PriorityQueue<Prefetcher.WellStatus>(4,comp);
