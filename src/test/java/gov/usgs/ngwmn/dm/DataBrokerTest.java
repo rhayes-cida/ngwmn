@@ -10,6 +10,8 @@ import java.io.OutputStream;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import gov.usgs.ngwmn.WellDataType;
+import gov.usgs.ngwmn.dm.dao.CacheMetaData;
+import gov.usgs.ngwmn.dm.dao.CacheMetaDataDAO;
 import gov.usgs.ngwmn.dm.dao.ContextualTest;
 import gov.usgs.ngwmn.dm.dao.WellRegistry;
 import gov.usgs.ngwmn.dm.dao.WellRegistryDAO;
@@ -119,6 +121,15 @@ public class DataBrokerTest extends ContextualTest {
 				
 				loaderCallCt.incrementAndGet();
 				return true;
+			}
+			
+		});
+		
+		broker.setCacheDAO(new CacheMetaDataDAO(null) {
+
+			@Override
+			public CacheMetaData get(WellRegistryKey well, WellDataType type) {
+				return null;
 			}
 			
 		});
