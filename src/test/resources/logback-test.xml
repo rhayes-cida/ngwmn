@@ -14,8 +14,7 @@
   <logger level="info"  name="httpclient.wire" />
   <logger level="info"  name="org.apache.commons.httpclient" />
   <logger level="info"  name="gov.usgs.ngwmn.dm"/>
-  <logger level="info"  name="gov.usgs.ngwmn.dm.DataManagerServlet"/>
-  <logger level="info"  name="gov.usgs.ngwmn.dm.cache"/>
   <logger level="debug" name="gov.usgs.ngwmn.dm.io"/>
-  <logger level="debug" name="gov.usgs.ngwmn.dm.dao.FetchLogMapper" />
+  <logger level="trace" name="gov.usgs.ngwmn.dm.io.transform"/>
+
 </configuration>

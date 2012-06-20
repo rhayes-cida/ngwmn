@@ -74,13 +74,13 @@ public abstract class OutputStreamTransform extends FilterOutputStream {
 	    		long count=0;
 	    		Map<String,String> row;
 				while ( (row=parser.nextRow()) != null ) {
-					headers.set( new ArrayList<Element>( parser.headers() ) );
+					if (headers.get() == null) {
+						headers.set( new ArrayList<Element>( parser.headers() ) );
+					}
 					Map<String,String> newRow = new HashMap<String,String>();
 					newRow.putAll(row);
 					rows.add(newRow);
 					count++;
-		    		logger.trace("parser rows {}",  System.identityHashCode(rows));
-		    		logger.trace("parser transformer {}",  System.identityHashCode(OutputStreamTransform.this));
 		    		logger.trace("parser row {}:{} ", count, newRow);
 				}
 	    		logger.trace("parser rows final {}",  rows);

@@ -15,8 +15,12 @@ import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 
 public class DataRowParser implements Parser {
+	private final Logger logger = LoggerFactory.getLogger(getClass());
 	
 	protected final PostParser 			postParser;
 	protected final ParseState          state;
@@ -26,8 +30,9 @@ public class DataRowParser implements Parser {
 	protected final Map<String, String> contentDefinedElements;
 	
 	protected XMLStreamReader     reader;
-	protected boolean eof;
-	protected int rowCount;
+	protected boolean 	eof;
+	protected int 		rowCount;
+	protected int 		lastColListSize;
 	
 	public DataRowParser() {
 		this(new DefaultPostParser());
@@ -76,13 +81,15 @@ public class DataRowParser implements Parser {
 		state.isDoCopyDown = copyDown;
 	}
 	public List<Element> headers() {
-		if ( headers.isEmpty() ) {
+		if ( state.targetColumnList.size() > lastColListSize ) {
+			logger.debug("NEW HEADERS ADDED: {}", state.targetColumnList);
 			List<Element> refinedHeaders = postParser.refineHeaderColumns(state.targetColumnList);
 			for (Element element : refinedHeaders) {
-				if ( ! element.hasChildren ) {
+				if ( ! element.hasChildren && ! headers.contains(element)) {
 					headers.add(element);
 				}
 			}
+			lastColListSize = state.targetColumnList.size();
 		}
 		return headers;
 	}
@@ -126,7 +133,7 @@ public class DataRowParser implements Parser {
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
-		if (state.targetColumnValues.size()==0 && eof) {
+		if (state.targetColumnValues.isEmpty() && eof) {
 			return null;
 		}
 
