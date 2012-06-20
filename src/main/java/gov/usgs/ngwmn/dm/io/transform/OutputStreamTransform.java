@@ -74,9 +74,12 @@ public abstract class OutputStreamTransform extends FilterOutputStream {
 	    		long count=0;
 	    		Map<String,String> row;
 				while ( (row=parser.nextRow()) != null ) {
-					if (headers.get() == null) {
-						headers.set( new ArrayList<Element>( parser.headers() ) );
-					}
+					// we have to update headers every time because new headers could be discovered
+					// we also have another thread consuming rows as they are added 
+					// so that thread needs headers as soon as there are rows
+					headers.set( new ArrayList<Element>( parser.headers() ) );
+					
+					// add the new row to the row cache
 					Map<String,String> newRow = new HashMap<String,String>();
 					newRow.putAll(row);
 					rows.add(newRow);
