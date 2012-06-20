@@ -3,7 +3,6 @@ package gov.usgs.ngwmn.dm.dao;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.math.BigDecimal;
 
 public class CacheMetaDataExample {
     /**
