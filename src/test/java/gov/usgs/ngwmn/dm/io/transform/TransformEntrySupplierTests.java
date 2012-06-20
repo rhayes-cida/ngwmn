@@ -12,6 +12,7 @@ import gov.usgs.ngwmn.dm.io.SpecifierEntry;
 import gov.usgs.ngwmn.dm.io.Supplier;
 import gov.usgs.ngwmn.dm.io.parse.DataRowParser;
 import gov.usgs.ngwmn.dm.io.parse.DefaultPostParser;
+import gov.usgs.ngwmn.dm.io.parse.HeadersListener;
 import gov.usgs.ngwmn.dm.io.parse.ParseState;
 import gov.usgs.ngwmn.dm.io.parse.PostParser;
 import gov.usgs.ngwmn.dm.io.parse.WaterPortalPostParserFactory;
@@ -115,7 +116,7 @@ public class TransformEntrySupplierTests {
 				throw new RuntimeException("should not be called during this test");
 			}
 		};
-		transformEntrySupplier = new TransformEntrySupplier(null, null, null, true);
+		transformEntrySupplier = new TransformEntrySupplier(null, null, null, true, (HeadersListener)null);
 		transformEntrySupplier.appendIdentifierColumns(pp);
 		
 		assertEquals(0, values.size());

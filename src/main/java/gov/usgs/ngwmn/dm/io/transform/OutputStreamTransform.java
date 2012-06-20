@@ -35,6 +35,8 @@ public abstract class OutputStreamTransform extends FilterOutputStream {
 	private final LinkedBlockingQueue<Map<String,String>> rows;
 	public int id;
 
+	private List<Element> overrideHeaders;
+
 	public abstract String formatRow(List<Element> headers, Map<String, String> rowData);
 	
 	
@@ -111,7 +113,7 @@ public abstract class OutputStreamTransform extends FilterOutputStream {
 
 		Map<String, String> row = rows.poll();
 		if (row != null) {
-			List<Element> headList = headers.get();
+			List<Element> headList = getHeaders();
 			if ( ! writtenHeaders ) {
 				writeRow(headList);
 				writtenHeaders=true;
@@ -162,5 +164,21 @@ public abstract class OutputStreamTransform extends FilterOutputStream {
 			throw new IOException(e);
 		}
     }
+
+
+	
+	// when joining two or more results we only want to use the headers from
+	// the first source to preserve column ordinal.
+	public void setHeaders(List<Element> headers) {
+		overrideHeaders = headers;
+	}
+	
+	public List<Element> getHeaders() {
+		if (overrideHeaders == null) {
+			return headers.get();
+		}
+		return overrideHeaders;
+	}
+	
 }
 

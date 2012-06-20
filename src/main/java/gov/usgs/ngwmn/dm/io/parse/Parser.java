@@ -26,4 +26,8 @@ public interface Parser {
 	void setInputStream(InputStream is);
 	
 	boolean done();
+	
+	// used to allow headers shared across transformer entries 
+	// since they share headers they must be in the same ordinal for each transformer
+	boolean addHeaderListener(HeadersListener listener);
 }
