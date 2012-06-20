@@ -86,6 +86,12 @@ public class DataBroker implements FlowFactory, PrefetchI {
 			logger.info("checking for emptiness of aliased type {} from {}", cachedType, spec.getTypeID());
 		}
 		
+		if (cachedType == WellDataType.ALL) {
+			// short-circuit this as a special case, so we always check the constituent data streams
+			logger.info("Short-circuit decline to check for emptiness of ALL for {}", spec);
+			return false;
+		}
+		
 		try {
 			logger.debug("Updating stats for {}", spec);
 			cacheDAO.updateStatsForWell(spec.getWellRegistryKey());
