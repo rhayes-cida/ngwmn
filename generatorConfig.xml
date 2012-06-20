@@ -35,6 +35,7 @@
     	<columnOverride column="SUCCESS_CT" javaType="java.lang.Integer"/>
     	<columnOverride column="FAIL_CT" javaType="java.lang.Integer"/>
     	<columnOverride column="FETCH_PRIORITY" javaType="java.lang.Integer"/>
+    	<columnOverride column="EMPTY_CT" javaType="java.lang.Integer"/>
     </table>
     <table schema="GW_DATA_PORTAL" tableName="LOG_DATA_QUALITY">
     	<columnOverride column="lithologyCount" javaType="java.lang.Integer"/>

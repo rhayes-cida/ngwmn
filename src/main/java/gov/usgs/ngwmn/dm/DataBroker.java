@@ -1,5 +1,9 @@
 package gov.usgs.ngwmn.dm;
 
+import gov.usgs.ngwmn.WellDataType;
+import gov.usgs.ngwmn.dm.cache.EmptyDataFetcher;
+import gov.usgs.ngwmn.dm.dao.CacheMetaData;
+import gov.usgs.ngwmn.dm.dao.CacheMetaDataDAO;
 import gov.usgs.ngwmn.dm.dao.WellRegistry;
 import gov.usgs.ngwmn.dm.dao.WellRegistryDAO;
 import gov.usgs.ngwmn.dm.dao.WellRegistryKey;
@@ -24,7 +28,7 @@ public class DataBroker implements FlowFactory, PrefetchI {
 	private DataLoader  loader;
 	
 	private WellRegistryDAO wellDAO;
-	
+	private CacheMetaDataDAO cacheDAO;
 	
 	public void fetchWellData(Specifier spec, final Supplier<OutputStream> out) throws Exception {
 		Pipeline pipe = (Pipeline) makeFlow(spec, out);
@@ -54,12 +58,46 @@ public class DataBroker implements FlowFactory, PrefetchI {
 			success = configureInput(retriever, pipe);
 		}
 		
+		// check to see if we've tried to fetch but gotten empty results
+		// assumes that retriever would have marked success if it found non-empty data in cache
+		if ( ! success) {
+			success = checkForEmpty(spec, pipe);
+		}
+		
+		// TODO If data type is CONSTRUCTION or LITHOLOGY, look into the log data quality info to see if we have data of the particular sub-type available
+		
 		if ( ! success) {
 			loader.configureOutput(spec, pipe);
 			success = configureInput(harvester, pipe); 
 		}
 		
 		return pipe;
+	}
+
+	public boolean checkForEmpty(Specifier spec, Pipeline pipe)
+			throws IOException {
+		boolean success = false;
+		
+		logger.debug("Checking for emptiness of {}", spec);
+		WellDataType cachedType = spec.getTypeID().aliasFor;
+		if (cachedType != spec.getTypeID()) {
+			logger.info("checking for emptiness of aliased type {} from {}", cachedType, spec.getTypeID());
+		}
+		CacheMetaData cmd = cacheDAO.get(spec.getWellRegistryKey(), cachedType);
+		if (cmd != null) {
+			if (cmd.getEmptyCt() != null && cmd.getEmptyCt() > 0) {
+				// TODO check for staleness by looking at most recent empty date?
+				
+				logger.info("returning cached emptiness for {}, most recent empty result on {}", spec, cmd.getMostRecentEmptyDt());
+				
+				// We tried earlier and found an empty result -- reflect that to the caller
+				EmptyDataFetcher edf = new EmptyDataFetcher();
+				edf.configureInput(spec, pipe);
+				
+				success = true;
+			}
+		}
+		return success;
 	}
 	
 
@@ -117,6 +155,10 @@ public class DataBroker implements FlowFactory, PrefetchI {
 	
 	public void setWellRegistry(WellRegistryDAO wellDAO) {
 		this.wellDAO = wellDAO;
+	}
+
+	public void setCacheDAO(CacheMetaDataDAO cacheDAO) {
+		this.cacheDAO = cacheDAO;
 	}
 
 

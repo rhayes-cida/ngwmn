@@ -3,6 +3,7 @@ package gov.usgs.ngwmn.dm.io;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import gov.usgs.ngwmn.WellDataType;
 import gov.usgs.ngwmn.dm.cache.PipeStatistics;
 import gov.usgs.ngwmn.dm.cache.PipeStatisticsWithProblem;
 import gov.usgs.ngwmn.dm.dao.FetchLog;
@@ -41,7 +42,8 @@ public class FetchRecorder {
 		Specifier specifier = stats.getSpecifier();
 		if (specifier != null) {
 			item.setWell(specifier.getWellRegistryKey());
-			item.setDataStream(specifier.getTypeID().toString());
+			WellDataType wdt = specifier.getTypeID().aliasFor;
+			item.setDataStream(wdt.toString());
 			item.setSpecifier(specifier.toString());			
 		} else {
 			item.setAgencyCd("");
