@@ -56,15 +56,13 @@ public class DataBroker implements FlowFactory, PrefetchI {
 		if (out != null) {
 			pipe.setOutputSupplier(out);
 			success = configureInput(retriever, pipe);
+			
+			// check to see if we've tried to fetch but gotten empty results
+			// assumes that retriever would have marked success if it found non-empty data in cache
+			if ( ! success) {
+				success = checkForEmpty(spec, pipe);
+			}
 		}
-		
-		// check to see if we've tried to fetch but gotten empty results
-		// assumes that retriever would have marked success if it found non-empty data in cache
-		if ( ! success) {
-			success = checkForEmpty(spec, pipe);
-		}
-		
-		// TODO If data type is CONSTRUCTION or LITHOLOGY, look into the log data quality info to see if we have data of the particular sub-type available
 		
 		if ( ! success) {
 			loader.configureOutput(spec, pipe);
@@ -74,6 +72,10 @@ public class DataBroker implements FlowFactory, PrefetchI {
 		return pipe;
 	}
 
+	private boolean positive(Integer x) {
+		return (x != null) && (x > 0);
+	}
+	
 	public boolean checkForEmpty(Specifier spec, Pipeline pipe)
 			throws IOException {
 		boolean success = false;
@@ -83,9 +85,17 @@ public class DataBroker implements FlowFactory, PrefetchI {
 		if (cachedType != spec.getTypeID()) {
 			logger.info("checking for emptiness of aliased type {} from {}", cachedType, spec.getTypeID());
 		}
+		
+		try {
+			logger.debug("Updating stats for {}", spec);
+			cacheDAO.updateStatsForWell(spec.getWellRegistryKey());
+		} catch (Exception e) {
+			logger.error("Problem updating stats", e);
+		}
+		
 		CacheMetaData cmd = cacheDAO.get(spec.getWellRegistryKey(), cachedType);
 		if (cmd != null) {
-			if (cmd.getEmptyCt() != null && cmd.getEmptyCt() > 0) {
+			if (positive(cmd.getEmptyCt())) {
 				// TODO check for staleness by looking at most recent empty date?
 				
 				logger.info("returning cached emptiness for {}, most recent empty result on {}", spec, cmd.getMostRecentEmptyDt());
@@ -95,6 +105,17 @@ public class DataBroker implements FlowFactory, PrefetchI {
 				edf.configureInput(spec, pipe);
 				
 				success = true;
+			} else if (positive(cmd.getFailCt())) {
+				// TODO check for staleness by looking at most recent empty date?
+				
+				logger.info("returning cached failure for {}, most recent failure on {}", spec, cmd.getMostRecentFailDt());
+				
+				// We tried earlier and only failed -- reflect that to the caller
+				EmptyDataFetcher edf = new EmptyDataFetcher();
+				edf.configureInput(spec, pipe);
+				
+				// success in the sense of "we got a result" not "we got data"
+				success = true;	
 			}
 		}
 		return success;

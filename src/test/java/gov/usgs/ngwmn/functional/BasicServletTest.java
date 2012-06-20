@@ -65,11 +65,11 @@ public class BasicServletTest extends ContextualTest {
 	public void test_listOfCsvLogEncodedData() throws Exception {
 		ServletRunner     sr = new ServletRunner( getClass().getResourceAsStream("/servlet-test-web.xml"), "/ngwmn");
 		
-		System.out.printf("URL: %s\n", WELL_LIST_CSV_LOG);
+		System.out.printf("test_listOfCsvLogEncodedData URL: %s\n", WELL_LIST_CSV_LOG);
 		
 		ServletUnitClient sc = sr.newClient();
 		WebRequest       req = new GetMethodWebRequest(WELL_LIST_CSV_LOG);
-		System.out.printf("URL: %s\n", req.getURL());
+		System.out.printf("test_listOfCsvLogEncodedData URL: %s\n", req.getURL());
 
 		WebResponse     resp = sc.getResponse(req);
 		assertNotNull("response", resp);
@@ -96,11 +96,11 @@ public class BasicServletTest extends ContextualTest {
 	public void test_listOfCsvEncodedData() throws Exception {
 		ServletRunner     sr = new ServletRunner( getClass().getResourceAsStream("/servlet-test-web.xml"), "/ngwmn");
 		
-		System.out.printf("URL: %s\n", WELL_LIST_CSV);
+		System.out.printf("test_listOfCsvEncodedData URL: %s\n", WELL_LIST_CSV);
 		
 		ServletUnitClient sc = sr.newClient();
 		WebRequest       req = new GetMethodWebRequest(WELL_LIST_CSV);
-		System.out.printf("URL: %s\n", req.getURL());
+		System.out.printf("test_listOfCsvEncodedData URL: %s\n", req.getURL());
 
 		WebResponse     resp = sc.getResponse(req);
 		assertNotNull("response", resp);
@@ -128,7 +128,7 @@ public class BasicServletTest extends ContextualTest {
 		
 		ServletUnitClient sc = sr.newClient();
 		WebRequest       req = new GetMethodWebRequest(WELL_LIST_DATA);
-		System.out.printf("URL: %s\n", req.getURL());
+		System.out.printf("test_listOfWells URL: %s\n", req.getURL());
 		
 		WebResponse     resp = sc.getResponse(req);
 		assertNotNull("response", resp);
@@ -157,7 +157,7 @@ public class BasicServletTest extends ContextualTest {
 		
 		ServletUnitClient sc = sr.newClient();
 		WebRequest       req = new GetMethodWebRequest(WELL_LIST_AGENCY_DATA);
-		System.out.printf("URL: %s\n", req.getURL());
+		System.out.printf("test_listOfWells_forSingleAgency URL: %s\n", req.getURL());
 
 		WebResponse     resp = sc.getResponse(req);
 		assertNotNull("response", resp);
@@ -188,7 +188,7 @@ public class BasicServletTest extends ContextualTest {
 		
 		ServletUnitClient sc = sr.newClient();
 		WebRequest req = new GetMethodWebRequest(WELL_WITH_DATA);
-		System.out.printf("URL: %s\n", req.getURL());
+		System.out.printf("testWithData URL: %s\n", req.getURL());
 
 		WebResponse resp = sc.getResponse(req);
 		assertNotNull("response", resp);
@@ -197,8 +197,8 @@ public class BasicServletTest extends ContextualTest {
 			System.out.printf("Header %s:%s\n", hn, resp.getHeaderField(hn));
 		}
 		String body = resp.getText();
-		System.out.printf("contentLength=%d,size=%d\n", resp.getContentLength(), body.length());
-		assertTrue("response size", body.length() > 10000);
+		System.out.printf("testWithData contentLength=%d,size=%d\n", resp.getContentLength(), body.length());
+		assertTrue("response size", body.length() > 1000);
 	}
 
 	@Test
@@ -208,7 +208,7 @@ public class BasicServletTest extends ContextualTest {
 		
 		ServletUnitClient sc = sr.newClient();
 		WebRequest req = new GetMethodWebRequest(WELL_NO_DATA);
-		System.out.printf("URL: %s\n", req.getURL());
+		System.out.printf("testWithNoData URL: %s\n", req.getURL());
 
 		WebResponse resp = sc.getResponse(req);
 		assertNotNull("response", resp);
@@ -230,7 +230,7 @@ public class BasicServletTest extends ContextualTest {
 		
 		ServletUnitClient sc = sr.newClient();
 		WebRequest req = new GetMethodWebRequest("http://localhost:8080/ngwmn/data?"+PARAM_FEATURE+"=NOSUCHSITE&"+PARAM_AGENCY+"=USGS");
-		System.out.printf("URL: %s\n", req.getURL());
+		System.out.printf("testNonSite URL: %s\n", req.getURL());
 
 		sc.getResponse(req);
 		assertFalse("expected exception", true);
