@@ -198,7 +198,7 @@ public class BasicServletTest extends ContextualTest {
 		}
 		String body = resp.getText();
 		System.out.printf("contentLength=%d,size=%d\n", resp.getContentLength(), body.length());
-		assertTrue("response size", body.length() > 10000);
+		assertTrue("response size", body.length() > 1000);
 	}
 
 	@Test

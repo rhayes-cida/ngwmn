@@ -56,15 +56,13 @@ public class DataBroker implements FlowFactory, PrefetchI {
 		if (out != null) {
 			pipe.setOutputSupplier(out);
 			success = configureInput(retriever, pipe);
+			
+			// check to see if we've tried to fetch but gotten empty results
+			// assumes that retriever would have marked success if it found non-empty data in cache
+			if ( ! success) {
+				success = checkForEmpty(spec, pipe);
+			}
 		}
-		
-		// check to see if we've tried to fetch but gotten empty results
-		// assumes that retriever would have marked success if it found non-empty data in cache
-		if ( ! success) {
-			success = checkForEmpty(spec, pipe);
-		}
-		
-		// TODO If data type is CONSTRUCTION or LITHOLOGY, look into the log data quality info to see if we have data of the particular sub-type available
 		
 		if ( ! success) {
 			loader.configureOutput(spec, pipe);
