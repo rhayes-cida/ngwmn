@@ -54,6 +54,19 @@ public class CacheMetaDataDAO {
 		}
 	}
 	
+	public void updateStatsForWell(WellRegistryKey well) throws Exception {
+		Connection conn = dataSource.getConnection();
+		try {
+			CallableStatement s = conn.prepareCall("{call GW_DATA_PORTAL.UPDATE_CMD_FOR_WELL(?,?)}");
+			s.setString(1, well.getAgencyCd());
+			s.setString(2, well.getSiteNo());
+			int uc = s.executeUpdate();
+			logger.info("Updated cache meta data, result = {}", uc);
+		} finally {
+			conn.close();
+		}		
+	}
+	
 	public void updateCacheMetaData() {
 		mapper.updateCacheMetaData();
 	}

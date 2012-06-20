@@ -74,6 +74,10 @@ public class DataBroker implements FlowFactory, PrefetchI {
 		return pipe;
 	}
 
+	private boolean positive(Integer x) {
+		return (x != null) && (x > 0);
+	}
+	
 	public boolean checkForEmpty(Specifier spec, Pipeline pipe)
 			throws IOException {
 		boolean success = false;
@@ -83,9 +87,17 @@ public class DataBroker implements FlowFactory, PrefetchI {
 		if (cachedType != spec.getTypeID()) {
 			logger.info("checking for emptiness of aliased type {} from {}", cachedType, spec.getTypeID());
 		}
+		
+		try {
+			logger.debug("Updating stats for {}", spec);
+			cacheDAO.updateStatsForWell(spec.getWellRegistryKey());
+		} catch (Exception e) {
+			logger.error("Problem updating stats", e);
+		}
+		
 		CacheMetaData cmd = cacheDAO.get(spec.getWellRegistryKey(), cachedType);
 		if (cmd != null) {
-			if (cmd.getEmptyCt() != null && cmd.getEmptyCt() > 0) {
+			if (positive(cmd.getEmptyCt())) {
 				// TODO check for staleness by looking at most recent empty date?
 				
 				logger.info("returning cached emptiness for {}, most recent empty result on {}", spec, cmd.getMostRecentEmptyDt());
@@ -95,7 +107,7 @@ public class DataBroker implements FlowFactory, PrefetchI {
 				edf.configureInput(spec, pipe);
 				
 				success = true;
-			} else if (cmd.getFailCt() != null && cmd.getFailCt() > 3 /* arbitrary retry count */) {
+			} else if (positive(cmd.getFailCt())) {
 				// TODO check for staleness by looking at most recent empty date?
 				
 				logger.info("returning cached failure for {}, most recent failure on {}", spec, cmd.getMostRecentFailDt());
