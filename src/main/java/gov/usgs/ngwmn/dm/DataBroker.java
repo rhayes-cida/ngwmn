@@ -95,6 +95,17 @@ public class DataBroker implements FlowFactory, PrefetchI {
 				edf.configureInput(spec, pipe);
 				
 				success = true;
+			} else if (cmd.getFailCt() != null && cmd.getFailCt() > 3 /* arbitrary retry count */) {
+				// TODO check for staleness by looking at most recent empty date?
+				
+				logger.info("returning cached failure for {}, most recent failure on {}", spec, cmd.getMostRecentFailDt());
+				
+				// We tried earlier and only failed -- reflect that to the caller
+				EmptyDataFetcher edf = new EmptyDataFetcher();
+				edf.configureInput(spec, pipe);
+				
+				// success in the sense of "we got a result" not "we got data"
+				success = true;	
 			}
 		}
 		return success;
