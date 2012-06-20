@@ -104,16 +104,16 @@ public class TsvOutputStreamTests {
 		String       line;
 		
 		line = lines.readLine();
-		assertEquals("\"code\"\t\"agency\"\t\"Id\"\t\"level\"\t\"Type\"", line);
+		assertTrue(line.startsWith("\"code\"\t\"agency\"\t\"Id\"\t\"level\"\t\"Type\""));
 		
 		line = lines.readLine();
-		assertEquals("\"01\"\t\"\"\t\"2172257\"\t\"admin\"\t\"water\"", line);
+		assertTrue(line.startsWith("\"01\"\t\"\"\t\"2172257\"\t\"admin\"\t\"water\""));
 		
 		line = lines.readLine();
-		assertEquals("\"02\"\t\"USGS2\"\t\"\"\t\"\"\t\"clay\"", line);
+		assertTrue(line.startsWith("\"02\"\t\"USGS2\"\t\"\"\t\"\"\t\"clay\""));
 		
 		line = lines.readLine();
-		assertEquals("\"03\"\t\"\"\t\"2172258\"\t\"user\"\t\"stream\"", line);
+		assertTrue(line.startsWith("\"03\"\t\"\"\t\"2172258\"\t\"user\"\t\"stream\""));
 	}
 	
 }

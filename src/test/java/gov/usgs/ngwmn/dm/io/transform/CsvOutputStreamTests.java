@@ -104,16 +104,16 @@ public class CsvOutputStreamTests {
 		String       line;
 		
 		line = lines.readLine();
-		assertEquals("\"code\",\"agency\",\"Id\",\"level\",\"Type\"", line);
+		assertTrue(line.startsWith("\"code\",\"agency\",\"Id\",\"level\",\"Type\""));
 		
 		line = lines.readLine();
-		assertEquals("\"01\",\"\",\"2172257\",\"admin\",\"water\"", line);
+		assertTrue(line.startsWith("\"01\",\"\",\"2172257\",\"admin\",\"water\""));
 		
 		line = lines.readLine();
-		assertEquals("\"02\",\"USGS2\",\"\",\"\",\"clay\"", line);
+		assertTrue(line.startsWith("\"02\",\"USGS2\",\"\",\"\",\"clay\""));
 		
 		line = lines.readLine();
-		assertEquals("\"03\",\"\",\"2172258\",\"user\",\"stream\"", line);
+		assertTrue(line.startsWith("\"03\",\"\",\"2172258\",\"user\",\"stream\""));
 	}
 	
 }
