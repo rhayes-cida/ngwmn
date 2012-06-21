@@ -93,17 +93,16 @@ public class DataRowParser implements Parser {
 				}
 			}
 			
-			// TODO  protect header list read-only
-			for (HeadersListener listener : headerListeners) {
-				listener.headerUpdate(headers);
-			}
+			signalHeaderListeners();
 			lastColListSize = state.targetColumnList.size();
 		}
 		return headers;
 	}
+	
 	public Map<String, String> currentRow() {
 		return state.targetColumnValues;
 	}
+	
 	public Map<String, String> nextRow() throws IOException {
 		boolean done = eof;
 		
@@ -145,8 +144,10 @@ public class DataRowParser implements Parser {
 			return null;
 		}
 
-		headers();  // TODO maybe do this once
-		postParser.refineDataColumns(state.targetColumnValues);
+		boolean headersChanged = postParser.refineDataColumns(state.targetColumnValues, headers());
+		if (headersChanged) {
+			signalHeaderListeners();
+		}
 		rowCount++;
 
 		// if currentRow is last Row then returns empty set
@@ -267,5 +268,11 @@ public class DataRowParser implements Parser {
 			return headerListeners.add(listener);
 		}
 		return false;
+	}
+	protected void signalHeaderListeners() {
+		// TODO  protect header list read-only
+		for (HeadersListener listener : headerListeners) {
+			listener.headerUpdate(headers);
+		}
 	}
 }

@@ -1,8 +1,6 @@
 package gov.usgs.ngwmn.dm.io.parse;
 
-import static gov.usgs.ngwmn.WellDataType.LITHOLOGY;
-import static gov.usgs.ngwmn.WellDataType.LOG;
-import static gov.usgs.ngwmn.WellDataType.WATERLEVEL;
+import static gov.usgs.ngwmn.WellDataType.*;
 import gov.usgs.ngwmn.WellDataType;
 
 import java.util.HashMap;
@@ -23,11 +21,17 @@ public class WaterPortalPostParserFactory {
 	public static final String LOG_EXCLUSION_COLUMNS_DISPLAY_NAME[] = new String[] {
 						"MappedInterval/observationMethod/CGI_TermValue/value/codeSpace",
 						"HydrostratigraphicUnit/observationMethod/CGI_TermValue/value/codeSpace",
+						"HydrostratigraphicUnit/observationMethod/CGI_TermValue/value",
+						"HydrostratigraphicUnit/purpose",
 						"role",
 						"role/codeSpace",
 						"name/codeSpace",
 						"proportion/CGI_TermValue/value",
 						"proportion/CGI_TermValue/value/codeSpace",
+						"UnconsolidatedMaterial/name",
+						"UnconsolidatedMaterial/purpose",
+						"UnconsolidatedMaterial/name",
+						"UnconsolidatedMaterial/purpose",
 						"srsDimension"};
 	
 	public static final String WATERLEVEL_EXCLUSION_COLUMNS_DISPLAY_NAME[] = new String[] {
@@ -50,9 +54,33 @@ public class WaterPortalPostParserFactory {
 		renameColumns = new HashMap<WellDataType, Map<String,String>>();
 		
 		HashMap<String, String> logRenames = new HashMap<String, String>();
-		logRenames.put("MappedInterval/observationMethod/CGI_TermValue/value", "MappedIntervalValue");
-		logRenames.put("HydrostratigraphicUnit/observationMethod/CGI_TermValue/value", "HydrostratigraphicUnitValue");
+		logRenames.put("MappedInterval/observationMethod/CGI_TermValue/value", "ObservationMethod");
+		logRenames.put("id", "LithologyID");
+		logRenames.put("description", "LithologyDescription");
+		logRenames.put("ControlledConcept/name", "LithologyControlledConcept");
 		renameColumns.put(LOG, logRenames);
+		renameColumns.put(LITHOLOGY, logRenames);
+		
+		HashMap<String, String> levelRenames = new HashMap<String, String>();
+		levelRenames.put("time", "DateTime");
+		levelRenames.put("code", "Unit");
+		levelRenames.put("value", "Value");
+		levelRenames.put("comment", "ObservationMethod");
+		renameColumns.put(WATERLEVEL, levelRenames);
+		
+		HashMap<String, String> qualityRenames = new HashMap<String, String>();
+		qualityRenames.put("date", "Date");
+		qualityRenames.put("time", "Time");
+		qualityRenames.put("zone", "TimeZone");
+		qualityRenames.put("ResultMeasureValue ", "Value");
+		qualityRenames.put("MeasureUnitCode  ", "Unit");
+		qualityRenames.put("ResultStatusIdentifier", "ResultStatus");
+		qualityRenames.put("ResultValueTypeName", "ValueType");
+		qualityRenames.put("ResultTemperatureBasisText", "ResultTemperatureBasis");
+		qualityRenames.put("ResultCommentText", "Comment");
+		qualityRenames.put("MethodIdentifierContext", "MethodContext");
+		qualityRenames.put("MethodDescriptionText", "MethodDescription");
+		renameColumns.put(QUALITY, qualityRenames);
 		
 		for (WellDataType type : WellDataType.values()) {
 			if ( ! exclusions.containsKey(type) ) {
@@ -62,6 +90,7 @@ public class WaterPortalPostParserFactory {
 				renameColumns.put(type, new HashMap<String, String>() );
 			}
 		}
+		
 	}
 	
 	public PostParser make(WellDataType type) {

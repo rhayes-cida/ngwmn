@@ -22,6 +22,7 @@ public class CsvOutputStream extends OutputStreamTransform {
 		
 		String sep = "";
 		for (Element header : headers) {
+			// if rowData is null then we are rendering headers
 			String data = (rowData==null) ? header.displayName : rowData.get(header.fullName);
 			data = (data==null) ? "" : data;
 			data = data.trim().replaceAll("\"", "'");

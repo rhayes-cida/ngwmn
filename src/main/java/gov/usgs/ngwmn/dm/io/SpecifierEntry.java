@@ -49,8 +49,8 @@ public class SpecifierEntry implements EntryDescription {
 	@Override
 	public Map<String, String> constColumns() {
 		Map<String,String> data = new LinkedHashMap<String,String>();
-		data.put("Agency", spec.getAgencyID());
-		data.put("Site",   spec.getFeatureID());
+		data.put("AgencyCd", spec.getAgencyID());
+		data.put("SiteNo",   spec.getFeatureID());
 		return data;
 	}
 }
