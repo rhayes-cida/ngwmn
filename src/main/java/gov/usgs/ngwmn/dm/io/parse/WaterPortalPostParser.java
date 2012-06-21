@@ -32,10 +32,9 @@ public class WaterPortalPostParser implements PostParser {
 	
 	
 	@Override
-	public boolean refineDataColumns(Map<String, String> data, List<Element> headers) {
+	public void refineDataColumns(Map<String, String> data) {
 		removeIngnoreElements(data);
 		appendConstElements(data);
-		return false;
 	}
 
 	public void removeIngnoreElements(Map<String, String> data) {

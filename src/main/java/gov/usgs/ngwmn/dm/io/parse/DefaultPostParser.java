@@ -16,9 +16,8 @@ public class DefaultPostParser implements PostParser {
 	}
 
 	@Override
-	public boolean refineDataColumns(Map<String, String> data, List<Element> headers) {
+	public void refineDataColumns(Map<String, String> data) {
 		// default no refinements
-		return false;
 	}
 
 	@Override

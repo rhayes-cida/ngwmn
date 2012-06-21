@@ -144,10 +144,8 @@ public class DataRowParser implements Parser {
 			return null;
 		}
 
-		boolean headersChanged = postParser.refineDataColumns(state.targetColumnValues, headers());
-		if (headersChanged) {
-			signalHeaderListeners();
-		}
+		headers();
+		postParser.refineDataColumns(state.targetColumnValues);
 		rowCount++;
 
 		// if currentRow is last Row then returns empty set

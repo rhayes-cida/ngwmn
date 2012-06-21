@@ -8,9 +8,7 @@ import java.util.Set;
 public interface PostParser {
 
 	List<Element> refineHeaderColumns(Collection<Element> headers);
-	
-	// return true if headers changed
-	boolean refineDataColumns(Map<String, String> data, List<Element> headers);
+	void refineDataColumns(Map<String, String> data);
 	
 	void addConstColumn(String col, String string);
 	Set<String> getRemoveColumns();

@@ -93,12 +93,12 @@ public class TransformEntrySupplierTests {
 			}
 		};
 		transformEntrySupplier.appendIdentifierColumns(pp);
-		
+		System.err.println(values);
 		assertEquals(2, values.size());
-		assertTrue(values.keySet().contains("Agency"));
-		assertTrue(values.keySet().contains("Site"));
-		assertEquals("a", values.get("Agency"));
-		assertEquals("f", values.get("Site"));
+		assertTrue(values.keySet().contains("AgencyCd"));
+		assertTrue(values.keySet().contains("SiteNo"));
+		assertEquals("a", values.get("AgencyCd"));
+		assertEquals("f", values.get("SiteNo"));
 	}
 
 	@Test

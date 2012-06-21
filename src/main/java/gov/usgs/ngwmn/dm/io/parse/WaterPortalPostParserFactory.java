@@ -97,7 +97,12 @@ public class WaterPortalPostParserFactory {
 		String removeCols[] = exclusions.get(type);
 		Map<String, String> renameCols = renameColumns.get(type);
 		
-		WaterPortalPostParser postParser = new WaterPortalPostParser(removeCols, renameCols);
+		WaterPortalPostParser postParser;
+		if (type == LOG || type == LITHOLOGY) {
+			postParser = new LithologyPostParser(removeCols, renameCols);
+		} else {
+			postParser = new WaterPortalPostParser(removeCols, renameCols);
+		}
 		return postParser;
 	}
 }
