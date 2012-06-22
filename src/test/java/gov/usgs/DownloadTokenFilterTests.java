@@ -53,9 +53,14 @@ public class DownloadTokenFilterTests {
 			public String getServerName() {
 				return "foo"+DownloadTokenFilter.DOMAIN+"bar";
 			}
+			@Override
+			public String getContextPath() {
+				return "";
+			}
 		};
 		
 		res = new MockResponse() {
+			@Override
 			public void addCookie(javax.servlet.http.Cookie cookie) {
 				calls.put("addCookie", cookie);
 			}
@@ -78,9 +83,14 @@ public class DownloadTokenFilterTests {
 			public String getServerName() {
 				return DownloadTokenFilter.DOMAIN;
 			}
+			@Override
+			public String getContextPath() {
+				return "";
+			}
 		};
 		
 		res = new MockResponse() {
+			@Override
 			public void addCookie(javax.servlet.http.Cookie cookie) {
 				calls.put("addCookie", cookie);
 			}
@@ -104,9 +114,14 @@ public class DownloadTokenFilterTests {
 			public String getServerName() {
 				return "serverName";
 			}
+			@Override
+			public String getContextPath() {
+				return "";
+			}
 		};
 		
 		res = new MockResponse() {
+			@Override
 			public void addCookie(javax.servlet.http.Cookie cookie) {
 				calls.put("addCookie", cookie);
 			}
