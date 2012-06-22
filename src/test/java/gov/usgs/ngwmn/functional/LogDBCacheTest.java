@@ -32,7 +32,7 @@ import com.google.common.io.NullOutputStream;
 
 public class LogDBCacheTest extends ContextualTest {
 
-	private static final int SIZE = 27180;
+	private static final int SIZE = 27149;
 	private static final WellDataType TYPE = WellDataType.LOG;
 	private static final String SITE = "P408750";
 	private static final String AGENCY = "IL EPA";

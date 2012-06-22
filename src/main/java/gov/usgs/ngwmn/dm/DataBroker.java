@@ -122,7 +122,12 @@ public class DataBroker implements FlowFactory, PrefetchI {
 				
 				// success in the sense of "we got a result" not "we got data"
 				success = true;	
+			} else {
+				logger.info("empty checker will allow fetch of {}, emptyCt={}, failCt={}",
+						new Object[] {spec,cmd.getEmptyCt(), cmd.getFailCt()});
 			}
+		} else {
+			logger.info("No cache meta data for {}", spec);
 		}
 		return success;
 	}
