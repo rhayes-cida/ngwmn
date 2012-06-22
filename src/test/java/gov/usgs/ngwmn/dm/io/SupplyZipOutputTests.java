@@ -32,7 +32,7 @@ public class SupplyZipOutputTests {
 		SupplyZipOutput oz          = new SupplyZipOutput(outs);
 		Supplier<OutputStream> ze   = oz.makeEntry( new SpecifierEntry(spec) );
 
-		byte buffer[] = PipelineTest.makeBytes(10, 1);
+		byte[] buffer = PipelineTest.makeBytes(10, 1);
 		ByteArrayInputStream bais = new ByteArrayInputStream(buffer){
 //			@Override
 //			public int read(byte[] bytes) throws IOException {
@@ -72,10 +72,10 @@ public class SupplyZipOutputTests {
 		checkBytes( out.toByteArray() );
 	}
 	
-	private void checkBytes(byte bytes[]) throws IOException {
+	private void checkBytes(byte[] bytes) throws IOException {
 		assertNotNull(bytes);
 		
-		byte buffer[] = new byte[10];
+		byte[] buffer = new byte[10];
 		
 		ByteArrayInputStream bais = new ByteArrayInputStream(bytes);
 		ZipInputStream zis = new ZipInputStream(bais);

@@ -10,7 +10,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public class WaterPortalPostParser implements PostParser {
+	private final transient Logger logger = LoggerFactory.getLogger(getClass());
 
 	protected final Map<String, String> constAdditionalCols;
 	protected final Set<String> 		removeColumns;
@@ -33,6 +37,8 @@ public class WaterPortalPostParser implements PostParser {
 	
 	@Override
 	public void refineDataColumns(Map<String, String> data) {
+		logger.trace("General data refinements");
+		
 		removeIngnoreElements(data);
 		appendConstElements(data);
 	}
@@ -40,10 +46,6 @@ public class WaterPortalPostParser implements PostParser {
 	public void removeIngnoreElements(Map<String, String> data) {
 		for (String name : removeColumns) {
 			data.remove(name);
-//			String value = data.remove(name);
-//			if (value != null) {
-//				System.err.println("Removed key:'" +name+"' value:'"+value+"'");
-//			}
 		}
 	}
 	
@@ -56,9 +58,12 @@ public class WaterPortalPostParser implements PostParser {
 	
 	@Override
 	public List<Element> refineHeaderColumns(Collection<Element> headers) {
+		logger.trace("General header refinements");
+		
 		List<Element> modHeaders = new LinkedList<Element>();
 		
 		for (String constCol : constAdditionalCols.keySet()) {
+			logger.trace("adding column: {}", constCol);
 			modHeaders.add( new Element(constCol, constCol, constCol) );
 		}
 		for (Element element : headers) {
@@ -67,9 +72,11 @@ public class WaterPortalPostParser implements PostParser {
 					&& ! removeColumns.contains(element.displayName)
 					&& ! removeColumns.contains(element.localName)
 					) {
+				logger.trace("retaining element: {}", element.displayName);
 				modHeaders.add( element );
 			}
 			if ( renameColumns.containsKey( element.displayName ) ) {
+				logger.trace("renaming  element: from '{}' to '{}'", element.displayName, renameColumns.get( element.displayName ));
 				element.displayName = renameColumns.get( element.displayName );
 			}
 		}
@@ -83,8 +90,8 @@ public class WaterPortalPostParser implements PostParser {
 	}
 	
 	@Override
-	public void addConstColumn(String col, String string) {
-		constAdditionalCols.put(col, string);
+	public void addConstColumn(String col, String value) {
+		constAdditionalCols.put(col, value);
 	}
 	
 	public void addRenameColumn(String col, String string) {

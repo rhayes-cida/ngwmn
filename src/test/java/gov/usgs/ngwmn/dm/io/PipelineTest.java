@@ -47,7 +47,7 @@ public class PipelineTest extends Pipeline {
 		ByteArrayOutputStream os = new ByteArrayOutputStream(10);
 		Supplier<OutputStream> outs1 = new SimpleSupplier<OutputStream>(os);
 		
-		byte buffer[] = makeBytes(10, 1);
+		byte[] buffer = makeBytes(10, 1);
 		ByteArrayInputStream is = new ByteArrayInputStream(buffer);
 		Supplier<InputStream> ins = new SimpleSupplier<InputStream>(is);
 		
@@ -68,7 +68,7 @@ public class PipelineTest extends Pipeline {
 		ByteArrayOutputStream os2 = new ByteArrayOutputStream(10);
 		Supplier<OutputStream> outs2 = new SimpleSupplier<OutputStream>(os2);
 
-		byte buffer[] = makeBytes(10, 1);
+		byte[] buffer = makeBytes(10, 1);
 		ByteArrayInputStream is = new ByteArrayInputStream(buffer);
 		Supplier<InputStream> ins = new SimpleSupplier<InputStream>(is);
 		
@@ -93,7 +93,7 @@ public class PipelineTest extends Pipeline {
 		ByteArrayOutputStream os3 = new ByteArrayOutputStream(10);
 		Supplier<OutputStream> outs3 = new SimpleSupplier<OutputStream>(os3);
 		
-		byte buffer[] = makeBytes(10, 1);
+		byte[] buffer = makeBytes(10, 1);
 		ByteArrayInputStream is = new ByteArrayInputStream(buffer);
 		Supplier<InputStream> ins = new SimpleSupplier<InputStream>(is);
 		
@@ -111,7 +111,7 @@ public class PipelineTest extends Pipeline {
 	}
 	
 	// used in multiple i/o tests
-	public static void checkBytes(byte bytes[], int length, int factor) {
+	public static void checkBytes(byte[] bytes, int length, int factor) {
 		assertNotNull(bytes);
 		assertEquals(length, bytes.length);
 		byte n = 0;
@@ -122,7 +122,7 @@ public class PipelineTest extends Pipeline {
 	}
 	
 	public static byte[] makeBytes(int length, int factor) {
-		byte bytes[] = new byte[length];
+		byte[] bytes = new byte[length];
 		for (int b=0; b<length; b++) {
 			bytes[b] = (byte) (b * factor);
 		}
@@ -135,7 +135,7 @@ public class PipelineTest extends Pipeline {
 		ByteArrayOutputStream os = new ByteArrayOutputStream(10);
 		Supplier<OutputStream> outs1 = new SimpleSupplier<OutputStream>(os);
 
-		byte buffer[] = makeBytes(10, 1);
+		byte[] buffer = makeBytes(10, 1);
 		ByteArrayInputStream is = new ByteArrayInputStream(buffer);
 		Supplier<InputStream> ins = new SimpleSupplier<InputStream>(is);
 		

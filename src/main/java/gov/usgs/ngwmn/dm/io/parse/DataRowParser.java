@@ -34,7 +34,7 @@ public class DataRowParser implements Parser {
 	protected int 		rowCount;
 	protected int 		lastColListSize;
 
-	protected final List<HeadersListener> headerListeners;
+	protected final List<HeaderChangeListener> headerListeners;
 	
 	public DataRowParser() {
 		this(new DefaultPostParser());
@@ -44,7 +44,7 @@ public class DataRowParser implements Parser {
 		state					= new ParseState();
 		ignoredAttributes		= new HashSet<String>();
 		headers					= new LinkedList<Element>();
-		headerListeners			= new LinkedList<HeadersListener>();
+		headerListeners			= new LinkedList<HeaderChangeListener>();
 		ignoredElements			= new HashSet<String>();
 		contentDefinedElements	= new HashMap<String, String>();
 	}
@@ -261,7 +261,7 @@ public class DataRowParser implements Parser {
 	}
 	
 	@Override
-	public boolean addHeaderListener(HeadersListener listener) {
+	public boolean addHeaderListener(HeaderChangeListener listener) {
 		if (listener != null) {
 			return headerListeners.add(listener);
 		}
@@ -269,8 +269,8 @@ public class DataRowParser implements Parser {
 	}
 	protected void signalHeaderListeners() {
 		// TODO  protect header list read-only
-		for (HeadersListener listener : headerListeners) {
-			listener.headerUpdate(headers);
+		for (HeaderChangeListener listener : headerListeners) {
+			listener.headersChanged(headers);
 		}
 	}
 }

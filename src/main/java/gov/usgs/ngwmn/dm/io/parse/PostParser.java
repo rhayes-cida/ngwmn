@@ -10,6 +10,6 @@ public interface PostParser {
 	List<Element> refineHeaderColumns(Collection<Element> headers);
 	void refineDataColumns(Map<String, String> data);
 	
-	void addConstColumn(String col, String string);
+	void addConstColumn(String col, String value);
 	Set<String> getRemoveColumns();
 }

@@ -52,7 +52,7 @@ public abstract class PrivateField {
 	
 	private static Field getPrivate(Class<?> clazz, String fieldName) {
 		/* Go and find the private field... */
-		final Field fields[] = clazz.getDeclaredFields();
+		final Field[] fields = clazz.getDeclaredFields();
 		for (int i = 0; i < fields.length; ++i) {
 			if (fieldName.equals(fields[i].getName())) {
 					return fields[i];

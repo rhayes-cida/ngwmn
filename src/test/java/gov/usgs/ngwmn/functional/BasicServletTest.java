@@ -21,7 +21,8 @@ import com.meterware.servletunit.ServletRunner;
 import com.meterware.servletunit.ServletUnitClient;
 
 public class BasicServletTest extends ContextualTest {
-	
+			
+	private static final String WELL_LIST_EMPTY_FIRST = "http://localhost:8080/ngwmn/data?"+PARAM_AGENCY+"=USGS&"+PARAM_FEATURE+"=403948085414601&"+PARAM_FEATURE+"=403836085374401&"+PARAM_FEATURE+"=402734087033401&"+PARAM_FEATURE+"=402431075020801&"+PARAM_TYPE+"="+WellDataType.CONSTRUCTION;
 	private static final String WELL_LIST_AGENCY_DATA = "http://localhost:8080/ngwmn/data?"+PARAM_AGENCY+"=USGS&"+PARAM_FEATURE+"=402734087033401&"+PARAM_FEATURE+"=402431075020801&"+PARAM_TYPE+"="+WellDataType.WATERLEVEL;
 	private static final String WELL_LIST_CSV_LOG     = "http://localhost:8080/ngwmn/data?"+PARAM_ENCODING+"=CSV&"+PARAM_AGENCY+"=USGS&"+PARAM_FEATURE+"=402734087033401&"+PARAM_FEATURE+"=402431075020801&"+PARAM_TYPE+"="+WellDataType.LOG;
 	private static final String WELL_LIST_CSV         = "http://localhost:8080/ngwmn/data?"+PARAM_ENCODING+"=CSV&"+PARAM_AGENCY+"=USGS&"+PARAM_FEATURE+"=402734087033401&"+PARAM_FEATURE+"=402431075020801&"+PARAM_TYPE+"="+WellDataType.WATERLEVEL+"&"+PARAM_TYPE+"="+WellDataType.LITHOLOGY+"&"+PARAM_TYPE+"="+WellDataType.CONSTRUCTION+"&"+PARAM_TYPE+"="+WellDataType.QUALITY;
@@ -59,6 +60,37 @@ public class BasicServletTest extends ContextualTest {
 		checkSiteIsVisible("NJGS","2288614");
 		checkSiteIsVisible("USGS","400204074145401");
 		checkSiteIsVisible("USGS","402734087033401");
+	}
+	
+	@Test
+	public void test_listOfCsvWithFirstTwoMissingData_testingHeadersWrittenOnSubsequentSites() throws Exception {
+		ServletRunner     sr = new ServletRunner( getClass().getResourceAsStream("/servlet-test-web.xml"), "/ngwmn");
+		
+		System.out.printf("test_listOfCsvWithFirstTwoMissingData_testingHeadersWrittenOnSubsequentSites URL: %s\n", WELL_LIST_EMPTY_FIRST);
+		
+		ServletUnitClient sc = sr.newClient();
+		WebRequest       req = new GetMethodWebRequest(WELL_LIST_EMPTY_FIRST);
+		System.out.printf("test_listOfCsvWithFirstTwoMissingData_testingHeadersWrittenOnSubsequentSites URL: %s\n", req.getURL());
+
+		WebResponse     resp = sc.getResponse(req);
+		assertNotNull("response", resp);
+		
+		for (String hn : resp.getHeaderFieldNames()) {
+			System.out.printf("Header %s:%s\n", hn, resp.getHeaderField(hn));
+		}
+		String body = resp.getText();
+		System.out.printf("contentLength=%d,size=%d\n", resp.getContentLength(), body.length());
+//		assertTrue("response size too big", body.length() < 850);
+//		assertTrue("response size too small", body.length() > 100);
+		
+		File file = new File("/tmp","dataHeaderTest.zip");
+		FileOutputStream fos = new FileOutputStream(file);
+		ByteStreams.copy(resp.getInputStream(), fos);
+		fos.flush();
+		fos.close();
+		int available = new FileInputStream(file).available();
+		int bodyLenth = body.length();
+		assertEquals("response size", available, bodyLenth);
 	}
 	
 	@Test

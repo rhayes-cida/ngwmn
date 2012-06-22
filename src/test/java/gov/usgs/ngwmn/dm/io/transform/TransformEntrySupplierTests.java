@@ -12,7 +12,7 @@ import gov.usgs.ngwmn.dm.io.SpecifierEntry;
 import gov.usgs.ngwmn.dm.io.Supplier;
 import gov.usgs.ngwmn.dm.io.parse.DataRowParser;
 import gov.usgs.ngwmn.dm.io.parse.DefaultPostParser;
-import gov.usgs.ngwmn.dm.io.parse.HeadersListener;
+import gov.usgs.ngwmn.dm.io.parse.HeaderChangeListener;
 import gov.usgs.ngwmn.dm.io.parse.ParseState;
 import gov.usgs.ngwmn.dm.io.parse.PostParser;
 import gov.usgs.ngwmn.dm.io.parse.WaterPortalPostParserFactory;
@@ -48,9 +48,10 @@ public class TransformEntrySupplierTests {
 	}
 
 	@Test
-	public void test_initialize_skipHeadersFalseThenTrue() throws IOException {
+	public void test_initialize_skipHeadersFalseUntilHeadersWritten() throws IOException {
 		OutputStreamTransform ost = (OutputStreamTransform) transformEntrySupplier.begin();
 		boolean writtenHeaders = PrivateField.getBoolean(ost, "writtenHeaders");
+		
 		assertFalse("headers should >NOT< be skipped for the first entry", writtenHeaders);
 		
 		Specifier spec = new Specifier("a","b",WellDataType.QUALITY);
@@ -58,6 +59,17 @@ public class TransformEntrySupplierTests {
 		transformEntrySupplier = (TransformEntrySupplier) transSupply.makeEntry(desc);
 		ost = (OutputStreamTransform) transformEntrySupplier.begin();
 		writtenHeaders = PrivateField.getBoolean(ost, "writtenHeaders");
+
+		assertFalse("headers should be skipped for the subsequent entries", writtenHeaders);
+
+		ost.signalHeaderListeners();
+
+		spec = new Specifier("a","c",WellDataType.QUALITY);
+		desc = new SpecifierEntry(spec);
+		transformEntrySupplier = (TransformEntrySupplier) transSupply.makeEntry(desc);
+		ost = (OutputStreamTransform) transformEntrySupplier.begin();
+		writtenHeaders = PrivateField.getBoolean(ost, "writtenHeaders");
+		
 		assertTrue("headers should be skipped for the subsequent entries", writtenHeaders);
 	}	
 	
@@ -116,7 +128,7 @@ public class TransformEntrySupplierTests {
 				throw new RuntimeException("should not be called during this test");
 			}
 		};
-		transformEntrySupplier = new TransformEntrySupplier(null, null, null, true, (HeadersListener)null);
+		transformEntrySupplier = new TransformEntrySupplier(null, null, null, true, (HeaderChangeListener)null);
 		transformEntrySupplier.appendIdentifierColumns(pp);
 		
 		assertEquals(0, values.size());

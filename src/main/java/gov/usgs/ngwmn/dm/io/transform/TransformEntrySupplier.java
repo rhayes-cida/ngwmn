@@ -5,7 +5,7 @@ import gov.usgs.ngwmn.dm.io.EntryDescription;
 import gov.usgs.ngwmn.dm.io.Supplier;
 import gov.usgs.ngwmn.dm.io.parse.DataRowParser;
 import gov.usgs.ngwmn.dm.io.parse.Element;
-import gov.usgs.ngwmn.dm.io.parse.HeadersListener;
+import gov.usgs.ngwmn.dm.io.parse.HeaderChangeListener;
 import gov.usgs.ngwmn.dm.io.parse.Parser;
 import gov.usgs.ngwmn.dm.io.parse.PostParser;
 import gov.usgs.ngwmn.dm.io.parse.WaterPortalPostParserFactory;
@@ -26,12 +26,12 @@ class TransformEntrySupplier extends Supplier<OutputStream> {
 	protected EntryDescription entryDesc;
 	protected boolean skipHeaders;
 	protected WellDataType dataType;
-	protected HeadersListener headerListener;
+	protected HeaderChangeListener headerListener;
 
 	private List<Element> headers;
 	
 	public TransformEntrySupplier(Supplier<OutputStreamTransform> output, EntryDescription entryDesc,
-			WellDataType type, boolean skipHeaders, HeadersListener listener) {
+			WellDataType type, boolean skipHeaders, HeaderChangeListener listener) {
 		
 		upstream         = output;
 		dataType         = type; // add this to the entry desc
@@ -41,7 +41,7 @@ class TransformEntrySupplier extends Supplier<OutputStream> {
 	}
 	public TransformEntrySupplier(Supplier<OutputStreamTransform> output, EntryDescription entryDesc,
 			WellDataType type, boolean skipHeaders, List<Element> headers) {
-		this(output, entryDesc, type, skipHeaders, (HeadersListener)null);
+		this(output, entryDesc, type, skipHeaders, (HeaderChangeListener)null);
 		this.headers = headers;
 	}
 	
@@ -51,8 +51,9 @@ class TransformEntrySupplier extends Supplier<OutputStream> {
 		OutputStreamTransform ost = upstream.begin();
 		Parser parser = makeParser();
 		ost.setParser(parser);
-		if (skipHeaders) {
-			ost.skipHeaders();
+		ost.skipHeaders(skipHeaders);
+		
+		if (headers != null) {
 			// headers can be null - headers will be extracted from the stream if null
 			ost.setHeaders(headers);
 		} else {

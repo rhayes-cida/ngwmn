@@ -6,7 +6,7 @@ import gov.usgs.ngwmn.dm.io.EntryDescription;
 import gov.usgs.ngwmn.dm.io.SimpleSupplier;
 import gov.usgs.ngwmn.dm.io.Supplier;
 import gov.usgs.ngwmn.dm.io.parse.Element;
-import gov.usgs.ngwmn.dm.io.parse.HeadersListener;
+import gov.usgs.ngwmn.dm.io.parse.HeaderChangeListener;
 import gov.usgs.ngwmn.dm.spec.Encoding;
 
 import java.io.IOException;
@@ -17,7 +17,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 
-public class TransformSupplier extends Supplier<OutputStream> implements HeadersListener {
+public class TransformSupplier extends Supplier<OutputStream> 
+		implements HeaderChangeListener, HeaderWrittenListener {
 	protected final transient Logger logger = LoggerFactory.getLogger(getClass());
 
 	protected Supplier<OutputStream> upstream;
@@ -29,7 +30,7 @@ public class TransformSupplier extends Supplier<OutputStream> implements Headers
 	
 	// this supplier will be a listener for the headers on the first entry
 	// it will supply subsequent entries with these headers to preserve column ordinal
-	protected List<Element> masterHeaders;
+	protected List<Element> masterHeaders; // previous headers
 
 	public TransformSupplier(Supplier<OutputStream> output, WellDataType type, Encoding encode) {
 		upstream = output;
@@ -39,7 +40,7 @@ public class TransformSupplier extends Supplier<OutputStream> implements Headers
 	
 	
 	@Override
-	public void headerUpdate(List<Element> headers) {
+	public void headersChanged(List<Element> headers) {
 		masterHeaders = headers;
 	}
 	
@@ -51,6 +52,7 @@ public class TransformSupplier extends Supplier<OutputStream> implements Headers
 		if (ost == null) {
 			throw new RuntimeException("Cannot makeEntry on a uninitialized supplier.");
 		}
+		ost.addHeaderListener(this);
 		
 		Supplier<OutputStreamTransform> sos = new SimpleSupplier<OutputStreamTransform>(ost);
 		TransformEntrySupplier transformer;
@@ -61,9 +63,10 @@ public class TransformSupplier extends Supplier<OutputStream> implements Headers
 			// we need master headers so listen for them
 			transformer  = new TransformEntrySupplier(sos, entryDesc, dataType, skipHeaders, this);
 		}
-		skipHeaders = true;
 		return transformer;
 	}
+	
+	
 	
 	@Override
 	public OutputStream initialize() throws IOException {
@@ -84,4 +87,8 @@ public class TransformSupplier extends Supplier<OutputStream> implements Headers
 		return ost;
 	}
 
+	@Override
+	public void headersWritten() {
+		skipHeaders = true;
+	}
 }
