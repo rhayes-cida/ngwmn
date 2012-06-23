@@ -24,7 +24,7 @@ public class UrlFactoryTest {
 	
 	@BeforeClass
 	public static void setSystemProperty() {
-		System.setProperty("cocoon", "http://javadevp/cocoon");		
+		System.setProperty("cocoon", "http://cida-wiwsc-javadevp.er.usgs.gov:8080/cocoon");		
 	}
 	
 	@Before
@@ -33,12 +33,21 @@ public class UrlFactoryTest {
 	}
 
 	@Test
-	public void testResolve() {
+	public void testALL() {
 		WellDataType t = WellDataType.ALL;
 		
-		String u = victim.resolve(t, "MBMG", "3445");
+		String u = victim.resolve(t, "MBMG", "1388");
 		
-		assertEquals("http://javadevp/cocoon/gin/gwdp/MBMG?featureId=3445", u);
+		assertEquals("http://cida-wiwsc-javadevp.er.usgs.gov:8080/cocoon/gin/gwdp/cache/download/xls/MBMG?featureId=1388", u);
+	}
+
+	@Test
+	public void testWQ() {
+		WellDataType t = WellDataType.QUALITY;
+		
+		String u = victim.resolve(t, "MBMG", "1388");
+		
+		assertEquals("http://cida-wiwsc-javadevp.er.usgs.gov:8080/cocoon/gin/gwdp/agency/MBMG/qw?mimeType=xml&siteid=1388", u);
 	}
 
 }
