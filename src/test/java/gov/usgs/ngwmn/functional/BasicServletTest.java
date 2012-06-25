@@ -233,7 +233,7 @@ public class BasicServletTest extends ContextualTest {
 		assertTrue("response size", body.length() > 1000);
 	}
 
-	// TODO fix and re-enable @Test
+	@Test
 	public void testWithNoData() throws Exception {
 		// this site exists, but has no data (on 2012/03/23)
 		ServletRunner sr = new ServletRunner( getClass().getResourceAsStream("/servlet-test-web.xml"), "/ngwmn");
@@ -287,7 +287,7 @@ public class BasicServletTest extends ContextualTest {
 		testWithData();
 	}
 	
-	// TODO fix and re-enable @Test(timeout=3000) // TODO why is this sometime this slow on Windows
+	@Test(timeout=3000) // TODO why is this sometime this slow on Windows
 	public void testWithNoData_fromCacheShouldBeFast() throws Exception {
 		testWithNoData();
 	}

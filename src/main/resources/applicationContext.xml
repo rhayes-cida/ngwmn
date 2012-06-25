@@ -227,8 +227,8 @@
 		<property name="mapping" >
 			<props >
 			<prop key="ALL">#{gwdp}/cache/download/xls/_{#agencyId}?featureId=_{#featureId}</prop>
-			<prop key="LOG">#{gwdp}/agency_{#agencyId}/wfs?request=GetFeature&amp;featureId=_{#featureId}</prop>
-			<prop key="LITHOLOGY">#{gwdp}/agency/_{#agencyId}/wfs?request=GetFeature&amp;featureId=_{#featureId}</prop>
+			<prop          key="LOG">#{gwdp}/agency/_{#agencyId}/wfs?request=GetFeature&amp;featureId=_{#featureId}</prop>
+			<prop    key="LITHOLOGY">#{gwdp}/agency/_{#agencyId}/wfs?request=GetFeature&amp;featureId=_{#featureId}</prop>
 			<prop key="CONSTRUCTION">#{gwdp}/agency/_{#agencyId}/wfs?request=GetFeature&amp;featureId=_{#featureId}</prop>
 			<prop key="WATERLEVEL">#{gwdp}/agency/_{#agencyId}/sos?request=GetObservation&amp;featureId=_{#featureId}</prop>
 			<prop key="QUALITY">#{gwdp}/agency/_{#agencyId}/qw?mimeType=xml&amp;siteid=_{#featureId}</prop>
