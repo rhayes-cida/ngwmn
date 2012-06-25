@@ -16,7 +16,10 @@ public class EmptyDataFetcher implements DataFetcher {
 	public boolean configureInput(Specifier spec, Pipeline pipe)
 			throws IOException {
 		
-		byte[] buf = {};
+		// This needs to be a valid XML file, else Cocoon gets upset.
+		
+		byte[] buf = "<?xml version=\"1.0\"?><nothing/>".getBytes();
+"
 		InputStream eis = new ByteArrayInputStream(buf);
 		Supplier<InputStream> eiss = new SimpleSupplier<InputStream>(eis);
 		pipe.setInputSupplier(eiss);
