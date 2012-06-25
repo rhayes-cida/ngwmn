@@ -3,14 +3,19 @@
 	xmlns="http://www.springframework.org/schema/beans" 
 	xmlns:task="http://www.springframework.org/schema/task"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:context="http://www.springframework.org/schema/context"
+    
     xsi:schemaLocation="
     	http://www.springframework.org/schema/beans 	http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+    	http://www.springframework.org/schema/context	http://www.springframework.org/schema/context/spring-context-3.1.xsd
 		http://www.springframework.org/schema/task 		http://www.springframework.org/schema/task/spring-task-3.1.xsd
     ">
 
+	<context:property-placeholder ignore-unresolvable="true"/>
+		
 	<bean id="Prefetcher" class="gov.usgs.ngwmn.dm.prefetch.Prefetcher">
-		<property name="fetchLimit" value="400"/>
-		<property name="timeLimit" 	value="18000000"/> <!-- 1000*60*60*5, 5 hours -->
+		<property name="fetchLimit" value="${ngwmn_prefetch_count_limit:400}"/>
+		<property name="timeLimit" 	value="${ngwmn_prefetch_ms_limit:18000000}"/>
 		<property name="wellDAO" 	ref="WellRegistryDAO"/>
 		<property name="cacheDAO" 	ref="CacheMetaDataDAO"/>
 		<property name="broker" 	ref="DataBroker"/>
@@ -18,7 +23,7 @@
     
     <task:scheduled-tasks scheduler="scheduler">
     									<!--  second minute hour day month weekday -->
-    	<task:scheduled ref="Prefetcher" method="call" cron="0 21 22 * * ?"/>
+    	<task:scheduled ref="Prefetcher" method="call" cron="0 21 ${ngwmn_prefetch_start_hour:22} * * ?"/>
     </task:scheduled-tasks>
     
     <task:scheduler id="scheduler" pool-size="1"/>

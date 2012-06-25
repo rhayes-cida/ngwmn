@@ -14,6 +14,7 @@ import gov.usgs.ngwmn.dm.prefetch.Prefetcher.WellStatus;
 import gov.usgs.ngwmn.dm.spec.Specifier;
 
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 public class PrefetcherIntegrationTest extends ContextualTest {
@@ -21,7 +22,7 @@ public class PrefetcherIntegrationTest extends ContextualTest {
 	private Prefetcher victim;
 	private int ct = 0;
 	private int delay = 0;
-	
+		
 	@Before
 	public void setup() {
 		victim = ctx.getBean("Prefetcher", Prefetcher.class);
@@ -36,6 +37,11 @@ public class PrefetcherIntegrationTest extends ContextualTest {
 				return spec.hashCode();
 			}
 		});
+	}
+	
+	@Test
+	public void test_config() {
+		assertEquals("overridden fetch count limit", 401, victim.getFetchLimit());
 	}
 	
 	@Test
