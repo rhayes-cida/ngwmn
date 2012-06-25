@@ -55,8 +55,8 @@ public class WebRetriever implements DataFetcher {
 	}
 
 
-	protected UrlFactory urlFactory = new UrlFactory();
-	protected Harvester  harvester  = new Harvester();
+	protected SpringUrlFactory urlFactory;
+	protected Harvester harvester;
 
 	@Override
 	public boolean configureInput(final Specifier spec, final Pipeline pipe) throws IOException {
@@ -76,4 +76,13 @@ public class WebRetriever implements DataFetcher {
 		return true;
 	}
 
+	public void setUrlFactory(SpringUrlFactory urlFactory) {
+		this.urlFactory = urlFactory;
+	}
+
+	public void setHarvester(Harvester harvester) {
+		this.harvester = harvester;
+	}
+
+	
 }

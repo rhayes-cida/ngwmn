@@ -22,7 +22,7 @@ import org.slf4j.LoggerFactory;
 public class DataBroker implements FlowFactory, PrefetchI {
 	protected final transient Logger logger = LoggerFactory.getLogger(getClass());
 
-	private DataFetcher harvester;
+	private DataFetcher fetcher;
 	private DataFetcher retriever;
 
 	private DataLoader  loader;
@@ -66,7 +66,7 @@ public class DataBroker implements FlowFactory, PrefetchI {
 		
 		if ( ! success) {
 			loader.configureOutput(spec, pipe);
-			success = configureInput(harvester, pipe); 
+			success = configureInput(fetcher, pipe); 
 		}
 		
 		return pipe;
@@ -159,8 +159,8 @@ public class DataBroker implements FlowFactory, PrefetchI {
 //		throw new DataNotAvailableException(spec);
 //	}
 	
-	public void setHarvester(DataFetcher harvester) {
-		this.harvester = harvester;
+	public void setFetcher(DataFetcher harvester) {
+		this.fetcher = harvester;
 	}
 	public void setRetriever(DataFetcher retriever) {
 		this.retriever = retriever;
@@ -170,7 +170,7 @@ public class DataBroker implements FlowFactory, PrefetchI {
 	}
 	
 	void check(Specifier spec) {
-		if (retriever == null && harvester == null) 
+		if (retriever == null && fetcher == null) 
 			throw new NullPointerException("At least one Data Fetcher is required");
 		if (spec == null) 
 			throw new NullPointerException("Specifier is required");

@@ -11,12 +11,12 @@
 	<context:property-placeholder/>
 	
 	<bean id="gwdp" class="java.lang.String">
-		<constructor-arg value="${cocoon}/gin/gwdp"></constructor-arg>
+		<constructor-arg value="${ngwmn_cocoon}/gin/gwdp"></constructor-arg>
 	</bean>
 	
 	<!-- both ${...} and #{...} are evaluated at bean construction time, sigh. -->
 	    <bean id="urlFactory"
-	        class="gov.usgs.ngwmn.dm.harvest.BetterUrlFactory">
+	        class="gov.usgs.ngwmn.dm.harvest.SpringUrlFactory">
 			<property name="mapping" >
 				<props >
 				<prop key="ALL">#{gwdp}/cache/download/xls/_{#agencyId}?featureId=_{#featureId}</prop>

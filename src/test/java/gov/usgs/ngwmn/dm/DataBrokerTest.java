@@ -55,7 +55,7 @@ public class DataBrokerTest extends ContextualTest {
 		
 		// these are not called - just removing nulls.
 		broker.setRetriever(new WebRetriever());
-		broker.setHarvester(new WebRetriever());
+		broker.setFetcher(new WebRetriever());
 		
 		broker.check(null);
 		
@@ -71,7 +71,7 @@ public class DataBrokerTest extends ContextualTest {
 		final AtomicInteger harvestorCallCt = new AtomicInteger(0);
 		
 		
-		broker.setHarvester(new DataFetcher() {
+		broker.setFetcher(new DataFetcher() {
 
 			@Override
 			public boolean configureInput(Specifier spec, Pipeline pipe)

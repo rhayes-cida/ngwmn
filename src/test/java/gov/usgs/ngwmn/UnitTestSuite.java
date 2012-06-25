@@ -4,7 +4,7 @@ import gov.usgs.DownloadTokenFilterTests;
 import gov.usgs.ngwmn.dm.DataManagerServletTests;
 import gov.usgs.ngwmn.dm.cache.PipeStatisticsTest;
 import gov.usgs.ngwmn.dm.cache.fs.FileCacheFilenameTest;
-import gov.usgs.ngwmn.dm.harvest.UrlFactoryTests;
+import gov.usgs.ngwmn.dm.harvest.UrlFactoryTest;
 import gov.usgs.ngwmn.dm.harvest.WebRetrieverTests;
 import gov.usgs.ngwmn.dm.io.CopyInvokerTest;
 import gov.usgs.ngwmn.dm.io.FileInputInvokerTest;
@@ -44,7 +44,7 @@ import org.junit.runners.Suite.SuiteClasses;
     ExcelXssfOutputStreamTest.class,
     DataRowParserTests.class,
     PipeStatisticsTest.class,
-    UrlFactoryTests.class,
+    UrlFactoryTest.class,
     TsvOutputStreamTests.class
 })
 public class UnitTestSuite {

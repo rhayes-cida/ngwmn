@@ -33,7 +33,7 @@ public class WebRetrieverTests {
 		checkValues = new HashMap<String, Boolean>();
 		
 		web = new WebRetriever();
-		web.urlFactory   = new UrlFactory() {
+		web.urlFactory   = new SpringUrlFactory() {
 			@Override
 			public String makeUrl(Specifier spec) {
 				checkValues.put("makeUrlCalled",true);

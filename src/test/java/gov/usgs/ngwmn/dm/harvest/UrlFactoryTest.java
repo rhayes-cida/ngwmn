@@ -2,8 +2,8 @@ package gov.usgs.ngwmn.dm.harvest;
 
 import static org.junit.Assert.*;
 import gov.usgs.ngwmn.WellDataType;
+import gov.usgs.ngwmn.dm.spec.Specifier;
 
-import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -17,19 +17,21 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 @ContextConfiguration({"classpath:urlFactoryContext.xml"})
 public class UrlFactoryTest {
 
+	private static final String BASE_URL = "http://cida-wiwsc-javadevp.er.usgs.gov:8080/cocoon";
+
 	@Autowired
 	protected ApplicationContext ctx;
 
-	private BetterUrlFactory victim;
+	private SpringUrlFactory victim;
 	
 	@BeforeClass
 	public static void setSystemProperty() {
-		System.setProperty("cocoon", "http://cida-wiwsc-javadevp.er.usgs.gov:8080/cocoon");		
+		System.setProperty("ngwmn_cocoon", BASE_URL);		
 	}
 	
 	@Before
 	public void setUp() throws Exception {
-		victim = ctx.getBean(BetterUrlFactory.class);
+		victim = ctx.getBean(SpringUrlFactory.class);
 	}
 
 	@Test
@@ -38,7 +40,7 @@ public class UrlFactoryTest {
 		
 		String u = victim.resolve(t, "MBMG", "1388");
 		
-		assertEquals("http://cida-wiwsc-javadevp.er.usgs.gov:8080/cocoon/gin/gwdp/cache/download/xls/MBMG?featureId=1388", u);
+		assertEquals(BASE_URL + "/gin/gwdp/cache/download/xls/MBMG?featureId=1388", u);
 	}
 
 	@Test
@@ -47,7 +49,47 @@ public class UrlFactoryTest {
 		
 		String u = victim.resolve(t, "MBMG", "1388");
 		
-		assertEquals("http://cida-wiwsc-javadevp.er.usgs.gov:8080/cocoon/gin/gwdp/agency/MBMG/qw?mimeType=xml&siteid=1388", u);
+		assertEquals(BASE_URL + "/gin/gwdp/agency/MBMG/qw?mimeType=xml&siteid=1388", u);
+	}
+
+
+	@Test
+	public void test_makeUrl_forWaterQualityData() {
+		Specifier  spec = new Specifier("USGS","WELL0",WellDataType.QUALITY);
+		String url = victim.makeUrl(spec);
+		System.out.println(url);
+		assertTrue(url.contains("qw?"));
+	}
+	
+	@Test
+	public void test_makeUrl_forWaterLevelData() {
+		Specifier  spec = new Specifier("USGS","WELL0",WellDataType.WATERLEVEL);
+		String url = victim.makeUrl(spec);
+		System.out.println(url);
+		assertTrue(url.contains("sos?"));
+	}
+	
+	@Test
+	public void test_makeUrl_forLogData() {
+		Specifier  spec = new Specifier("USGS","WELL0",WellDataType.LOG);
+		String url = victim.makeUrl(spec);
+		System.out.println(url);
+		assertTrue(url.contains("wfs?"));
+	}
+		
+	@Test
+	public void test_makeUrl_containsAgencyAndFeature() {
+		Specifier  spec = new Specifier("USGS","WELL0",WellDataType.LOG);
+		String url = victim.makeUrl(spec);
+		assertTrue(url.contains(spec.getAgencyID()));
+		assertTrue(url.contains(spec.getFeatureID()));
+	}
+	
+	@Test
+	public void test_makeUrl_startsWithBaseUrl() {
+		Specifier  spec = new Specifier("USGS","WELL0",WellDataType.LOG);
+		String url = victim.makeUrl(spec);
+		assertTrue("generated url is " + url, url.startsWith(BASE_URL));
 	}
 
 }
