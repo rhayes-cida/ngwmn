@@ -2,6 +2,7 @@ package gov.usgs.ngwmn.dm.io.parse;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -86,7 +87,8 @@ public class DataRowParser implements Parser {
 	public List<Element> headers() {
 		if ( state.targetColumnList.size() > lastColListSize ) {
 			logger.debug("NEW HEADERS ADDED: {}", state.targetColumnList);
-			List<Element> refinedHeaders = postParser.refineHeaderColumns(state.targetColumnList);
+			List<Element> refinedHeaders = postParser.refineHeaderColumns(
+					new ArrayList<Element>( state.targetColumnList) );
 			for (Element element : refinedHeaders) {
 				if ( ! element.hasChildren && ! headers.contains(element)) {
 					headers.add(element);

@@ -131,37 +131,33 @@ public class WaterPortalPostParserFactory {
 		constructionMap.put("prefix",   ConstructionDepthPrefix);
 	}
 	
-	public PostParser make(WellDataType type) {
+	public CompositePostParser make(WellDataType type) {
 		String[] removeCols = exclusions.get(type);
 		Map<String, String> renameCols = renameColumns.get(type);
+
+		CompositePostParser postParser = new CompositePostParser();
+		postParser.addPostParser( new ColumnRenamePostParser(renameCols) );
+		postParser.addPostParser( new ColumnExclusionPostParser(removeCols) );
 		
 		// LITH and CON data types have coordinate cols
 		if ( coordinateMap.containsKey(type) ) {
-			return makeCoordinatePostParser(type, removeCols, renameCols);
+			postParser.addPostParser( makeCoordinatePostParser(type, removeCols, renameCols) );
 		}
 		
 		if (type == LOG) { // LOG is a composite data type of LITH and CON
-			CompositePostParser cpp = new CompositePostParser();
 			for (WellDataType cType : coordinateMap.keySet()) {
 				PostParser pp = makeCoordinatePostParser(cType, removeCols, renameCols);
-				cpp.addPostParser(pp);
+				postParser.addPostParser(pp);
 			}
-			return cpp;
 		}
 
-		// default
-		return new WaterPortalPostParser(removeCols, renameCols);
+		return postParser;
 	}
 
-	protected WaterPortalPostParser makeCoordinatePostParser(WellDataType type,
+	protected PostParser makeCoordinatePostParser(WellDataType type,
 			String[] removeCols, Map<String, String> renameCols) {
 		
 		Map<String, String> map = coordinateMap.get(type);
-		
-		WaterPortalPostParser postParser = 
-				new CoordinatePostParser(removeCols, renameCols, 
-				map.get("fullName"), map.get("prefix"));
-		
-		return postParser;
+		return new CoordinatePostParser(map.get("fullName"), map.get("prefix"));
 	}
 }

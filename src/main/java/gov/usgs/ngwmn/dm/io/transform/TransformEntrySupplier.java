@@ -3,6 +3,8 @@ package gov.usgs.ngwmn.dm.io.transform;
 import gov.usgs.ngwmn.WellDataType;
 import gov.usgs.ngwmn.dm.io.EntryDescription;
 import gov.usgs.ngwmn.dm.io.Supplier;
+import gov.usgs.ngwmn.dm.io.parse.AdditionalColumnsPostParser;
+import gov.usgs.ngwmn.dm.io.parse.CompositePostParser;
 import gov.usgs.ngwmn.dm.io.parse.DataRowParser;
 import gov.usgs.ngwmn.dm.io.parse.Element;
 import gov.usgs.ngwmn.dm.io.parse.HeaderChangeListener;
@@ -65,28 +67,24 @@ class TransformEntrySupplier extends Supplier<OutputStream> {
 
 
 	protected DataRowParser makeParser() {
-		// TODO this might be a bit too tightly coupled
-		PostParser postParser = new WaterPortalPostParserFactory().make(dataType);
+		// TODO this is too tightly coupled
+		CompositePostParser postParser = new WaterPortalPostParserFactory().make(dataType);
 		appendIdentifierColumns(postParser);
 		
-		// TODO this might be a bit too tightly coupled
+		// TODO this is also too tightly coupled
 		DataRowParser parser = new DataRowParser(postParser);
 		
-		// TODO specific to water level
 		parser.setRowElementName( dataType.rowElementName );
-		
-		
 		return parser;
 	}
 
 
-	protected void appendIdentifierColumns(PostParser parser) {
+	protected void appendIdentifierColumns(CompositePostParser parser) {
 		if (entryDesc==null) return; // if null than there are no cols
 		
 		Map<String,String> cols = entryDesc.constColumns();
-		for (String col : cols.keySet()) {
-			parser.addConstColumn(col, cols.get(col));
-		}
+		PostParser pp = new AdditionalColumnsPostParser(cols);
+		parser.addPostParser(pp);
 	}
 
 }

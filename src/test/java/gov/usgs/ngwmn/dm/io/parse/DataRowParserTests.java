@@ -97,11 +97,6 @@ public class DataRowParserTests {
 	void makeParser(String xml) {
 		PostParser pp = new DefaultPostParser() {
 			@Override
-			public void addConstColumn(String col, String string) {
-				throw new RuntimeException("should not be called during this test");
-			}
-			
-			@Override
 			public Set<String> getRemoveColumns() {
 				throw new RuntimeException("should not be called during this test");
 			}

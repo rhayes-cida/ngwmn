@@ -1,8 +1,6 @@
 package gov.usgs.ngwmn.dm.io.parse;
 
-import java.util.Collection;
 import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -26,10 +24,10 @@ public class CompositePostParser implements PostParser {
 	}
 	
 	@Override
-	public List<Element> refineHeaderColumns(Collection<Element> original) {
+	public List<Element> refineHeaderColumns(List<Element> original) {
 		logger.trace("Composite header refinements");
 
-		List<Element> headers = new LinkedList<Element>(original);
+		List<Element> headers = original;
 
 		for (PostParser postParser : postParsers) {
 			headers = postParser.refineHeaderColumns(headers);
@@ -47,16 +45,6 @@ public class CompositePostParser implements PostParser {
 		for (PostParser postParser : postParsers) {
 			postParser.refineDataColumns(data);
 		}
-	}
-
-	@Override
-	public void addConstColumn(String col, String value) {
-		logger.trace("Composite add const col");
-
-		for (PostParser postParser : postParsers) {
-			postParser.addConstColumn(col, value);
-		}
-		
 	}
 
 	@Override

@@ -1,19 +1,21 @@
 package gov.usgs.ngwmn.dm.io.transform;
 
-import static org.junit.Assert.*;
-import static gov.usgs.ngwmn.WellDataType.*;
-
-
+import static gov.usgs.ngwmn.WellDataType.WATERLEVEL;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 import gov.usgs.ngwmn.PrivateField;
 import gov.usgs.ngwmn.WellDataType;
 import gov.usgs.ngwmn.dm.io.EntryDescription;
 import gov.usgs.ngwmn.dm.io.SimpleSupplier;
 import gov.usgs.ngwmn.dm.io.SpecifierEntry;
 import gov.usgs.ngwmn.dm.io.Supplier;
+import gov.usgs.ngwmn.dm.io.parse.AdditionalColumnsPostParser;
 import gov.usgs.ngwmn.dm.io.parse.DataRowParser;
-import gov.usgs.ngwmn.dm.io.parse.DefaultPostParser;
 import gov.usgs.ngwmn.dm.io.parse.HeaderChangeListener;
 import gov.usgs.ngwmn.dm.io.parse.ParseState;
+import gov.usgs.ngwmn.dm.io.parse.CompositePostParser;
 import gov.usgs.ngwmn.dm.io.parse.PostParser;
 import gov.usgs.ngwmn.dm.io.parse.WaterPortalPostParserFactory;
 import gov.usgs.ngwmn.dm.spec.Encoding;
@@ -25,6 +27,9 @@ import java.io.OutputStream;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.junit.Before;
@@ -78,11 +83,11 @@ public class TransformEntrySupplierTests {
 		DataRowParser parser = transformEntrySupplier.makeParser();
 		assertNotNull(parser);
 		
-		ParseState state = (ParseState) PrivateField.getPrivateField(parser, "state");
+		ParseState state = (ParseState) PrivateField.get(parser, "state");
 		assertEquals(1, state.rowElementIds.size());
 		assertTrue( state.rowElementIds.contains( WellDataType.WATERLEVEL.rowElementName ) );
 		
-		PostParser  pp  = (PostParser) PrivateField.getPrivateField(parser, "postParser");
+		PostParser  pp  = (PostParser) PrivateField.get(parser, "postParser");
 		Set<String> set = pp.getRemoveColumns();
 		Set<String> expected = new HashSet<String>( Arrays.asList(
 				WaterPortalPostParserFactory.exclusions.get(WATERLEVEL) ) );
@@ -91,12 +96,13 @@ public class TransformEntrySupplierTests {
 	
 	@Test
 	public void test_appendIdentifierColumns_withValues() {
-		final HashMap<String, String> values = new HashMap<String, String>();
+		final List<PostParser> values = new LinkedList<PostParser>();
 		
-		PostParser pp = new DefaultPostParser() {
+		CompositePostParser pp = new CompositePostParser() {
 			@Override
-			public void addConstColumn(String column, String value) {
-				values.put(column, value);
+			public void addPostParser(PostParser postParser) {
+				super.addPostParser(postParser);
+				values.add(postParser);
 			}
 			
 			@Override
@@ -106,23 +112,22 @@ public class TransformEntrySupplierTests {
 		};
 		transformEntrySupplier.appendIdentifierColumns(pp);
 		System.err.println(values);
-		assertEquals(2, values.size());
-		assertTrue(values.keySet().contains("AgencyCd"));
-		assertTrue(values.keySet().contains("SiteNo"));
-		assertEquals("a", values.get("AgencyCd"));
-		assertEquals("f", values.get("SiteNo"));
+		assertEquals(1, values.size());
+		assertEquals(AdditionalColumnsPostParser.class, values.get(0).getClass());
+		
+		@SuppressWarnings("unchecked")
+		Map<String, String> cols = (Map<String, String>)PrivateField.get(values.get(0), "additionalCols");
+		assertTrue(cols.keySet().contains("AgencyCd"));
+		assertTrue(cols.keySet().contains("SiteNo"));
+		assertEquals("a", cols.get("AgencyCd"));
+		assertEquals("f", cols.get("SiteNo"));
 	}
 
 	@Test
 	public void test_appendIdentifierColumns_nullEntryDesc() {
 		final HashMap<String, String> values = new HashMap<String, String>();
 		
-		PostParser pp = new DefaultPostParser() {
-			@Override
-			public void addConstColumn(String column, String value) {
-				throw new RuntimeException("This should not be called when entry description is null.");
-			}
-			
+		CompositePostParser pp = new CompositePostParser() {
 			@Override
 			public Set<String> getRemoveColumns() {
 				throw new RuntimeException("should not be called during this test");

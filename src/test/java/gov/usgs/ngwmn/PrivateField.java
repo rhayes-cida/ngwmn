@@ -11,31 +11,31 @@ public abstract class PrivateField {
 	
 	
 	public static double getDouble(Object o, String fieldName) {
-		Object value = getPrivateField(o, fieldName);
+		Object value = get(o, fieldName);
 		assertDouble(o, fieldName, value);
 		return (Double)value;
 	}
 	
 	public static int getInteger(Object o, String fieldName) {
-		Object value = getPrivateField(o, fieldName);
+		Object value = get(o, fieldName);
 		assertInteger(o, fieldName, value);
 		return (Integer)value;
 	}
 	
 	public static String getString(Object o, String fieldName) {
-		Object value = getPrivateField(o, fieldName);
+		Object value = get(o, fieldName);
 		assertString(o, fieldName, value);
 		return (String)value;
 	}
 	
 	public static boolean getBoolean(Object o, String fieldName) {
-		Object value = getPrivateField(o, fieldName);
+		Object value = get(o, fieldName);
 		assertBoolean(o, fieldName, value);
 		return (Boolean)value;
 	}
 	
 	
-	public static Object getPrivateField(Object o, String fieldName) {
+	public static Object get(Object o, String fieldName) {
 		/* Check we have valid arguments */
 		assertNotNull(o);
 		assertNotNull(fieldName);

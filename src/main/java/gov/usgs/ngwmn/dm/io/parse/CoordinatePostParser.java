@@ -1,13 +1,14 @@
 package gov.usgs.ngwmn.dm.io.parse;
 
-import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class CoordinatePostParser extends WaterPortalPostParser {
+public class CoordinatePostParser implements PostParser {
 	private final transient Logger logger = LoggerFactory.getLogger(getClass());
 	
 	private final String  coordinateFullName;
@@ -15,9 +16,7 @@ public class CoordinatePostParser extends WaterPortalPostParser {
 	private final Element depthFrom;
 	private final Element depthTo;
 	
-	public CoordinatePostParser(String[] removeCols, Map<String, String> renameCols,
-			String elementFullName, String displayPrefix) {
-		super(removeCols, renameCols);
+	public CoordinatePostParser(String elementFullName, String displayPrefix) {
 		
 		coordinateFullName = elementFullName;
 		this.displayPrefix = displayPrefix;
@@ -27,8 +26,7 @@ public class CoordinatePostParser extends WaterPortalPostParser {
 
 	
 	@Override
-	public List<Element> refineHeaderColumns(Collection<Element> original) {
-		List<Element> headers = super.refineHeaderColumns(original);
+	public List<Element> refineHeaderColumns(List<Element> headers) {
 		
 		logger.trace("Coordinate-Depth specific header refinements");
 		
@@ -54,8 +52,6 @@ public class CoordinatePostParser extends WaterPortalPostParser {
 	// custom refinement
 	@Override
 	public void refineDataColumns(Map<String, String> data) {
-		super.refineDataColumns(data);
-		
 		logger.trace("Coordinate-Depth specific data refinements");
 		splitCoordinatesIntoDepth(data);
 	}
@@ -77,5 +73,11 @@ public class CoordinatePostParser extends WaterPortalPostParser {
 				data.put(depthFrom.fullName, oldValue);
 			}
 		}
+	}
+	
+	@Override
+	public Set<String> getRemoveColumns() {
+		// no remove columns
+		return new HashSet<String>();
 	}
 }
