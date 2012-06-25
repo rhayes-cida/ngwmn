@@ -2,6 +2,7 @@ package gov.usgs.ngwmn.dm.io.parse;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -34,7 +35,7 @@ public class DataRowParser implements Parser {
 	protected int 		rowCount;
 	protected int 		lastColListSize;
 
-	protected final List<HeadersListener> headerListeners;
+	protected final List<HeaderChangeListener> headerListeners;
 	
 	public DataRowParser() {
 		this(new DefaultPostParser());
@@ -44,7 +45,7 @@ public class DataRowParser implements Parser {
 		state					= new ParseState();
 		ignoredAttributes		= new HashSet<String>();
 		headers					= new LinkedList<Element>();
-		headerListeners			= new LinkedList<HeadersListener>();
+		headerListeners			= new LinkedList<HeaderChangeListener>();
 		ignoredElements			= new HashSet<String>();
 		contentDefinedElements	= new HashMap<String, String>();
 	}
@@ -86,24 +87,24 @@ public class DataRowParser implements Parser {
 	public List<Element> headers() {
 		if ( state.targetColumnList.size() > lastColListSize ) {
 			logger.debug("NEW HEADERS ADDED: {}", state.targetColumnList);
-			List<Element> refinedHeaders = postParser.refineHeaderColumns(state.targetColumnList);
+			List<Element> refinedHeaders = postParser.refineHeaderColumns(
+					new ArrayList<Element>( state.targetColumnList) );
 			for (Element element : refinedHeaders) {
 				if ( ! element.hasChildren && ! headers.contains(element)) {
 					headers.add(element);
 				}
 			}
 			
-			// TODO  protect header list read-only
-			for (HeadersListener listener : headerListeners) {
-				listener.headerUpdate(headers);
-			}
+			signalHeaderListeners();
 			lastColListSize = state.targetColumnList.size();
 		}
 		return headers;
 	}
+	
 	public Map<String, String> currentRow() {
 		return state.targetColumnValues;
 	}
+	
 	public Map<String, String> nextRow() throws IOException {
 		boolean done = eof;
 		
@@ -145,7 +146,7 @@ public class DataRowParser implements Parser {
 			return null;
 		}
 
-		headers();  // TODO maybe do this once
+		headers();
 		postParser.refineDataColumns(state.targetColumnValues);
 		rowCount++;
 
@@ -262,10 +263,16 @@ public class DataRowParser implements Parser {
 	}
 	
 	@Override
-	public boolean addHeaderListener(HeadersListener listener) {
+	public boolean addHeaderListener(HeaderChangeListener listener) {
 		if (listener != null) {
 			return headerListeners.add(listener);
 		}
 		return false;
+	}
+	protected void signalHeaderListeners() {
+		// TODO  protect header list read-only
+		for (HeaderChangeListener listener : headerListeners) {
+			listener.headersChanged(headers);
+		}
 	}
 }

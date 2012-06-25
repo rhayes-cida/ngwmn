@@ -114,7 +114,7 @@ public class SequentialJoiningAggregatorTests {
 		zis.close();
 
 		int size = baos.toByteArray().length;
-		assertTrue("expecting around 400 bytes", size<450 && size>375);
+		assertTrue("expecting around 400 bytes but was " + size, size<450 && size>375);
 		
 	}
 }

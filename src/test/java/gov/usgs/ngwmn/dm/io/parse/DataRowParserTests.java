@@ -9,7 +9,6 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.regex.Pattern;
 
 import org.junit.*;
@@ -95,17 +94,7 @@ public class DataRowParserTests {
 	
 	
 	void makeParser(String xml) {
-		PostParser pp = new DefaultPostParser() {
-			@Override
-			public void addConstColumn(String col, String string) {
-				throw new RuntimeException("should not be called during this test");
-			}
-			
-			@Override
-			public Set<String> getRemoveColumns() {
-				throw new RuntimeException("should not be called during this test");
-			}
-		};
+		PostParser pp = new DefaultPostParser();
 		parser = new DataRowParser(pp);
 		parser.setInputStream( new ByteArrayInputStream( xml.getBytes() ) );
 	}

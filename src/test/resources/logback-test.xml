@@ -16,5 +16,6 @@
   <logger level="info"  name="gov.usgs.ngwmn.dm"/>
   <logger level="debug" name="gov.usgs.ngwmn.dm.io"/>
   <logger level="trace" name="gov.usgs.ngwmn.dm.io.transform"/>
+  <logger level="trace" name="gov.usgs.ngwmn.dm.io.parse"/>
 
 </configuration>

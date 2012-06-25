@@ -11,6 +11,7 @@ import java.io.PipedInputStream;
 import java.io.PipedOutputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
@@ -36,6 +37,7 @@ public abstract class OutputStreamTransform extends FilterOutputStream {
 	public int id;
 
 	private List<Element> overrideHeaders;
+	protected final List<HeaderWrittenListener> headerListeners;
 
 	public abstract String formatRow(List<Element> headers, Map<String, String> rowData);
 	
@@ -46,10 +48,11 @@ public abstract class OutputStreamTransform extends FilterOutputStream {
 		executor = Executors.newSingleThreadExecutor();
 		headers  = new AtomicReference<List<Element>>();
 		rows     = new LinkedBlockingQueue<Map<String,String>>();
+		headerListeners = new LinkedList<HeaderWrittenListener>();
 	}
 	
-	public void skipHeaders() {
-		writtenHeaders = true;
+	public void skipHeaders(boolean skipHeaders) {
+		writtenHeaders = skipHeaders;
 	}
 
 	public void setParser(Parser parser) {
@@ -97,7 +100,7 @@ public abstract class OutputStreamTransform extends FilterOutputStream {
 	}
 
 	@Override
-    public void write(byte b[], int off, int len) throws IOException {
+    public void write(byte[] b, int off, int len) throws IOException {
 		logger.trace( new String(b) );
     	pout.write(b, off, len);
     	processRow();
@@ -116,7 +119,7 @@ public abstract class OutputStreamTransform extends FilterOutputStream {
 			List<Element> headList = getHeaders();
 			if ( ! writtenHeaders ) {
 				writeRow(headList);
-				writtenHeaders=true;
+				signalHeaderListeners();
 			}
 	    	logger.trace("processing row");
 			writeRow(headList, row);
@@ -126,13 +129,13 @@ public abstract class OutputStreamTransform extends FilterOutputStream {
     
 	private void writeRow(List<Element> headers, Map<String, String> rowData) throws IOException {
 		String rowText = formatRow(headers, rowData);
-		logger.trace("writeRow: {}", rowText);
+		logger.trace("writeRow data: {}", rowText);
 		out.write( rowText.toString().getBytes() );
 	}
 
 	private void writeRow(List<Element> headers) throws IOException {
 		String rowText = formatRow(headers, null); // TODO add method without the row data formatHeaders
-		logger.trace("writeRow: {}", rowText);
+		logger.trace("writeRow headers: {}", rowText);
 		out.write( rowText.toString().getBytes() );
 	}
 
@@ -180,5 +183,19 @@ public abstract class OutputStreamTransform extends FilterOutputStream {
 		return overrideHeaders;
 	}
 	
+	
+	public boolean addHeaderListener(HeaderWrittenListener listener) {
+		if (listener != null) {
+			return headerListeners.add(listener);
+		}
+		return false;
+	}
+	protected void signalHeaderListeners() {
+		writtenHeaders=true;
+
+		for (HeaderWrittenListener listener : headerListeners) {
+			listener.headersWritten();
+		}
+	}
 }
 

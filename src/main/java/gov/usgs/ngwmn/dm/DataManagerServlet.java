@@ -164,14 +164,14 @@ public class DataManagerServlet extends HttpServlet {
 		
 		// TODO handle invalid types
 		
-		String typeIDs[] = req.getParameterValues(PARAM_TYPE);
+		String[] typeIDs = req.getParameterValues(PARAM_TYPE);
 		
 		// TODO ALL asdf
 		if (typeIDs==null) { // || (typeIDs.length==1 && "ALL".equalsIgnoreCase(typeIDs[0]) ) ) {
 			return WellDataType.values();
 		}
 		
-		WellDataType wtd[] = new WellDataType[typeIDs.length];
+		WellDataType[] wtd = new WellDataType[typeIDs.length];
 		int w=0;
 		for (String typeID : typeIDs) {
 			wtd[w++] = WellDataType.valueOf(typeID);
@@ -205,12 +205,12 @@ public class DataManagerServlet extends HttpServlet {
 	protected Specification parseListOfWells(HttpServletRequest req) {
 		Specification spect = new Specification();
 		
-		WellDataType typeIDs[] = parseDataTypes(req);
+		WellDataType[] typeIDs = parseDataTypes(req);
 		
 		// TODO this is how we can enforce one agency?
 		String agencyDefault = req.getParameter(PARAM_AGENCY);
 
-		String wells[] = req.getParameterValues(PARAM_FEATURE);
+		String[] wells = req.getParameterValues(PARAM_FEATURE);
 		if (wells == null) return spect; // TODO I would rather there be only featureId instead of listOfWells
 
 		RuntimeException re = null; // TODO should we allow one well to be bad or none?
@@ -221,7 +221,7 @@ public class DataManagerServlet extends HttpServlet {
 
 			try {
 				// attempt to separate the agency and site IDs
-				String specParts[] = well.split("[:_]");
+				String[] specParts = well.split("[:_]");
 				boolean hasSeparator = well.contains(":") || well.contains("_");
 				
 				// list of wells might be a list of sites only or a list of agency:site combos
@@ -265,7 +265,7 @@ public class DataManagerServlet extends HttpServlet {
 		
 		String agencyID        = req.getParameter(PARAM_AGENCY);
 		String featureID       = req.getParameter(PARAM_FEATURE);
-		WellDataType typeIDs[] = parseDataTypes(req);
+		WellDataType[] typeIDs = parseDataTypes(req);
 
 		for (WellDataType typeID : typeIDs) {
 			Specifier spec   = makeSpec(agencyID, featureID, typeID);
