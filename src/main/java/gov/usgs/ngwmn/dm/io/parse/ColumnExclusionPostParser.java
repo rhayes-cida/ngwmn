@@ -14,7 +14,7 @@ import org.slf4j.LoggerFactory;
 public class ColumnExclusionPostParser implements PostParser {
 	private final transient Logger logger = LoggerFactory.getLogger(getClass());
 
-	protected final Set<String> 		removeColumns;
+	protected final Set<String>  removeColumns;
 	
 	public ColumnExclusionPostParser(Collection<String> removeCols) {
 		if (removeCols==null) {
@@ -57,13 +57,6 @@ public class ColumnExclusionPostParser implements PostParser {
 		for (String name : removeColumns) {
 			data.remove(name);
 		}
-	}
-
-
-	@Override
-	public Set<String> getRemoveColumns() {
-		// protective copy
-		return new HashSet<String>(removeColumns);
 	}
 
 }

@@ -9,7 +9,6 @@ import gov.usgs.ngwmn.dm.io.parse.PostParser;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.StringReader;
-import java.util.Set;
 
 import org.junit.Test;
 
@@ -36,12 +35,7 @@ public class TsvOutputStreamTests {
 	DataRowParser psr;
 	
 	void makeTsv(String xml) throws Exception {
-		PostParser pp = new DefaultPostParser() {
-			@Override
-			public Set<String> getRemoveColumns() {
-				throw new RuntimeException("should not be called during this test");
-			}
-		};
+		PostParser pp = new DefaultPostParser();
 		
 		out = new ByteArrayOutputStream(1000);
 		tsv = new TsvOutputStream(out);

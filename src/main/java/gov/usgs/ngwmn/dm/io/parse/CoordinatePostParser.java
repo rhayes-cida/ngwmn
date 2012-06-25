@@ -1,9 +1,7 @@
 package gov.usgs.ngwmn.dm.io.parse;
 
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -73,11 +71,5 @@ public class CoordinatePostParser implements PostParser {
 				data.put(depthFrom.fullName, oldValue);
 			}
 		}
-	}
-	
-	@Override
-	public Set<String> getRemoveColumns() {
-		// no remove columns
-		return new HashSet<String>();
 	}
 }

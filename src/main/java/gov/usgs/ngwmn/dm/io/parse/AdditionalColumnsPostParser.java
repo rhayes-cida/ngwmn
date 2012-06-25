@@ -1,11 +1,9 @@
 package gov.usgs.ngwmn.dm.io.parse;
 
-import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -54,12 +52,6 @@ public class AdditionalColumnsPostParser implements PostParser {
 
 	public void addColumn(String col, String value) {
 		additionalCols.put(col, value);
-	}
-
-	@Override
-	public Set<String> getRemoveColumns() {
-		// no remove columns
-		return new HashSet<String>();
 	}
 
 }

@@ -1,10 +1,8 @@
 package gov.usgs.ngwmn.dm.io.parse;
 
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,12 +38,6 @@ public class ColumnRenamePostParser implements PostParser {
 
 	public void addColumn(String col, String value) {
 		renameColumns.put(col, value);
-	}
-
-	@Override
-	public Set<String> getRemoveColumns() {
-		// no remove columns
-		return new HashSet<String>();
 	}
 
 }

@@ -1,6 +1,10 @@
 package gov.usgs.ngwmn.dm.io.parse;
 
-import static gov.usgs.ngwmn.WellDataType.*;
+import static gov.usgs.ngwmn.WellDataType.CONSTRUCTION;
+import static gov.usgs.ngwmn.WellDataType.LITHOLOGY;
+import static gov.usgs.ngwmn.WellDataType.LOG;
+import static gov.usgs.ngwmn.WellDataType.QUALITY;
+import static gov.usgs.ngwmn.WellDataType.WATERLEVEL;
 import gov.usgs.ngwmn.WellDataType;
 
 import java.util.Arrays;

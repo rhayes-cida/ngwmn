@@ -12,6 +12,7 @@ import gov.usgs.ngwmn.dm.io.SimpleSupplier;
 import gov.usgs.ngwmn.dm.io.SpecifierEntry;
 import gov.usgs.ngwmn.dm.io.Supplier;
 import gov.usgs.ngwmn.dm.io.parse.AdditionalColumnsPostParser;
+import gov.usgs.ngwmn.dm.io.parse.ColumnExclusionPostParser;
 import gov.usgs.ngwmn.dm.io.parse.DataRowParser;
 import gov.usgs.ngwmn.dm.io.parse.HeaderChangeListener;
 import gov.usgs.ngwmn.dm.io.parse.ParseState;
@@ -79,6 +80,7 @@ public class TransformEntrySupplierTests {
 	}	
 	
 	@Test
+	@SuppressWarnings("unchecked")
 	public void test_makeParser_withValues() {
 		DataRowParser parser = transformEntrySupplier.makeParser();
 		assertNotNull(parser);
@@ -88,7 +90,16 @@ public class TransformEntrySupplierTests {
 		assertTrue( state.rowElementIds.contains( WellDataType.WATERLEVEL.rowElementName ) );
 		
 		PostParser  pp  = (PostParser) PrivateField.get(parser, "postParser");
-		Set<String> set = pp.getRemoveColumns();
+		Set<PostParser> pps = (Set<PostParser>) PrivateField.get(pp, "postParsers");
+		PostParser excludes = null;
+		for (PostParser ppp : pps) {
+			if (ppp instanceof ColumnExclusionPostParser) {
+				excludes = ppp;
+				break;
+			}
+		}
+		assertNotNull(excludes);
+		Set<String> set = (Set<String>) PrivateField.get(excludes, "removeColumns");
 		Set<String> expected = new HashSet<String>( Arrays.asList(
 				WaterPortalPostParserFactory.exclusions.get(WATERLEVEL) ) );
 		assertEquals( expected, set);
@@ -103,11 +114,6 @@ public class TransformEntrySupplierTests {
 			public void addPostParser(PostParser postParser) {
 				super.addPostParser(postParser);
 				values.add(postParser);
-			}
-			
-			@Override
-			public Set<String> getRemoveColumns() {
-				throw new RuntimeException("should not be called during this test");
 			}
 		};
 		transformEntrySupplier.appendIdentifierColumns(pp);
@@ -127,12 +133,7 @@ public class TransformEntrySupplierTests {
 	public void test_appendIdentifierColumns_nullEntryDesc() {
 		final HashMap<String, String> values = new HashMap<String, String>();
 		
-		CompositePostParser pp = new CompositePostParser() {
-			@Override
-			public Set<String> getRemoveColumns() {
-				throw new RuntimeException("should not be called during this test");
-			}
-		};
+		CompositePostParser pp = new CompositePostParser();
 		transformEntrySupplier = new TransformEntrySupplier(null, null, null, true, (HeaderChangeListener)null);
 		transformEntrySupplier.appendIdentifierColumns(pp);
 		

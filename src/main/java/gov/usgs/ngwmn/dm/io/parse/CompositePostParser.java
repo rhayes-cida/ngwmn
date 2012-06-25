@@ -47,14 +47,4 @@ public class CompositePostParser implements PostParser {
 		}
 	}
 
-	@Override
-	public Set<String> getRemoveColumns() {
-		Set<String> cols = new HashSet<String>();
-
-		for (PostParser postParser : postParsers) {
-			cols.addAll( postParser.getRemoveColumns() );
-		}
-		return cols;
-	}
-
 }
