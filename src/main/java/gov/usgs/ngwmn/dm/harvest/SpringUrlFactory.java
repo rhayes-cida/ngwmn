@@ -33,8 +33,14 @@ public class SpringUrlFactory {
 		context.setVariable("agencyId", agency);
 		context.setVariable("featureId", site);
 		
-		return parser.parseExpression(exp,
+		String val = parser.parseExpression(exp,
 				new TemplateParserContext("_{","}")).getValue(context, String.class);
+		
+		if (val.contains(" ")) {
+			val = val.replace(" ", "%20");
+		}
+		
+		return val;
 	}
 	
 	public String makeUrl(Specifier spec) {
