@@ -105,14 +105,15 @@ public class WaterPortalPostParserFactory {
 		qualityRenames.put("date", "Date");
 		qualityRenames.put("time", "Time");
 		qualityRenames.put("zone", "TimeZone");
-		qualityRenames.put("ResultMeasureValue ", "Value");
-		qualityRenames.put("MeasureUnitCode  ", "Unit");
+		qualityRenames.put("ResultMeasureValue", "Value");
+		qualityRenames.put("MeasureUnitCode", "Unit");
 		qualityRenames.put("ResultStatusIdentifier", "ResultStatus");
 		qualityRenames.put("ResultValueTypeName", "ValueType");
 		qualityRenames.put("ResultTemperatureBasisText", "ResultTemperatureBasis");
 		qualityRenames.put("ResultCommentText", "Comment");
 		qualityRenames.put("MethodIdentifierContext", "MethodContext");
 		qualityRenames.put("MethodDescriptionText", "MethodDescription");
+		qualityRenames.put("ResultSampleFractionText", "SampleFraction");
 		renameColumns.put(QUALITY, qualityRenames);
 		
 		for (WellDataType type : WellDataType.values()) {
