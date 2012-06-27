@@ -57,7 +57,7 @@ Loader loader = ctx.getBean("Loader", Loader.class);
 <%
 dao.updateStatistics();
 %>
-<c:forEach items="<%= dao.listAll() %>" var="cmd">
+<c:forEach items="<%= dao.listAllByFetchDate() %>" var="cmd">
 <tr>
 <td>${cmd.agencyCd}</td>
 <td>${cmd.siteNo}</td>

@@ -4,18 +4,33 @@ import static org.junit.Assert.*;
 
 import gov.usgs.ngwmn.WellDataType;
 
+import java.util.Date;
 import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
 
-public class CacheMetaDataDAOTest extends ContextualTest {
+public class CacheMetaDataDAOIntegrationTest extends ContextualTest {
 
 	private CacheMetaDataDAO dao;
 	
 	@Before
 	public void setUp() throws Exception {
 		dao = ctx.getBean("CacheMetaDataDAO", CacheMetaDataDAO.class);
+	}
+
+	@Test
+	public void testSelectAllByFetchDate() {
+		List<CacheMetaData> dd = dao.listAllByFetchDate();
+		assertFalse("empty", dd.isEmpty());
+		Date prevDate = null;
+		for (CacheMetaData cmd : dd) {
+			System.out.println("attempt " + cmd.getMostRecentAttemptDt());
+			if (prevDate != null && cmd.getMostRecentAttemptDt() != null) {
+				assertFalse("attempt dates in descending order", prevDate.before(cmd.getMostRecentAttemptDt()));
+			}
+			prevDate = cmd.getMostRecentAttemptDt();
+		}
 	}
 
 	@Test

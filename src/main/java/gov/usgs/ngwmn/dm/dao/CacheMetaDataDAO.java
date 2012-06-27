@@ -43,6 +43,10 @@ public class CacheMetaDataDAO {
 		return mapper.listAll();
 	}
 	
+	public List<CacheMetaData> listAllByFetchDate() {
+		return mapper.listAllByFetchDate();
+	}
+
 	public void updateStatistics() throws Exception {
 		Connection conn = dataSource.getConnection();
 		try {

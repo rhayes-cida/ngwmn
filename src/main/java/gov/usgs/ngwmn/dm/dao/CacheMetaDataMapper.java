@@ -150,5 +150,17 @@ public interface CacheMetaDataMapper {
 	@ResultMap("BaseResultMap")
 	List<CacheMetaData> listAll();
 	
+	@Select({
+		"select",
+		"AGENCY_CD, DATA_TYPE, SITE_NO, SUCCESS_CT, FAIL_CT, FIRST_DATA_DT, LAST_DATA_DT, ",
+		"MOST_RECENT_SUCCESS_DT, MOST_RECENT_ATTEMPT_DT, MOST_RECENT_FAIL_DT, FETCH_PRIORITY",
+		"EMPTY_CT, MOST_RECENT_EMPTY_DT",
+		"from GW_DATA_PORTAL.CACHE_META_DATA",
+		"WHERE SUCCESS_CT > 0 OR FAIL_CT > 0 ",
+		"order by MOST_RECENT_ATTEMPT_DT DESC, AGENCY_CD, SITE_NO, DATA_TYPE"
+	})
+	@ResultMap("BaseResultMap")
+	List<CacheMetaData> listAllByFetchDate();
+
 	void updateCacheMetaData();
 }
