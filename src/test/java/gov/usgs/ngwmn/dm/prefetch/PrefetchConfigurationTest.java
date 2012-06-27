@@ -7,6 +7,7 @@ import org.junit.Test;
 import org.springframework.beans.factory.BeanCreationException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 
 public class PrefetchConfigurationTest {
 
@@ -30,6 +31,7 @@ public class PrefetchConfigurationTest {
 		
 		Object sked = ctx.getBean("scheduler");
 		assertNotNull("scheduler", sked);
+		assertTrue("instanceof", sked instanceof ThreadPoolTaskScheduler);
 	}
 
 	@Test

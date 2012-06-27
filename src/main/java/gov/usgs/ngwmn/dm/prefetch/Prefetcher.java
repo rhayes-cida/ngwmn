@@ -9,6 +9,7 @@ import gov.usgs.ngwmn.dm.dao.WellRegistry;
 import gov.usgs.ngwmn.dm.dao.WellRegistryDAO;
 import gov.usgs.ngwmn.dm.spec.Specifier;
 
+import java.io.InterruptedIOException;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
@@ -78,6 +79,10 @@ public class Prefetcher implements Callable<PrefetchOutcome> {
 		
 		Iterable<WellStatus> wellQueue = populateWellQeue();
 		
+		if (isQuitting() || Thread.interrupted()) {
+			return PrefetchOutcome.UNSTARTED;
+		}
+		
 		// start timer after the prelims are done
 		Long endTime = null;
 		if (timeLimit != null) {
@@ -85,6 +90,12 @@ public class Prefetcher implements Callable<PrefetchOutcome> {
 		}
 		
 		for (WellStatus well : wellQueue) {
+			if (isQuitting() || Thread.interrupted()) {
+				logger.warn("Prefetch stopped");
+				outcome = PrefetchOutcome.LIMIT_TIME;
+				break;
+			}
+			
 			if (fetchLimit > 0 && tried >= fetchLimit) {
 				logger.info("hit fetch limit {}", tried);
 				outcome = PrefetchOutcome.LIMIT_COUNT;
@@ -151,13 +162,31 @@ public class Prefetcher implements Callable<PrefetchOutcome> {
 				wdt);
 		return spec;
 	}
-
+	
+	private boolean quitting = false;
+	private synchronized void requestStop() {
+		quitting = true;
+	}
+	private synchronized boolean isQuitting() {
+		return quitting;
+	}
+	
 	private Future<Long> dispatch(final Specifier spec) {
 		Future<Long> f = executor.submit(new Callable<Long>() {
 			public Long call() throws Exception {
-				long count = 
-					broker.prefetchWellData(spec);
-				return count;
+				try {
+					long count = 
+							broker.prefetchWellData(spec);
+					return count;
+				}
+				catch (InterruptedException ie) {
+					requestStop();
+					return null;
+				}
+				catch (InterruptedIOException ioe) {
+					requestStop();
+					return null;
+				}
 			}
 		});
 		
@@ -322,7 +351,7 @@ public class Prefetcher implements Callable<PrefetchOutcome> {
 			// TODO Should re-try every so often even for these
 			c.setFetchPriority(200);
 		} 
-		else if (c.getMostRecentSuccessDt() != null && c.getMostRecentSuccessDt().getTime() < (now.getTime() - 10*DAYS)) {
+		else if (c.getMostRecentSuccessDt() != null && c.getMostRecentSuccessDt().getTime() < (now.getTime() - 7*DAYS)) {
 			// try to fetch every 10 days
 			c.setFetchPriority(10);
 		}
