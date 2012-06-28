@@ -45,6 +45,16 @@
         <url-pattern>/data</url-pattern>
     </servlet-mapping>
 
+  <servlet>
+    <servlet-name>DataRestServlet</servlet-name>
+    <servlet-class>gov.usgs.ngwmn.dm.DataRestServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>DataRestServlet</servlet-name>
+    <url-pattern>/data/*</url-pattern>
+  </servlet-mapping>
+
+
   <!--  Spring integration -->
   <context-param>
 	<param-name>contextConfigLocation</param-name>

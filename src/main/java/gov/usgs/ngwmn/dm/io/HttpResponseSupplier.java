@@ -17,7 +17,7 @@ public class HttpResponseSupplier extends Supplier<OutputStream> {
 	protected static final int    MAX_BUFFER_SIZE  = 1024<<3; // a reasonable guess at efficiency
 	protected static final int    MIN_BUFFER_SIZE  = 2000;   // a reasonable guess at inefficiency
 	public    static final String ZIP_CONTENT_TYPE = "application/zip";
-	public    static final String XML_CONTENT_TYPE = "text/xml";
+	public    static final String XML_CONTENT_TYPE = "application/xml";
 	
 	private String filename = "data.zip"; // TODO we need a real name
 	private HttpServletResponse hsr;

@@ -100,7 +100,7 @@ public class DataRestServlet extends HttpServlet {
 			String agncy = agency.replaceAll("_", " ");
 			if (! agncy.equals(agency)) {
 				logger.warn("retrying with spaced-out agency name {}", agncy);
-				spec = new Specifier(agency,site,WellDataType.valueOf(type));
+				spec = new Specifier(agncy,site,WellDataType.valueOf(type));
 			}
 			// don't check again, just let the downstream processing throw the error
 		}
