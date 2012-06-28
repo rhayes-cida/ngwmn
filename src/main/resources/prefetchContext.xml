@@ -27,5 +27,10 @@
     </task:scheduled-tasks>
     
     <task:scheduler id="scheduler" pool-size="1"/>
+    
+    <bean id="PrefetchController" class="gov.usgs.ngwmn.dm.prefetch.PrefetchController">
+    	<property name="scheduler" ref="scheduler"/>
+    	<property name="prefetcher" ref="Prefetcher"/>
+    </bean>
    
 </beans>

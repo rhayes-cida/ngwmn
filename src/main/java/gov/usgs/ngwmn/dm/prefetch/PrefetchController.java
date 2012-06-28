@@ -31,8 +31,14 @@ public class PrefetchController {
 			}
 		};
 		
-		// What are valid states of sked for this call?
-		// Do we have to check that it has not been shut down?
+		// TODO clean out scheduled jobs?
+		// Would be best to remove all previously scheduled jobs, but that's not easy to do from here.
+		// ThreadPoolExecutor has some useful methods, if the Executor used by the cheduler is in
+		// fact that kind of executor.
+		
+		// This will fail if the scheduler is not enabled;
+		// because enabling the scheduler can have far-reaching effects,
+		// leave that decision to the user.
 		sked.execute(task);
 	}
 	
