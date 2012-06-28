@@ -87,14 +87,32 @@ public class DataRestServlet extends HttpServlet {
 			throw new ServletException("not enuf parameters");
 		}
 		
+		boolean exists = true;
+		try {
+			db.checkSiteExists(spec);
+		} catch (SiteNotFoundException snfe) {
+			exists = false;
+		}
+		
+		if ( ! exists) {
+			// See if changing _ to space in agency name will fix it
+			// maybe it a problem with space in agency name?
+			String agncy = agency.replaceAll("_", " ");
+			if (! agncy.equals(agency)) {
+				logger.warn("retrying with spaced-out agency name {}", agncy);
+				spec = new Specifier(agency,site,WellDataType.valueOf(type));
+			}
+			// don't check again, just let the downstream processing throw the error
+		}
+		
 		Specification spect = makeSpecification(spec);
 
 		try {
 			db.fetchWellData(spec, new HttpResponseSupplier(spect, response));
-		} catch (Exception e) {
+		}
+		catch (Exception e) {
 			throw new ServletException(e);
 		}
-	
 	}
 
 	protected Specification makeSpecification(Specifier well) {
