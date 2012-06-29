@@ -3,7 +3,6 @@ package gov.usgs.ngwmn.dm.harvest;
 import static org.junit.Assert.*;
 
 import gov.usgs.ngwmn.dm.dao.ContextualTest;
-import gov.usgs.ngwmn.dm.dao.WellRegistryKey;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -28,7 +27,7 @@ import org.junit.Test;
 
 import  org.w3c.dom.Document;
 
-public class HarvesterIntegrationTest 
+public class GWDP_362_IntegrationTest 
 extends ContextualTest
 {
 
