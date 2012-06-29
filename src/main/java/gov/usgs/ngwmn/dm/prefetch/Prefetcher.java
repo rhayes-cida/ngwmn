@@ -80,7 +80,8 @@ public class Prefetcher implements Callable<PrefetchOutcome> {
 		Iterable<WellStatus> wellQueue = populateWellQeue();
 		
 		if (isQuitting() || Thread.interrupted()) {
-			return PrefetchOutcome.UNSTARTED;
+			logger.warn("Prefetcher stopped");
+			return PrefetchOutcome.INTERRUPTED;
 		}
 		
 		// start timer after the prelims are done
@@ -164,7 +165,12 @@ public class Prefetcher implements Callable<PrefetchOutcome> {
 	}
 	
 	private boolean quitting = false;
-	private synchronized void requestStop() {
+	public synchronized void allowRun() {
+		logger.info("eanbling prefetch");
+		quitting = false;
+	}
+	public synchronized void requestStop(Exception e) {
+		logger.info("requesting stop", e);
 		quitting = true;
 	}
 	private synchronized boolean isQuitting() {
@@ -180,11 +186,11 @@ public class Prefetcher implements Callable<PrefetchOutcome> {
 					return count;
 				}
 				catch (InterruptedException ie) {
-					requestStop();
+					requestStop(ie);
 					return null;
 				}
 				catch (InterruptedIOException ioe) {
-					requestStop();
+					requestStop(ioe);
 					return null;
 				}
 			}

@@ -15,8 +15,11 @@ public class PrefetchController {
 	 * Stop any active prefetch and prevent any subsequent starts.
 	 */
 	public void stop() {
-		sked.setWaitForTasksToCompleteOnShutdown(false);
-		sked.shutdown();
+		prefetcher.requestStop(null);
+		
+		//sked.setWaitForTasksToCompleteOnShutdown(false);
+		//sked.shutdown();
+		sked.getScheduledExecutor().shutdownNow();
 	}
 	
 	/**
@@ -27,6 +30,7 @@ public class PrefetchController {
 			
 			@Override
 			public void run() {
+				prefetcher.allowRun();
 				prefetcher.call();
 			}
 		};
@@ -47,6 +51,7 @@ public class PrefetchController {
 	 * depending on schedule and time.
 	 */
 	public void enable() {
+		prefetcher.allowRun();
 		if (sked.getScheduledExecutor().isShutdown() ||
 				sked.getScheduledExecutor().isTerminated()) {
 			sked.initialize();

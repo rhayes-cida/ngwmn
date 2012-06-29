@@ -6,5 +6,6 @@ public enum PrefetchOutcome {
 	FINISHED,
 	LIMIT_TIME,
 	LIMIT_COUNT,
+	INTERRUPTED,
 	PROBLEM
 }

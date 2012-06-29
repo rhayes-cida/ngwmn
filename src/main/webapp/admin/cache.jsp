@@ -25,6 +25,9 @@ th { text-align: left; }
 (<a href="cachestats.jsp">Daily data fetch statistics</a>)
 </p>
 
+<h2>Prefetch</h2>
+<a href="prefetch.jsp">control</a>
+
 <%
 org.springframework.context.ApplicationContext
 ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(config.getServletContext());
