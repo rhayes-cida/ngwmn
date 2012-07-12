@@ -5,6 +5,8 @@ import gov.usgs.ngwmn.dm.spec.Specifier;
 
 import java.util.Properties;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.expression.ExpressionParser;
 import org.springframework.expression.common.TemplateParserContext;
 import org.springframework.expression.spel.standard.SpelExpressionParser;
@@ -12,6 +14,8 @@ import org.springframework.expression.spel.support.StandardEvaluationContext;
 
 public class SpringUrlFactory {
 
+	private Logger logger = LoggerFactory.getLogger(getClass());
+	
 	private Properties myProps;
 	
 	public void setMapping(Properties pp) {
@@ -30,6 +34,13 @@ public class SpringUrlFactory {
 		ExpressionParser parser = new SpelExpressionParser();
 
 		StandardEvaluationContext context = new StandardEvaluationContext();
+		
+		if (agency.contains(" ")) {
+			String agcy = agency.replace(" ", "_");
+			logger.warn("Using despaced agency code {} for original agency code {}",  agcy, agency);
+			agency = agcy;
+		}
+		
 		context.setVariable("agencyId", agency);
 		context.setVariable("featureId", site);
 		

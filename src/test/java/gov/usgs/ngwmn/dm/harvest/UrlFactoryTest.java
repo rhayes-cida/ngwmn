@@ -52,6 +52,14 @@ public class UrlFactoryTest {
 		assertEquals(BASE_URL + "/gin/gwdp/agency/MBMG/qw?mimeType=xml&siteid=1388", u);
 	}
 
+	@Test
+	public void testWQ_for_MN_DNR() {
+		WellDataType t = WellDataType.QUALITY;
+		
+		String u = victim.resolve(t, "MN DNR", "210308");
+		
+		assertEquals(BASE_URL + "/gin/gwdp/agency/MN_DNR/qw?mimeType=xml&siteid=210308", u);
+	}
 
 	@Test
 	public void test_makeUrl_forWaterQualityData() {
