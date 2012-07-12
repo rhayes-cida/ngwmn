@@ -221,11 +221,11 @@ public class DataManagerServlet extends HttpServlet {
 
 			try {
 				// attempt to separate the agency and site IDs
-				String[] specParts = well.split("[:_]");
-				boolean hasSeparator = well.contains(":") || well.contains("_");
+				String[] specParts = well.split(":",2);
+				boolean hasSeparator = well.contains(":");
 				
 				// list of wells might be a list of sites only or a list of agency:site combos
-				String agencyID  = specParts.length==1 && !hasSeparator ? agencyDefault : specParts[0];
+				String agencyID  = (specParts.length==1 && !hasSeparator) ? agencyDefault : specParts[0];
 				
 				// TODO with all this commentary it would be better to rewrite
 				// if the well contains only one entry and a separator then the agency was given w/o feature

@@ -351,6 +351,37 @@ public class DataManagerServletTests {
 				arrayOfWells.length-1, spect.getWellIDs(WellDataType.LOG).size());
 	}
 	
+	@Test
+	public void test_parseListOfWells_with_extra_separators() {
+		final Map<String,String> params = new HashMap<String, String>();
+		params.put(PARAM_TYPE,   "LOG");
+		final String[] arrayOfWells = new String[] {"IL_EPA:007","IL_EPA:1-well-with-:-and-chars"};
+		
+		HttpServletRequest req = new MockRequest() {
+			@Override
+			public String getParameter(String param) {
+				return params.get(param);
+			}
+			@Override
+			public String[] getParameterValues(String param) {
+				if (DataManagerServlet.PARAM_FEATURE.equals(param)) {
+					return arrayOfWells;
+				}
+				return null;
+			}
+		};
+		
+		Specification spect = dms.parseListOfWells(req);
+		assertEquals("expect all wells to parse", 
+				arrayOfWells.length, spect.getWellIDs(WellDataType.LOG).size());
+		
+		List<Specifier> wells = spect.getWellIDs(WellDataType.LOG);
+		for (Specifier spec : wells) {
+			// Note that parser transliterates _ to space!
+			assertEquals("agency id", "IL EPA", spec.getAgencyID());
+		}
+	}
+	
 	@Test(expected=InvalidParameterException.class)
 	public void test_parseListOfWells_successfully_twoBadIsTooMany() {
 		final Map<String,String> params = new HashMap<String, String>();
