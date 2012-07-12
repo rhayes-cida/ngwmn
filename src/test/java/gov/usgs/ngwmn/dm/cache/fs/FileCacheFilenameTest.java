@@ -1,9 +1,8 @@
 package gov.usgs.ngwmn.dm.cache.fs;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 import gov.usgs.ngwmn.WellDataType;
+import gov.usgs.ngwmn.dm.io.Pipeline;
 import gov.usgs.ngwmn.dm.spec.Specifier;
 
 import java.io.File;
@@ -99,6 +98,19 @@ public class FileCacheFilenameTest extends FileCache {
 		
 		File f1 = super.contentFile(spec);
 		assertTrue("feature ID is human-readable", f1.getName().contains(spec.getFeatureID()));
+	}
+	
+	@Test
+	public void testDisabledFileCache() throws Exception {
+		setBasedir(null);
+		
+		Specifier spec = new Specifier("AGID","safe",WellDataType.WATERLEVEL);
+		assertFalse(super.contains(spec));
+		assertNull(super.getInfo(spec));
+		
+		Pipeline pipe = null;
+		assertFalse(super.fetchWellData(spec, pipe));
+		
 	}
 	
 }

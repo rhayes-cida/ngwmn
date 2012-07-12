@@ -22,6 +22,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.io.ByteStreams;
+import com.google.common.io.NullOutputStream;
 
 public class FileCache implements Cache {
 	protected final transient Logger logger = LoggerFactory.getLogger(getClass());
@@ -85,6 +86,10 @@ public class FileCache implements Cache {
 	public OutputStream destination(Specifier spec)
 			throws IOException
 	{
+		if (basedir == null) {
+			return new NullOutputStream();
+		}
+		
 		File file = contentFile(spec);
 		File tmpFile = File.createTempFile("LDR", "." + spec.getTypeID().suffix);
 		
@@ -100,6 +105,10 @@ public class FileCache implements Cache {
 	public boolean fetchWellData(final Specifier spec, Pipeline pipe) 
 			throws IOException
 	{
+		if (basedir == null) {
+			return false;
+		}
+		
 		Invoker i = new FileInputInvoker();
 		pipe.setInvoker(i);
 		
@@ -117,6 +126,10 @@ public class FileCache implements Cache {
 	
 	@Override
 	public InputStream retrieve(String id) throws IOException {
+		if (basedir == null) {
+			throw new IOException("Null base directory, file cache disabled");
+		}
+		
 		File f = new File(basedir,id);
 		
 		return new FileInputStream(f);
@@ -142,6 +155,12 @@ public class FileCache implements Cache {
 	}
 
 	public void setBasedir(File basedir) throws IOException {
+		if (basedir == null) {
+			logger.warn("Disabling file cache");
+			this.basedir = null;
+			return;
+		}
+		
 		if ( ! basedir.exists() ) {
 			boolean ok = basedir.mkdirs();
 			if ( ! ok) {
@@ -161,6 +180,10 @@ public class FileCache implements Cache {
 	}
 
 	public boolean contains(Specifier spec) {
+		if (basedir == null) {
+			return false;
+		}
+		
 		File f = contentFile(spec);
 		
 		if (f == null) {
@@ -179,6 +202,10 @@ public class FileCache implements Cache {
 
 	@Override
 	public CacheInfo getInfo(Specifier spec) {
+		if (basedir == null) {
+			return null;
+		}
+		
 		File f = contentFile(spec);
 
 		boolean exists = f.exists() && f.canRead();
