@@ -64,6 +64,11 @@ public class FileCache implements Cache {
 	
 	protected final File contentFile(Specifier spec) {
 		
+		if (isDisabled()) {
+			logger.warn("Calling contentFile with disabled cache");
+			return null;
+		}
+		
 		String fname = filename(spec);
 		if (fname.isEmpty()) {
 			// can't happen, but let's be safe
@@ -79,6 +84,10 @@ public class FileCache implements Cache {
 		return v;
 	}
 	
+	public boolean isDisabled() {
+		return basedir == null;
+	}
+	
 	/**
 	 * @see gov.usgs.ngwmn.dm.cache.Cache#putter(gov.usgs.ngwmn.dm.spec.Specifier)
 	 */
@@ -86,7 +95,7 @@ public class FileCache implements Cache {
 	public OutputStream destination(Specifier spec)
 			throws IOException
 	{
-		if (basedir == null) {
+		if (isDisabled()) {
 			return new NullOutputStream();
 		}
 		
@@ -105,7 +114,7 @@ public class FileCache implements Cache {
 	public boolean fetchWellData(final Specifier spec, Pipeline pipe) 
 			throws IOException
 	{
-		if (basedir == null) {
+		if (isDisabled()) {
 			return false;
 		}
 		
@@ -126,7 +135,7 @@ public class FileCache implements Cache {
 	
 	@Override
 	public InputStream retrieve(String id) throws IOException {
-		if (basedir == null) {
+		if (isDisabled()) {
 			throw new IOException("Null base directory, file cache disabled");
 		}
 		
@@ -180,7 +189,7 @@ public class FileCache implements Cache {
 	}
 
 	public boolean contains(Specifier spec) {
-		if (basedir == null) {
+		if (isDisabled()) {
 			return false;
 		}
 		
@@ -202,7 +211,7 @@ public class FileCache implements Cache {
 
 	@Override
 	public CacheInfo getInfo(Specifier spec) {
-		if (basedir == null) {
+		if (isDisabled()) {
 			return null;
 		}
 		
@@ -229,6 +238,7 @@ public class FileCache implements Cache {
 		StringBuilder builder = new StringBuilder();
 		builder.append("FileCache [basedir=").append(basedir).
 			// append(", wdt=").append(wdt).
+			append(isDisabled() ? ",disabled" : "").
 			append("]");
 		return builder.toString();
 	}

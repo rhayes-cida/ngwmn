@@ -111,6 +111,7 @@ public class FileCacheFilenameTest extends FileCache {
 		Pipeline pipe = null;
 		assertFalse(super.fetchWellData(spec, pipe));
 		
+		assertTrue(super.isDisabled());
 	}
 	
 }
