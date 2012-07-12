@@ -34,8 +34,9 @@ public class WellLogInspector implements Inspector {
 			logger.debug("finished update, got {}", did);
 			
 			// TODO would be convenient if stored proc contained a select to supply this result set
+			// (but that's seriously inconvenient in Oracle. sigh.)
 			PreparedStatement ps = conn.prepareStatement(
-					"SELECT wldq.md5,wldq.lithologyCount,wldq.constructionCount " +
+					"SELECT wldq.md5,wldq.lithologyCount,wldq.constructionCount,wldq.wellCount " +
 					"FROM GW_DATA_PORTAL.LOG_DATA_QUALITY wldq, GW_DATA_PORTAL.log_cache wlc " +
 					"WHERE wldq.md5 = wlc.md5 AND wlc.log_cache_id = ?");
 			ps.setInt(1, cachekey);
@@ -46,11 +47,12 @@ public class WellLogInspector implements Inspector {
 				String md5 = rs.getString(1);
 				int lithologyCt = rs.getInt(2);
 				int constructionCt = rs.getInt(3);
+				int wellCount = rs.getInt(4);
 				
-				logger.debug("Stats for well log, id={} md5={}: lith {} const {}",
-						new Object[] {cachekey, md5, lithologyCt, constructionCt});
+				logger.debug("Stats for well log, id={} md5={}: lith {} const {} wellCt {}",
+						new Object[] {cachekey, md5, lithologyCt, constructionCt, wellCount});
 				
-				totct += (lithologyCt + constructionCt);
+				totct += (lithologyCt + constructionCt + wellCount);
 			}
 			return totct > 0;
 		} finally {

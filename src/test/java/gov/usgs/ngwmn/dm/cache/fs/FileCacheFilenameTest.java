@@ -102,7 +102,9 @@ public class FileCacheFilenameTest extends FileCache {
 	
 	@Test
 	public void testDisabledFileCache() throws Exception {
+		System.out.printf("my name is %s\n", this.toString());
 		setBasedir(null);
+		System.out.printf("my name is now %s\n", this.toString());
 		
 		Specifier spec = new Specifier("AGID","safe",WellDataType.WATERLEVEL);
 		assertFalse(super.contains(spec));

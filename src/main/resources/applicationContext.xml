@@ -108,14 +108,14 @@
 	<bean id="FileCache"
 		class="gov.usgs.ngwmn.dm.cache.fs.FileCache">
 		<!-- Leave unset for fail-fast <property name="basedir" value="/tmp/gwdp-cache"/>  -->  
-		<property name="basedir" ref="FSCache.basedir"/>
+		<!-- Leave unset to disable file cache <property name="basedir" ref="FSCache.basedir"/> -->
 	</bean>
 	
 	<bean id="Retriever"
 		class="gov.usgs.ngwmn.dm.cache.Retriever">
 		<constructor-arg>
 			<list>
-				<ref bean="FileCache"/> <!--  TODO ALL asdf -->
+				<ref bean="FileCache"/>
 				<ref bean="QualityCache"/>
 				<ref bean="LogCache"/>
 				<ref bean="LithologyCache"/>
@@ -129,7 +129,7 @@
 		class="gov.usgs.ngwmn.dm.cache.Loader">
 		<constructor-arg>
 			<list>
-				<ref bean="FileCache"/> <!--  TODO ALL asdf -->
+				<ref bean="FileCache"/>
 				<ref bean="QualityCache"/>
 				<ref bean="LogCache"/>
 				<ref bean="LithologyCache"/>
