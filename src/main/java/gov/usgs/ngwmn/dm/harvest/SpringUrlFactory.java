@@ -37,7 +37,7 @@ public class SpringUrlFactory {
 		
 		if (agency.contains(" ")) {
 			String agcy = agency.replace(" ", "_");
-			logger.warn("Using despaced agency code {} for original agency code {}",  agcy, agency);
+			logger.warn("Using despaced agency code '{}' for original agency code '{}'",  agcy, agency);
 			agency = agcy;
 		}
 		
