@@ -37,7 +37,7 @@ public class WaterQualityInspector implements Inspector {
 			try {
 				did = stat.execute();
 			} catch (SQLIntegrityConstraintViolationException ix) {
-				logger.warn("integrity constraint violated, assuming no quality data in this sample");
+				logger.warn("integrity constraint violated, assuming no quality data for quality cache key {}", cachekey);
 				return false;
 			}
 			logger.debug("finished update for {}, got {}", cachekey, did);

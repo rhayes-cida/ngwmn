@@ -67,6 +67,7 @@ public class WaterQualityInspectorIntegrationTest extends ContextualTest {
 	@Test
 	public void testLots() throws Exception {
 		Statement s = conn.createStatement();
+		s.setMaxRows(100);
 		ResultSet rs = s.executeQuery("SELECT QUALITY_CACHE_ID from gw_data_portal.quality_cache " +
 				"where xml IS NOT NULL ");
 		
@@ -78,7 +79,6 @@ public class WaterQualityInspectorIntegrationTest extends ContextualTest {
 		s.close();
 		
 		for (Integer i : ii) {
-			if (i > 90) return; // added to quicken the test cycle
 			
 			System.out.println("checking " + i);
 			boolean ok = victim.acceptable(i);
