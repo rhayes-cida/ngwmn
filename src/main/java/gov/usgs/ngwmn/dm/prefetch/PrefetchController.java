@@ -68,6 +68,7 @@ public class PrefetchController {
 
 	public void setScheduler(ThreadPoolTaskScheduler sked) {
 		this.sked = sked;
+		sked.setWaitForTasksToCompleteOnShutdown(true);
 	}
 
 	public Prefetcher getPrefetcher() {

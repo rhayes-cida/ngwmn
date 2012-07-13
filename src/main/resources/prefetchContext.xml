@@ -32,5 +32,11 @@
     	<property name="scheduler" ref="scheduler"/>
     	<property name="prefetcher" ref="Prefetcher"/>
     </bean>
+    
+<!--     
+	<bean id="ShutdownController" class="gov.usgs.ngwmn.dm.prefetch.ShutdownController">
+		<property name="scheduler" ref="scheduler"/>
+    </bean> 
+-->
    
 </beans>
