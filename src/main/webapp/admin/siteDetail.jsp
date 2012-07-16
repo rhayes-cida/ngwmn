@@ -22,7 +22,6 @@
 	
 	ApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(config.getServletContext());
 	FetchLogDAO dao = ctx.getBean("FetchLogDAO", FetchLogDAO.class);
-	Loader loader = ctx.getBean("Loader", Loader.class);
 	
 	List<FetchLog> fLogs = dao.fetchHistory(agencyCd, siteNo);
 

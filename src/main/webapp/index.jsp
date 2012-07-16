@@ -25,8 +25,7 @@
 					
 					CacheMetaDataDAO
 					dao = ctx.getBean("CacheMetaDataDAO", CacheMetaDataDAO.class);
-					
-					Loader loader = ctx.getBean("Loader", Loader.class);
+
 				%>
 				
 				<c:forEach items="<%= dao.listAgencySummary() %>" var="agency">
