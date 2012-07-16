@@ -452,5 +452,41 @@ public class DataRowParserTests {
 		assertEquals("03",    row0.get( head.get(2).fullName ));
 		assertEquals("water", row0.get( head.get(3).fullName ));
 	}
+	
+	@Test
+	public void testFixedColumns() throws Exception {
+		String xml = TRIPLE_ROW_MULTIPLE_ORG;
+		
+		String[][] columns = new String[][] {
+				{"Site/Type","Site type"},
+				{"Site/Result","Site result"},
+				{"Site/Identification/code", "Site code"},
+				{"Site/Identification/agency", null}
+		};
+		PostParser pp = new FixedOrderPostParser(columns);
+		parser = new DataRowParser(pp);
+		parser.setInputStream( new ByteArrayInputStream( xml.getBytes() ) );
+		parser.setKeepElderInfo(false);
+		parser.setRowElementName("Site");
+
+		
+		Map<String,String>      row0 = parser.nextRow();
+		List<Element>           head = parser.headers();
+
+		assertNotNull(row0);
+		boolean hasResultHeader = false;
+		for (Element e : head) {
+			// check for site result because it's not present in first data row
+			if ("Site result".equals(e.displayName)) {
+				hasResultHeader = true;
+			}
+		}
+		assertTrue("has Site result header",hasResultHeader);
+		
+		Map<String,String> row1 = parser.nextRow();
+		Map<String,String> row2 = parser.nextRow();
+		
+		assertTrue("row2 has site id", row2.containsKey("Site/Identification/code"));
+	}
 
 }
