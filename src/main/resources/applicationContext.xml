@@ -89,7 +89,7 @@
 		<constructor-arg ref="WellRegistryDAO"></constructor-arg>
 	</bean>	
 	
- 	<bean id="FetchEventBus" class="gov.usgs.ngwmn.dm.eventbus.EventBusSpring">
+ 	<bean id="FetchEventBus" class="gov.usgs.ngwmn.dm.eventbus.EventBusSpring" destroy-method="shutdown">
  		<property name="subscribers">
      		<list>
        			<ref bean="FetchRecorder"/>
