@@ -48,6 +48,39 @@ public class WaterPortalPostParserFactory {
 						"UnconsolidatedMaterial/purpose",
 						"srsDimension"};
 	
+	public static final String[][] qualityMapping = new String[][] {
+		{"AgencyCd","AgencyCd"},
+		{"SiteNo","SiteNo"},
+		{"Result/date","Date"},
+		{"Result/time","Time"},
+		{"Result/zone","TimeZone"},
+		{"Result/ResultDescription",null},
+		{"Result/ResultDescription/CharacteristicName","CharacteristicName"},
+		{"Result/ResultDescription/ResultMeasure",null},
+		{"Result/ResultDescription/ResultMeasure/ResultMeasureValue","Value"},
+		{"Result/ResultDescription/ResultMeasure/MeasureUnitCode","Unit"},
+		{"Result/ResultDescription/ResultStatusIdentifier","ResultStatus"},
+		{"Result/ResultDescription/ResultValueTypeName","ValueType"},
+		{"Result/ResultDescription/USGSPCode","USGSPCode"},
+		{"Result/ResultDescription/ResultSampleFractionText","SampleFraction"},
+		{"Result/ResultDescription/ResultCommentText","ResultComment"},	
+		{"Result/ResultDescription/ResultTemperatureBasisText","TemperatureBasis"},
+		{"Result/ResultDescription/ResultDetectionConditionText","DetectionCondition"},
+		{"Result/ResultAnalyticalMethod",null},
+		{"Result/ResultAnalyticalMethod/MethodIdentifier","MethodIdentifier"},
+		{"Result/ResultAnalyticalMethod/MethodIdentifierContext","MethodContext"},
+		{"Result/ResultAnalyticalMethod/MethodName","MethodName"},
+		{"Result/ResultAnalyticalMethod/MethodDescriptionText","MethodDescription"},
+		{"Result/ResultLabInformation",null},
+		{"Result/ResultLabInformation/ResultDetectionQuantitationLimit",null},
+		{"Result/ResultLabInformation/ResultDetectionQuantitationLimit/DetectionQuantitationLimitTypeName","QuantitationLimitType"},
+		{"Result/ResultLabInformation/ResultDetectionQuantitationLimit/DetectionQuantitationLimitMeasure",null},
+		{"Result/ResultLabInformation/ResultDetectionQuantitationLimit/DetectionQuantitationLimitMeasure/MeasureValue","QuantitationLimitValue"},
+		{"Result/ResultLabInformation/ResultDetectionQuantitationLimit/DetectionQuantitationLimitMeasure/MeasureUnitCode","QuantitationLimitUnit"}
+	};
+	
+
+	
 	public static final String[] CONSTRUCTION_EXCLUSION_COLUMNS_DISPLAY_NAME = new String[] {
 						"id",
 						"srsName",
@@ -102,18 +135,6 @@ public class WaterPortalPostParserFactory {
 		renameColumns.put(WATERLEVEL, levelRenames);
 		
 		HashMap<String, String> qualityRenames = new HashMap<String, String>();
-		qualityRenames.put("date", "Date");
-		qualityRenames.put("time", "Time");
-		qualityRenames.put("zone", "TimeZone");
-		qualityRenames.put("ResultMeasureValue", "Value");
-		qualityRenames.put("MeasureUnitCode", "Unit");
-		qualityRenames.put("ResultStatusIdentifier", "ResultStatus");
-		qualityRenames.put("ResultValueTypeName", "ValueType");
-		qualityRenames.put("ResultTemperatureBasisText", "ResultTemperatureBasis");
-		qualityRenames.put("ResultCommentText", "Comment");
-		qualityRenames.put("MethodIdentifierContext", "MethodContext");
-		qualityRenames.put("MethodDescriptionText", "MethodDescription");
-		qualityRenames.put("ResultSampleFractionText", "SampleFraction");
 		renameColumns.put(QUALITY, qualityRenames);
 		
 		for (WellDataType type : WellDataType.values()) {
@@ -135,7 +156,8 @@ public class WaterPortalPostParserFactory {
 		constructionMap.put("fullName", ConstructionCoordinateFullName);
 		constructionMap.put("prefix",   ConstructionDepthPrefix);
 	}
-	
+
+
 	public CompositePostParser make(WellDataType type) {
 		String[] removeCols = exclusions.get(type);
 		Map<String, String> renameCols = renameColumns.get(type);
@@ -156,8 +178,17 @@ public class WaterPortalPostParserFactory {
 			}
 		}
 
+		if (type == QUALITY) {
+			postParser.addPostParser(makeQualityPP());
+		}
 		return postParser;
 	}
+
+	
+	protected PostParser makeQualityPP() {
+		return new FixedOrderPostParser(qualityMapping);
+	}
+
 
 	protected PostParser makeCoordinatePostParser(WellDataType type,
 			String[] removeCols, Map<String, String> renameCols) {
