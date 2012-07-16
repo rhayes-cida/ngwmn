@@ -7,6 +7,5 @@ function snoop(form, type, id){
 		alert("Please enter a numeric cache id");
 		return;
 	}
-	alert(form.action + type + "/" + id);
 	return form.action + type + "/" + id;
 };

@@ -50,7 +50,7 @@
 		</li>
 		<li>
 			<form id="cacheSnoop" method="get" action="cache/">
-				<input type="button" onclick="this.location.href = snoop(this.form, this.form.cacheType.value, this.form.cacheId.value);" value="snoop" name="snooper"></input>
+				<input type="button" onclick="window.location.href = snoop(this.form, this.form.cacheType.value, this.form.cacheId.value);" value="snoop" name="snooper"></input>
 				<select name="cacheType">
 					<option value="LOG">LOG</option>
 					<option value="LITHOLOGY">LITHOLOGY</option>
