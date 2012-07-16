@@ -159,4 +159,14 @@ public interface FetchLogMapper {
 		""})
 	List<Map<String,Object>> statisticsByDay(@Param("day") Date day);
 
+	/* Ordering by SPECIFIER as a proxy to DATA_SOURCE, seems that is null */
+	@Select({
+		" SELECT FETCHLOG_ID, AGENCY_CD, SITE_NO, DATA_SOURCE, STARTED_AT, STATUS, PROBLEM, CT, ",
+		" ELAPSED_SEC, SPECIFIER, FETCHER, DATA_STREAM",
+		" from GW_DATA_PORTAL.FETCH_LOG",
+		" where AGENCY_CD = #{agency_cd} and SITE_NO = #{site_no} ",
+		" ORDER BY SPECIFIER, STARTED_AT DESC ",
+		""})
+	@ResultMap("BaseResultMap")
+	List<FetchLog> fetchHistory(@Param("agency_cd") String agency_cd, @Param("site_no") String site_no);
 }

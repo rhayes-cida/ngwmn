@@ -46,6 +46,13 @@ public class CacheMetaDataDAO {
 	public List<CacheMetaData> listAllByFetchDate() {
 		return mapper.listAllByFetchDate();
 	}
+	
+	public List<CacheMetaData> listAgencySummary() {
+		return mapper.listAgencySummary();
+	}
+	
+	
+	
 
 	public void updateStatistics() throws Exception {
 		Connection conn = dataSource.getConnection();

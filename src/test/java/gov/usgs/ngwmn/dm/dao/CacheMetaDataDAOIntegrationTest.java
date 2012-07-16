@@ -5,7 +5,9 @@ import static org.junit.Assert.*;
 import gov.usgs.ngwmn.WellDataType;
 
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -47,6 +49,21 @@ public class CacheMetaDataDAOIntegrationTest extends ContextualTest {
 			assertEquals("agency", "USGS", md.getAgencyCd());
 		}
 	}
+	
+	@Test
+	public void testListAgencySummary() {
+		List<CacheMetaData> dd = dao.listAgencySummary();
+		assertFalse("no agencies retrieved from cache", dd.isEmpty());
+		Set<String> agencies = new HashSet<String>();
+		for (CacheMetaData md : dd) {
+			agencies.add(md.getAgencyCd());
+		}
+		
+		// Just a sanity check test that some of the agencies are there.
+		assertTrue(agencies.contains("USGS"));
+		assertTrue(agencies.contains("IL EPA"));
+	}
+	
 	
 	@Test
 	public void testUpdate() throws Exception {

@@ -161,6 +161,20 @@ public interface CacheMetaDataMapper {
 	})
 	@ResultMap("BaseResultMap")
 	List<CacheMetaData> listAllByFetchDate();
+	
+	@Select({
+		"select ",
+		"agency_cd, ' ' as DATA_TYPE, ' ' as SITE_NO, SUM(SUCCESS_CT) as SUCCESS_CT, SUM(FAIL_CT) as FAIL_CT, MAX(FIRST_DATA_DT) as FIRST_DATA_DT, MAX(LAST_DATA_DT) as LAST_DATA_DT, ",
+		"MAX(MOST_RECENT_SUCCESS_DT) as MOST_RECENT_SUCCESS_DT, MAX(MOST_RECENT_ATTEMPT_DT) as MOST_RECENT_ATTEMPT_DT, MAX(MOST_RECENT_FAIL_DT) as MOST_RECENT_FAIL_DT, MAX(FETCH_PRIORITY) as FETCH_PRIORITY,",
+		"SUM(EMPTY_CT) as EMPTY_CT, MAX(MOST_RECENT_EMPTY_DT) as MOST_RECENT_EMPTY_DT",
+		"from GW_DATA_PORTAL.CACHE_META_DATA",
+		"group by agency_cd"
+	})
+	@ResultMap("BaseResultMap")
+	List<CacheMetaData> listAgencySummary();
+	
 
 	void updateCacheMetaData();
+
+	
 }

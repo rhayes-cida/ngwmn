@@ -43,5 +43,10 @@ public class FetchLogDAO {
 		List<Map<String,Object>> v = mapper.statisticsByDay(day);
 		return v;
 	}
+	
+	public List<FetchLog> fetchHistory(String agencyCd, String siteNo) {
+		List<FetchLog> v = mapper.fetchHistory(agencyCd, siteNo);
+		return v;
+	}
 
 }
