@@ -30,7 +30,11 @@
 		<!-- This needs to be corrected -->
 		<url>http://internal.cida.usgs.gov/jira/browse/GWDP</url>
 	</issueManagement>
-
+	<scm>
+		<connection>scm:git:http://gitub.com/USGS-CIDA/ngmwn.git</connection>
+		<developerConnection>scm:git:ssh://git@github.com/USGS-CIDA/ngwmn.git</developerConnection>
+		<url>https://github.com/USGS-CIDA/ngwmn</url>
+	</scm>
 	<repositories>
 		<repository>
 			<id>nexus</id>
