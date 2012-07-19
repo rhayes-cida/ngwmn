@@ -146,7 +146,7 @@ extends ContextualTest
 		return newkey.intValueExact();
 	}
 
-	/*
+	
 	@Test
 	public void testToOracleXML() throws Exception {
 		DataSource ds = getDataSource();
@@ -168,5 +168,5 @@ extends ContextualTest
 		
 		assertTrue("inserted clob", true);
 	}
-	*/
+	
 }
