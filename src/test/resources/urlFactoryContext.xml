@@ -25,7 +25,7 @@
 				<prop key="CONSTRUCTION">#{gwdp}/agency/_{#agencyId}/wfs?request=GetFeature&amp;featureId=_{#featureId}</prop>
 				<prop key="WATERLEVEL">#{gwdp}/agency/_{#agencyId}/sos?request=GetObservation&amp;featureId=_{#featureId}</prop>
 				<prop key="QUALITY">#{gwdp}/agency/_{#agencyId}/qw?mimeType=xml&amp;siteid=_{#featureId}</prop>
-				<prop key="REGISTRY">#{gwdp}/well-registry/_{#agencyId}/_{#featureId}</prop>			
+				<prop key="REGISTRY">#{gwdp}/well-registry/_{#agencyId}/_{#featureId}</prop>
 				</props>
 			</property>
 	    </bean>
