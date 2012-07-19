@@ -111,6 +111,10 @@
 		<!-- Leave unset to disable file cache <property name="basedir" ref="FSCache.basedir"/> -->
 	</bean>
 	
+	<bean id="RegistryCache" class="gov.usgs.ngwmn.dm.cache.NullCache">
+		<constructor-arg value="REGISTRY"/>
+	</bean>
+	
 	<bean id="Retriever"
 		class="gov.usgs.ngwmn.dm.cache.Retriever">
 		<constructor-arg>
@@ -121,6 +125,7 @@
 				<ref bean="LithologyCache"/>
 				<ref bean="ConstructionCache"/>
 				<ref bean="WaterlevelCache"/>
+				<ref bean="RegistryCache"/>
 			</list>
 		</constructor-arg>
 	</bean>
@@ -135,6 +140,7 @@
 				<ref bean="LithologyCache"/>
 				<ref bean="ConstructionCache"/>
 				<ref bean="WaterlevelCache"/>
+				<ref bean="RegistryCache"/>
 			</list>
 		</constructor-arg>
 	</bean>
@@ -232,6 +238,7 @@
 			<prop key="CONSTRUCTION">#{gwdp}/agency/_{#agencyId}/wfs?request=GetFeature&amp;featureId=_{#featureId}</prop>
 			<prop key="WATERLEVEL">#{gwdp}/agency/_{#agencyId}/sos?request=GetObservation&amp;featureId=_{#featureId}</prop>
 			<prop key="QUALITY">#{gwdp}/agency/_{#agencyId}/qw?mimeType=xml&amp;siteid=_{#featureId}</prop>
+			<prop key="REGISTRY">#{gwdp}/well-registry/_{#agencyId}/_{#featureId}</prop>
 			</props>
 		</property>
     </bean>
