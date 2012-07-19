@@ -52,8 +52,8 @@ public class WaterPortalPostParserFactory {
 	public static final String[] REGISTRY_EXCLUSION_COLUMNS_DISPLAY_NAME = new String[] {
 		// These should, ideally, not appear in the input data now that we are using an explicit column list.
 		// No harm and some benefit in leaving the exclusion list in place, though.
-		"AgencyCd",
-		"SiteNo",
+		"agency_cd",
+		"site_no",
 		"my_siteid",
 		"agency_med",
 		"display_flag",
