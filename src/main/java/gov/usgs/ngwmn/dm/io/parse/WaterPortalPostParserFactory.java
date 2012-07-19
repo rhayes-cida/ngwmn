@@ -5,6 +5,7 @@ import static gov.usgs.ngwmn.WellDataType.LITHOLOGY;
 import static gov.usgs.ngwmn.WellDataType.LOG;
 import static gov.usgs.ngwmn.WellDataType.QUALITY;
 import static gov.usgs.ngwmn.WellDataType.WATERLEVEL;
+import static gov.usgs.ngwmn.WellDataType.REGISTRY;
 import gov.usgs.ngwmn.WellDataType;
 
 import java.util.Arrays;
@@ -47,6 +48,31 @@ public class WaterPortalPostParserFactory {
 						"UnconsolidatedMaterial/name",
 						"UnconsolidatedMaterial/purpose",
 						"srsDimension"};
+	
+	public static final String[] REGISTRY_EXCLUSION_COLUMNS_DISPLAY_NAME = new String[] {
+		// These should, ideally, not appear in the input data now that we are using an explicit column list.
+		// No harm and some benefit in leaving the exclusion list in place, though.
+		"AgencyCd",
+		"SiteNo",
+		"my_siteid",
+		"agency_med",
+		"display_flag",
+		// "nat_aqfr_desc",
+		"wl_data_flag",
+		"qw_data_flag",
+		"log_data_flag",
+		"geom",	
+		"geom_3785",	
+		"insert_date",	
+		"update_date",	
+		"data_provider",	
+		"wl_data_provider",	
+		"qw_data_provider",	
+		"lith_data_provider",	
+		"const_data_provider",
+		"unused"
+		// ,"link"
+	};
 	
 	public static final String[][] qualityMapping = new String[][] {
 		{"AgencyCd","AgencyCd"},
@@ -108,6 +134,8 @@ public class WaterPortalPostParserFactory {
 		exclusions.put(LITHOLOGY,		LITHOLOGY_EXCLUSION_COLUMNS_DISPLAY_NAME);
 		exclusions.put(CONSTRUCTION,	CONSTRUCTION_EXCLUSION_COLUMNS_DISPLAY_NAME);
 		exclusions.put(WATERLEVEL,		WATERLEVEL_EXCLUSION_COLUMNS_DISPLAY_NAME);
+		exclusions.put(REGISTRY, REGISTRY_EXCLUSION_COLUMNS_DISPLAY_NAME);
+		
 		
 		renameColumns = new HashMap<WellDataType, Map<String,String>>();
 		
