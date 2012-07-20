@@ -1,5 +1,6 @@
 package gov.usgs.ngwmn.dm.io.parse;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
@@ -60,10 +61,10 @@ public class ParseState {
 		maxRowDepthLevel       = DEFAULT_ROW_DEPTH_LEVEL;
 		targetColumnList       = new LinkedHashSet<Element>();
 		elderColumnList        = new LinkedHashSet<Element>();
-		targetColumnValues     = new HashMap<String, String>();
-		elderColumnValues      = new HashMap<String, String>();
-		contentDefinedElements = new HashMap<String, String>();
-		rowElementIds          = new HashSet<String>();
+		targetColumnValues     = Collections.synchronizedMap(new HashMap<String, String>());
+		elderColumnValues      = Collections.synchronizedMap(new HashMap<String, String>());
+		contentDefinedElements = Collections.synchronizedMap(new HashMap<String, String>());
+		rowElementIds          = Collections.synchronizedSet(new HashSet<String>());
 		rowElementIds.add(NONSENSE_ROW_ELEMENT_IDENTIFIER);
 		
 		// initialize the context stack to avoid empty stack errors

@@ -15,4 +15,15 @@ public class ElementTests {
 		assertFalse("null is not an instanceof element", element.equals(other));
 	}
 
+	@Test
+	public void testCamel() {
+		assertNull(Element.camelcase(null));
+		assertEquals("ThisIsOK", Element.camelcase("this_is_O_K"));
+		assertEquals("Alright", Element.camelcase("alRight"));
+		assertEquals("",Element.camelcase(""));
+		assertEquals("",Element.camelcase("_"));
+		assertEquals("",Element.camelcase("__"));
+		assertEquals("TwoWords", Element.camelcase("TWO____WORDS___"));
+		assertEquals("Oneword", Element.camelcase("____oneword__"));
+	}
 }

@@ -84,19 +84,21 @@ public class DataRowParser implements Parser {
 	public void setCopyDown(boolean copyDown) {
 		state.isDoCopyDown = copyDown;
 	}
-	public List<Element> headers() {
-		if ( state.targetColumnList.size() > lastColListSize ) {
-			logger.debug("NEW HEADERS ADDED: {}", state.targetColumnList);
-			List<Element> refinedHeaders = postParser.refineHeaderColumns(
-					new ArrayList<Element>( state.targetColumnList) );
-			for (Element element : refinedHeaders) {
-				if ( ! element.hasChildren && ! headers.contains(element)) {
-					headers.add(element);
+	public synchronized List<Element> headers() {
+		synchronized (state.targetColumnList) {
+			if ( state.targetColumnList.size() > lastColListSize ) {
+				logger.debug("NEW HEADERS ADDED: {}", state.targetColumnList);
+				List<Element> refinedHeaders = postParser.refineHeaderColumns(
+						new ArrayList<Element>( state.targetColumnList) );
+				for (Element element : refinedHeaders) {
+					if ( ! element.hasChildren && ! headers.contains(element)) {
+						headers.add(element);
+					}
 				}
+				
+				signalHeaderListeners();
+				lastColListSize = state.targetColumnList.size();
 			}
-			
-			signalHeaderListeners();
-			lastColListSize = state.targetColumnList.size();
 		}
 		return headers;
 	}
@@ -105,53 +107,55 @@ public class DataRowParser implements Parser {
 		return state.targetColumnValues;
 	}
 	
-	public Map<String, String> nextRow() throws IOException {
-		boolean done = eof;
-		
-		try {
-			state.targetColumnValues.clear();
+	public synchronized Map<String, String> nextRow() throws IOException {
+		synchronized (state.targetColumnValues) {
+			boolean done = eof;
 			
-			while ( ! done && reader.hasNext() ) {
-				int event = reader.next();
+			try {
+				state.targetColumnValues.clear();
 				
-				switch (event) {
-					case XMLStreamConstants.START_DOCUMENT:
-						break; // no start document handling needed
-					case XMLStreamConstants.START_ELEMENT:
-						startElement(state);
-						break;
-					case XMLStreamConstants.CHARACTERS:
-						state.putChars(reader.getText().trim());
-						break;
-					case XMLStreamConstants.ATTRIBUTE:
-						// TODO may need to handle this later
-						break;
-					case XMLStreamConstants.END_ELEMENT:
-						// this is where writing to the stream happens
-						// before this it was all setup
-						done = endElement(); // the end elements for elders will be handled on nextRow
-						eof  = state.isContextEmpty();
-						done = done || eof;
-						break;
-					case XMLStreamConstants.END_DOCUMENT:
-						done = eof = true;
-						return null;
-					// TODO no default
+				while ( ! done && reader.hasNext() ) {
+					int event = reader.next();
+					
+					switch (event) {
+						case XMLStreamConstants.START_DOCUMENT:
+							break; // no start document handling needed
+						case XMLStreamConstants.START_ELEMENT:
+							startElement(state);
+							break;
+						case XMLStreamConstants.CHARACTERS:
+							state.putChars(reader.getText().trim());
+							break;
+						case XMLStreamConstants.ATTRIBUTE:
+							// TODO may need to handle this later
+							break;
+						case XMLStreamConstants.END_ELEMENT:
+							// this is where writing to the stream happens
+							// before this it was all setup
+							done = endElement(); // the end elements for elders will be handled on nextRow
+							eof  = state.isContextEmpty();
+							done = done || eof;
+							break;
+						case XMLStreamConstants.END_DOCUMENT:
+							done = eof = true;
+							return null;
+						// TODO no default
+					}
 				}
+			} catch (Exception e) {
+				throw new RuntimeException(e);
 			}
-		} catch (Exception e) {
-			throw new RuntimeException(e);
+			if (state.targetColumnValues.isEmpty() && eof) {
+				return null;
+			}
+	
+			headers();
+			postParser.refineDataColumns(state.targetColumnValues);
+			rowCount++;
+	
+			// if currentRow is last Row then returns empty set
+			return  currentRow();
 		}
-		if (state.targetColumnValues.isEmpty() && eof) {
-			return null;
-		}
-
-		headers();
-		postParser.refineDataColumns(state.targetColumnValues);
-		rowCount++;
-
-		// if currentRow is last Row then returns empty set
-		return  currentRow();
 	}
 
 	
