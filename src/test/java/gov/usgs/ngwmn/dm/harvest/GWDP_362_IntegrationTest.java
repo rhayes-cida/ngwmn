@@ -15,6 +15,8 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.sql.DataSource;
 import javax.xml.parsers.DocumentBuilder;
@@ -66,7 +68,7 @@ extends ContextualTest
 		System.out.printf("Got code %d\n", code);
 		
 		byte[] contents = null;
-		InputStream is = victim.getInputStream();
+			InputStream is = victim.getInputStream();
 		try {
 			contents = readFully(is);
 		} finally {
@@ -82,11 +84,24 @@ extends ContextualTest
 		}
 		System.out.printf("found %d non-ascii\n", nonAsciiCt);
 		
+		
 		String c = new String(contents,"ISO-8859-1");
 		System.out.printf("Decode length = %d\n", c.length());
 		assertTrue("string decode ok", true);
 		
-	    DocumentBuilder parser = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+		// look for encoded char
+		Pattern enpat = Pattern.compile("&#(\\d+);");
+		Matcher enmat = enpat.matcher(c);
+		int enct = 0;
+		while (enmat.find()) {
+			if (enct == 0) {
+				System.out.println("Found encoded character " + enmat.group());
+			}
+			enct++;
+		}
+		System.out.printf("Found %d matches\n", enct);
+
+		DocumentBuilder parser = DocumentBuilderFactory.newInstance().newDocumentBuilder();
 	    Document document = parser.parse(new ByteArrayInputStream(contents));
 	    assertNotNull("well-formed document", document.getDocumentElement());
 	    System.out.printf("Top-level element: %s\n", document.getDocumentElement().getNodeName());
@@ -146,6 +161,35 @@ extends ContextualTest
 		return newkey.intValueExact();
 	}
 
+	@Test
+	public void checkData() throws Exception {
+		InputStream is = getClass().getResourceAsStream("/sample-data/MBMG_257423_LOG.xml");
+
+		byte[] contents = null;
+		try {
+			contents = readFully(is);
+		} finally {
+			is.close();
+		}
+
+		String c = new String(contents,"ISO-8859-1");
+		System.out.printf("Decode length = %d\n", c.length());
+		assertTrue("string decode ok", true);
+		
+		// look for encoded char
+		Pattern enpat = Pattern.compile("&#(\\d+);");
+		Matcher enmat = enpat.matcher(c);
+		int enct = 0;
+		while (enmat.find()) {
+			if (enct == 0) {
+				System.out.println("Found encoded character " + enmat.group());
+			}
+			enct++;
+		}
+		
+		System.out.printf("Found %d matches\n", enct);
+		assertTrue("sample data has encoded chars", enct>0);
+	}
 	
 	@Test
 	public void testToOracleXML() throws Exception {
