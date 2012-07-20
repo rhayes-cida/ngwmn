@@ -191,7 +191,7 @@ extends ContextualTest
 		assertTrue("sample data has encoded chars", enct>0);
 	}
 	
-	@Test
+	// @Test
 	public void testToOracleXML() throws Exception {
 		DataSource ds = getDataSource();
 		Connection conn = ds.getConnection();
