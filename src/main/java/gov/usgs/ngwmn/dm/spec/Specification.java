@@ -3,6 +3,7 @@ package gov.usgs.ngwmn.dm.spec;
 import gov.usgs.ngwmn.WellDataType;
 
 import java.util.Collection;
+import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -59,13 +60,13 @@ public class Specification {
 	// QW_WELL_TYPE
 	private String qwType;
 	
-	private final Set<WellDataType> dataTypes;
+	private final EnumSet<WellDataType> dataTypes;
 	// Delineated list of agency well IDs
 	private final Map<WellDataType,List<Specifier>> wellIDs;
 	
 	
 	public Specification() {
-		dataTypes = new HashSet<WellDataType>();
+		dataTypes = EnumSet.noneOf(WellDataType.class);
 		wellIDs   = new HashMap<WellDataType, List<Specifier>>();
 		for (WellDataType type : WellDataType.values()) {
 			wellIDs.put(type, new LinkedList<Specifier>());

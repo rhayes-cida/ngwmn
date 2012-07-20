@@ -4,6 +4,7 @@ import static org.junit.Assert.*;
 
 import java.security.InvalidParameterException;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -452,6 +453,7 @@ public class DataManagerServletTests {
 		
 		assertTrue(unique.contains(WellDataType.QUALITY));
 		assertTrue(unique.contains(WellDataType.LOG));
+		
 	}
 	
 	@Test
@@ -472,6 +474,21 @@ public class DataManagerServletTests {
 		
 	}
 	
+	@Test
+	public void test_type_order() throws Exception {
+		Specification spec = new Specification();
+		
+		spec.addWell(new Specifier("agency", "007", WellDataType.WATERLEVEL));
+		spec.addWell(new Specifier("agency", "007", WellDataType.WATERLEVEL));
+		spec.addWell(new Specifier("agency", "007", WellDataType.REGISTRY));
+		spec.addWell(new Specifier("agency", "007a", WellDataType.LITHOLOGY));
+		
+		Collection<WellDataType> types = spec.getDataTypes();
+		
+		String asString = types.toString();
+		assertEquals("[REGISTRY, LITHOLOGY, WATERLEVEL]", asString);
+		
+	}
 	
 	@Test
 	@SuppressWarnings("serial")

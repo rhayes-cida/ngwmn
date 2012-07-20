@@ -166,8 +166,8 @@ public class DataManagerServlet extends HttpServlet {
 		
 		String[] typeIDs = req.getParameterValues(PARAM_TYPE);
 		
-		// TODO ALL asdf
-		if (typeIDs==null) { // || (typeIDs.length==1 && "ALL".equalsIgnoreCase(typeIDs[0]) ) ) {
+		if (typeIDs==null) {
+			// TODO This seems bogus. Change to new WellDataType[0]?
 			return WellDataType.values();
 		}
 		
