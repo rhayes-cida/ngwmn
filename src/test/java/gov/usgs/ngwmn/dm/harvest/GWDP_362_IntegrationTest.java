@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.math.BigDecimal;
+import java.sql.Blob;
 import java.sql.Clob;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -119,14 +120,14 @@ extends ContextualTest
 		}
 	}
 	
-	private Clob makeClob(Connection conn, InputStream is) throws Exception {
+	private Blob makeBlob(Connection conn, InputStream is) throws Exception {
 		if (conn instanceof DelegatingConnection) {
 			conn = ((DelegatingConnection) conn).getInnermostDelegate();
 		}
 		
-		final Clob clob = conn.createClob();
+		final Blob blob = conn.createBlob();
 		// TODO Ascii?
-		OutputStream os = clob.setAsciiStream(1);
+		OutputStream os = blob.setBinaryStream(0);
 	
 		try {
 			copy(is,os);
@@ -134,9 +135,35 @@ extends ContextualTest
 			os.close();
 		}
 		
-		return clob;
+		return blob;
 	}
 	
+
+	private int insert(Connection conn, String agncy, String site, Blob blob) 
+			throws SQLException
+	{
+		String SQLTEXT = "INSERT INTO GW_DATA_PORTAL."+"LOG_CACHE"+"(agency_cd,site_no,fetch_date,xml,md5) VALUES (" +
+				"?, ?, ?, XMLType(?,nls_charset_id('UTF8')), ?)";
+		
+		int[] pkColumns = {1};
+		PreparedStatement s = conn.prepareStatement(SQLTEXT, pkColumns);
+		
+		s.setString(1, agncy);
+		s.setString(2, site);
+		s.setTimestamp(3, new java.sql.Timestamp(System.currentTimeMillis()));
+		s.setBlob(4, blob);
+		s.setString(5, null);
+				
+		s.executeUpdate();
+		
+		ResultSet gkrs = s.getGeneratedKeys();
+		BigDecimal newkey = null;
+		while (gkrs.next()) {
+			newkey = gkrs.getBigDecimal(1);
+			// logger.info("Generated key {}", newkey);
+		}
+		return newkey.intValueExact();
+	}
 
 	private int insert(Connection conn, String agncy, String site, Clob clob) 
 			throws SQLException
@@ -222,6 +249,34 @@ extends ContextualTest
 		}
 	}
 	
+	/** Verify that blob has the same contents as the resource at path.
+	 * 
+	 * @param blob
+	 * @param path
+	 */
+	private void checkBlob(Blob blob, String path) throws Exception {
+		InputStream cis = blob.getBinaryStream();
+		InputStream ris = getClass().getResourceAsStream(path);
+		
+		try {
+			// compare stream contents
+			long pos = 0;
+			while (true) {
+				int c_in = cis.read();
+				int r_in = ris.read();
+				
+				pos++;
+				if (c_in < 0 && r_in < 0) {
+					return;
+				}
+				assertEquals("at pos " + pos, c_in, r_in);
+			}
+		} finally {
+			cis.close();
+			ris.close();
+		}
+	}
+
 	@Test
 	public void testToOracleXML() throws Exception {
 		DataSource ds = getDataSource();
@@ -230,10 +285,10 @@ extends ContextualTest
 		try {
 		InputStream is = getClass().getResourceAsStream(RESOURCE_PATH);
 		try {
-			Clob clob = makeClob(conn, is);
+			Blob blob = makeBlob(conn, is);
 			
-			checkClob(clob,RESOURCE_PATH);
-			int pk = insert(conn, "MBMG", "257423", clob);
+			checkBlob(blob,RESOURCE_PATH);
+			int pk = insert(conn, "MBMG", "257423", blob);
 			System.out.printf("cache row %d\n", pk);
 		} finally {
 			is.close();
@@ -242,7 +297,7 @@ extends ContextualTest
 			conn.close();
 		}
 		
-		assertTrue("inserted clob", true);
+		assertTrue("inserted blob", true);
 	}
 	
 }
