@@ -152,7 +152,7 @@ extends ContextualTest
 		s.setString(2, site);
 		s.setTimestamp(3, new java.sql.Timestamp(System.currentTimeMillis()));
 		s.setBlob(4, blob);
-		s.setString(5, null);
+		s.setString(5, "fake");
 				
 		s.executeUpdate();
 		
@@ -178,7 +178,7 @@ extends ContextualTest
 		s.setString(2, site);
 		s.setTimestamp(3, new java.sql.Timestamp(System.currentTimeMillis()));
 		s.setClob(4, clob);
-		s.setString(5, null);
+		s.setString(5, "fake");
 				
 		s.executeUpdate();
 		
