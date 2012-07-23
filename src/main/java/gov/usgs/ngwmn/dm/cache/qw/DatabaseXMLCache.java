@@ -18,6 +18,7 @@ import java.math.BigDecimal;
 import java.security.DigestOutputStream;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.sql.Blob;
 import java.sql.Clob;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -121,9 +122,8 @@ public class DatabaseXMLCache implements Cache {
 			}
 			final Connection conn = dconn;
 			
-			final Clob clob = conn.createClob();
-			// TODO Ascii?
-			OutputStream bos = clob.setAsciiStream(1);
+			final Blob blob = conn.createBlob();
+			OutputStream bos = blob.setBinaryStream(0);
 			
 			// TODO Defer MD5 calculation until quality inspection step
 			MessageDigest md5 = null;
@@ -142,18 +142,18 @@ public class DatabaseXMLCache implements Cache {
 				public void close() throws IOException {
 					super.close();
 					try {
-						long length = clob.length();
-						logger.debug("About to insert, clob.length={}", length);
+						long length = blob.length();
+						logger.debug("About to insert, blob.length={}", length);
 						String hash = null;
 						if (md5final != null) {
 							byte[] raw = md5final.digest();
 							char[] hex = Hex.encodeHex(raw);
 							hash = new String(hex);
 						}
-						int newkey = insert(conn, key, clob, hash);
+						int newkey = insert(conn, key, blob, hash);
 						conn.commit();
 						// TODO Clean up clob?
-						clob.free();
+						blob.free();
 						pooledConn.close();
 						logger.info("saved data for {}, sz {}", well, length);
 						
@@ -387,11 +387,11 @@ public class DatabaseXMLCache implements Cache {
 	}
 
 	// Cannot do the insert until the Clob has been filled up
-	private int insert(Connection conn, WellRegistryKey key, Clob clob, String hash) 
+	private int insert(Connection conn, WellRegistryKey key, Blob blob, String hash) 
 			throws SQLException
 	{
 		String SQLTEXT = "INSERT INTO GW_DATA_PORTAL."+tablename+"(agency_cd,site_no,fetch_date,xml,md5) VALUES (" +
-				"?, ?, ?, XMLType(?), ?)";
+				"?, ?, ?, XMLType(?,nls_charset_id('UTF8')), ?)";
 		
 		int[] pkColumns = {1};
 		PreparedStatement s = conn.prepareStatement(SQLTEXT, pkColumns);
@@ -399,7 +399,7 @@ public class DatabaseXMLCache implements Cache {
 		s.setString(1, key.getAgencyCd());
 		s.setString(2, key.getSiteNo());
 		s.setTimestamp(3, new java.sql.Timestamp(System.currentTimeMillis()));
-		s.setClob(4, clob);
+		s.setBlob(4, blob);
 		s.setString(5, hash);
 				
 		s.executeUpdate();

@@ -126,7 +126,6 @@ extends ContextualTest
 		}
 		
 		final Blob blob = conn.createBlob();
-		// TODO Ascii?
 		OutputStream os = blob.setBinaryStream(0);
 	
 		try {
