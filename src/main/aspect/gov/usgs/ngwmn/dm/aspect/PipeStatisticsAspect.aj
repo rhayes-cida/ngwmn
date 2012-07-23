@@ -10,6 +10,7 @@ import gov.usgs.ngwmn.dm.dao.FetchLog;
 import gov.usgs.ngwmn.dm.io.Pipeline;
 import gov.usgs.ngwmn.dm.spec.Specifier;
 import gov.usgs.ngwmn.dm.harvest.WebRetriever;
+import gov.usgs.ngwmn.dm.cache.qw.DatabaseXMLCache;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -98,16 +99,19 @@ public aspect PipeStatisticsAspect {
 	}
 	
 	// use recorded pipe stats, as inspection may be asynchronous
-	pointcut withdraw(int ck, Specifier spec):
-		call(* gov.usgs.ngwmn.dm.cache.qw.DatabaseXMLCache.withdraw(int,Specifier)) &&
+	pointcut withdraw(int ck, Specifier spec, DatabaseXMLCache cache):
+		call(* DatabaseXMLCache.withdraw(int,Specifier)) &&
+		target(cache) &&
 		args(ck,spec);
 	
-	after(int ck, Specifier spec):withdraw(ck,spec) {
+	after(int ck, Specifier spec, DatabaseXMLCache cache):withdraw(ck,spec,cache) {
 		logger.trace("ASPECT: Enter after withdraw");
 		// record that this fetch was inspected and found empty
 		if (spec.stats == null) {
 			return;
 		}
+		
+		logger.debug("note withdraw for {} with pipe stats={}", spec, spec.stats);		
 		try {
 			// this waits until the FetchRecorder sets the fetch log on the PipeStatistics
 			FetchLog fl = spec.stats.getFetchLog(15, TimeUnit.SECONDS);
@@ -117,26 +121,46 @@ public aspect PipeStatisticsAspect {
 				
 				// let the event bus update the fetch log
 				fetchEventBus.post(fl);
+				
+				// remember the linkage
+				cache.linkFetchLog(fl.getFetchlogId(), ck);
 			}
 		} catch (InterruptedException ie) {
 			// oh well, the fetch did not get recorded in time, give up
 			logger.warn("Abandoned wait for fetchlog in withdraw");
 		}
-		logger.debug("note withdraw for {} with pipe stats={}", spec, spec.stats);		
 		logger.trace("ASPECT: Exit  after withdraw");
 	}
 	
 	// use recorded fetch log, as inspection may be asynchronous
-	pointcut publish(int ck, Specifier spec):
-		call(* gov.usgs.ngwmn.dm.cache.qw.DatabaseXMLCache.publish(int,Specifier)) &&
+	pointcut publish(int ck, Specifier spec, DatabaseXMLCache cache):
+		call(* DatabaseXMLCache.publish(int,Specifier)) &&
+		target(cache) &&
 		args(ck,spec);
 	
-	after(int ck, Specifier spec):publish(ck,spec) {
+	after(int ck, Specifier spec, DatabaseXMLCache cache):publish(ck,spec,cache) {
 		logger.trace("ASPECT: Enter after publish");
+		if (spec.stats == null) {
+			return;
+		}
+
 		// record that this fetch was inspected and found OK
 		logger.debug("record publish for {} with pipe stats={}", spec, spec.stats);
-		logger.trace("ASPECT: Exit  after publish");
 		
+		// update cache to remember fetch log
+		try {
+			// this waits until the FetchRecorder sets the fetch log on the PipeStatistics
+			FetchLog fl = spec.stats.getFetchLog(15, TimeUnit.SECONDS);
+			if (fl != null) {
+				// remember the linkage
+				cache.linkFetchLog(fl.getFetchlogId(), ck);
+			}
+		} catch (InterruptedException ie) {
+			// oh well, the fetch did not get recorded in time, give up
+			logger.warn("Abandoned wait for fetchlog in publish");
+		}		
+		
+		logger.trace("ASPECT: Exit  after publish");
 	}
 
 	after(Pipeline p) throwing (Exception e) : invoke(p) {

@@ -92,6 +92,10 @@ public class DatabaseXMLCache implements Cache {
 		}
 	}
 	
+	public void linkFetchLog(int cacheKey, int fetchLogID) {
+		logger.info("link cache key {} type {} to fetch log id {}", new Object[] {cacheKey, wdt, fetchLogID});
+	}
+	
 	public void inspectAndRelease(int key, Specifier spec) {
 		try {
 			if (inspector.acceptable(key)) {
