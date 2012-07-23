@@ -19,6 +19,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import javax.sql.DataSource;
+import javax.xml.bind.annotation.XmlType;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
@@ -33,6 +34,7 @@ public class GWDP_362_IntegrationTest
 extends ContextualTest
 {
 
+	private static final String RESOURCE_PATH = "/sample-data/MBMG_257423_LOG.xml";
 	private Harvester victim;
 	
 	@Before
@@ -61,7 +63,7 @@ extends ContextualTest
 		return bos.toByteArray();
 	}
 	
-	@Test
+	// @Test
 	public void testWget_GWDP_362() throws Exception {
 		String url = "http://cida-wiwsc-javaprodp.er.usgs.gov:8080/cocoon/gin/gwdp/agency/MBMG/wfs?request=GetFeature&featureId=257423";
 		int code = victim.wget(url);
@@ -125,6 +127,7 @@ extends ContextualTest
 		final Clob clob = conn.createClob();
 		// TODO Ascii?
 		OutputStream os = clob.setAsciiStream(1);
+	
 		try {
 			copy(is,os);
 		} finally {
@@ -163,7 +166,7 @@ extends ContextualTest
 
 	@Test
 	public void checkData() throws Exception {
-		InputStream is = getClass().getResourceAsStream("/sample-data/MBMG_257423_LOG.xml");
+		InputStream is = getClass().getResourceAsStream(RESOURCE_PATH);
 
 		byte[] contents = null;
 		try {
@@ -191,16 +194,45 @@ extends ContextualTest
 		assertTrue("sample data has encoded chars", enct>0);
 	}
 	
-	// @Test
+	/** Verify that clob has the same contents as the resource at path.
+	 * 
+	 * @param clob
+	 * @param path
+	 */
+	private void checkClob(Clob clob, String path) throws Exception {
+		InputStream cis = clob.getAsciiStream();
+		InputStream ris = getClass().getResourceAsStream(path);
+		
+		try {
+			// compare stream contents
+			long pos = 0;
+			while (true) {
+				int c_in = cis.read();
+				int r_in = ris.read();
+				
+				pos++;
+				if (c_in < 0 && r_in < 0) {
+					return;
+				}
+				assertEquals("at pos " + pos, c_in, r_in);
+			}
+		} finally {
+			cis.close();
+			ris.close();
+		}
+	}
+	
+	@Test
 	public void testToOracleXML() throws Exception {
 		DataSource ds = getDataSource();
 		Connection conn = ds.getConnection();
 		
 		try {
-		InputStream is = getClass().getResourceAsStream("/sample-data/MBMG_257423_LOG.xml");
+		InputStream is = getClass().getResourceAsStream(RESOURCE_PATH);
 		try {
 			Clob clob = makeClob(conn, is);
 			
+			checkClob(clob,RESOURCE_PATH);
 			int pk = insert(conn, "MBMG", "257423", clob);
 			System.out.printf("cache row %d\n", pk);
 		} finally {
