@@ -1,6 +1,8 @@
 package gov.usgs.ngwmn.dm.io.transform;
 
 import static gov.usgs.ngwmn.WellDataType.WATERLEVEL;
+import static gov.usgs.ngwmn.WellDataType.LITHOLOGY;
+
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
@@ -14,6 +16,7 @@ import gov.usgs.ngwmn.dm.io.Supplier;
 import gov.usgs.ngwmn.dm.io.parse.AdditionalColumnsPostParser;
 import gov.usgs.ngwmn.dm.io.parse.ColumnExclusionPostParser;
 import gov.usgs.ngwmn.dm.io.parse.DataRowParser;
+import gov.usgs.ngwmn.dm.io.parse.Element;
 import gov.usgs.ngwmn.dm.io.parse.HeaderChangeListener;
 import gov.usgs.ngwmn.dm.io.parse.ParseState;
 import gov.usgs.ngwmn.dm.io.parse.CompositePostParser;
@@ -25,6 +28,7 @@ import gov.usgs.ngwmn.dm.spec.Specifier;
 import java.io.FilterOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -103,6 +107,30 @@ public class TransformEntrySupplierTests {
 		Set<String> expected = new HashSet<String>( Arrays.asList(
 				WaterPortalPostParserFactory.exclusions.get(WATERLEVEL) ) );
 		assertEquals( expected, set);
+	}
+	
+	@Test
+	public void test_lithology_transformation() {
+		DataRowParser parser = transformEntrySupplier.makeParser();
+		assertNotNull(parser);
+				
+		PostParser  pp  = (PostParser) PrivateField.get(parser, "postParser");
+		
+		// refine headers in order to get exclusions set up
+		List<Element> headers = new ArrayList<Element>();
+		headers.add(new Element("logElement/MappedInterval/specification/HydrostratigraphicUnit/purpose", "purpose", null));
+		headers.add(new Element("logElement/MappedInterval/observationMethod/CGI_TermValue/value", "value", null));
+		pp.refineHeaderColumns(headers);
+		
+		Map<String,String> row = new HashMap<String,String>();
+		row.put("logElement/MappedInterval/specification/HydrostratigraphicUnit/purpose","hsgupurp");
+		row.put("logElement/MappedInterval/observationMethod/CGI_TermValue/value","obmeth");
+		pp.refineDataColumns(row);
+				
+		assertFalse("contains excluded column", row.containsKey("logElement/MappedInterval/specification/HydrostratigraphicUnit/purpose"));
+		assertFalse("contains renamed column", row.containsKey("logElement/MappedInterval/observationMethod/CGI_TermValue/value"));
+		assertTrue("contains new renamed column", row.containsKey("ObservationMethod"));
+		assertEquals("renamed columns has proper value", "obmeth", row.get("ObservationMethod"));
 	}
 	
 	@Test

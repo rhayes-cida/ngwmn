@@ -24,8 +24,12 @@ public class ColumnRenamePostParser implements PostParser {
 		for (Element element : headers) {
 			// three - rename cols
 			if ( renameColumns.containsKey( element.displayName ) ) {
-				logger.trace("renaming  element: from '{}' to '{}'", element.displayName, renameColumns.get( element.displayName ));
+				logger.trace("renaming  element: from '{}' to '{}'", element, renameColumns.get( element.displayName ));
 				element.displayName = renameColumns.get( element.displayName );
+			}
+			else if (renameColumns.containsKey(element.fullName)) {
+				logger.trace("renaming  element by fullname: from '{}' to '{}'", element, renameColumns.get( element.fullName ));
+				element.displayName = renameColumns.get( element.fullName );				
 			}
 		}
 		return headers;

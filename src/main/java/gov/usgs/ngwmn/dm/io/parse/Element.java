@@ -33,12 +33,16 @@ public class Element {
 	public int hashCode() {
 		return fullName.hashCode();
 	};
-
+	
 	@Override
 	public String toString() {
-		return fullName;
+		StringBuilder builder = new StringBuilder();
+		builder.append("Element [fullName=").append(fullName)
+				.append(", localName=").append(localName)
+				.append(", displayName=").append(displayName).append("]");
+		return builder.toString();
 	}
-	
+
 	@Override
 	public boolean equals(Object obj) {
 		if ( ! (obj instanceof Element) ) { // null is implicitly checked with !instanceOf

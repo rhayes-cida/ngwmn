@@ -40,10 +40,10 @@ public class ColumnExclusionPostParser implements PostParser {
 					&& ! removeColumns.contains(element.displayName)
 					&& ! removeColumns.contains(element.localName)
 					) {
-				logger.trace("retaining element: {}", element.displayName);
+				logger.trace("retaining element: {}", element);
 				keepHeaders.add( element );
 			} else {
-				logger.trace("excluding element: {}", element.displayName);
+				logger.trace("excluding element: {}", element);
 			}
 		}
 		return keepHeaders;

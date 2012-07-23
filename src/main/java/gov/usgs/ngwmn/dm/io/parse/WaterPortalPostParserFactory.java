@@ -23,7 +23,8 @@ public class WaterPortalPostParserFactory {
 	
 	private static final Map<WellDataType,Map<String,String>> coordinateMap = new HashMap<WellDataType, Map<String,String>>();
 
-	public static final String[] LITHOLOGY_EXCLUSION_COLUMNS_FULL_NAME = new String[] {
+	public static final String[] LITHOLOGY_EXCLUSION_COLUMNS_NAME = new String[] {
+						"logElement/MappedInterval/observationMethod/CGI_TermValue/value",
 						"logElement/MappedInterval/observationMethod/CGI_TermValue/value/codeSpace",
 						"logElement/MappedInterval/specification/HydrostratigraphicUnit/observationMethod/CGI_TermValue/value/codeSpace",
 						"logElement/MappedInterval/specification/HydrostratigraphicUnit/composition/CompositionPart/role",
@@ -31,25 +32,23 @@ public class WaterPortalPostParserFactory {
 						"logElement/MappedInterval/specification/HydrostratigraphicUnit/composition/CompositionPart/lithology/ControlledConcept/name/codeSpace",
 						"logElement/MappedInterval/specification/HydrostratigraphicUnit/composition/CompositionPart/proportion/CGI_TermValue/value",
 						"logElement/MappedInterval/specification/HydrostratigraphicUnit/composition/CompositionPart/proportion/CGI_TermValue/value/codeSpace",
-						"logElement/MappedInterval/shape/LineString/srsDimension"};
-	
-	public static final String[] LITHOLOGY_EXCLUSION_COLUMNS_DISPLAY_NAME = new String[] {
-						"MappedInterval/observationMethod/CGI_TermValue/value/codeSpace",
-						"HydrostratigraphicUnit/observationMethod/CGI_TermValue/value/codeSpace",
-						"HydrostratigraphicUnit/observationMethod/CGI_TermValue/value",
-						"HydrostratigraphicUnit/purpose",
-						"role",
-						"role/codeSpace",
-						"name/codeSpace",
-						"proportion/CGI_TermValue/value",
-						"proportion/CGI_TermValue/value/codeSpace",
-						"UnconsolidatedMaterial/name",
-						"UnconsolidatedMaterial/purpose",
-						"UnconsolidatedMaterial/name",
-						"UnconsolidatedMaterial/purpose",
-						"srsDimension"};
-	
-	public static final String[] REGISTRY_EXCLUSION_COLUMNS_DISPLAY_NAME = new String[] {
+						"logElement/MappedInterval/shape/LineString/srsDimension",
+						// "logElement/MappedInterval/specification/HydrostratigraphicUnit/observationMethod/CGI_TermValue/value",
+						"logElement/MappedInterval/specification/HydrostratigraphicUnit/observationMethod/CGI_TermValue/value/codeSpace",
+						"logElement/MappedInterval/specification/HydrostratigraphicUnit/purpose",
+						"logElement/MappedInterval/specification/HydrostratigraphicUnit/composition/CompositionPart/role/codeSpace",
+						"logElement/MappedInterval/specification/HydrostratigraphicUnit/composition/CompositionPart/lithology/ControlledConcept/name/codeSpace",
+						"logElement/MappedInterval/specification/HydrostratigraphicUnit/composition/CompositionPart/material/UnconsolidatedMaterial/purpose",
+						"logElement/MappedInterval/specification/HydrostratigraphicUnit/composition/CompositionPart/proportion/CGI_TermValue/value",
+						"logElement/MappedInterval/specification/HydrostratigraphicUnit/composition/CompositionPart/proportion/CGI_TermValue/value/codeSpace",
+						"logElement/MappedInterval/specification/HydrostratigraphicUnit/composition/CompositionPart/lithology/ControlledConcept/name",
+						"logElement/MappedInterval/specification/HydrostratigraphicUnit/composition/CompositionPart/material/UnconsolidatedMaterial/name",
+						"codeSpace",
+						"purpose",
+						"srsDimension"
+						};
+		
+	public static final String[] REGISTRY_EXCLUSION_COLUMNS_NAME = new String[] {
 		// These should, ideally, not appear in the input data now that we are using an explicit column list.
 		// No harm and some benefit in leaving the exclusion list in place, though.
 		"agency_cd",
@@ -107,17 +106,17 @@ public class WaterPortalPostParserFactory {
 	
 
 	
-	public static final String[] CONSTRUCTION_EXCLUSION_COLUMNS_DISPLAY_NAME = new String[] {
+	public static final String[] CONSTRUCTION_EXCLUSION_COLUMNS_NAME = new String[] {
 						"id",
 						"srsName",
 						"codeSpace"};
-	public static final String[] LOG_EXCLUSION_COLUMNS_DISPLAY_NAME = Arrays.copyOf(
-					ArrayUtils.addAll(LITHOLOGY_EXCLUSION_COLUMNS_DISPLAY_NAME,
-									  CONSTRUCTION_EXCLUSION_COLUMNS_DISPLAY_NAME),
-					LITHOLOGY_EXCLUSION_COLUMNS_DISPLAY_NAME.length + CONSTRUCTION_EXCLUSION_COLUMNS_DISPLAY_NAME.length,
+	public static final String[] LOG_EXCLUSION_COLUMNS_NAME = Arrays.copyOf(
+					ArrayUtils.addAll(LITHOLOGY_EXCLUSION_COLUMNS_NAME,
+									  CONSTRUCTION_EXCLUSION_COLUMNS_NAME),
+					LITHOLOGY_EXCLUSION_COLUMNS_NAME.length + CONSTRUCTION_EXCLUSION_COLUMNS_NAME.length,
 					String[].class);
 	
-	public static final String[] WATERLEVEL_EXCLUSION_COLUMNS_DISPLAY_NAME = new String[] {
+	public static final String[] WATERLEVEL_EXCLUSION_COLUMNS_NAME = new String[] {
 					"uom"};
 	
 	public static final String[] NO_EXCLUSION_COLUMNS = new String[] {};
@@ -130,20 +129,24 @@ public class WaterPortalPostParserFactory {
 	
 	static {
 		exclusions = new HashMap<WellDataType, String[]>();
-		exclusions.put(LOG,				LOG_EXCLUSION_COLUMNS_DISPLAY_NAME);
-		exclusions.put(LITHOLOGY,		LITHOLOGY_EXCLUSION_COLUMNS_DISPLAY_NAME);
-		exclusions.put(CONSTRUCTION,	CONSTRUCTION_EXCLUSION_COLUMNS_DISPLAY_NAME);
-		exclusions.put(WATERLEVEL,		WATERLEVEL_EXCLUSION_COLUMNS_DISPLAY_NAME);
-		exclusions.put(REGISTRY, REGISTRY_EXCLUSION_COLUMNS_DISPLAY_NAME);
+		exclusions.put(LOG,				LOG_EXCLUSION_COLUMNS_NAME);
+		exclusions.put(LITHOLOGY,		LITHOLOGY_EXCLUSION_COLUMNS_NAME);
+		exclusions.put(CONSTRUCTION,	CONSTRUCTION_EXCLUSION_COLUMNS_NAME);
+		exclusions.put(WATERLEVEL,		WATERLEVEL_EXCLUSION_COLUMNS_NAME);
+		exclusions.put(REGISTRY, REGISTRY_EXCLUSION_COLUMNS_NAME);
 		
 		
 		renameColumns = new HashMap<WellDataType, Map<String,String>>();
 		
 		HashMap<String, String> lithologyRenames = new HashMap<String, String>();
 		lithologyRenames.put("MappedInterval/observationMethod/CGI_TermValue/value", "ObservationMethod");
+		lithologyRenames.put("logElement/MappedInterval/specification/HydrostratigraphicUnit/observationMethod/CGI_TermValue/value","ObservationMethod");
 		lithologyRenames.put("id", "LithologyID");
+		lithologyRenames.put("Id", "LithologyID");
 		lithologyRenames.put("description", "LithologyDescription");
+		lithologyRenames.put("Description", "LithologyDescription");
 		lithologyRenames.put("ControlledConcept/name", "LithologyControlledConcept");
+		lithologyRenames.put("logElement/MappedInterval/specification/HydrostratigraphicUnit/composition/CompositionPart/lithology/ControlledConcept/name","LithologyControlledConcept");
 		renameColumns.put(LITHOLOGY, lithologyRenames);
 		
 		HashMap<String, String> constructionRenames = new HashMap<String, String>();
