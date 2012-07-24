@@ -277,10 +277,16 @@ public class ParseState {
 	 * @param value
 	 */
 	public void putChars(String value) {
+		String crrnt = current();
+		String prev = targetColumnValues.get(crrnt);
+		if (prev == null) {
+			prev = "";
+		}
+		value = prev + value;
 		if (isInTarget) {
-			targetColumnValues.put(current(), value);
+			targetColumnValues.put(crrnt, value);
 		} else if (isKeepElders) {
-			elderColumnValues.put(current(), value);
+			elderColumnValues.put(crrnt, value);
 		}
 	}
 
