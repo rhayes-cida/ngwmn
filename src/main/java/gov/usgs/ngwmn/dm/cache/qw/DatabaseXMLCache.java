@@ -92,8 +92,30 @@ public class DatabaseXMLCache implements Cache {
 		}
 	}
 	
-	public void linkFetchLog(int cacheKey, int fetchLogID) {
+	public void linkFetchLog(int fetchLogID , int cacheKey) {
 		logger.info("link cache key {} type {} to fetch log id {}", new Object[] {cacheKey, wdt, fetchLogID});
+
+		try {
+			final Connection conn = ds.getConnection();
+			try {
+				PreparedStatement s = conn.prepareStatement(
+						"UPDATE GW_DATA_PORTAL." + tablename + " " +
+						"SET fetchlog_ref = ? " +
+						"WHERE " + tablename+"_id = ? ");
+
+				s.setInt(1, fetchLogID);
+				s.setInt(2, cacheKey);
+
+				int ct = s.executeUpdate();
+				if (ct != 1) {
+					logger.warn("Failed to set fetchlog_ref to {} for cache row {}", fetchLogID, cacheKey);
+				}
+			} finally {
+				conn.close();
+			} 
+		} catch (SQLException e) {
+			logger.warn("Problem setting fetchlog_ref", e);
+		}
 	}
 	
 	public void inspectAndRelease(int key, Specifier spec) {
