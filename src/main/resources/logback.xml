@@ -20,6 +20,7 @@
   <logger level="DEBUG" name="gov.usgs.ngwmn.dm.DataManagerServlet"/>
   <logger name="com.base22" level="TRACE"/>
   <logger name="httpclient.wire.content" level="WARN"/>
+  	<logger level="trace" name="gov.usgs.ngwmn.dm.visualization"/>
   
   <root level="debug">
   	<if condition=' ! p("user.name").equals("tomcat")'>

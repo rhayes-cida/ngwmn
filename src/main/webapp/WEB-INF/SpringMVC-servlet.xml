@@ -12,8 +12,8 @@
         http://www.springframework.org/schema/context 
         http://www.springframework.org/schema/context/spring-context-3.1.xsd">
 
-    <context:component-scan base-package="gov.usgs.ngwmn.admin"/>
-    
+	<import resource="classpath:applicationContext.xml"/>
+
     <mvc:annotation-driven  />
     
     <bean id="viewResolver" class="org.springframework.web.servlet.view.InternalResourceViewResolver">
@@ -21,4 +21,7 @@
     	<property name="suffix" value=".jsp"/>
     </bean>
     
+    <bean id="FetchStatsController" class="gov.usgs.ngwmn.admin.FetchStatsController">
+    	<property name="generator" ref="FetchStatsGenerator"/>
+    </bean>
 </beans>

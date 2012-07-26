@@ -14,6 +14,12 @@
 	                  value="${ngwmn_cache_url}" />
 	        <property name="user" value="${ngwmn_cache_username}" />
 	        <property name="password" value="${ngwmn_cache_pw}" />
+	        <!--  ask Oracle JDBC driver to not convert DATE to TIMESTAMP please -->
+	       	<property name="connectionProperties">
+	        	<props>
+	        		<prop key="oracle.jdbc.mapDateToTimestamp">false</prop>
+	        	</props>
+	        </property>
 	    </bean>
     </beans>
     
@@ -26,6 +32,13 @@
 	                  value="jdbc:oracle:thin:@192.168.56.10:1521:orcl" />
 	        <property name="user" value="ngwmn_cache" />
 	        <property name="password" value="${ngwmn_cache_pw}" />
+	       	<!--  ask Oracle JDBC driver to not convert DATE to TIMESTAMP please -->
+	       	<property name="connectionProperties">
+	        	<props>
+	        		<prop key="oracle.jdbc.mapDateToTimestamp">false</prop>
+	        	</props>
+	        </property>
+	        
 	    </bean>
     </beans>
     
@@ -38,6 +51,12 @@
 	                  value="jdbc:oracle:thin:@192.168.56.10:1521:orcl" />
 	        <property name="user" value="gw_data_portal" />
 	        <property name="password" value="oracle" />
+	       	<!--  ask Oracle JDBC driver to not convert DATE to TIMESTAMP please -->
+	       	<property name="connectionProperties">
+	        	<props>
+	        		<prop key="oracle.jdbc.mapDateToTimestamp">false</prop>
+	        	</props>
+	        </property>
 	    </bean>
     </beans>
     
