@@ -7,6 +7,10 @@
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
     <!--Load the AJAX API-->
     <script type="text/javascript" src="https://www.google.com/jsapi"></script>
+    <meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7; IE=EmulateIE9"></meta> 
+	<script type="text/javascript"
+		  src="http://cida.usgs.gov/js/dygraphs/2012_07_21_bc2d2/dygraph-dev.js"></script>
+    
     <script type="text/javascript">
 
       // Load the Visualization API and the piechart package.
@@ -36,6 +40,10 @@
                     'width':400,
                     'height':300};
     	    visualization.draw(data, options);
+    	    
+    	    var dyChart = new Dygraph.GVizChart(
+    	    		document.getElementById('dygraphs_chart'));
+    	    dyChart.draw(data, {});
     	  }
       
       // Callback that creates and populates a data table,
@@ -76,5 +84,6 @@
 <h1>Some random chart</h1>
 
 <div id="chart_div"></div>
+<div id="dygraphs_chart"></div>
 </body>
 </html>
