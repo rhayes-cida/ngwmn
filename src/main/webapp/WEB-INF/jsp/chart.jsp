@@ -43,7 +43,15 @@
     	    
     	    var dyChart = new Dygraph.GVizChart(
     	    		document.getElementById('dygraphs_chart'));
-    	    dyChart.draw(data, {});
+    	    var dyOptions = {
+    	    		hideOverlayOnMouseOut: false,
+    	    	      labelsDivStyles: { border: '1px solid black' },
+    	    	      title: 'Fetch Statistics',
+    	    	      xlabel: 'Date',
+    	    	      ylabel: 'Count',
+    	    	      showRangeSelector: true
+    	    	    }
+    	    dyChart.draw(data, dyOptions);
     	  }
       
       // Callback that creates and populates a data table,
@@ -83,7 +91,8 @@
 
 <h1>Some random chart</h1>
 
-<div id="chart_div"></div>
 <div id="dygraphs_chart"></div>
+
+<div id="chart_div"></div>
 </body>
 </html>
