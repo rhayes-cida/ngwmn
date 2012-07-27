@@ -35,3 +35,53 @@ select to_date('2012-07-11','YYYY-MM-dd') from dual;
 				order by trunc(fl.started_at) ASC;
 				
 
+select 
+
+trunc(fl.started_at) fetched, 
+				
+(select count(*) from GW_DATA_PORTAL.WATERLEVEL_CACHE_STATS cs1
+								 where trunc(cs1.fetch_date) = trunc(fl.started_at) 
+								 and cs1.published = 'Y') success,
+				
+(select count(*) from GW_DATA_PORTAL.WATERLEVEL_CACHE_STATS cs2
+								 where trunc(cs2.fetch_date) = trunc(fl.started_at) 
+								 and cs2.published = 'N') "empty",
+count(*) attempts 
+
+from GW_DATA_PORTAL.fetch_log fl
+where fl.data_source is not null
+
+								group by trunc(fl.started_at) 
+				 order by trunc(fl.started_at) asc;
+				 
+				 
+select 
+
+trunc(fl.started_at) fetched, 
+				
+(select count(*) from GW_DATA_PORTAL.WATERLEVEL_CACHE_STATS cs1
+								 where trunc(cs1.fetch_date) = trunc(fl.started_at) 
+								 and cs1.published = 'Y') success,
+				
+(select count(*) from GW_DATA_PORTAL.WATERLEVEL_CACHE_STATS cs2
+								 where trunc(cs2.fetch_date) = trunc(fl.started_at) 
+								 and cs2.published = 'N') "empty",
+								 
+count(distinct fetch_log.fetchlog_id) fail_ct,
+
+count(*) attempts 
+
+from 
+(select * from GW_DATA_PORTAL.fetch_log 
+ where fetch_log.data_stream = 'WATERLEVEL'
+ and fetcher = 'WebRetriever' ) fl
+ 
+ left join GW_DATA_PORTAL.fetch_log 
+ on (fetch_log.fetchlog_id = fl.fetchlog_id and fetch_log.status = 'FAIL')
+ 
+group by trunc(fl.started_at)
+order by trunc(fl.started_at) asc;
+				 
+				 
+				 
+				 

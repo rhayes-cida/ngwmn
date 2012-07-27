@@ -22,18 +22,32 @@ public class FetchStatsDAO {
 	
 	public RowSet overallTimeSeries() throws SQLException {
 		String query = 
-				"select trunc(fl.started_at) fetched, " +
-				"(select count(*) from GW_DATA_PORTAL.WATERLEVEL_CACHE_STATS cs1" +
-				"				 where trunc(cs1.fetch_date) = trunc(fl.started_at) " +
-				"				 and cs1.published = 'Y') success," +
-				"				(select count(*) from GW_DATA_PORTAL.WATERLEVEL_CACHE_STATS cs2" +
-				"				 where trunc(cs2.fetch_date) = trunc(fl.started_at) " +
-				"				 and cs2.published = 'N') failure," +
-				"				 count(*) trials" +
-				"		 from GW_DATA_PORTAL.fetch_log fl" +
-				"				where fl.data_source is not null" +
-				"				group by trunc(fl.started_at) " +
-				" order by trunc(fl.started_at) asc ";
+				"select "+
+
+				"trunc(fl.started_at) fetch_date, "+
+								
+				"(select count(*) from GW_DATA_PORTAL.WATERLEVEL_CACHE_STATS cs1 "+
+												 "where trunc(cs1.fetch_date) = trunc(fl.started_at) "+
+												 "and cs1.published = 'Y') success, "+
+								
+				"(select count(*) from GW_DATA_PORTAL.WATERLEVEL_CACHE_STATS cs2 "+
+												 "where trunc(cs2.fetch_date) = trunc(fl.started_at) "+
+												 "and cs2.published = 'N') \"EMPTY\", "+
+												 
+				"count(distinct fetch_log.fetchlog_id) fail, "+
+
+				"count(*) attempts "+
+
+				"from "+
+				"(select * from GW_DATA_PORTAL.fetch_log "+
+				 "where fetch_log.data_stream = 'WATERLEVEL' "+
+				 "and fetcher = 'WebRetriever' ) fl "+
+				 
+				 "left join GW_DATA_PORTAL.fetch_log "+
+				 "on (fetch_log.fetchlog_id = fl.fetchlog_id and fetch_log.status = 'FAIL') "+
+				 
+				"group by trunc(fl.started_at) "+
+				"order by trunc(fl.started_at) asc";
 		
 		Connection conn = datasource.getConnection();
 		try {

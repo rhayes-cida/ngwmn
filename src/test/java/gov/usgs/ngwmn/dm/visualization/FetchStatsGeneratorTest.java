@@ -23,9 +23,11 @@ public class FetchStatsGeneratorTest extends ContextualTest {
 	public void testGenerateDataTable() throws Exception {
 		DataTable dt = victim.generateDataTable(null, null);
 		
-		assertTrue(dt.containsColumn("AGENCY_CD"));
-		assertTrue(dt.containsColumn("FETCHED"));
-		assertTrue(dt.containsColumn("CT"));
+		assertTrue(dt.containsColumn("FETCH_DATE"));
+		assertTrue(dt.containsColumn("SUCCESS"));
+		assertTrue(dt.containsColumn("EMPTY"));
+		assertTrue(dt.containsColumn("FAIL"));
+		assertTrue(dt.containsColumn("ATTEMPTS"));
 		
 		int nr = dt.getNumberOfRows();
 		assertTrue("some rows", nr > 0);

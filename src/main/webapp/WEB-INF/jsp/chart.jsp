@@ -89,7 +89,7 @@
 </head>
 <body>
 
-<h1>Some random chart</h1>
+<h1>Fetch results</h1>
 
 <div id="dygraphs_chart"></div>
 

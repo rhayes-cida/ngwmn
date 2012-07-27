@@ -102,7 +102,9 @@ public class ResultSetDataTable extends DataTable {
 			val = new TextValue(v.toString());
 			break;
 			
-		// TODO more data types...
+		default:
+			// TODO more data types...
+			throw new RuntimeException("Unmapped data type " + t);
 		}
 		
 		logger.trace("converted {} to {}", v, val);
