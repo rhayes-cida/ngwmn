@@ -21,26 +21,6 @@ public class FetchStatsController {
 
 	private FetchStatsGenerator gen;
 	
-	@RequestMapping("agency/{agency}")
-	public void agencyData(
-			@PathVariable String agency,
-			Writer writer)
-	throws IOException
-	{
-		PrintWriter pw = new PrintWriter(writer);
-		pw.printf("Hello there, Mr. %s!", agency);
-	}
-	
-	@RequestMapping("hello")
-	public String sayHello() {
-		return "sayhello";
-	}
-	
-	@RequestMapping("wombat")
-	public String wombat() {
-		return "redirect:agency/Wombat";
-	}
-	
 	@RequestMapping("chart")
 	public String showChart() {
 		return "chart";

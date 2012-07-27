@@ -53,36 +53,7 @@
     	    	    }
     	    dyChart.draw(data, dyOptions);
     	  }
-      
-      // Callback that creates and populates a data table,
-      // instantiates the pie chart, passes in the data and
-      // draws it.
-      function drawChart() {
-
-        // Create the data table.
-        var data = new google.visualization.DataTable();
-        data.addColumn('date', 'Date');
-        data.addColumn('number', 'Success');
-        data.addColumn('number', 'Failure');
-        data.addRows([
-          [new Date('2012-07-02'), 4, 6],
-          [new Date('2012-07-17'), 0, 4],
-          [new Date('2012-07-18'), 1, 0],
-          [new Date('2012-07-20'), 10, 1],
-          [new Date('2012-07-23'), 3, 3]
-        ]);
-
-        // Set chart options
-        var options = {'title':'Fetch Statistics',
-                       'width':400,
-                       'height':300};
-
-        // Instantiate and draw our chart, passing in some options.
-        var chart = new google.visualization.LineChart(document.getElementById('chart_div'));
-        chart.draw(data, options);
-        
-      }
-      
+            
       </script>
       
 <title>Chart</title>
