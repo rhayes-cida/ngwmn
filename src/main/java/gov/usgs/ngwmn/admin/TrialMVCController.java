@@ -4,8 +4,11 @@ package gov.usgs.ngwmn.admin;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.Writer;
+import java.util.Arrays;
+import java.util.List;
 
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 
@@ -24,7 +27,8 @@ public class TrialMVCController {
 	}
 	
 	@RequestMapping("hello")
-	public String sayHello() {
+	public String sayHello(
+			) {
 		return "sayhello";
 	}
 	
@@ -33,4 +37,15 @@ public class TrialMVCController {
 		return "redirect:agency/Wombat";
 	}
 	
+	@ModelAttribute("agencyCodes")
+	public List<String> getAgencyCodes() {
+		return Arrays.asList("USGS","TWDB", "IL EPA");
+	}
+	
+	@RequestMapping("site")
+	public String selectSite(
+			@ModelAttribute SiteSelector site
+	) {
+		return null;
+	}
 }
