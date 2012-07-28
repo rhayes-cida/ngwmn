@@ -12,6 +12,9 @@
 </head>
 <body>
 
+<!-- 
+For Ajax/JSON, see http://blog.springsource.org/2010/01/25/ajax-simplifications-in-spring-3-0/
+ -->
 Agency codes = ${agencyCodes}<br />
 
 And, in jstl, site is ${siteSelector}.
