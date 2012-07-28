@@ -7,17 +7,17 @@ public class SiteSelector {
 	private String site_id;
 	private WellDataType wdt;
 	
-	public String getAgency_cd() {
+	public String getAgency() {
 		return agency_cd;
 	}
-	public void setAgency_cd(String agency_cd) {
+	public void setAgency(String agency_cd) {
 		this.agency_cd = agency_cd;
 	}
 	
-	public String getSite_id() {
+	public String getSiteId() {
 		return site_id;
 	}
-	public void setSite_id(String site_id) {
+	public void setSiteId(String site_id) {
 		this.site_id = site_id;
 	}
 	
@@ -27,6 +27,18 @@ public class SiteSelector {
 	public void setDataType(WellDataType wdt) {
 		this.wdt = wdt;
 	}
+	@Override
+	public String toString() {
+		StringBuilder builder = new StringBuilder();
+		builder.append("SiteSelector " +
+				"[agency_cd=").append(agency_cd)
+				.append(", site_id=").append(site_id)
+				.append(", wdt=").append(wdt)
+				.append("]");
+		return builder.toString();
+	}
+	
+	
 	
 	
 }

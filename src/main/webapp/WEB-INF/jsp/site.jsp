@@ -12,19 +12,24 @@
 </head>
 <body>
 
-<%
-// how are model objects made available?
-		
-	String cType = request.getContentType();
-
-	log("ctype = " + cType);
-	
-	Object agencyCodes = request.getAttribute("agencyCodes");
-%>
-
-Agency codes = <%= agencyCodes %><br />
+Agency codes = ${agencyCodes}<br />
 
 And, in jstl, site is ${siteSelector}.
+<form:form commandName="siteSelector">
+<table>
+<tr>
+<th>agency: </th><td><form:select path="agency" items="${agencyCodes}"/></td></tr>
+<tr><th>site:</th><td> <form:input path="siteId" /></td></tr>
+<tr><th>type:</th> <td>
+<form:select path="dataType">
+              <form:option value="-" label="--Please Select"/>
+              <form:options items="${dataTypes}"/>
+</form:select>
+</td></tr>
+
+<tr><td colspan="2"><input type="submit" value="Save Changes" /></td></tr>
+</table>
+</form:form>
 
 </body>
 </html>

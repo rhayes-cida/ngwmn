@@ -1,6 +1,8 @@
 package gov.usgs.ngwmn.admin;
 
 
+import gov.usgs.ngwmn.WellDataType;
+
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.Writer;
@@ -45,6 +47,11 @@ public class TrialMVCController {
 	public List<String> getAgencyCodes() {
 		logger.info("creating model object agencyCodes");
 		return Arrays.asList("USGS","TWDB", "IL EPA");
+	}
+	
+	@ModelAttribute("dataTypes")
+	public WellDataType[] getDataTypes() {
+		return WellDataType.values();
 	}
 	
 	@RequestMapping("site")
