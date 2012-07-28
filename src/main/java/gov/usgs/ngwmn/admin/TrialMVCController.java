@@ -57,13 +57,14 @@ public class TrialMVCController {
 		return WellDataType.values();
 	}
 	
-	// TODO Does not seem to work...
 	@RequestMapping("agency/{agency}/sites")
 	@ResponseBody
-	public List<String> sitesForAgency(String agency) {
-		List<String> value = new ArrayList<String>(4);
-		for (int i = 0; i < 4; i++) {
-			value.add(String.format("%s%3d", agency, i));
+	public List<String> sitesForAgency(
+			@PathVariable String agency
+	) {
+		ArrayList<String> value = new ArrayList<String>(4);
+		for (int i = 1; i <= 3; i++) {
+			value.add(String.format("%s%03d", agency, i));
 		}
 		return value;
 	}
