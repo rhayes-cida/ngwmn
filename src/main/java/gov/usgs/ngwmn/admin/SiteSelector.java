@@ -27,6 +27,14 @@ public class SiteSelector {
 	public void setDataType(WellDataType wdt) {
 		this.wdt = wdt;
 	}
+	
+	public SiteSelector(String agency_cd, String site_id, WellDataType wdt) {
+		super();
+		this.agency_cd = agency_cd;
+		this.site_id = site_id;
+		this.wdt = wdt;
+	}
+	
 	@Override
 	public String toString() {
 		StringBuilder builder = new StringBuilder();

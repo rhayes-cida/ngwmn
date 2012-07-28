@@ -69,6 +69,17 @@ public class TrialMVCController {
 		return value;
 	}
 	
+	@RequestMapping("selector/{agency}/{site}/{type}")
+	@ResponseBody
+	public SiteSelector makeSelector(
+			@PathVariable String agency,
+			@PathVariable String site,
+			@PathVariable WellDataType type
+			)
+	{
+		return new SiteSelector(agency,site,type);
+	}
+	
 	@RequestMapping("site")
 	public String selectSite(
 			@ModelAttribute SiteSelector site

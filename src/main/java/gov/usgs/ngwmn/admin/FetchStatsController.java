@@ -28,6 +28,7 @@ public class FetchStatsController {
 	
 	@RequestMapping("table")
 	public void generateTable(HttpServletRequest request, HttpServletResponse response) throws IOException {
+		// TODO Could do this much more efficiently using Jackson streaming
 		DataSourceHelper.executeDataSourceServletFlow(request, response, gen, false);
 	}
 
