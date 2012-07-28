@@ -21,7 +21,7 @@
 
       function doQuery() {
     	  var query = new google.visualization.Query(
-    			  "http://localhost:8080/ngwmn/wip/fetchlog/table"
+    			  "table"
     			  );
     	  
     	  query.send(handleQueryResponse);

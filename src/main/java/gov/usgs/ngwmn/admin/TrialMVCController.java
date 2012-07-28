@@ -7,6 +7,8 @@ import java.io.Writer;
 import java.util.Arrays;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -15,6 +17,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @Controller
 @RequestMapping("/trial")
 public class TrialMVCController {
+	
+	private Logger logger = LoggerFactory.getLogger(getClass());
 	
 	@RequestMapping("agency/{agency}")
 	public void agencyData(
@@ -39,6 +43,7 @@ public class TrialMVCController {
 	
 	@ModelAttribute("agencyCodes")
 	public List<String> getAgencyCodes() {
+		logger.info("creating model object agencyCodes");
 		return Arrays.asList("USGS","TWDB", "IL EPA");
 	}
 	
@@ -46,6 +51,7 @@ public class TrialMVCController {
 	public String selectSite(
 			@ModelAttribute SiteSelector site
 	) {
-		return null;
+		logger.info("in selectSite, site={}", site);
+		return "site";
 	}
 }
