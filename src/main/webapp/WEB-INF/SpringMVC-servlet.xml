@@ -23,7 +23,8 @@
     </bean>
     
     <bean id="FetchStatsController" class="gov.usgs.ngwmn.admin.FetchStatsController">
-    	<property name="generator" ref="FetchStatsGenerator"/>
+    	<property name="dao" ref="FetchStatsDAO"/>
+    	<property name="wellDao" ref="WellRegistryDAO"/>
     </bean>
     
     <bean id="TrialController" class="gov.usgs.ngwmn.admin.TrialMVCController"/>

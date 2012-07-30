@@ -66,6 +66,7 @@
     <bean id="WellRegistryDAO"
     	class="gov.usgs.ngwmn.dm.dao.WellRegistryDAO">
     	<property name="mapper" ref="wellRegistryMapper"/>
+    	<property name="datasource" ref="dataSource"/>
    	</bean>
    	
    	<bean id="fetchLogMapper" class="org.mybatis.spring.mapper.MapperFactoryBean">
@@ -255,11 +256,7 @@
 	<bean id="FetchStatsDAO" class="gov.usgs.ngwmn.dm.dao.FetchStatsDAO">
 		<constructor-arg ref="dataSource"/>
 	</bean>
-	
-	<bean id="FetchStatsGenerator" class="gov.usgs.ngwmn.dm.visualization.FetchStatsGenerator">
-		<constructor-arg ref="FetchStatsDAO"/>
-	</bean>
-	
+		
 </beans>
 
        

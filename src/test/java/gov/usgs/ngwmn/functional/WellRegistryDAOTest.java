@@ -117,5 +117,11 @@ public class WellRegistryDAOTest extends ContextualTest {
 		assertTrue("empty", ww.isEmpty());
 	}
 
+	@Test
+	public void testAgencies() {
+		List<String> aa = dao.agencies();
+		assertTrue("has USGS", aa.contains("USGS"));
+		assertFalse("contains Silly", aa.contains("Silly"));
+	}
 	
 }

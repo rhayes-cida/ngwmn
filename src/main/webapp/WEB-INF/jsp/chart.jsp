@@ -14,7 +14,7 @@
     <script type="text/javascript">
 
       // Load the Visualization API and the piechart package.
-      google.load('visualization', '1.0', {'packages':['corechart']});
+      google.load('visualization', '1.0', {'packages':['corechart','table']});
 
       // Set a callback to run when the Google Visualization API is loaded.
       google.setOnLoadCallback(doQuery);
@@ -23,7 +23,7 @@
     	  var query = new google.visualization.Query(
     			  "table"
     			  );
-    	  
+    	      	  
     	  query.send(handleQueryResponse);
     	  
       }
@@ -35,12 +35,16 @@
     	    }
 
     	    var data = response.getDataTable();
-    	    visualization = new google.visualization.LineChart(document.getElementById('chart_div'));
+    	    
+    	    var visualization = new google.visualization.LineChart(document.getElementById('chart_div'));
             var options = {'title':'Fetch Statistics',
                     'width':400,
                     'height':300};
     	    visualization.draw(data, options);
     	    
+    	    var table = new google.visualization.Table(document.getElementById('stats_table'));
+            table.draw(data, {showRowNumber: false});
+            
     	    var dyChart = new Dygraph.GVizChart(
     	    		document.getElementById('dygraphs_chart'));
     	    var dyOptions = {
@@ -65,5 +69,7 @@
 <div id="dygraphs_chart"></div>
 
 <div id="chart_div"></div>
+
+<div id="stats_table"></div>
 </body>
 </html>

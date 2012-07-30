@@ -143,7 +143,7 @@ public class DataManagerServlet extends HttpServlet {
 			spect.setEncode( Encoding.valueOf(encoding) );
 		}
 
-		// TODO parse out BBox and other query params
+		// TODO parse out BBox and other timeSeriesQuery params
 		
 		precheckWells(spect);
 		
@@ -255,7 +255,7 @@ public class DataManagerServlet extends HttpServlet {
 	
 	/** Parse a specifier from the request.
 	 * This may get arbitrarily complex, but the specifier should not be evaluated here.
-	 * The specifier is a query and can be constructed without touching the cache.
+	 * The specifier is a timeSeriesQuery and can be constructed without touching the cache.
 	 * 
 	 * @param req
 	 * @return

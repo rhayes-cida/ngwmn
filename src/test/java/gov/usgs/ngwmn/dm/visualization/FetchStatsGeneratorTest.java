@@ -2,6 +2,7 @@ package gov.usgs.ngwmn.dm.visualization;
 
 import static org.junit.Assert.*;
 import gov.usgs.ngwmn.dm.dao.ContextualTest;
+import gov.usgs.ngwmn.dm.dao.FetchStatsDAO;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -12,11 +13,13 @@ import com.google.visualization.datasource.datatable.TableCell;
 
 public class FetchStatsGeneratorTest extends ContextualTest {
 
-	private FetchStatsGenerator victim;
+	private FetchStatsAgencyGenerator victim;
 	
 	@Before
 	public void init() {
-		victim = ctx.getBean(FetchStatsGenerator.class);
+		FetchStatsDAO dao = ctx.getBean(FetchStatsDAO.class);
+		victim = new FetchStatsAgencyGenerator(dao);
+		victim.setAgency(null);
 	}
 	
 	@Test

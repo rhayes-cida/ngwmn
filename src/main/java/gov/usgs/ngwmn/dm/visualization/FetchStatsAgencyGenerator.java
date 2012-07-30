@@ -15,13 +15,22 @@ import com.google.visualization.datasource.base.ReasonType;
 import com.google.visualization.datasource.datatable.DataTable;
 import com.google.visualization.datasource.query.Query;
 
-public class FetchStatsGenerator implements DataTableGenerator {
+public class FetchStatsAgencyGenerator implements DataTableGenerator {
 
 	private FetchStatsDAO dao;
+	private String agency;
+	private final ResultSetExtractor<DataTable> rs2dt = new DataTableExtractor();
 	
-	public FetchStatsGenerator(FetchStatsDAO dao) {
+	public FetchStatsAgencyGenerator(FetchStatsDAO dao) {
 		super();
 		this.dao = dao;		
+	}
+
+	public String getAgency() {
+		return agency;
+	}
+	public void setAgency(String agency) {
+		this.agency = agency;
 	}
 
 	@Override
@@ -29,7 +38,11 @@ public class FetchStatsGenerator implements DataTableGenerator {
 			throws DataSourceException {
 		
 		try {
-			return queryDataTable();
+			if (agency == null) {
+				return dao.timeSeriesData(rs2dt);
+			} else {
+				return dao.timeSeriesAgencyData(agency, rs2dt);
+			}
 		} 
 		catch (RuntimeException rte) {
 			if (rte.getCause() instanceof DataSourceException) {
@@ -44,14 +57,6 @@ public class FetchStatsGenerator implements DataTableGenerator {
 		}
 	}
 
-	private ResultSetExtractor<DataTable> rs2dt = new DataTableExtractor();
-
-	public DataTable queryDataTable() throws SQLException {
-		DataTable dt = dao.timeSeriesData(rs2dt);
-		
-		return dt;
-	}
-	
 	@Override
 	public Capabilities getCapabilities() {
 		return Capabilities.NONE;

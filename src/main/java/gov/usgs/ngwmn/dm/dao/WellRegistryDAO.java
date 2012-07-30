@@ -1,11 +1,15 @@
 package gov.usgs.ngwmn.dm.dao;
 
 import java.util.List;
+import javax.sql.DataSource;
+
+import org.springframework.jdbc.core.JdbcTemplate;
 
 public class WellRegistryDAO {
 
 	private WellRegistryMapper mapper;
-
+	private DataSource dataSource;
+	
 	public WellRegistryDAO() {
 	}
 
@@ -15,6 +19,10 @@ public class WellRegistryDAO {
 
 	public void setMapper(WellRegistryMapper mapper) {
 		this.mapper = mapper;
+	}
+
+	public void setDatasource(DataSource dataSource) {
+		this.dataSource = dataSource;
 	}
 
 	public int countByExample(WellRegistryExample example) {
@@ -61,6 +69,19 @@ public class WellRegistryDAO {
 			.andStateCdEqualTo(fips);
 		filter.setOrderByClause("AGENCY_CD, SITE_NO");
 		return selectByExample(filter);
+	}
+	
+	public List<String> agencies() {
+		String query = 
+				"select distinct agency_cd "+
+				"from gw_data_portal.well_registry " +
+				"order by agency_cd ASC ";
+		
+		JdbcTemplate template = new JdbcTemplate(dataSource);
+		
+		List<String> v = template.queryForList(query,String.class);
+		
+		return v;
 	}
 	
 }

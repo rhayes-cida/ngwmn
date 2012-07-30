@@ -456,7 +456,7 @@ public class DatabaseXMLCache implements Cache {
 				"set xml = null " +
 				"where "+tablename+"_id = ? ";
 		
-		logger.debug("query is {}", cleanable);
+		logger.debug("timeSeriesQuery is {}", cleanable);
 		int ct = 0;
 		Connection conn = ds.getConnection();
 		try {
