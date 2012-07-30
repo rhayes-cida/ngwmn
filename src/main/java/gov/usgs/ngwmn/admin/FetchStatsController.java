@@ -3,7 +3,6 @@ package gov.usgs.ngwmn.admin;
 import gov.usgs.ngwmn.dm.dao.FetchStatsDAO;
 import gov.usgs.ngwmn.dm.dao.WellRegistryDAO;
 import gov.usgs.ngwmn.dm.visualization.FetchStatsAgencyGenerator;
-import gov.usgs.ngwmn.dm.visualization.FetchStatsGenerator;
 
 import java.io.IOException;
 import java.io.Writer;
