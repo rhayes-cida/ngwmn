@@ -50,6 +50,7 @@ public class FetchStatsController {
 		
 	}
 	
+	// TODO Eliminate this (here only to make form:form tag work)
 	@ModelAttribute("charter")
 	public Charter getModel() {
 		return new Charter();
@@ -77,6 +78,8 @@ public class FetchStatsController {
 		DataSourceHelper.executeDataSourceServletFlow(request, response, gen, false);
 	}
 
+	// TODO Handle table/all, which should produce a separate data series (i.e. column) for each agency
+	
 	@RequestMapping("table/{agency}")
 	public void generateTable(
 			@PathVariable String agency,
