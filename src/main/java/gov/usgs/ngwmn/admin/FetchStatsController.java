@@ -8,7 +8,9 @@ import java.io.IOException;
 import java.io.Writer;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -35,8 +37,28 @@ public class FetchStatsController {
 	
 	private Logger logger = LoggerFactory.getLogger(getClass());
 
+	public static class Charter {
+		private String agency;
+
+		public String getAgency() {
+			return agency;
+		}
+
+		public void setAgency(String agency) {
+			this.agency = agency;
+		}
+		
+	}
+	
+	@ModelAttribute("charter")
+	public Charter getModel() {
+		return new Charter();
+	}
+	
 	@RequestMapping("chart")
-	public String showChart() {
+	public String showChart(
+			@ModelAttribute("agency") String agency
+	) {
 		return "chart";
 	}
 	
