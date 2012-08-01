@@ -32,7 +32,8 @@
     	  query.setQuery(
     			  'select toDate(FETCH_DATE), count(PUBLISHED) ' +
     			  'group by toDate(FETCH_DATE) '+
-    			  'pivot AGENCY_CD ');
+    			  'pivot AGENCY_CD ' +
+    			  'label toDate(FETCH_DATE) "fetch date"');
     	  
     	  query.send(handleQueryResponse);
     	  
