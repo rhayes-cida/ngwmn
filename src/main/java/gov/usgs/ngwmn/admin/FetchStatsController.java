@@ -3,6 +3,7 @@ package gov.usgs.ngwmn.admin;
 import gov.usgs.ngwmn.dm.dao.FetchStatsDAO;
 import gov.usgs.ngwmn.dm.dao.WellRegistryDAO;
 import gov.usgs.ngwmn.dm.visualization.FetchStatsAgencyGenerator;
+import gov.usgs.ngwmn.dm.visualization.WaterLevelDataAgeGenerator;
 import gov.usgs.ngwmn.dm.visualization.WaterlevelStatsGenerator;
 
 import java.io.IOException;
@@ -106,10 +107,21 @@ public class FetchStatsController {
 			)
 	throws IOException
 	{
-		WaterlevelStatsGenerator gen = new WaterlevelStatsGenerator	(dao);
+		WaterlevelStatsGenerator gen = new WaterlevelStatsGenerator(dao);
 		DataSourceHelper.executeDataSourceServletFlow(request, response, gen, false);
 	}
 	
+	@RequestMapping("age")
+	public void ageTable(
+			HttpServletRequest request, 
+			HttpServletResponse response
+			)
+	throws IOException
+	{
+		WaterLevelDataAgeGenerator gen = new WaterLevelDataAgeGenerator(dao);
+		DataSourceHelper.executeDataSourceServletFlow(request, response, gen, false);
+	}
+
 	@RequestMapping(value="data/{agency}", produces="text/csv")
 	public void exportData(
 			@PathVariable String agency,

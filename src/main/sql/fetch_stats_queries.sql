@@ -116,6 +116,13 @@ from
 group by trunc(fl.started_at)
 order by trunc(fl.started_at) asc;
 				 
-				 
+-- query to find age of data for each well
+select well_registry.agency_cd, well_registry.site_no, max(fetch_date) publication_date
+from gw_data_portal.well_registry 
+left join gw_data_portal.waterlevel_cache_stats
+on well_registry.agency_cd = waterlevel_cache_stats.agency_cd 
+   and well_registry.site_no = waterlevel_cache_stats.site_no
+where published = 'Y' or published is null
+group by well_registry.agency_cd, well_registry.site_no;
 				 
 				 
