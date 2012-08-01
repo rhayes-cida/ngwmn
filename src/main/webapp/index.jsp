@@ -18,6 +18,7 @@
 	<ul>
 		<li><a href="wip/fetchlog/chart">Fetch Statistics</a></li>
 		<li><a href="wip/fetchlog/timechart">Data Publication Timeline</a></li>
+		<li><a href="wip/fetchlog/fetchdates">Most Recent Fetch Date</a></li>
 		<li><a href="wells">Well List</a></li>
 		<li> Well Prefetch by Agency
 			<ul>

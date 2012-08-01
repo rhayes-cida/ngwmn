@@ -111,6 +111,12 @@ public class FetchStatsController {
 		DataSourceHelper.executeDataSourceServletFlow(request, response, gen, false);
 	}
 	
+	@RequestMapping("fetchdates")
+	public String showFetchDates(
+	) {
+		return "fetchdates";
+	}
+
 	@RequestMapping("age")
 	public void ageTable(
 			HttpServletRequest request, 
