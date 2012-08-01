@@ -14,6 +14,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 
+import com.google.visualization.datasource.datatable.DataTable;
 import com.sun.rowset.CachedRowSetImpl;
 
 // Not using MyBatis as this generates bulk data which I don't wish to represent as objects.
@@ -188,4 +189,5 @@ public class FetchStatsDAO {
 		
 		return value;		
 	}
+	
 }

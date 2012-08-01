@@ -3,6 +3,7 @@ package gov.usgs.ngwmn.admin;
 import gov.usgs.ngwmn.dm.dao.FetchStatsDAO;
 import gov.usgs.ngwmn.dm.dao.WellRegistryDAO;
 import gov.usgs.ngwmn.dm.visualization.FetchStatsAgencyGenerator;
+import gov.usgs.ngwmn.dm.visualization.WaterlevelStatsGenerator;
 
 import java.io.IOException;
 import java.io.Writer;
@@ -62,7 +63,13 @@ public class FetchStatsController {
 	) {
 		return "chart";
 	}
-	
+
+	@RequestMapping("timechart")
+	public String showTimeChart(
+	) {
+		return "timechart";
+	}
+
 	@ModelAttribute("agencyCodes")
 	public List<String> getAgencyCodes() {
 		logger.info("getting agency codes");
@@ -79,6 +86,7 @@ public class FetchStatsController {
 	}
 
 	// TODO Handle table/all, which should produce a separate data series (i.e. column) for each agency
+	// (or use "pivot" operation in data query, https://developers.google.com/chart/interactive/docs/querylanguage#Pivot)
 	
 	@RequestMapping("table/{agency}")
 	public void generateTable(
@@ -88,6 +96,17 @@ public class FetchStatsController {
 	throws IOException {
 		FetchStatsAgencyGenerator gen = new FetchStatsAgencyGenerator(dao);
 		gen.setAgency(agency);
+		DataSourceHelper.executeDataSourceServletFlow(request, response, gen, false);
+	}
+	
+	@RequestMapping("stats")
+	public void statsTable(
+			HttpServletRequest request, 
+			HttpServletResponse response
+			)
+	throws IOException
+	{
+		WaterlevelStatsGenerator gen = new WaterlevelStatsGenerator	(dao);
 		DataSourceHelper.executeDataSourceServletFlow(request, response, gen, false);
 	}
 	

@@ -4,6 +4,7 @@ import java.util.Date;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 
@@ -12,14 +13,17 @@ import org.slf4j.LoggerFactory;
 
 import com.google.visualization.datasource.base.DataSourceException;
 import com.google.visualization.datasource.base.ReasonType;
+import com.google.visualization.datasource.base.TypeMismatchException;
 import com.google.visualization.datasource.datatable.ColumnDescription;
 import com.google.visualization.datasource.datatable.DataTable;
 import com.google.visualization.datasource.datatable.TableRow;
+import com.google.visualization.datasource.datatable.value.DateTimeValue;
 import com.google.visualization.datasource.datatable.value.DateValue;
 import com.google.visualization.datasource.datatable.value.NumberValue;
 import com.google.visualization.datasource.datatable.value.TextValue;
 import com.google.visualization.datasource.datatable.value.Value;
 import com.google.visualization.datasource.datatable.value.ValueType;
+import com.ibm.icu.util.TimeZone;
 
 public class ResultSetDataTable extends DataTable {
 
@@ -63,6 +67,7 @@ public class ResultSetDataTable extends DataTable {
 		switch (columnType) {
 		case java.sql.Types.NVARCHAR:
 		case java.sql.Types.VARCHAR:
+		case java.sql.Types.CHAR:
 			return ValueType.TEXT;
 			
 		case java.sql.Types.INTEGER:
@@ -73,6 +78,8 @@ public class ResultSetDataTable extends DataTable {
 		case java.sql.Types.DATE:
 			return ValueType.DATE;
 			
+		case java.sql.Types.TIMESTAMP:
+			return ValueType.DATETIME;
 		}
 		throw new RuntimeException(("Unmapped data type " + columnType));
 	}
@@ -81,16 +88,22 @@ public class ResultSetDataTable extends DataTable {
 	private Value objectToValue(Object v, ValueType t) {
 		Value val = null;
 		
+		if (v == null) {
+			return nullValueOf(t);
+		}
+		
 		switch (t) {
 		case DATE:
-			Date d = (Date)v;
-			GregorianCalendar cal = new GregorianCalendar();
-			cal.setTime(d);
-			val = new DateValue(
-					cal.get(Calendar.YEAR),
-					cal.get(Calendar.MONTH),
-					cal.get(Calendar.DATE)
-			);
+			{
+				Date d = (Date)v;
+				GregorianCalendar cal = new GregorianCalendar();
+				cal.setTime(d);
+				val = new DateValue(
+						cal.get(Calendar.YEAR),
+						cal.get(Calendar.MONTH),
+						cal.get(Calendar.DATE)
+				);
+			}
 			break;
 			
 		case NUMBER:
@@ -102,6 +115,20 @@ public class ResultSetDataTable extends DataTable {
 			val = new TextValue(v.toString());
 			break;
 			
+		case DATETIME:
+			try {
+				oracle.sql.TIMESTAMP ts = (oracle.sql.TIMESTAMP)v;
+				Timestamp tsq = ts.timestampValue();
+				// sigh. well out of date.
+				com.ibm.icu.util.GregorianCalendar cal = new com.ibm.icu.util.GregorianCalendar();
+				cal.setTime(tsq);
+				cal.setTimeZone(TimeZone.getTimeZone("GMT"));
+				val = new DateTimeValue(cal);
+			} catch (SQLException sqe) {
+				throw new RuntimeException(sqe);
+			}
+			break;
+
 		default:
 			// TODO more data types...
 			throw new RuntimeException("Unmapped data type " + t);
@@ -110,6 +137,14 @@ public class ResultSetDataTable extends DataTable {
 		logger.trace("converted {} to {}", v, val);
 		
 		return val;
+	}
+
+	private Value nullValueOf(ValueType t) {
+		try {
+			return t.createValue(null);
+		} catch (TypeMismatchException e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 	private void populateData(ResultSet data) throws SQLException, DataSourceException {

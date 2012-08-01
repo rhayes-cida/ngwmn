@@ -11,6 +11,7 @@ import com.google.visualization.datasource.datatable.DataTable;
 
 public class DataTableExtractor implements
 		ResultSetExtractor<DataTable> {
+	
 	@Override
 	public DataTable extractData(ResultSet rs) 
 			throws SQLException, DataAccessException
