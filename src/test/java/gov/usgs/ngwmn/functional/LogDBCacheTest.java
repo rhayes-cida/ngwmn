@@ -101,7 +101,7 @@ public class LogDBCacheTest extends ContextualTest {
 		int ct = victim.cleanCache(spec.getWellRegistryKey());
 		
 		System.out.printf("Cleaned cache, count %d\n", ct);
-		assertTrue("should not have a lot of cruft", ct <= 4);
+		assertTrue("should not have a lot of cruft", ct <= 5);
 	}
 	
 	@Test
