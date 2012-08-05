@@ -73,12 +73,33 @@ public class Prefetcher implements Callable<PrefetchOutcome> {
 	};
 	
 	public PrefetchOutcome call() {
-		int tried = 0;
 		
 		outcome = PrefetchOutcome.RUNNING;
 		
 		Iterable<WellStatus> wellQueue = populateWellQeue();
 		
+		return performPrefetch(wellQueue);
+	}
+	
+	public List<String> agencyCodes() {
+		return wellDAO.agencies();
+	}
+	
+	public PrefetchOutcome callForAgency(String agency_cd) {
+		
+		outcome = PrefetchOutcome.RUNNING;
+		
+		Iterable<WellStatus> wellQueue = populateWellQeueForAgency(agency_cd);
+		
+		return performPrefetch(wellQueue);
+	}
+
+	private PrefetchOutcome performPrefetch(Iterable<WellStatus> wellQueue) 
+			throws RuntimeException 
+	{
+		
+		int tried = 0;
+
 		if (isQuitting() || Thread.interrupted()) {
 			logger.warn("Prefetcher stopped");
 			return PrefetchOutcome.INTERRUPTED;
@@ -312,6 +333,46 @@ public class Prefetcher implements Callable<PrefetchOutcome> {
 		
 		return pq;
 	}
+	
+	private Iterable<WellStatus> populateWellQeueForAgency(String agency_cd) {
+		List<WellRegistry> allWells = wellDAO.selectByAgency(agency_cd);
+		PriorityQueue<WellStatus> pq = new PriorityQueue<WellStatus>(allWells.size(), wellCompare);
+		
+		// make sure we're working with fresh statistics
+		try {
+			cacheDAO.updateCacheMetaData();
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+
+		List<CacheMetaData> cmd = cacheDAO.listAll();
+		
+		updateFetchPriorities(cmd);
+		
+		Map<CacheMetaDataKey,CacheMetaData> mdMap = new HashMap<CacheMetaDataKey, CacheMetaData>(cmd.size());
+		for (CacheMetaData c : cmd) {
+			mdMap.put(c, c);
+		}
+		
+		for (WellRegistry wr : allWells) {
+			for (WellDataType dt : fetchTypes) {
+				WellStatus well = new WellStatus();
+				well.well = wr;
+				well.type = dt;
+				
+				CacheMetaDataKey ck = new CacheMetaDataKey();
+				ck.setAgencyCd(wr.getAgencyCd());
+				ck.setSiteNo(wr.getSiteNo());
+				ck.setDataType(dt.name());
+				well.cacheInfo = mdMap.get(ck);
+			
+				pq.add(well);
+			}
+		}
+		
+		return pq;
+	}
+
 	
 	/**
 	 * Set cache priorities -- this overrides any other ranking.

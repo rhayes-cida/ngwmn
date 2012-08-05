@@ -42,6 +42,10 @@ if (action != null) {
 		log("enable");
 		controller.enable();
 	} 
+	else if ("startInParallel".equals(action)) {
+		log("startInParallel");
+		controller.startInParallel();
+	} 
 	else {
 		log("unknown action: " + action);
 	}
@@ -55,6 +59,7 @@ Enabled: <%= controller.isEnabled() %>
 <button type="submit" name="action" value="start">Start immediately</button>
 <button type="submit" name="action" value="stop">Stop and disable</button>
 <button type="submit" name="action" value="enable">Enable schedule</button>
+<button type="submit" name="action" value="startInParallel">Start in parallel, immediately</button>
 
 </form>
 

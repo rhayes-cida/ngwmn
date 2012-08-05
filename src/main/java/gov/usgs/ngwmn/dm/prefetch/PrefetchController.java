@@ -1,8 +1,9 @@
 package gov.usgs.ngwmn.dm.prefetch;
 
+import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.Callable;
+import java.util.concurrent.Future;
 
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 
@@ -44,6 +45,27 @@ public class PrefetchController {
 		// because enabling the scheduler can have far-reaching effects,
 		// leave that decision to the user.
 		sked.execute(task);
+	}
+	
+	private List<Future<PrefetchOutcome>> multithreadOutcomes = new ArrayList<Future<PrefetchOutcome>>();
+	
+	public synchronized List<Future<PrefetchOutcome>>  startInParallel() {
+		List<String> agencies = prefetcher.agencyCodes();
+		
+		for (final String agency : agencies) {
+			Callable<PrefetchOutcome> task = new Callable<PrefetchOutcome>() {
+
+				@Override
+				public PrefetchOutcome call() throws Exception {
+					return prefetcher.callForAgency(agency);					
+				}
+				
+			};
+			
+			multithreadOutcomes.add(sked.submit(task));
+		}
+		
+		return multithreadOutcomes;
 	}
 	
 	/**
