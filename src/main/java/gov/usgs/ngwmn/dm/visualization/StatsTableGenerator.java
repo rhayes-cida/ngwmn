@@ -6,16 +6,16 @@ import java.sql.SQLException;
 
 import com.google.visualization.datasource.datatable.DataTable;
 
-public class WaterlevelStatsGenerator extends SQLDataTableGenerator {
+public class StatsTableGenerator extends SQLDataTableGenerator {
 
 	private FetchStatsDAO dao;
-	public WaterlevelStatsGenerator(FetchStatsDAO dao) {
+	public StatsTableGenerator(FetchStatsDAO dao) {
 		this.dao = dao;		
 	}
 
 	@Override
 	protected DataTable generateDT() throws SQLException, RuntimeException {
-		return dao.waterlevelData(null, rs2dt);
+		return dao.viewData(null, rs2dt);
 	}
 
 }

@@ -253,10 +253,15 @@
 		</property>
     </bean>
 	
-	<bean id="FetchStatsDAO" class="gov.usgs.ngwmn.dm.dao.FetchStatsDAO">
+	<bean id="WaterlevelStatsDAO" class="gov.usgs.ngwmn.dm.dao.FetchStatsDAO">
 		<constructor-arg ref="dataSource"/>
+		<constructor-arg value="WATERLEVEL"/>
 	</bean>
 		
+	<bean id="QualityStatsDAO" class="gov.usgs.ngwmn.dm.dao.FetchStatsDAO">
+		<constructor-arg ref="dataSource"/>
+		<constructor-arg value="QUALITY"/>
+	</bean>
 </beans>
 
        

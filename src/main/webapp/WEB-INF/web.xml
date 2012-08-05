@@ -98,7 +98,7 @@
 
     <servlet-mapping>
         <servlet-name>SpringMVC</servlet-name>
-        <url-pattern>/wip/*</url-pattern>
+        <url-pattern>/stats/*</url-pattern>
     </servlet-mapping>
     
  	<security-constraint>

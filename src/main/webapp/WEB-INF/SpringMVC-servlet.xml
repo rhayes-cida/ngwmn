@@ -22,11 +22,16 @@
     	<property name="suffix" value=".jsp"/>
     </bean>
     
-    <bean id="FetchStatsController" class="gov.usgs.ngwmn.admin.FetchStatsController">
-    	<property name="dao" ref="FetchStatsDAO"/>
+    <bean id="WaterlevelStatsController" class="gov.usgs.ngwmn.admin.WaterlevelStatsController">
+    	<property name="dao" ref="WaterlevelStatsDAO"/>
     	<property name="wellDao" ref="WellRegistryDAO"/>
     </bean>
     
+    <bean id="QualityStatsController" class="gov.usgs.ngwmn.admin.QualityStatsController">
+    	<property name="dao" ref="QualityStatsDAO"/>
+    	<property name="wellDao" ref="WellRegistryDAO"/>
+    </bean>
+
     <bean id="TrialController" class="gov.usgs.ngwmn.admin.TrialMVCController"/>
     
 </beans>

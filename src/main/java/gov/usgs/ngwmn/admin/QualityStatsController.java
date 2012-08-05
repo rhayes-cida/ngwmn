@@ -4,15 +4,13 @@ import gov.usgs.ngwmn.dm.dao.FetchStatsDAO;
 import gov.usgs.ngwmn.dm.dao.WellRegistryDAO;
 import gov.usgs.ngwmn.dm.visualization.FetchStatsAgencyGenerator;
 import gov.usgs.ngwmn.dm.visualization.WaterLevelDataAgeGenerator;
-import gov.usgs.ngwmn.dm.visualization.WaterlevelStatsGenerator;
+import gov.usgs.ngwmn.dm.visualization.StatsTableGenerator;
 
 import java.io.IOException;
 import java.io.Writer;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -31,8 +29,8 @@ import au.com.bytecode.opencsv.CSVWriter;
 import com.google.visualization.datasource.DataSourceHelper;
 
 @Controller
-@RequestMapping("/fetchlog")
-public class FetchStatsController {
+@RequestMapping("/quality")
+public class QualityStatsController {
 
 	private FetchStatsDAO dao;
 	private WellRegistryDAO wellDao;
@@ -62,13 +60,13 @@ public class FetchStatsController {
 	public String showChart(
 			@ModelAttribute("agency") String agency
 	) {
-		return "chart";
+		return "quality/chart";
 	}
 
 	@RequestMapping("timechart")
 	public String showTimeChart(
 	) {
-		return "timechart";
+		return "quality/timechart";
 	}
 
 	@ModelAttribute("agencyCodes")
@@ -107,14 +105,14 @@ public class FetchStatsController {
 			)
 	throws IOException
 	{
-		WaterlevelStatsGenerator gen = new WaterlevelStatsGenerator(dao);
+		StatsTableGenerator gen = new StatsTableGenerator(dao);
 		DataSourceHelper.executeDataSourceServletFlow(request, response, gen, false);
 	}
 	
 	@RequestMapping("fetchdates")
 	public String showFetchDates(
 	) {
-		return "fetchdates";
+		return "quality/fetchdates";
 	}
 
 	@RequestMapping("age")
@@ -151,7 +149,7 @@ public class FetchStatsController {
 			}
 		};
 		
-		dao.waterlevelData(agency, rse);
+		dao.viewData(agency, rse);
 	}
 	
 	@RequestMapping(value="data", produces="text/csv")

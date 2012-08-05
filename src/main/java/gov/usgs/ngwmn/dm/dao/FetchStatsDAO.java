@@ -1,5 +1,7 @@
 package gov.usgs.ngwmn.dm.dao;
 
+import gov.usgs.ngwmn.WellDataType;
+
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -14,7 +16,6 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 
-import com.google.visualization.datasource.datatable.DataTable;
 import com.sun.rowset.CachedRowSetImpl;
 
 // Not using MyBatis as this generates bulk data which I don't wish to represent as objects.
@@ -22,9 +23,11 @@ import com.sun.rowset.CachedRowSetImpl;
 public class FetchStatsDAO {
 	
 	private DataSource datasource;
+	private WellDataType type;
 
-	public FetchStatsDAO(DataSource ds) {
+	public FetchStatsDAO(DataSource ds, WellDataType t) {
 		this.datasource = ds;
+		type = t;
 	}
 	
 	String timeSeriesQuery = 
@@ -32,11 +35,11 @@ public class FetchStatsDAO {
 
 			"trunc(fl.started_at) fetch_date, "+
 							
-			"(select count(*) from GW_DATA_PORTAL.WATERLEVEL_CACHE_STATS cs1 "+
+			"(select count(*) from GW_DATA_PORTAL.%1$s_CACHE_STATS cs1 "+
 											 "where trunc(cs1.fetch_date) = trunc(fl.started_at) "+
 											 "and cs1.published = 'Y') success, "+
 							
-			"(select count(*) from GW_DATA_PORTAL.WATERLEVEL_CACHE_STATS cs2 "+
+			"(select count(*) from GW_DATA_PORTAL.%1$s_CACHE_STATS cs2 "+
 											 "where trunc(cs2.fetch_date) = trunc(fl.started_at) "+
 											 "and cs2.published = 'N') \"EMPTY\", "+
 											 
@@ -46,7 +49,7 @@ public class FetchStatsDAO {
 
 			"from "+
 			"(select * from GW_DATA_PORTAL.fetch_log "+
-			 "where fetch_log.data_stream = 'WATERLEVEL' "+
+			 "where fetch_log.data_stream = '%1$s' "+
 			 "and fetcher = 'WebRetriever' ) fl "+
 			 
 			 "left join GW_DATA_PORTAL.fetch_log fail_log "+
@@ -60,12 +63,12 @@ public class FetchStatsDAO {
 
 			"trunc(fl.started_at) fetch_date, "+
 							
-			"(select count(*) from GW_DATA_PORTAL.WATERLEVEL_CACHE_STATS cs1 "+
+			"(select count(*) from GW_DATA_PORTAL.%1$s_CACHE_STATS cs1 "+
 											 "where trunc(cs1.fetch_date) = trunc(fl.started_at) " +
 											 "and agency_cd = :agency "+
 											 "and cs1.published = 'Y') success, "+
 							
-			"(select count(*) from GW_DATA_PORTAL.WATERLEVEL_CACHE_STATS cs2 "+
+			"(select count(*) from GW_DATA_PORTAL.%1$s_CACHE_STATS cs2 "+
 											 "where trunc(cs2.fetch_date) = trunc(fl.started_at) " +
 											 "and agency_cd = :agency "+
 											 "and cs2.published = 'N') \"EMPTY\", "+
@@ -76,7 +79,7 @@ public class FetchStatsDAO {
 
 			"from "+
 			"(select * from GW_DATA_PORTAL.fetch_log "+
-			 "where fetch_log.data_stream = 'WATERLEVEL' " +
+			 "where fetch_log.data_stream = '%1$s' " +
 			 "and agency_cd = :agency "+
 			 "and fetcher = 'WebRetriever' ) fl "+
 			 
@@ -90,7 +93,8 @@ public class FetchStatsDAO {
 		
 		Connection conn = datasource.getConnection();
 		try {
-			PreparedStatement ps = conn.prepareStatement(timeSeriesQuery, ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY);
+			String query = String.format(timeSeriesQuery, type.name());
+			PreparedStatement ps = conn.prepareStatement(query, ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY);
 			
 			ResultSet rs = ps.executeQuery();
 			
@@ -107,9 +111,11 @@ public class FetchStatsDAO {
 	public RowSet successTimeSeries() throws SQLException {
 		String query = 
 				"select agency_cd, trunc(fetch_date) fetched, count(*) ct " +
-				"from GW_DATA_PORTAL.WATERLEVEL_CACHE_STATS " +
+				"from GW_DATA_PORTAL.%1$s_CACHE_STATS " +
 				"where published = 'Y' " +
 				"group by agency_cd,trunc(fetch_date) ";
+		
+		query = String.format(query, type.name());
 		
 		Connection conn = datasource.getConnection();
 		try {
@@ -130,9 +136,11 @@ public class FetchStatsDAO {
 	public RowSet failTimeSeries() throws SQLException {
 		String query = 
 				"select agency_cd, trunc(fetch_date) fetched, count(*) ct " +
-				"from GW_DATA_PORTAL.WATERLEVEL_CACHE_STATS " +
+				"from GW_DATA_PORTAL.%1$s_CACHE_STATS " +
 				"where coalesce(published, 'N') = 'N' " +
 				"group by agency_cd,trunc(fetch_date) ";
+		
+		query = String.format(query, type.name());
 		
 		Connection conn = datasource.getConnection();
 		try {
@@ -156,7 +164,8 @@ public class FetchStatsDAO {
 		NamedParameterJdbcTemplate template = new NamedParameterJdbcTemplate(datasource);
 		
 		Map<String,String> params = Collections.singletonMap("agency", agency);
-		T value = template.query(timeSeriesAgencyQuery, params,  rse);
+		String query = String.format(timeSeriesAgencyQuery, type.name());
+		T value = template.query(query, params,  rse);
 		
 		return value;
 	}
@@ -164,7 +173,9 @@ public class FetchStatsDAO {
 	public <T> T timeSeriesData(ResultSetExtractor<T> rse) 
 	throws SQLException {
 		JdbcTemplate t = new JdbcTemplate(datasource);
-		T value = t.query(timeSeriesQuery, rse);
+		
+		String query = String.format(timeSeriesQuery, type.name());
+		T value = t.query(query, rse);
 		
 		return value;
 		
@@ -172,18 +183,19 @@ public class FetchStatsDAO {
 	
 	
 	/**
-	 * Raw data from waterlevel_cache_stats view; for all agencies if argument is null.
+	 * Raw data from cache statistics view; for all agencies if argument is null.
 	 * 
 	 * @param agency
 	 * @return
 	 * @throws SQLException
 	 */
-	public <T> T waterlevelData(String agency, ResultSetExtractor<T> rse) throws SQLException {
+	public <T> T viewData(String agency, ResultSetExtractor<T> rse) throws SQLException {
 		String query = "SELECT * " +
-				"FROM GW_DATA_PORTAL.WATERLEVEL_CACHE_STATS " +
+				"FROM GW_DATA_PORTAL.%1$s_CACHE_STATS " +
 				"WHERE agency_cd = coalesce(?,agency_cd) " +
 				"";
 		
+		query = String.format(query, type.name());
 		JdbcTemplate t = new JdbcTemplate(datasource);
 		T value = t.query(query, rse, agency);
 		
@@ -194,12 +206,13 @@ public class FetchStatsDAO {
 		String query = 
 				"select well_registry.agency_cd, well_registry.site_no, max(fetch_date) publication_date " +
 				"from gw_data_portal.well_registry  " +
-				"      left join gw_data_portal.waterlevel_cache_stats " +
-				"on well_registry.agency_cd = waterlevel_cache_stats.agency_cd " +
-				"   and well_registry.site_no = waterlevel_cache_stats.site_no " +
+				"      left join gw_data_portal.%1$s_cache_stats " +
+				"on well_registry.agency_cd = %1$s_cache_stats.agency_cd " +
+				"   and well_registry.site_no = %1$s_cache_stats.site_no " +
 				"where published = 'Y' or published is null " +
 				"group by well_registry.agency_cd, well_registry.site_no ";
 		
+		query = String.format(query, type.name());
 		JdbcTemplate t = new JdbcTemplate(datasource);
 		T value = t.query(query, rse);
 		

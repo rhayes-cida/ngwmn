@@ -16,9 +16,22 @@
 	<h1>National Ground Water Monitoring Network</h1>
 	<h2>Data Cache</h2>
 	<ul>
-		<li><a href="wip/fetchlog/chart">Fetch Statistics</a></li>
-		<li><a href="wip/fetchlog/timechart">Data Publication Timeline</a></li>
-		<li><a href="wip/fetchlog/fetchdates">Most Recent Fetch Date</a></li>
+		<li>Water Level
+		<ul>
+		<li><a href="stats/waterlevel/chart">Fetch Statistics</a></li>
+		<li><a href="stats/waterlevel/timechart">Data Publication Timeline</a></li>
+		<li><a href="stats/waterlevel/fetchdates">Most Recent Fetch Date</a></li>
+		</ul>
+		</li>
+		
+		<li>Quality
+		<ul>
+		<li><a href="stats/quality/chart">Fetch Statistics</a></li>
+		<li><a href="stats/quality/timechart">Data Publication Timeline</a></li>
+		<li><a href="stats/quality/fetchdates">Most Recent Fetch Date</a></li>
+		</ul>
+		</li>
+		
 		<li><a href="wells">Well List</a></li>
 		<li> Well Prefetch by Agency
 			<ul>
