@@ -262,6 +262,11 @@
 		<constructor-arg ref="dataSource"/>
 		<constructor-arg value="QUALITY"/>
 	</bean>
+	
+	<bean id="WellLogStatsDAO" class="gov.usgs.ngwmn.dm.dao.FetchStatsDAO">
+		<constructor-arg ref="dataSource"/>
+		<constructor-arg value="LOG"/>
+	</bean>
 </beans>
 
        

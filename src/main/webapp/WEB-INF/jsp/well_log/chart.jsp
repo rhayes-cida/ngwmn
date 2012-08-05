@@ -91,7 +91,7 @@
 </head>
 <body>
 
-<h1>FFetch Statistics</h1>
+<h1>Fetch Statistics</h1>
 
 <form:form commandName="charter" onsubmit="redraw(); return false; " >
 Agency: 

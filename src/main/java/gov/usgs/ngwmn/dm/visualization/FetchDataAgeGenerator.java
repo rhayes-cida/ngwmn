@@ -6,10 +6,10 @@ import java.sql.SQLException;
 
 import com.google.visualization.datasource.datatable.DataTable;
 
-public class WaterLevelDataAgeGenerator extends SQLDataTableGenerator {
+public class FetchDataAgeGenerator extends SQLDataTableGenerator {
 
 	private FetchStatsDAO dao;
-	public WaterLevelDataAgeGenerator(FetchStatsDAO dao) {
+	public FetchDataAgeGenerator(FetchStatsDAO dao) {
 		this.dao = dao;		
 	}
 

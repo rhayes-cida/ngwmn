@@ -32,6 +32,11 @@
     	<property name="wellDao" ref="WellRegistryDAO"/>
     </bean>
 
+    <bean id="WellLogStatsController" class="gov.usgs.ngwmn.admin.WellLogStatsController">
+    	<property name="dao" ref="WellLogStatsDAO"/>
+    	<property name="wellDao" ref="WellRegistryDAO"/>
+    </bean>
+
     <bean id="TrialController" class="gov.usgs.ngwmn.admin.TrialMVCController"/>
     
 </beans>

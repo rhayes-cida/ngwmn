@@ -29,8 +29,8 @@ import au.com.bytecode.opencsv.CSVWriter;
 import com.google.visualization.datasource.DataSourceHelper;
 
 @Controller
-@RequestMapping("/quality")
-public class QualityStatsController {
+@RequestMapping("/well_log")
+public class WellLogStatsController {
 
 	private FetchStatsDAO dao;
 	private WellRegistryDAO wellDao;
@@ -60,13 +60,13 @@ public class QualityStatsController {
 	public String showChart(
 			@ModelAttribute("agency") String agency
 	) {
-		return "quality/chart";
+		return "well_log/chart";
 	}
 
 	@RequestMapping("timechart")
 	public String showTimeChart(
 	) {
-		return "quality/timechart";
+		return "well_log/timechart";
 	}
 
 	@ModelAttribute("agencyCodes")
@@ -112,7 +112,7 @@ public class QualityStatsController {
 	@RequestMapping("fetchdates")
 	public String showFetchDates(
 	) {
-		return "quality/fetchdates";
+		return "well_log/fetchdates";
 	}
 
 	@RequestMapping("age")

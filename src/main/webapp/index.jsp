@@ -32,6 +32,13 @@
 		</ul>
 		</li>
 		
+		<li>Well Log
+		<ul>
+		<li><a href="stats/well_log/chart">Fetch Statistics</a></li>
+		<li><a href="stats/well_log/timechart">Data Publication Timeline</a></li>
+		<li><a href="stats/well_log/fetchdates">Most Recent Fetch Date</a></li>
+		</ul>
+		</li>
 		<li><a href="wells">Well List</a></li>
 		<li> Well Prefetch by Agency
 			<ul>
