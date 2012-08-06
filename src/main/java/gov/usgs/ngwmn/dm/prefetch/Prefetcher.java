@@ -24,8 +24,9 @@ import java.util.concurrent.Callable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-// TODO Abstract well list, make a per-agency version
 public class Prefetcher implements Callable<PrefetchOutcome> {
+	private static final long HOUR = 1000*60*60;
+
 	protected final transient Logger logger = LoggerFactory.getLogger(getClass());
 
 	private int fetchLimit = 0;
@@ -224,6 +225,16 @@ public class Prefetcher implements Callable<PrefetchOutcome> {
 		WellRegistry well;
 		CacheMetaData cacheInfo;
 		WellDataType type;
+		
+		@Override
+		public String toString() {
+			StringBuilder builder = new StringBuilder();
+			builder.append("WellStatus [")
+					.append("well=").append((well==null)? "??" : well.getMySiteid())
+					.append(", type=").append(type)
+					.append("]");
+			return builder.toString();
+		}	
 	}
 
 	public Comparator<WellStatus> getWellComparator() {
@@ -235,6 +246,7 @@ public class Prefetcher implements Callable<PrefetchOutcome> {
 		protected final transient Logger logger = LoggerFactory.getLogger(getClass());
 
 		private int compareDates(Date d1, Date d2) {
+			// Null dates default to the beginning of time
 			if (d1 == null) {
 				d1 = new Date(0);
 			}
@@ -295,6 +307,68 @@ public class Prefetcher implements Callable<PrefetchOutcome> {
 		
 	};
 	
+	private static Comparator<WellStatus> simpleWellCompare = new Comparator<WellStatus>() {
+
+		protected final transient Logger logger = LoggerFactory.getLogger(getClass());
+
+		private int compareDates(Date d1, Date d2) {
+			// Null dates default to the beginning of time
+			if (d1 == null) {
+				d1 = new Date(0);
+			}
+			if (d2 == null) {
+				d2 = new Date(0);
+			}
+			
+			return d1.compareTo(d2);
+		}
+
+		// return <0, 0, >0 as o1 is <, =, > o2
+		@Override
+		public int compare(WellStatus ws1, WellStatus ws2) {
+			CacheMetaData c1 = ws1.cacheInfo;
+			CacheMetaData c2 = ws2.cacheInfo;
+			
+			int v = 0;
+			
+			if (c1 != null && c2 != null) {
+				try {
+					if (v == 0) {
+						v = compareDates(c1.getMostRecentAttemptDt(), c2.getMostRecentAttemptDt());
+					}
+					if (v == 0) {
+						// sense reversed, well with more recent data gets re-fetched
+						v = compareDates(c2.getLastDataDt(), c1.getLastDataDt());
+					}
+				} catch (NullPointerException npe) {
+					// bail out, this is hopefully a test artifact
+					logger.warn("npe in comparator");
+				}
+			}
+			
+			try {
+				// no fetches recorded -- order by agency, site, type (somewhat arbitrary)
+				if (v == 0) {
+					v = ws1.well.getAgencyCd().compareTo(ws2.well.getAgencyCd());
+				}
+				
+				if (v == 0) {
+					v = ws1.well.getSiteNo().compareTo(ws2.well.getSiteNo());
+				}
+			} catch (NullPointerException npe) {
+				// bail out, this is hopefully a test artifact
+				logger.warn("npe2 in comparator");				
+			}
+			
+			if (v == 0) {
+				v = ws1.type.compareTo(ws2.type);
+			}
+			
+			return v;
+		}
+		
+	};
+
 	private Iterable<WellStatus> populateWellQeue() {
 		List<WellRegistry> allWells = wellDAO.selectAll();
 		PriorityQueue<WellStatus> pq = new PriorityQueue<WellStatus>(allWells.size(), wellCompare);
@@ -309,6 +383,8 @@ public class Prefetcher implements Callable<PrefetchOutcome> {
 		List<CacheMetaData> cmd = cacheDAO.listAll();
 		
 		updateFetchPriorities(cmd);
+
+		Date horizon = new Date(System.currentTimeMillis() - 2*HOUR);
 		
 		Map<CacheMetaDataKey,CacheMetaData> mdMap = new HashMap<CacheMetaDataKey, CacheMetaData>(cmd.size());
 		for (CacheMetaData c : cmd) {
@@ -327,7 +403,11 @@ public class Prefetcher implements Callable<PrefetchOutcome> {
 				ck.setDataType(dt.name());
 				well.cacheInfo = mdMap.get(ck);
 			
-				pq.add(well);
+				if ( ! tooRecent(well, horizon)) {
+					pq.add(well);
+				} else {
+					logger.info("Skipped {} as too recent", well);
+				}
 			}
 		}
 		
@@ -336,7 +416,7 @@ public class Prefetcher implements Callable<PrefetchOutcome> {
 	
 	private Iterable<WellStatus> populateWellQeueForAgency(String agency_cd) {
 		List<WellRegistry> allWells = wellDAO.selectByAgency(agency_cd);
-		PriorityQueue<WellStatus> pq = new PriorityQueue<WellStatus>(allWells.size(), wellCompare);
+		PriorityQueue<WellStatus> pq = new PriorityQueue<WellStatus>(allWells.size(), simpleWellCompare);
 		
 		// make sure we're working with fresh statistics
 		try {
@@ -344,10 +424,10 @@ public class Prefetcher implements Callable<PrefetchOutcome> {
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
-
-		List<CacheMetaData> cmd = cacheDAO.listAll();
 		
-		updateFetchPriorities(cmd);
+		Date horizon = new Date(System.currentTimeMillis() - 2*HOUR);
+
+		List<CacheMetaData> cmd = cacheDAO.listByAgencyCd(agency_cd);
 		
 		Map<CacheMetaDataKey,CacheMetaData> mdMap = new HashMap<CacheMetaDataKey, CacheMetaData>(cmd.size());
 		for (CacheMetaData c : cmd) {
@@ -366,13 +446,26 @@ public class Prefetcher implements Callable<PrefetchOutcome> {
 				ck.setDataType(dt.name());
 				well.cacheInfo = mdMap.get(ck);
 			
-				pq.add(well);
+				if ( ! tooRecent(well, horizon)) {
+					pq.add(well);
+				} else {
+					logger.info("Skipped {} as fetched too recently", well);
+				}
 			}
 		}
 		
 		return pq;
 	}
 
+	private boolean tooRecent(WellStatus well, Date hzn) {
+		Date lastTry = well.cacheInfo.getMostRecentAttemptDt();
+		if (lastTry != null) {
+			if (lastTry.after(hzn)) {
+				return true;
+			}
+		}
+		return false;
+	}
 	
 	/**
 	 * Set cache priorities -- this overrides any other ranking.
