@@ -17,7 +17,7 @@ public class FetchStatsGeneratorTest extends ContextualTest {
 	
 	@Before
 	public void init() {
-		FetchStatsDAO dao = ctx.getBean(FetchStatsDAO.class);
+		FetchStatsDAO dao = ctx.getBean("WaterlevelStatsDAO", FetchStatsDAO.class);
 		victim = new FetchStatsAgencyGenerator(dao);
 		victim.setAgency(null);
 	}
