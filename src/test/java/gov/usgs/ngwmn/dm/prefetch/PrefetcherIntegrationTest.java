@@ -122,4 +122,45 @@ public class PrefetcherIntegrationTest extends ContextualTest {
 		
 		assertTrue(ows2.cacheInfo.getMostRecentAttemptDt().before(ows3.cacheInfo.getMostRecentAttemptDt()));
 	}
+
+	@Test
+	public void testSimpleComparator() {
+		Comparator<Prefetcher.WellStatus> comp = victim.getSimpleWellComparator();
+		
+		long now = System.currentTimeMillis();
+		
+		Prefetcher.WellStatus ws1 = new Prefetcher.WellStatus();
+		ws1.cacheInfo = new CacheMetaData();
+		ws1.type = WellDataType.CONSTRUCTION;
+		ws1.cacheInfo.setMostRecentAttemptDt(new Date(now - 2134));
+		
+		Prefetcher.WellStatus ws2 = new Prefetcher.WellStatus();
+		ws2.cacheInfo = new CacheMetaData();
+		ws2.type = WellDataType.LITHOLOGY;
+		ws2.cacheInfo.setMostRecentAttemptDt(new Date(now));
+		
+		Prefetcher.WellStatus ws3 = new Prefetcher.WellStatus();
+		ws3.cacheInfo = new CacheMetaData();
+		ws3.cacheInfo.setMostRecentAttemptDt(new Date(now));
+		ws3.type = WellDataType.LOG;
+
+		PriorityQueue<WellStatus> pq = new PriorityQueue<Prefetcher.WellStatus>(4,comp);
+		pq.add(ws1);
+		pq.add(ws2);
+		pq.add(ws3);
+		
+		Prefetcher.WellStatus ows1 = pq.poll();
+		Prefetcher.WellStatus ows2 = pq.poll();
+		Prefetcher.WellStatus ows3 = pq.poll();
+		Prefetcher.WellStatus ows4 = pq.poll();
+		
+		assertNotNull(ows1);
+		assertEquals(ws1, ows1);
+		assertNotNull(ows2);
+		assertNotNull(ows3);
+		assertNull(ows4);
+		
+		assertEquals(now, ows2.cacheInfo.getMostRecentAttemptDt().getTime());
+		assertEquals(now, ows3.cacheInfo.getMostRecentAttemptDt().getTime());
+	}
 }

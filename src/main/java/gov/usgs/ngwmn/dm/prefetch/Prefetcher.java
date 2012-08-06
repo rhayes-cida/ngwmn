@@ -241,6 +241,10 @@ public class Prefetcher implements Callable<PrefetchOutcome> {
 		return wellCompare;
 	}
 	
+	public Comparator<WellStatus> getSimpleWellComparator() {
+		return simpleWellCompare;
+	}
+	
 	private static Comparator<WellStatus> wellCompare = new Comparator<WellStatus>() {
 
 		protected final transient Logger logger = LoggerFactory.getLogger(getClass());
@@ -458,11 +462,14 @@ public class Prefetcher implements Callable<PrefetchOutcome> {
 	}
 
 	private boolean tooRecent(WellStatus well, Date hzn) {
-		Date lastTry = well.cacheInfo.getMostRecentAttemptDt();
-		if (lastTry != null) {
+		try {
+			Date lastTry = well.cacheInfo.getMostRecentAttemptDt();
 			if (lastTry.after(hzn)) {
 				return true;
 			}
+		} catch (NullPointerException npe) {
+			// expected
+			return false;
 		}
 		return false;
 	}
