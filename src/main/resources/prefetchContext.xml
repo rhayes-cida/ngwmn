@@ -27,7 +27,7 @@
     	<task:scheduled ref="PrefetchController" method="startInParallel" cron="0 21 ${ngwmn_prefetch_start_hour:22} * * ?"/>
     </task:scheduled-tasks>
     
-    <task:scheduler id="scheduler" pool-size="1"/>
+    <task:scheduler id="scheduler" pool-size="10"/>
     
     <bean id="PrefetchController" class="gov.usgs.ngwmn.dm.prefetch.PrefetchController">
     	<property name="scheduler" ref="scheduler"/>
