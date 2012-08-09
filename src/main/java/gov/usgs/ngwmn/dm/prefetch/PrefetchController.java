@@ -5,17 +5,21 @@ import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.Future;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 
 public class PrefetchController {
 
 	private ThreadPoolTaskScheduler sked;
 	private Prefetcher prefetcher;
+	private Logger logger = LoggerFactory.getLogger(getClass());
 	
 	/**
 	 * Stop any active prefetch and prevent any subsequent starts.
 	 */
 	public void stop() {
+		logger.info("Stopping");
 		prefetcher.requestStop(null);
 		
 		//sked.setWaitForTasksToCompleteOnShutdown(false);
@@ -27,6 +31,7 @@ public class PrefetchController {
 	 * Start the prefetch job immediately, without any scheduling.
 	 */
 	public void start() {
+		logger.info("Starting");
 		Runnable task = new Runnable() {
 			
 			@Override
@@ -50,9 +55,11 @@ public class PrefetchController {
 	private List<Future<PrefetchOutcome>> multithreadOutcomes = new ArrayList<Future<PrefetchOutcome>>();
 	
 	public synchronized List<Future<PrefetchOutcome>>  startInParallel() {
+		logger.info("Start in parallel");
 		List<String> agencies = prefetcher.agencyCodes();
 		
 		for (final String agency : agencies) {
+			logger.info("Launching for {}", agency);
 			Callable<PrefetchOutcome> task = new Callable<PrefetchOutcome>() {
 
 				@Override
@@ -63,6 +70,13 @@ public class PrefetchController {
 			};
 			
 			multithreadOutcomes.add(sked.submit(task));
+		}
+		
+		logger.info("Launched {} tasks", multithreadOutcomes.size());
+		if (logger.isDebugEnabled()) {
+			for (Future<PrefetchOutcome> f : multithreadOutcomes) {
+				logger.debug("future {} done: {}",f, f.isDone());
+			}
 		}
 		
 		return multithreadOutcomes;

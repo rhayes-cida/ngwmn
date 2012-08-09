@@ -90,6 +90,7 @@ public class Prefetcher implements Callable<PrefetchOutcome> {
 		
 		outcome = PrefetchOutcome.RUNNING;
 		
+		logger.debug("calling for agency {}", agency_cd);
 		Iterable<WellStatus> wellQueue = populateWellQeueForAgency(agency_cd);
 		
 		return performPrefetch(wellQueue);

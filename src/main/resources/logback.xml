@@ -17,10 +17,11 @@
 	  </encoder>
   </appender>
 
-  <logger level="DEBUG" name="gov.usgs.ngwmn.dm.DataManagerServlet"/>
+  <logger name="gov.usgs.ngwmn.dm.DataManagerServlet" level="DEBUG" />
   <logger name="com.base22" level="TRACE"/>
   <logger name="httpclient.wire.content" level="WARN"/>
-  	<logger level="trace" name="gov.usgs.ngwmn.dm.visualization"/>
+  <logger name="gov.usgs.ngwmn.dm.visualization" level="TRACE" />
+  <logger name="gov.usgs.ngwmn.dm.prefetch" level="DEBUG"/>
   
   <root level="debug">
   	<if condition=' ! p("user.name").equals("tomcat")'>
