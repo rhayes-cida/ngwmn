@@ -49,7 +49,7 @@ public class CSVController {
 	
 	/** Produce waterlevels for the given site, in format expected by Dygraphs:
 	 * first line has headers: time,value
-	 * then data as comma-separated values
+	 * then data as comma-separated values, with negative values
 
 	 * @param agency
 	 * @param site
@@ -105,6 +105,9 @@ public class CSVController {
 				// TODO clean up date (using Joda time?) or use truncated date column?
 				String time = rs.getString("FULLDATE");
 				String value = rs.getString("VAL");
+				if (! value.isEmpty() && ! value.startsWith("-")) {
+					value = "-" + value;
+				}
 				
 				pw.append(time).append(",").append(value);
 				pw.println();
