@@ -39,4 +39,8 @@
 
     <bean id="TrialController" class="gov.usgs.ngwmn.admin.TrialMVCController"/>
     
+    <bean id="CSVController" class="gov.usgs.ngwmn.admin.CSVController">
+    	<constructor-arg ref="dataSource"/>
+    </bean>
+    
 </beans>
