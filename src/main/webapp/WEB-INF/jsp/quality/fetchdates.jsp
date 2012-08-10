@@ -5,7 +5,7 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-<title>Latest Fetch Dates</title>
+<title>Latest <%@ include file="type.txt"%> Fetch Dates</title>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 
     <!--Load the AJAX API-->
@@ -46,11 +46,11 @@
             
       </script>
       
-<title>Fetch Dates</title>
+<title><%@ include file="type.txt"%> Fetch Dates</title>
 </head>
 <body>
 
-<h1>Most recent successful fetch of water level data</h1>
+<h1>Most recent successful fetch of <%@ include file="type.txt"%> data</h1>
 
 <div id="stats_table"></div>
 </body>

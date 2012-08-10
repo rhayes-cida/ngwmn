@@ -5,7 +5,7 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-<title>Data Publication Timeline</title>
+<title><%@ include file="type.txt"%> Data Publication Timeline</title>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 
     <!--Load the AJAX API-->
@@ -91,11 +91,11 @@
             
       </script>
       
-<title>Data Publication Timeline</title>
+<title><%@ include file="type.txt"%> Data Publication Timeline</title>
 </head>
 <body>
 
-<h1>Water level data publication by day</h1>
+<h1><%@ include file="type.txt"%> data publication by day</h1>
 <h2>count of wells</h2>
 
 <div id="dygraphs_chart"></div>
