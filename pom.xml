@@ -4,7 +4,7 @@
 	<groupId>gov.usgs.cida</groupId>
 	<artifactId>ngwmn</artifactId>
 	<packaging>war</packaging>
-	<version>1.0.3</version>
+	<version>1.0.3-SNAPSHOT</version>
 	<name>NGWMN Cache</name>
 
 	<properties>
