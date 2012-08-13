@@ -59,5 +59,43 @@ public class Specifier {
 	public WellRegistryKey getWellRegistryKey() {
 		return new WellRegistryKey(agencyID, featureID);
 	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result
+				+ ((agencyID == null) ? 0 : agencyID.hashCode());
+		result = prime * result
+				+ ((featureID == null) ? 0 : featureID.hashCode());
+		result = prime * result + ((typeID == null) ? 0 : typeID.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		Specifier other = (Specifier) obj;
+		if (agencyID == null) {
+			if (other.agencyID != null)
+				return false;
+		} else if (!agencyID.equals(other.agencyID))
+			return false;
+		if (featureID == null) {
+			if (other.featureID != null)
+				return false;
+		} else if (!featureID.equals(other.featureID))
+			return false;
+		if (typeID != other.typeID)
+			return false;
+		return true;
+	}
+	
+	
 }
 

@@ -235,7 +235,9 @@ public class DataManagerServlet extends HttpServlet {
 								
 				for (WellDataType typeID : typeIDs) {
 					Specifier spec   = makeSpec(agencyID, featureID, typeID);
-					spect.addWell(spec);
+					if ( ! spect.addWell(spec)) {
+						logger.warn("Duplicate well: {}", spec);
+					}
 				}
 			} catch (RuntimeException e) {
 				// TODO catching NPE and IPE for one entry but two is too many?

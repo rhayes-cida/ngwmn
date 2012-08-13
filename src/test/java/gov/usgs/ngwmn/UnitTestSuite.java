@@ -18,7 +18,6 @@ import gov.usgs.ngwmn.dm.io.transform.ExcelXssfOutputStreamTest;
 import gov.usgs.ngwmn.dm.io.transform.TransformEntrySupplierTests;
 import gov.usgs.ngwmn.dm.io.transform.TransformSupplierTests;
 import gov.usgs.ngwmn.dm.io.transform.TsvOutputStreamTests;
-import gov.usgs.ngwmn.dm.spec.LatLongResolverTests;
 
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
@@ -37,7 +36,6 @@ import org.junit.runners.Suite.SuiteClasses;
     DataManagerServletTests.class,
     SupplyZipOutputTests.class,
     TransformSupplierTests.class,
-    LatLongResolverTests.class,
     FileCacheFilenameTest.class,
     SequentialJoiningAggregatorTests.class,
     PipelineTest.class,

@@ -94,11 +94,6 @@
 		<property name="dao" ref="FetchLogDAO"/>
 	</bean>
 	
-	<bean id="LatLongResolver"
-		class="gov.usgs.ngwmn.dm.spec.LatLongResolver">
-		<constructor-arg ref="WellRegistryDAO"></constructor-arg>
-	</bean>	
-	
  	<bean id="FetchEventBus" class="gov.usgs.ngwmn.dm.eventbus.EventBusSpring" destroy-method="shutdown">
  		<property name="subscribers">
      		<list>
