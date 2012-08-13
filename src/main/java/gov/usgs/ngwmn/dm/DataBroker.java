@@ -80,23 +80,23 @@ public class DataBroker implements FlowFactory, PrefetchI {
 			throws IOException {
 		boolean success = false;
 		
-		logger.debug("Checking for emptiness of {}", spec);
+		logger.debug("checkForEmpty.Checking for emptiness of {}", spec);
 		WellDataType cachedType = spec.getTypeID().aliasFor;
 		if (cachedType != spec.getTypeID()) {
-			logger.info("checking for emptiness of aliased type {} from {}", cachedType, spec.getTypeID());
+			logger.info("checkForEmpty.checking for emptiness of aliased type {} from {}", cachedType, spec.getTypeID());
 		}
 		
 		if ( ! cachedType.isCachable()) {
 			// short-circuit this as a special case, so we always check the constituent data streams
-			logger.info("Short-circuit decline to check for emptiness of {}", spec);
+			logger.info("checkForEmpty.Short-circuit decline to check for emptiness of {}", spec);
 			return false;
 		}
 		
 		try {
-			logger.debug("Updating stats for {}", spec);
+			logger.debug("checkForEmpty.Updating stats for {}", spec);
 			cacheDAO.updateStatsForWell(spec.getWellRegistryKey());
 		} catch (Exception e) {
-			logger.error("Problem updating stats", e);
+			logger.error("checkForEmpty.Problem updating stats", e);
 		}
 		
 		CacheMetaData cmd = cacheDAO.get(spec.getWellRegistryKey(), cachedType);
@@ -104,7 +104,7 @@ public class DataBroker implements FlowFactory, PrefetchI {
 			if (positive(cmd.getEmptyCt())) {
 				// TODO check for staleness by looking at most recent empty date?
 				
-				logger.info("returning cached emptiness for {}, most recent empty result on {}", spec, cmd.getMostRecentEmptyDt());
+				logger.info("checkForEmpty.returning cached emptiness for {}, most recent empty result on {}", spec, cmd.getMostRecentEmptyDt());
 				
 				// We tried earlier and found an empty result -- reflect that to the caller
 				EmptyDataFetcher edf = new EmptyDataFetcher();
@@ -114,7 +114,7 @@ public class DataBroker implements FlowFactory, PrefetchI {
 			} else if (positive(cmd.getFailCt())) {
 				// TODO check for staleness by looking at most recent empty date?
 				
-				logger.info("returning cached failure for {}, most recent failure on {}", spec, cmd.getMostRecentFailDt());
+				logger.info("checkForEmpty.returning cached failure for {}, most recent failure on {}", spec, cmd.getMostRecentFailDt());
 				
 				// We tried earlier and only failed -- reflect that to the caller
 				EmptyDataFetcher edf = new EmptyDataFetcher();
@@ -123,11 +123,11 @@ public class DataBroker implements FlowFactory, PrefetchI {
 				// success in the sense of "we got a result" not "we got data"
 				success = true;	
 			} else {
-				logger.info("empty checker will allow fetch of {}, emptyCt={}, failCt={}",
+				logger.info("checkForEmpty.empty checker will allow fetch of {}, emptyCt={}, failCt={}",
 						new Object[] {spec,cmd.getEmptyCt(), cmd.getFailCt()});
 			}
 		} else {
-			logger.info("No cache meta data for {}", spec);
+			logger.info("checkForEmpty.No cache meta data for {}", spec);
 		}
 		return success;
 	}

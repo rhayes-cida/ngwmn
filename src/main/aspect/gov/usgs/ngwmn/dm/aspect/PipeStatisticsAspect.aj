@@ -8,6 +8,7 @@ import gov.usgs.ngwmn.dm.cache.PipeStatisticsWithProblem;
 import gov.usgs.ngwmn.dm.cache.PipeStatistics.Status;
 import gov.usgs.ngwmn.dm.dao.FetchLog;
 import gov.usgs.ngwmn.dm.io.Pipeline;
+import gov.usgs.ngwmn.dm.prefetch.Prefetcher;
 import gov.usgs.ngwmn.dm.spec.Specifier;
 import gov.usgs.ngwmn.dm.harvest.WebRetriever;
 import gov.usgs.ngwmn.dm.cache.qw.DatabaseXMLCache;
@@ -36,13 +37,29 @@ public aspect PipeStatisticsAspect {
 		&& target(df)
 		&& args(spec, p);
 	
-	before(DataFetcher df, Specifier spec, Pipeline p) : setInput(df, spec, p) {
+	pointcut prefetch() :
+		cflow(call( * gov.usgs.ngwmn.dm.PrefetchI.prefetchWellData(Specifier)));
+	
+	before(DataFetcher df, Specifier spec, Pipeline p) : 
+		setInput(df, spec, p) 
+		&& ! prefetch()
+	{
 		logger.trace("ASPECT: Enter before setInput");
 		p.stats.setSpecifier(spec);
 		p.stats.setCalledBy(df.getClass());
 		logger.trace("ASPECT: Exit  before setInput");
 	}
 	
+	before(DataFetcher df, Specifier spec, Pipeline p) : 
+		setInput(df, spec, p) 
+		&& prefetch()
+	{
+		logger.trace("ASPECT: Enter before setInput");
+		p.stats.setSpecifier(spec);
+		p.stats.setCalledBy(gov.usgs.ngwmn.dm.PrefetchI.class);
+		logger.trace("ASPECT: Exit  before setInput");
+	}
+
 	after(DataFetcher df, Specifier spec, Pipeline p) throwing (Exception oops): setInput(df, spec, p) {
 		logger.trace("ASPECT: Enter after setInput");
 		p.stats.markEnd(Status.FAIL);

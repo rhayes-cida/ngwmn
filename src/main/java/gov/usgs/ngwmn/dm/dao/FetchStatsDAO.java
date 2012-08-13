@@ -50,7 +50,7 @@ public class FetchStatsDAO {
 			"from "+
 			"(select * from GW_DATA_PORTAL.fetch_log "+
 			 "where fetch_log.data_stream = '%1$s' "+
-			 "and fetcher = 'WebRetriever' ) fl "+
+			 "and (fetcher = 'WebRetriever' or fetcher = 'PrefetchI') ) fl "+
 			 
 			 "left join GW_DATA_PORTAL.fetch_log fail_log "+
 			 "on (fail_log.fetchlog_id = fl.fetchlog_id and fail_log.status = 'FAIL') "+
@@ -81,7 +81,7 @@ public class FetchStatsDAO {
 			"(select * from GW_DATA_PORTAL.fetch_log "+
 			 "where fetch_log.data_stream = '%1$s' " +
 			 "and agency_cd = :agency "+
-			 "and fetcher = 'WebRetriever' ) fl "+
+			 "and (fetcher = 'WebRetriever' or fetcher = 'PrefetchI') ) fl "+
 			 
 			 "left join GW_DATA_PORTAL.fetch_log fail_log "+
 			 "on (fail_log.fetchlog_id = fl.fetchlog_id and fail_log.status = 'FAIL') "+

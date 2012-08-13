@@ -152,7 +152,7 @@ public interface FetchLogMapper {
 	@Select({
 		"select agency_cd, data_stream, status, count(*) ct, avg(elapsed_sec) avg",
 		"from gw_data_portal.fetch_log",
-		"where fetcher = 'WebRetriever' and data_source is not null",
+		"where (fetcher = 'WebRetriever' or fetcher = 'PrefetchI') and data_source is not null",
 		"and started_at between (#{day,jdbcType=DATE} - 12/24) and (#{day,jdbcType=DATE} + 12/24)",
 		"group by agency_cd, data_stream, status",
 		"order by agency_cd, data_stream, status",
