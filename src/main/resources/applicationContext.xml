@@ -262,6 +262,13 @@
 		<constructor-arg ref="dataSource"/>
 		<constructor-arg value="LOG"/>
 	</bean>
+	
+	<bean id="JITDataController" class="gov.usgs.ngwmn.admin.JITDataController">
+		<property name="wellRegistryDAO" ref="WellRegistryDAO"/>
+		<property name="waterlevelStatsDAO" ref="WaterlevelStatsDAO"/>
+		<property name="qualityStatsDAO" ref="QualityStatsDAO"/>
+		<property name="wellLogStatsDAO" ref="WellLogStatsDAO"/>
+	</bean>
 </beans>
 
        

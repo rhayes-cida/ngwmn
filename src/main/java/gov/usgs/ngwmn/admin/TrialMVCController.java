@@ -2,6 +2,7 @@ package gov.usgs.ngwmn.admin;
 
 
 import gov.usgs.ngwmn.WellDataType;
+import gov.usgs.ngwmn.admin.stats.JitTree;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -15,7 +16,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
@@ -78,6 +78,19 @@ public class TrialMVCController {
 			)
 	{
 		return new SiteSelector(agency,site,type);
+	}
+	
+	@RequestMapping("tree/sample")
+	@ResponseBody
+	public JitTree getTree() {
+		JitTree base = new JitTree("Name 1", 11);
+		
+		JitTree k1 = new JitTree("Kid 1", 3);
+		
+		base.addChild(k1);
+		base.addChild(new JitTree("Kid 2", 6));
+
+		return base;
 	}
 	
 	@RequestMapping("site")

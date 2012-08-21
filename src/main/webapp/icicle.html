@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<title>Icicle Tree</title>
+
+<!-- JIT Library File -->
+<script language="javascript" type="text/javascript" src="js/jit.js"></script>
+
+<!-- Example File -->
+<script language="javascript" type="text/javascript" src="js/icicle.js"></script>
+</head>
+
+<body onload="init();">
+<div id="container">
+
+<div id="left-container">
+
+<div class="text">
+
+  <h4>
+    Icicle Tree
+  </h4>
+  
+  <div>
+    <label for="s-orientation">Orientation: </label>
+    <select name="s-orientation" id="s-orientation">
+      <option value="h" selected>horizontal</option>
+      <option value="v">vertical</option>
+    </select>
+    <br>
+    <div id="max-levels">
+    <label for="i-levels-to-show">Max levels: </label>
+    <select  id="i-levels-to-show" name="i-levels-to-show" style="width: 50px">
+      <option>all</option>
+      <option>1</option>
+      <option>2</option>
+      <option selected="selected">3</option>
+      <option>4</option>
+      <option>5</option>
+    </select>
+    </div>
+  </div>
+</div>
+
+<a id="update" href="#" class="theme button white">Go to Parent</a>
+
+<div id="center-container">
+    <div id="infovis" style="height: 200px; ">
+    Graphic goes here!
+    </div>    
+</div>
+
+</body>
+</html>
