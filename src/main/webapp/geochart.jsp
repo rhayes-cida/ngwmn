@@ -92,7 +92,7 @@ select dec_lat_va, dec_long_va from gw_data_portal.well_registry
     <button onclick="refresh();return false;">refresh</button>
     <button onclick="useSample(0); return false;">sample 1</button>
     <button onclick="useSample(1); return false;">sample 2</button>
-    <button onclick="useSample('sample-query-3'); return false;">sample 3</button>
+    <button onclick="useSample('sample-query-3'); return false;">sample 3 (gnarly)</button>
     
     <textarea id="sample-query-3" hidden="true">
     select 
