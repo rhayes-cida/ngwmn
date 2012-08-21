@@ -43,4 +43,7 @@
     	<constructor-arg ref="dataSource"/>
     </bean>
     
+    <bean id="DataSourceController" class="gov.usgs.ngwmn.admin.DataSourceController">
+    	<property name="dataSource" ref="dataSource"/>
+    </bean>
 </beans>
