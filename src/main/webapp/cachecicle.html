@@ -17,15 +17,62 @@
 <link rel="stylesheet" href="css/ui-lightness/jquery-ui-1.8.23.custom.css">
 <script type="text/javascript">
 
-function colorize(vis) {
-	vis.graph.eachNode(function(nd) {
-		nd.Node.color = tinycolor.random().toHexString();
-	});
+function colorize(nd) {
+	// colorize nd
+	
+	var mixin = function(name) {
+		switch (name) {
+			case "fail": return "red";
+			case "success": return "green";
+			case "empty": return "blue";
+			
+			case "LOG": return "white";
+			case "WATERLEVEL": return "gray";
+			case "QUALITY": return "black";
+		}
+	}
+	
+	var blend = function(c1,c2) {
+		var tc1 = tinycolor(c1).toHsl();
+		var tc2 = tinycolor(c2).toHsl();
+		
+		var v = tinycolor({h: (tc1.h+tc2.h)/2, s: (tc1.s+tc2.s)/2, l: (tc1.l+tc2.l)/2});
+		
+		return v.toHexString();
+	}
+	
+	var computeColor = function(sf,pr,dp) {
+		switch (dp) {
+		case 0:
+			return "#333";
+		case 1:
+			return tinycolor({h: 360*Math.random(), s: 0.5, v: 0.5}).toHexString();
+		case 2:
+		case 3:
+			var mi = mixin(sf.name);
+			var clr = blend(pr.data.$color,mi);
+			return clr;
+		}
+	}
+	
+	var c3 = function(sf, pr, dp) {
+		// sf.data.$color = tinycolor.random().toHexString();
+		sf.data.$color = computeColor(sf,pr,dp);
+		if (sf.children) {
+			sf.children.forEach(
+				function(kn,idx,arr) {
+					c3(kn,sf,dp+1);
+				}
+			);
+		}
+	}
+	
+	c3(nd,null,0);
 }
 
 $.getJSON('stats/jit/tree/2012-07-12', function(data) {
+	  colorize(data);
 	  icicle.loadJSON(data);
-	  colorize(icicle);
 	  icicle.refresh();
 });
 
@@ -33,9 +80,10 @@ $(function() {
 	$( "#datepicker" ).datepicker({
 		dateFormat: "yy-mm-dd",
 		onSelect: function(dateText,inst) {
+			// TODO clear visualization here
 			$.getJSON('stats/jit/tree/'+dateText, function(data) {
+	  			colorize(data);
 	  			icicle.loadJSON(data);
-	  			colorize(icicle);
 	  			icicle.refresh();				
 			})
 		}
