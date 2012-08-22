@@ -70,31 +70,69 @@ function colorize(nd) {
 	c3(nd,null,0);
 }
 
-$.getJSON('stats/jit/tree/2012-07-12', function(data) {
-	  colorize(data);
-	  icicle.loadJSON(data);
-	  icicle.refresh();
-});
-
 $(function() {
 	$( "#datepicker" ).datepicker({
 		dateFormat: "yy-mm-dd",
 		onSelect: function(dateText,inst) {
+			$("#loading").show();
+
 			// TODO clear visualization here
 			$.getJSON('stats/jit/tree/'+dateText, function(data) {
 	  			colorize(data);
 	  			icicle.loadJSON(data);
 	  			icicle.refresh();				
-			})
+			});
+			$("#loading").hide();
 		}
 	});
 });
 
 </script>
 
+<script type="text/javascript" >
+
+$("#loading").hide();
+
+function hideLoading() {
+	$("#loading").hide();
+}
+
+// this next, although recommended by the jquery documentation, does not work.
+// $("#loading").ajaxStart(function(){
+// 	 $(this).show();
+// 	});
+	
+// $("#loading").ajaxStop(function(){
+// 	 	$(this).hide();
+// 	});
+	
+	
+</script>
+<style type="text/css">
+#loading
+{
+position:absolute;
+left:  0px;
+bottom: 0px;
+right: 0px;
+top:  0px;
+
+background-color: rgba(100,100,100,0.3);
+
+z-index:100;
+}
+
+#loading img {
+	display: block;
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: 100px;
+}
+</style>
+
 </head>
 
-<body onload="init();">
+<body onload="init(); hideLoading(); ">
 
 <div class="text">
 
@@ -104,14 +142,17 @@ $(function() {
   
 </div>
 
-<a id="update" href="#" class="theme button white">Go to Parent</a>
-
 <div id="datepicker">
 </div>
 
-<div id="center-container">
+<div id="center-container" style="position:relative;">
+    Left click to zoom in; right click to zoom out. 
+    <a id="update" href="#" class="theme button white">Go to Parent</a>
+
+	<div id="loading" >
+		<img alt="loading" src="images/ajax-loader.gif" >
+	</div>
     <div id="infovis" style="height: 480px; ">
-    Left click to zoom in; right click to zoom out.
     </div>    
 </div>
 

@@ -1,6 +1,13 @@
 <!DOCTYPE html>
 <html>
   <head>
+  
+<style type="text/css">
+.loading {
+	opacity: 0.5;
+}
+</style>
+
     <script type='text/javascript' src='https://www.google.com/jsapi'></script>
     <script type='text/javascript'>
      google.load('visualization', '1', {'packages': ['geochart']});
@@ -54,6 +61,9 @@
       var query;
       
       function refresh() {
+    	  var chart_div = document.getElementById('chart_div')
+    	  
+    	  chart_div.className = 'loading';
 	      var queryOpts = {};
 	      
 	      var sqlQuery = document.getElementById('q').value;
@@ -74,17 +84,21 @@
 	
 			var data = response.getDataTable();
 			chart.draw(data, options);
+	    	  chart_div.className = '';
+
 		   });
 
 		};
 </script>
   </head>
   <body>
-    <div id="chart_div" style="width: 900px; height: 500px;"></div>
+    <div id="chart_div" style="width: 900px; height: 500px;">
+    
+    </div>
     
     
     <form>
-    Query:<br />
+    Query: (<i>do not terminate with semicolon</i>)<br />
     <textarea id="q"   rows="20" cols="80">
 select dec_lat_va, dec_long_va from gw_data_portal.well_registry
     </textarea>
@@ -93,6 +107,7 @@ select dec_lat_va, dec_long_va from gw_data_portal.well_registry
     <button onclick="useSample(0); return false;">sample 1</button>
     <button onclick="useSample(1); return false;">sample 2</button>
     <button onclick="useSample('sample-query-3'); return false;">sample 3 (gnarly)</button>
+    <button onclick="useSample('sample-query-4'); return false;">sample 4</button>
     
     <textarea id="sample-query-3" hidden="true">
     select 
@@ -128,6 +143,14 @@ select dec_lat_va, dec_long_va from gw_data_portal.well_registry
 where qc.agency_cd = wr.agency_cd and qc.site_no = wr.site_no
 and qc.published = 'Y'
 group by wr.agency_cd, wr.site_no
+    </textarea>
+    
+    <textarea id="sample-query-4" hidden="true">
+select dec_lat_va, dec_long_va, 
+(select coalesce(ln(greatest(sum(success_ct),1)),0) from gw_data_portal.cache_meta_data 
+where well_registry.agency_cd = cache_meta_data.agency_cd 
+and well_registry.site_no = cache_meta_data.site_no) ln_success 
+from gw_data_portal.well_registry
     </textarea>
     </form>
   </body>
