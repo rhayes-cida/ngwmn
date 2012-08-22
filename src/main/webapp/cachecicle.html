@@ -74,52 +74,33 @@ $(function() {
 	$( "#datepicker" ).datepicker({
 		dateFormat: "yy-mm-dd",
 		onSelect: function(dateText,inst) {
-			// $("#loading").show();
+			$("#loading").show();
 
 			// TODO clear visualization here
 			$.getJSON('stats/jit/tree/'+dateText, function(data) {
 	  			colorize(data);
 	  			icicle.loadJSON(data);
 	  			icicle.refresh();				
+				$("#loading").hide();
 			});
-			// $("#loading").hide();
 		}
 	});
 	
 	$("#loading").hide();
 
-	// recommended by the jquery documentation
-	$("#loading").ajaxStart(function(){
-		$(this).show();
-	});
+// 	// recommended by the jquery documentation
+// 	$("#loading").ajaxStart(function(){
+// 		$(this).show();
+// 	});
 		
-	$("#loading").ajaxStop(function(){
-		$(this).hide();
-	});
+// 	$("#loading").ajaxStop(function(){
+// 		$(this).hide();
+// 	});
 
 });
 
 </script>
 
-<script type="text/javascript" >
-
-$("#loading").hide();
-
-function hideLoading() {
-	$("#loading").hide();
-}
-
-// this next, although recommended by the jquery documentation, does not work.
-// $("#loading").ajaxStart(function(){
-// 	 $(this).show();
-// 	});
-	
-// $("#loading").ajaxStop(function(){
-// 	 	$(this).hide();
-// 	});
-	
-	
-</script>
 <style type="text/css">
 #loading
 {
@@ -144,7 +125,7 @@ z-index:100;
 
 </head>
 
-<body onload="init(); hideLoading(); ">
+<body onload="init();">
 
 <div class="text">
 
@@ -158,7 +139,7 @@ z-index:100;
 </div>
 
 <div id="center-container" style="position:relative;">
-    Left click to zoom in; right click to zoom out. 
+    Left click to zoom in; right click to zoom out or use this: 
     <a id="update" href="#" class="theme button white">Go to Parent</a>
 
 	<div id="loading" >
