@@ -74,7 +74,7 @@ $(function() {
 	$( "#datepicker" ).datepicker({
 		dateFormat: "yy-mm-dd",
 		onSelect: function(dateText,inst) {
-			$("#loading").show();
+			// $("#loading").show();
 
 			// TODO clear visualization here
 			$.getJSON('stats/jit/tree/'+dateText, function(data) {
@@ -82,9 +82,21 @@ $(function() {
 	  			icicle.loadJSON(data);
 	  			icicle.refresh();				
 			});
-			$("#loading").hide();
+			// $("#loading").hide();
 		}
 	});
+	
+	$("#loading").hide();
+
+	// recommended by the jquery documentation
+	$("#loading").ajaxStart(function(){
+		$(this).show();
+	});
+		
+	$("#loading").ajaxStop(function(){
+		$(this).hide();
+	});
+
 });
 
 </script>
