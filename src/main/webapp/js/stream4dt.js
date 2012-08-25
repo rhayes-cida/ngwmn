@@ -26,14 +26,14 @@ function plotFetchOutcomes(dataTable,id) {
 	
 var dataT = dt2xy(dataTable);
 
-var layout = d3.layout.stack().offset("wiggle")(dataT);
+var layout = d3.layout.stack().order('inside-out').offset("wiggle")(dataT);
 
 var n = dataTable.getNumberOfColumns()-1,
 	m = dataTable.getNumberOfRows(),
     color = d3.interpolateRgb("#aad", "#556");
 
 var width = 960,
-    height = 500,
+    height = 200,
     minx = d3.min(layout, function(d) {
         return d3.min(d, function(d) {
             return d.x;
