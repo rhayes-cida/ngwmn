@@ -18,7 +18,7 @@
 
     var agency;
     
-      // Load the Visualization API and the piechart package.
+      // Load the Visualization API and some packages.
       google.load('visualization', '1.0', {'packages':['corechart','table']});
 
       // Set a callback to run when the Google Visualization API is loaded.
