@@ -1,5 +1,5 @@
 
-var dataRaw = [
+var data = [
              {time: new Date("2012-07-23"), v1: 10, v2:9},
              {time: new Date("2012-07-24"), v1: 11, v2: 6},
              {time: new Date("2012-07-25"), v1: 7, v2: 3},
@@ -10,13 +10,13 @@ var dataRaw = [
              {time: new Date("2012-08-02"), v1: 6, v2: 3}
              ];
 
-var startDate = new Date("2012-01-01");
+function plotFetchOutcomes(dataRaw) {
 var dataT = [
              dataRaw.map(function(t) {
-            	 return {x: (t.time.valueOf() - startDate.valueOf())/(24*60*60*1000.0), y: t.v1}
+            	 return {x: (t.time.valueOf()), y: t.v1}
              }),
              dataRaw.map(function(t) {
-            	 return {x: (t.time.valueOf() - startDate.valueOf())/(24*60*60*1000.0), y: t.v2}
+            	 return {x: (t.time.valueOf()), y: t.v2}
              })
              ];
 
@@ -44,19 +44,11 @@ var width = 960,
       });
     });
 
-var datebounds = [new Date("2012-07-15"), new Date("2012-08-15")
-                  ];
-
-
 // apply scaling to display area
 var area = d3.svg.area()
 .x(function(d) { return scale(d.x, minx, maxx, 0, width); })
 .y0(function(d) { return height - d.y0 * height / my; })
 .y1(function(d) { return height - (d.y + d.y0) * height / my; });
-
-
-
-// synthetic data is n x m arrays of {x,y} tuples.
 
 var vis = d3.select("#chart")
   	.append("svg")
@@ -68,4 +60,8 @@ vis.selectAll("path")
     .enter().append("path")
     .style("fill", function() { return color(Math.random()); })
     .attr("d", area);
+
+}
+
+plotFetchOutcomes(data);
 
