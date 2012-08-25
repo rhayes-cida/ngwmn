@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="content-type" content="text/html;charset=utf-8">
+    <title>Streamgraphs</title>
+    <script type="text/javascript" src="../js/d3.v2.js?2.9.5"></script>
+    <script src='../js/scale.js' type='text/javascript'> </script>
+	<script src='../js/stream4dt.js' type='text/javascript'> </script>
+	
+    <script type="text/javascript" src="https://www.google.com/jsapi"></script>
+    
+    <script type="text/javascript">
+    
+      // Load the Visualization API.
+      google.load('visualization', '1.0');
+
+      // Set a callback to run when the Google Visualization API is loaded.
+      google.setOnLoadCallback(doQueries);
+
+      function doQueries() {
+    	  doQuery('quality');
+    	  doQuery('well_log');
+    	  doQuery('waterlevel');
+      }
+      
+      function doQuery(t) {
+    	  var query = new google.visualization.Query(
+    			  "/ngwmn/stats/"+t+"/stats"
+    			  );
+    	  
+    	  query.setQuery(
+    			  'select toDate(FETCH_DATE), count(PUBLISHED) ' +
+    			  'group by toDate(FETCH_DATE) '+
+    			  'pivot AGENCY_CD ' +
+    			  'label toDate(FETCH_DATE) "fetch date"');
+    	  
+    	  query.send(function(resp) {handleQueryResponse(resp,t);});
+    	  
+      }
+      
+      function handleQueryResponse(response,t) {
+    	    if (response.isError()) {
+    	      alert('Error in query: ' + response.getMessage() + ' ' + response.getDetailedMessage());
+    	      return;
+    	    }
+
+    	    var data = response.getDataTable();
+    	    plotFetchOutcomes(data,'chart_'+t);
+    	  }
+            
+      </script>
+      
+    
+  </head>
+  <body>
+    <div class="body">
+      <div class="content">
+
+<h1 id='streamgraph'>Publication counts</h1>
+<h2>Quality</h2>
+<div class='gallery' id='chart_quality'>
+</div>
+<h2>Water Level</h2>
+<div class='gallery' id='chart_waterlevel'>
+</div>
+<h2>Well Log</h2>
+<div class='gallery' id='chart_well_log'>
+</div>
+
+    </div>
+  </div>
+  </body>
+</html>
