@@ -127,12 +127,13 @@ public class PrefetcherIntegrationTest extends ContextualTest {
 	public void testSimpleComparator() {
 		Comparator<Prefetcher.WellStatus> comp = victim.getSimpleWellComparator();
 		
-		long now = System.currentTimeMillis();
+		final long now = System.currentTimeMillis();
+		final long pastTime = now - 2134;
 		
 		Prefetcher.WellStatus ws1 = new Prefetcher.WellStatus();
 		ws1.cacheInfo = new CacheMetaData();
 		ws1.type = WellDataType.CONSTRUCTION;
-		ws1.cacheInfo.setMostRecentAttemptDt(new Date(now - 2134));
+		ws1.cacheInfo.setMostRecentAttemptDt(new Date(pastTime));
 		
 		Prefetcher.WellStatus ws2 = new Prefetcher.WellStatus();
 		ws2.cacheInfo = new CacheMetaData();
@@ -160,7 +161,8 @@ public class PrefetcherIntegrationTest extends ContextualTest {
 		assertNotNull(ows3);
 		assertNull(ows4);
 		
-		assertEquals(now, ows2.cacheInfo.getMostRecentAttemptDt().getTime());
-		assertEquals(now, ows3.cacheInfo.getMostRecentAttemptDt().getTime());
+		assertEquals("first time is oldest", pastTime, ows1.cacheInfo.getMostRecentAttemptDt().getTime());
+		assertEquals("second time is now", now, ows2.cacheInfo.getMostRecentAttemptDt().getTime());
+		assertEquals("thirst timne is now", now, ows3.cacheInfo.getMostRecentAttemptDt().getTime());
 	}
 }
