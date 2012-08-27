@@ -86,6 +86,8 @@
 				<input type="text" name="cacheId" value="cacheId" size="7"></input>
 				
 			</form>
+			</li>
+		<li><a href="admin/publication-flow.html">Flow chart of publication count by date</a></li>
 	</ul>
 
 </body>

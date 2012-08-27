@@ -13,7 +13,7 @@ function dt2xy(dt) {
 	for (j = 1; j < dt.getNumberOfColumns(); j++) {
 		var vv = [];
 		for (i = 0; i < dt.getNumberOfRows(); i++) {
-			var tuple = {x: xx[i], y: (dt.getValue(i,j) || 0)};
+			var tuple = {x: xx[i], y: (dt.getValue(i,j) || 0), row: i, column: j, v:  (dt.getValue(i,j) || 0)};
 			vv[i] = tuple;
 		}
 		dataT.push(vv);
@@ -67,6 +67,22 @@ vis.selectAll("path")
     .style("fill", function() { return color(Math.random()); })
     .attr("d", area);
 
+vis.selectAll("path")
+	.append("title")
+	.text(function(d,i) { 
+			//  "label for " + d + "," +i; 
+			// d is entire vv array 
+			return dataTable.getColumnLabel(i+1);
+			});
+
+var format8601 = d3.time.format("%Y-%m-%d");
+
+/*vis.selectAll("path")
+	.on('click', function(d,i) {
+		// this shows wrong values:
+		alert(dataTable.getColumnLabel(i+1) + " " + format8601(d[i].x) + ": " + d[i].v);
+	});
+*/
 }
 
 
