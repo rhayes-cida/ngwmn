@@ -290,7 +290,19 @@ select
 	over (
     	partition by qc.waterlevel_cache_id,xq.month
       	order by xq.depth
-    ) percent_rank
+    ) percent_rank,
+    
+    count(*)
+	over (
+    	partition by qc.waterlevel_cache_id,xq.month
+      	order by xq.depth
+    ) count,
+    
+    rank()
+	over (
+    	partition by qc.waterlevel_cache_id,xq.month
+      	order by xq.depth
+    ) rank,
     
 	from 
 		gw_data_portal.waterlevel_cache qc,
