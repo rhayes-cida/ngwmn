@@ -269,5 +269,70 @@ order by position desc)
 
 where ord = 0
 ;
-			
-		
+
+-- Here's a start at a per-month rank
+
+select 
+	
+    qc.waterlevel_cache_id,
+    xq.depth,
+    xq.ord,
+    xq.dt,
+    xq.month,
+    
+    cume_dist()
+    over (
+    	partition by qc.waterlevel_cache_id,xq.month
+      	order by xq.depth
+    ) cumulative_distribution,
+    
+    percent_rank() 
+	over (
+    	partition by qc.waterlevel_cache_id,xq.month
+      	order by xq.depth
+    ) percent_rank
+    
+	from 
+		gw_data_portal.waterlevel_cache qc,
+	
+		XMLTable(
+		XMLNAMESPACES(
+		  'http://www.wron.net.au/waterml2' AS "wml2",
+		  'http://www.opengis.net/om/2.0' AS "om",
+		  'http://www.opengis.net/swe/2.0' AS "swe"),
+		  
+		'
+    let $seq := //wml2:WaterMonitoringObservation/om:result/wml2:TimeSeries/wml2:element,
+    	$sz := count($seq)
+    
+    for $r at $pos in $seq
+
+		let 
+		$p := $r/wml2:TimeValuePair,
+    	$depth := $p/wml2:value/swe:Quantity/swe:value,
+      	$dt := substring($p/wml2:time,1,10),
+      	$month := month-from-date(xs:date($dt))
+    
+	 return
+     <well>
+     	<dt>{$dt}</dt>
+     	<month>{$month}</month>
+		<depth>{$depth}</depth>
+		<pos>{$pos}</pos>
+        <sz>{$sz}</sz>
+        <ord>{$sz - $pos}</ord>
+ 	</well>
+		'
+		  
+		passing qc.xml
+		columns 
+		"DT" date path 'dt',
+    	"MONTH" number path 'month',
+		"DEPTH" number path 'depth',
+    	"POSITION" number path 'pos',
+    	"SZ" number path 'sz',
+    	"ORD" number path 'ord'
+		) xq
+    
+    where waterlevel_cache_id = 220
+;
