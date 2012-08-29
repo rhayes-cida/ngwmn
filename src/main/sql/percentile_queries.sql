@@ -161,3 +161,113 @@ select
 		"VAL" number path 'wml2:value/swe:Quantity/swe:value',
 		"UNITS" varchar(40) path 'wml2:value/swe:Quantity/swe:uom/@code'
 		) xq
+;
+
+
+select 
+	
+    qc.waterlevel_cache_id,
+    
+    cume_dist()
+    over (
+    	partition by qc.waterlevel_cache_id
+      	order by xq.depth
+    ) cumulative_distribution,
+    
+    percent_rank() 
+	over (
+    	partition by qc.waterlevel_cache_id
+      	order by xq.depth
+    ) percent_rank
+    
+	from 
+		gw_data_portal.waterlevel_cache qc,
+	
+		XMLTable(
+		XMLNAMESPACES(
+		  'http://www.wron.net.au/waterml2' AS "wml2",
+		  'http://www.opengis.net/om/2.0' AS "om",
+		  'http://www.opengis.net/swe/2.0' AS "swe"),
+		  
+		'for $r in //wml2:WaterMonitoringObservation/om:result/wml2:TimeSeries/wml2:element
+
+		let 
+		$p := $r/wml2:TimeValuePair
+		
+		return $p
+		'
+		  
+		passing qc.xml
+		columns 
+		"DEPTH" number path 'wml2:value/swe:Quantity/swe:value'
+		) xq
+;
+
+
+-- has promise of being much more efficient!
+
+
+select * from 
+(select 
+	
+    qc.waterlevel_cache_id,
+    xq.position,
+    xq.depth,
+    xq.sz,
+    xq.ord,
+    
+    cume_dist()
+    over (
+    	partition by qc.waterlevel_cache_id
+      	order by xq.depth
+    ) cumulative_distribution,
+    
+    percent_rank() 
+	over (
+    	partition by qc.waterlevel_cache_id
+      	order by xq.depth
+    ) percent_rank
+    
+	from 
+		gw_data_portal.waterlevel_cache qc,
+	
+		XMLTable(
+		XMLNAMESPACES(
+		  'http://www.wron.net.au/waterml2' AS "wml2",
+		  'http://www.opengis.net/om/2.0' AS "om",
+		  'http://www.opengis.net/swe/2.0' AS "swe"),
+		  
+		'
+    let $seq := //wml2:WaterMonitoringObservation/om:result/wml2:TimeSeries/wml2:element
+    for $r at $pos in $seq
+
+		let 
+		$p := $r/wml2:TimeValuePair,
+    $depth := $p/wml2:value/swe:Quantity/swe:value,
+    $sz := count($seq)
+    
+		return
+     <well>
+				<depth>{$depth}</depth>
+				<pos>{$pos}</pos>
+        <sz>{$sz}</sz>
+        <ord>{$sz - $pos}</ord>
+ 			</well>
+		'
+		  
+		passing qc.xml
+		columns 
+		"DEPTH" number path 'depth',
+    "POSITION" number path 'pos',
+    "SZ" number path 'sz',
+    "ORD" number path 'ord'
+		) xq
+
+WHERE QC.WATERLEVEL_CACHE_ID in (220, 42)
+-- and ord = 0
+order by position desc)
+
+where ord = 0
+;
+			
+		
