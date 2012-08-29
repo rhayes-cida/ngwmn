@@ -203,9 +203,33 @@ public class DatabaseXMLCache implements Cache {
 	public void publish(int id,Specifier spec) throws Exception {
 		logger.info("publishing {}[{}]", tablename, id);
 		logger.debug("for specifier {}", spec);
+		replacePublished(spec.getAgencyID(), spec.getFeatureID());
 		setPublished(id, "Y");
 	}
 
+	public void replacePublished(String agency, String site) throws SQLException  {
+		// TODO use Spring jdbc template
+		final Connection conn = ds.getConnection();
+		try {
+			PreparedStatement s = conn.prepareStatement(
+					"UPDATE GW_DATA_PORTAL." + tablename + " " +
+					"SET published = 'R' " +
+					"WHERE agency_cd = ? " +
+					"AND site_no = ? " +
+					"AND published = 'Y' ");
+			
+			s.setString(1,agency);
+			s.setString(2, site);
+			
+			int ct = s.executeUpdate();
+			logger.info("Unpublished {} for {}", ct, agency+":"+site);
+			
+		} finally {
+			conn.close();
+		}
+
+	}
+	
 	public void withdraw(int id, Specifier spec) throws Exception {
 		logger.warn("fetched data was found unacceptable, {}[{}]", tablename, id);
 		setPublished(id, "N");
