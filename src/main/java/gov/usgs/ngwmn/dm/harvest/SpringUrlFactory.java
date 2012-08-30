@@ -35,12 +35,13 @@ public class SpringUrlFactory {
 
 		StandardEvaluationContext context = new StandardEvaluationContext();
 		
-		if (agency.contains(" ")) {
+		// TODO Horrible hack to deal with variance in Cocoon pipelines when it comes to handling spaces in agency codes.
+		if ((WellDataType.REGISTRY != t) && agency.contains(" ")) {
 			String agcy = agency.replace(" ", "_");
 			logger.warn("Using despaced agency code '{}' for original agency code '{}'",  agcy, agency);
 			agency = agcy;
 		}
-		
+	
 		context.setVariable("agencyId", agency);
 		context.setVariable("featureId", site);
 		
