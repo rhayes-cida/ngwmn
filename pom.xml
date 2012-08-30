@@ -248,11 +248,6 @@
 			<version>2.5.10</version>
 		</dependency>
 
-		<dependency>
-			<groupId>com.google.visualization</groupId>
-			<artifactId>visualization-datasource</artifactId>
-			<version>1.1.1</version>
-		</dependency>
 	</dependencies>
 
 	<build>
@@ -365,6 +360,19 @@
         		</executions>
       		</plugin>
 			
+			<plugin>
+        		<groupId>org.codehaus.mojo</groupId>
+        		<artifactId>cobertura-maven-plugin</artifactId>
+        		<version>2.5</version>
+        		<configuration>
+          			<instrumentation>
+            			<excludes>
+              				<exclude>gov/usgs/ngwmn/dm/aspect/*.class</exclude>
+            			</excludes>
+          			</instrumentation>
+        		</configuration>
+      		</plugin>
+      		
 		</plugins>
 		
 		<testResources>
