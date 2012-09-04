@@ -91,6 +91,7 @@
     
     <button onclick="useSample('rank-stats-query'); refresh(); return false;">Rank statistics</button>
     <button onclick="useSample('data-age-query'); refresh(); return false;">Data age</button>
+    <button onclick="useSample('monthly-stats-query'); refresh(); return false;">Per-month rank statistics (for most recent sample date)</button>
     
     
     <textarea id="rank-stats-query" hidden="true">
@@ -125,6 +126,22 @@ and c.waterlevel_cache_id = cs.waterlevel_cache_id
 and published='Y'
     </textarea>
     
+    <textarea id="monthly-stats-query" hidden="true">
+select dec_lat_va, dec_long_va, 
+monthly_cum_distribution,
+month
+
+
+from 
+gw_data_portal.well_registry wr, 
+GW_DATA_PORTAL.waterlevel_cache c,
+GW_DATA_PORTAL.waterlevel_data_stats cs
+
+where wr.agency_cd = c.agency_cd and wr.site_no = c.site_no
+and c.waterlevel_cache_id = cs.waterlevel_cache_id
+and published='Y'
+    </textarea>
+
     </form>
   </body>
 </html>
