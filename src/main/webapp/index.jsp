@@ -73,6 +73,7 @@
 		</li>
 		<li><a href="cachecicle.html">Cache Outcomes Chart</a></li>
 		<li><a href="admin/geochart.jsp">Ad-hoc map</a></li>
+		<li><a href="admin/fetchmap.jsp">Statistics map</a></li>
 		<li>
 			<form id="cacheSnoop" method="get" action="cache/">
 				<input type="button" onclick="window.location.href = snoop(this.form, this.form.cacheType.value, this.form.cacheId.value);" value="snoop" name="snooper"></input>
