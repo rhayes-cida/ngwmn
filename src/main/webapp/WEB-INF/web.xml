@@ -106,13 +106,15 @@
       <web-resource-collection>
          <web-resource-name>Protected Pages</web-resource-name>
          <url-pattern>/admin/*</url-pattern>
-         <url-pattern>/stats/data</url-pattern>
+         <url-pattern>/stats/*</url-pattern>
+         <url-pattern>/wells/*</url-pattern>
       </web-resource-collection>
       <auth-constraint>
          <role-name>tomcat</role-name>
          <role-name>admin</role-name>
          <role-name>manager</role-name>
          <role-name>debug</role-name>
+         <role-name>ngwmn</role-name>
       </auth-constraint>
     </security-constraint>
     
