@@ -49,6 +49,7 @@
          			<prop key="MaxLimit">20</prop>
          			<prop key="InitialLimit">1</prop>
          			<prop key="InactivityTimeout">30</prop>
+         			<prop key="ValidateConnection">TRUE</prop>
       			</props>
  			</property>
 	</bean>
