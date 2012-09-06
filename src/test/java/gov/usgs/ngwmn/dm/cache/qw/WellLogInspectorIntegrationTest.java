@@ -68,8 +68,10 @@ public class WellLogInspectorIntegrationTest extends ContextualTest {
 	@Test
 	public void testLots() throws Exception {
 		Statement s = conn.createStatement();
+		s.setMaxRows(30);
 		ResultSet rs = s.executeQuery("SELECT log_cache_id from gw_data_portal.log_cache " +
-				"where xml IS NOT NULL ");
+				"where xml IS NOT NULL " +
+				"order by log_cache_id DESC ");
 		
 		List<Integer> ii = new ArrayList<Integer>();
 		
