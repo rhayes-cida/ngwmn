@@ -185,7 +185,7 @@ public class WaterlevelDBCacheTest extends ContextualTest {
 	
 	@Test
 	public void testCacheClean() throws Exception {
-		int ct = victim.cleanCache(365);
+		int ct = victim.cleanCache(365,3);
 		
 		assertTrue("survived cache clean", ct >= 0);
 	}

@@ -92,7 +92,7 @@ public class DatabaseXMLCache implements Cache {
 		}
 	}
 	
-	public int cleanCache(int daysToRetain) {
+	public int cleanCache(int daysToRetain,int countToRetain) {
 		String typename = getDatatype().aliasFor.name();
 
 		String sql = 
@@ -114,11 +114,22 @@ public class DatabaseXMLCache implements Cache {
 "  AND c2.site_no     = c.site_no " +
 "  AND c2.published   = 'Y' " +
 "  ) " +
-"AND c.fetch_date < (sysdate - ?)";
+"AND c.fetch_date < (sysdate - ?) " +
+"AND c." + tablename + "_id IN " +
+"(SELECT " + tablename + "_id " +
+" FROM " +
+"  (SELECT  " +
+"    " + tablename + "_id, " +
+"    dense_rank() over (partition BY agency_cd, site_no order by fetch_date DESC) dr " +
+"    FROM GW_DATA_PORTAL." + tablename + " " +
+"  ) " +
+" WHERE dr > ? " +
+") "
+;
 		
 		JdbcTemplate template = new JdbcTemplate(ds);
 		
-		int ct = template.update(sql,daysToRetain);
+		int ct = template.update(sql,daysToRetain, countToRetain);
 		return ct;
 	}
 	
