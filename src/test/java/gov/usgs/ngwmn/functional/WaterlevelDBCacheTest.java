@@ -182,4 +182,11 @@ public class WaterlevelDBCacheTest extends ContextualTest {
 		assertTrue("expect created before now", info.getCreated().before(new Date()));
 		assertFalse("expect create time after modify time", info.getCreated().after(info.getModified()));
 	}
+	
+	@Test
+	public void testCacheClean() throws Exception {
+		int ct = victim.cleanCache(365);
+		
+		assertTrue("survived cache clean", ct >= 0);
+	}
 }

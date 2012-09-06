@@ -67,9 +67,10 @@ public class WaterLevelInspectorIntegrationTest extends ContextualTest {
 	@Test
 	public void testLots() throws Exception {
 		Statement s = conn.createStatement();
+		s.setMaxRows(30);
 		ResultSet rs = s.executeQuery("SELECT WATERLEVEL_CACHE_ID from gw_data_portal.waterlevel_cache " +
 				"where xml IS NOT NULL " +
-				"ORDER BY WATERLEVEL_CACHE_ID ASC ");
+				"ORDER BY WATERLEVEL_CACHE_ID DESC ");
 		
 		List<Integer> ii = new ArrayList<Integer>();
 		

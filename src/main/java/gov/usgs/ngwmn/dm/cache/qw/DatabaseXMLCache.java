@@ -19,7 +19,6 @@ import java.security.DigestOutputStream;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.sql.Blob;
-import java.sql.Clob;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -35,6 +34,7 @@ import org.apache.commons.codec.binary.Hex;
 import org.apache.tomcat.dbcp.dbcp.DelegatingConnection;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.lob.LobHandler;
 
 
@@ -90,6 +90,36 @@ public class DatabaseXMLCache implements Cache {
 				
 			});
 		}
+	}
+	
+	public int cleanCache(int daysToRetain) {
+		String typename = getDatatype().aliasFor.name();
+
+		String sql = 
+"UPDATE gw_data_portal." + tablename + " c " +
+"SET xml         = NULL " +
+"WHERE published = 'R' " +
+"AND xml        IS NOT NULL " +
+"AND NOT EXISTS " +
+"  (SELECT * " +
+"  FROM GW_DATA_PORTAL.cache_retain_sites retain " +
+"  WHERE retain.agency_cd = c.agency_cd " +
+"  AND retain.site_no     = c.site_no " +
+"  AND retain." + typename + "  = 'Y' " +
+"  ) " +
+"AND EXISTS " +
+"  (SELECT * " +
+"  FROM gw_data_portal." + tablename + " c2 " +
+"  WHERE c2.agency_cd = c.agency_cd " +
+"  AND c2.site_no     = c.site_no " +
+"  AND c2.published   = 'Y' " +
+"  ) " +
+"AND c.fetch_date < (sysdate - ?)";
+		
+		JdbcTemplate template = new JdbcTemplate(ds);
+		
+		int ct = template.update(sql,daysToRetain);
+		return ct;
 	}
 	
 	public void linkFetchLog(int fetchLogID , int cacheKey) {
