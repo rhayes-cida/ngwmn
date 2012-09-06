@@ -122,6 +122,7 @@ public class DatabaseXMLCache implements Cache {
 "    " + tablename + "_id, " +
 "    dense_rank() over (partition BY agency_cd, site_no order by fetch_date DESC) dr " +
 "    FROM GW_DATA_PORTAL." + tablename + " " +
+"    WHERE published = 'R' " +
 "  ) " +
 " WHERE dr > ? " +
 ") "
