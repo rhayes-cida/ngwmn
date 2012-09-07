@@ -2,21 +2,15 @@ package gov.usgs.ngwmn.dm.dao;
 
 import gov.usgs.ngwmn.WellDataType;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Collections;
 import java.util.Map;
 
 import javax.sql.DataSource;
-import javax.sql.RowSet;
 
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
-
-import com.sun.rowset.CachedRowSetImpl;
 
 // Not using MyBatis as this generates bulk data which I don't wish to represent as objects.
 
@@ -88,75 +82,6 @@ public class FetchStatsDAO {
 			 
 			"group by trunc(fl.started_at) "+
 			"order by trunc(fl.started_at) asc";
-
-	public RowSet overallTimeSeries() throws SQLException {
-		
-		Connection conn = datasource.getConnection();
-		try {
-			String query = String.format(timeSeriesQuery, type.name());
-			PreparedStatement ps = conn.prepareStatement(query, ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY);
-			
-			ResultSet rs = ps.executeQuery();
-			
-			CachedRowSetImpl value = new CachedRowSetImpl();
-			value.populate(rs);
-			
-			return value;
-		}
-		finally {
-			conn.close();
-		}
-	}
-	
-	public RowSet successTimeSeries() throws SQLException {
-		String query = 
-				"select agency_cd, trunc(fetch_date) fetched, count(*) ct " +
-				"from GW_DATA_PORTAL.%1$s_CACHE_STATS " +
-				"where published = 'Y' " +
-				"group by agency_cd,trunc(fetch_date) ";
-		
-		query = String.format(query, type.name());
-		
-		Connection conn = datasource.getConnection();
-		try {
-			PreparedStatement ps = conn.prepareStatement(query, ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY);
-			
-			ResultSet rs = ps.executeQuery();
-			
-			CachedRowSetImpl value = new CachedRowSetImpl();
-			value.populate(rs);
-			
-			return value;
-		}
-		finally {
-			conn.close();
-		}
-	}
-
-	public RowSet failTimeSeries() throws SQLException {
-		String query = 
-				"select agency_cd, trunc(fetch_date) fetched, count(*) ct " +
-				"from GW_DATA_PORTAL.%1$s_CACHE_STATS " +
-				"where coalesce(published, 'N') = 'N' " +
-				"group by agency_cd,trunc(fetch_date) ";
-		
-		query = String.format(query, type.name());
-		
-		Connection conn = datasource.getConnection();
-		try {
-			PreparedStatement ps = conn.prepareStatement(query, ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY);
-			
-			ResultSet rs = ps.executeQuery();
-			
-			CachedRowSetImpl value = new CachedRowSetImpl();
-			value.populate(rs);
-			
-			return value;
-		}
-		finally {
-			conn.close();
-		}
-	}
 
 	public <T> T timeSeriesAgencyData(String agency, ResultSetExtractor<T> rse)
 	throws SQLException
