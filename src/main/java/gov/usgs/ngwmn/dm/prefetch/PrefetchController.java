@@ -7,6 +7,8 @@ import java.util.concurrent.Future;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 
 public class PrefetchController {
@@ -14,6 +16,9 @@ public class PrefetchController {
 	private ThreadPoolTaskScheduler sked;
 	private Prefetcher prefetcher;
 	private Logger logger = LoggerFactory.getLogger(getClass());
+	
+	@Autowired
+	private ApplicationContext ctx;
 	
 	/**
 	 * Stop any active prefetch and prevent any subsequent starts.
@@ -43,7 +48,7 @@ public class PrefetchController {
 		
 		// TODO clean out scheduled jobs?
 		// Would be best to remove all previously scheduled jobs, but that's not easy to do from here.
-		// ThreadPoolExecutor has some useful methods, if the Executor used by the cheduler is in
+		// ThreadPoolExecutor has some useful methods, if the Executor used by the scheduler is in
 		// fact that kind of executor.
 		
 		// This will fail if the scheduler is not enabled;
@@ -54,17 +59,23 @@ public class PrefetchController {
 	
 	private List<Future<PrefetchOutcome>> multithreadOutcomes = new ArrayList<Future<PrefetchOutcome>>();
 	
+	private Prefetcher makePrefetcher() {
+		return ctx.getBean("PrefetchInstance", Prefetcher.class);
+	}
+	
 	public synchronized List<Future<PrefetchOutcome>>  startInParallel() {
 		logger.info("Start in parallel");
 		List<String> agencies = prefetcher.agencyCodes();
 		
 		for (final String agency : agencies) {
 			logger.info("Launching for {}", agency);
+			
 			Callable<PrefetchOutcome> task = new Callable<PrefetchOutcome>() {
 
 				@Override
 				public PrefetchOutcome call() throws Exception {
-					return prefetcher.callForAgency(agency);					
+					Prefetcher pf = makePrefetcher();
+					return pf.callForAgency(agency);					
 				}
 				
 			};

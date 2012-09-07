@@ -34,6 +34,16 @@ public class Prefetcher implements Callable<PrefetchOutcome> {
 	
 	private ExecutorService executor = Executors.newSingleThreadExecutor();
 	
+	public synchronized void setThreadCount(int ct) {
+		if (executor != null) {
+			executor.shutdownNow();
+		}
+		if (ct < 0) {
+			executor = Executors.newCachedThreadPool();
+		} else {
+			executor = Executors.newFixedThreadPool(ct);
+		}
+	}
 	
 	private PrefetchI broker;
 	
