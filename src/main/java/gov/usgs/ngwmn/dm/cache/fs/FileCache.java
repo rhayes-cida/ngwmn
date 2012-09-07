@@ -243,5 +243,11 @@ public class FileCache implements Cache {
 		return builder.toString();
 	}
 	
+	@Override
+	public int cleanCache(int daysToRetain, int countToRetain) {
+		// No old versions are retained, anyway
+		return 0;
+	}
+	
 	
 }

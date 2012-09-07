@@ -151,6 +151,19 @@
 		</constructor-arg>
 	</bean>
 	
+	<bean id="CacheCleaner"
+		class="gov.usgs.ngwmn.dm.cache.Cleaner">
+		<property name="toClean">
+		<list>
+			<ref bean="QualityCache"/>
+			<ref bean="LogCache"/>
+			<ref bean="WaterlevelCache"/>
+		</list>
+		</property>
+		<property name="daysToKeep" value="90"/>
+		<property name="countToKeep" value="3"/>
+	</bean>
+	
 	<bean id="WebRetriever"
 			class="gov.usgs.ngwmn.dm.harvest.WebRetriever">
 			<property name="urlFactory" ref="urlFactory"/>

@@ -1,5 +1,7 @@
 package gov.usgs.ngwmn.dm.prefetch;
 
+import gov.usgs.ngwmn.dm.cache.Cleaner;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Callable;
@@ -16,6 +18,7 @@ public class PrefetchController {
 	private ThreadPoolTaskScheduler sked;
 	private Prefetcher prefetcher;
 	private Logger logger = LoggerFactory.getLogger(getClass());
+	private Cleaner cleaner;
 	
 	@Autowired
 	private ApplicationContext ctx;
@@ -32,11 +35,23 @@ public class PrefetchController {
 		sked.getScheduledExecutor().shutdownNow();
 	}
 	
+	private void cleanCache() {
+		if (cleaner != null) {
+			int ct = cleaner.clean();
+			logger.info("Cleaned {} old cache entries", ct);
+		} else {
+			logger.info("No cleaner configured");
+		}
+	}
+
 	/**
 	 * Start the prefetch job immediately, without any scheduling.
 	 */
 	public void start() {
 		logger.info("Starting");
+		
+		cleanCache();
+
 		Runnable task = new Runnable() {
 			
 			@Override
@@ -66,6 +81,8 @@ public class PrefetchController {
 	public synchronized List<Future<PrefetchOutcome>>  startInParallel() {
 		logger.info("Start in parallel");
 		List<String> agencies = prefetcher.agencyCodes();
+		
+		cleanCache();
 		
 		for (final String agency : agencies) {
 			logger.info("Launching for {}", agency);
@@ -124,6 +141,14 @@ public class PrefetchController {
 
 	public void setPrefetcher(Prefetcher prefetcher) {
 		this.prefetcher = prefetcher;
+	}
+
+	public Cleaner getCleaner() {
+		return cleaner;
+	}
+
+	public void setCleaner(Cleaner cleaner) {
+		this.cleaner = cleaner;
 	}
 	
 }

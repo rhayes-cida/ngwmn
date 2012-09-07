@@ -34,6 +34,7 @@
     <bean id="PrefetchController" class="gov.usgs.ngwmn.dm.prefetch.PrefetchController">
     	<property name="scheduler" ref="scheduler"/>
     	<property name="prefetcher" ref="Prefetcher"/>
+    	<property name="cleaner" ref="CacheCleaner"/>
     </bean>
     
 <!--     

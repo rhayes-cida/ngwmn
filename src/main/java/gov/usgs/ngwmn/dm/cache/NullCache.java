@@ -49,4 +49,9 @@ public class NullCache implements Cache {
 		throw new RuntimeException("the retrieve method is not implemented and should not be called");
 	}
 
+	@Override
+	public int cleanCache(int daysToRetain, int countToRetain) {
+		return 0;
+	}
+
 }

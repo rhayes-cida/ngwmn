@@ -28,5 +28,7 @@ public interface Cache {
 	public WellDataType getDatatype();
 
 	InputStream retrieve(String id) throws IOException;
+
+	public int cleanCache(int daysToRetain, int countToRetain);
 }
 

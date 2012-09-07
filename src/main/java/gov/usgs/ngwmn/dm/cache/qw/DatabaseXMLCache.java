@@ -92,6 +92,7 @@ public class DatabaseXMLCache implements Cache {
 		}
 	}
 	
+	@Override
 	public int cleanCache(int daysToRetain,int countToRetain) {
 		String typename = getDatatype().aliasFor.name();
 
