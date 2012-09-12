@@ -6,6 +6,10 @@
            
 	<import resource="applicationContext.xml"/>
 	
+	<bean id="singleThreadExecutor" class="gov.usgs.ngwmn.NullFactoryBean">
+		<constructor-arg value="java.util.concurrent.ExecutorService"/>
+	</bean>
+	
     <beans profile="default">
 	    <bean id="dataSource"
 	        class="oracle.jdbc.pool.OracleDataSource"

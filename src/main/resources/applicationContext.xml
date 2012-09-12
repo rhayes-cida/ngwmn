@@ -283,6 +283,17 @@
 		<property name="qualityStatsDAO" ref="QualityStatsDAO"/>
 		<property name="wellLogStatsDAO" ref="WellLogStatsDAO"/>
 	</bean>
+	
+	<!-- this bean must not be lazily initialized if the exporting is to happen -->
+  <bean id="mbeanExporter" class="org.springframework.jmx.export.MBeanExporter" lazy-init="false">
+    <property name="beans">
+      <map>
+        <entry key="ngwmn:name=PrefetchController" value-ref="PrefetchController"/>
+      </map>
+    </property>
+    <property name="registrationBehaviorName" value="REGISTRATION_REPLACE_EXISTING"/>
+  </bean>
+	
 </beans>
 
        

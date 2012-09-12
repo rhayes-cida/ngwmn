@@ -7,10 +7,13 @@ import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.Future;
 
+import javax.management.ObjectName;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
+import org.springframework.jmx.export.MBeanExporter;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 
 public class PrefetchController {
@@ -22,6 +25,8 @@ public class PrefetchController {
 	
 	@Autowired
 	private ApplicationContext ctx;
+	@Autowired
+	private MBeanExporter mbeanExporter;
 	
 	/**
 	 * Stop any active prefetch and prevent any subsequent starts.
@@ -92,6 +97,9 @@ public class PrefetchController {
 				@Override
 				public PrefetchOutcome call() throws Exception {
 					Prefetcher pf = makePrefetcher();
+					if (mbeanExporter != null) {
+						mbeanExporter.registerManagedResource(pf,new ObjectName("ngwmn.prefetcher", "agency", agency));
+					}
 					return pf.callForAgency(agency);					
 				}
 				
@@ -109,6 +117,7 @@ public class PrefetchController {
 		
 		return multithreadOutcomes;
 	}
+	
 	
 	/**
 	 * Enable scheduling of the prefetch job -- may or may not start a prefetch job immediately,
@@ -134,6 +143,10 @@ public class PrefetchController {
 		this.sked = sked;
 		sked.setWaitForTasksToCompleteOnShutdown(true);
 	}
+	
+	public String getSchedulerClassname() {
+		return sked.getClass().toString();
+	}
 
 	public Prefetcher getPrefetcher() {
 		return prefetcher;
@@ -149,6 +162,14 @@ public class PrefetchController {
 
 	public void setCleaner(Cleaner cleaner) {
 		this.cleaner = cleaner;
+	}
+
+	public MBeanExporter getMbeanExporter() {
+		return mbeanExporter;
+	}
+
+	public void setMbeanExporter(MBeanExporter mbeanExporter) {
+		this.mbeanExporter = mbeanExporter;
 	}
 	
 }

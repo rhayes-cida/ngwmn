@@ -122,6 +122,7 @@ public class Prefetcher implements Callable<PrefetchOutcome> {
 		if (timeLimit != null) {
 			endTime = System.currentTimeMillis() + timeLimit;
 		}
+		logger.info("performing prefetch");
 		
 		for (WellStatus well : wellQueue) {
 			if (isQuitting() || Thread.interrupted()) {
@@ -431,6 +432,9 @@ public class Prefetcher implements Callable<PrefetchOutcome> {
 	
 	private Iterable<WellStatus> populateWellQeueForAgency(String agency_cd) {
 		List<WellRegistry> allWells = wellDAO.selectByAgency(agency_cd);
+		
+		logger.debug("populating well queue with list of {} wells for agency {}", allWells.size(), agency_cd);
+		
 		PriorityQueue<WellStatus> pq = new PriorityQueue<WellStatus>(allWells.size(), simpleWellCompare);
 		
 		// make sure we're working with fresh statistics
@@ -468,6 +472,7 @@ public class Prefetcher implements Callable<PrefetchOutcome> {
 				}
 			}
 		}
+		logger.info("Found {} data streams to fetch for agency {}", pq.size(), agency_cd);
 		
 		return pq;
 	}

@@ -141,10 +141,12 @@ public aspect PipeStatisticsAspect {
 				
 				// remember the linkage
 				cache.linkFetchLog(fl.getFetchlogId(), ck);
+			} else {
+				logger.warn("Null fetch log entry for {} in withdraw", spec);
 			}
 		} catch (InterruptedException ie) {
 			// oh well, the fetch did not get recorded in time, give up
-			logger.warn("Abandoned wait for fetchlog in withdraw");
+			logger.warn("Abandoned wait for fetchlog in withdraw for {}", spec);
 		}
 		logger.trace("ASPECT: Exit  after withdraw");
 	}
@@ -171,10 +173,12 @@ public aspect PipeStatisticsAspect {
 			if (fl != null) {
 				// remember the linkage
 				cache.linkFetchLog(fl.getFetchlogId(), ck);
+			} else {
+				logger.warn("Null fetch log entry for {} in publish", spec);
 			}
 		} catch (InterruptedException ie) {
 			// oh well, the fetch did not get recorded in time, give up
-			logger.warn("Abandoned wait for fetchlog in publish");
+			logger.warn("Abandoned wait for fetchlog in publish for {}", spec);
 		}		
 		
 		logger.trace("ASPECT: Exit  after publish");

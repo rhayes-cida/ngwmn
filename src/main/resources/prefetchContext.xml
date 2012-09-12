@@ -26,7 +26,7 @@
     <task:scheduled-tasks scheduler="scheduler">
     									<!--  second minute hour day month weekday -->
 <!--     	<task:scheduled ref="Prefetcher" method="call" cron="0 21 ${ngwmn_prefetch_start_hour:22} * * ?"/> -->
-    	<task:scheduled ref="PrefetchController" method="startInParallel" cron="0 21 ${ngwmn_prefetch_start_hour:22} * * ?"/>
+    	<task:scheduled ref="PrefetchController" method="startInParallel" cron="0 40 ${ngwmn_prefetch_start_hour:22} * * ?"/>
     </task:scheduled-tasks>
     
     <task:scheduler id="scheduler" pool-size="12"/>
@@ -35,6 +35,7 @@
     	<property name="scheduler" ref="scheduler"/>
     	<property name="prefetcher" ref="Prefetcher"/>
     	<property name="cleaner" ref="CacheCleaner"/>
+    	<property name="mbeanExporter" ref="mbeanExporter"/>
     </bean>
     
 <!--     
