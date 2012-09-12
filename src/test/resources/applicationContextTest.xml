@@ -6,10 +6,11 @@
            
 	<import resource="applicationContext.xml"/>
 	
+<!-- Here's how to set the cache fetch executor service to null, which causes inspection to happen in-thread.
 	<bean id="singleThreadExecutor" class="gov.usgs.ngwmn.NullFactoryBean">
 		<constructor-arg value="java.util.concurrent.ExecutorService"/>
 	</bean>
-	
+ -->	
     <beans profile="default">
 	    <bean id="dataSource"
 	        class="oracle.jdbc.pool.OracleDataSource"

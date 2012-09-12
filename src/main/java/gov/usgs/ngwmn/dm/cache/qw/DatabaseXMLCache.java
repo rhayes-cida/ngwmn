@@ -162,14 +162,21 @@ public class DatabaseXMLCache implements Cache {
 	}
 	
 	public void inspectAndRelease(int key, Specifier spec) {
+		logger.debug("Inspecting key {} for spec {}", key, spec);
 		try {
-			if (inspector.acceptable(key)) {
+			boolean acceptable = false;
+			try {
+				acceptable = inspector.acceptable(key);
+			} catch (Exception e) {
+				logger.error("Problem in inspectAndRelease.inspect " + key + " for spec " + spec, e);
+			}
+			if (acceptable) {
 				publish(key,spec);
 			} else {
 				withdraw(key, spec);
 			}
 		} catch (Exception e) {
-			logger.error("Problem in inspectAndRelease " + key, e);
+			logger.error("Problem in inspectAndRelease " + key + " for spec " + spec, e);
 		}
 	}
 	
@@ -224,7 +231,7 @@ public class DatabaseXMLCache implements Cache {
 						// TODO Clean up clob?
 						blob.free();
 						pooledConn.close();
-						logger.info("saved data for {}, sz {}", well, length);
+						logger.info("saved data for {}, sz {} as {}[{}]", new Object[] {well, length,tablename,newkey});
 						
 						// this may end up as an aysnchronous invocation
 						invokeInspect(newkey, well);
@@ -244,8 +251,7 @@ public class DatabaseXMLCache implements Cache {
 	}
 
 	public void publish(int id,Specifier spec) throws Exception {
-		logger.info("publishing {}[{}]", tablename, id);
-		logger.debug("for specifier {}", spec);
+		logger.info("publishing {}[{}] for spec {}", new Object[] {tablename, id,spec});
 		replacePublished(spec.getAgencyID(), spec.getFeatureID());
 		setPublished(id, "Y");
 	}
@@ -274,7 +280,7 @@ public class DatabaseXMLCache implements Cache {
 	}
 	
 	public void withdraw(int id, Specifier spec) throws Exception {
-		logger.warn("fetched data was found unacceptable, {}[{}]", tablename, id);
+		logger.warn("fetched data was found unacceptable, {}[{}] for spec{}", new Object[] {tablename, id, spec});
 		setPublished(id, "N");
 	}
 	
