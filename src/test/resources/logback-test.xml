@@ -7,8 +7,16 @@
 	  </encoder>
   </appender>
 
+	<appender name="file" class="ch.qos.logback.core.FileAppender">
+    	<File>/tmp/test.log</File>
+    	<Append>true</Append>
+    	<layout class="ch.qos.logback.classic.PatternLayout">
+      		<Pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %class{0}:%L %M - %msg%n</Pattern>
+    	</layout>
+  	</appender>
   <root level="warn">
     <appender-ref ref="STDOUT" />
+    <appender-ref ref="file"/>
   </root>
   
   <logger level="info"  name="httpclient.wire" />
@@ -16,6 +24,8 @@
   <logger level="debug" name="gov.usgs.ngwmn.dm"/>
   <logger level="debug" name="gov.usgs.ngwmn.dm.io"/>
   <logger level="trace" name="gov.usgs.ngwmn.dm.prefetch"/>
+  <logger level="trace" name="gov.usgs.ngwmn.dm.cache.qw.DatabaseXMLCache"/>
+  <logger level="trace" name="gov.usgs.ngwmn.dm.aspect"/>
 <!--   
   <logger level="trace" name="gov.usgs.ngwmn.dm.io.transform"/>
   <logger level="trace" name="gov.usgs.ngwmn.dm.io.parse"/>

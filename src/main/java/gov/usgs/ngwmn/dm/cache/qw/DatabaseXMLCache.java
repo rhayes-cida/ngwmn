@@ -26,7 +26,12 @@ import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 import javax.sql.DataSource;
 
@@ -44,7 +49,7 @@ public class DatabaseXMLCache implements Cache {
 	private final String tablename;
 	private final WellDataType wdt;
 	private Inspector inspector;
-	private ExecutorService xService;
+	private ExecutorService xService = Executors.newSingleThreadExecutor();
 	
 	public DatabaseXMLCache(DataSource ds, WellDataType datatype, LobHandler h) {
 		this.ds = ds;
@@ -76,20 +81,22 @@ public class DatabaseXMLCache implements Cache {
 	public WellDataType getDatatype() {
 		return wdt;
 	}
+	
+	private Future<Specifier> invokeInspect(final int key, final Specifier spec) {
+		logger.debug("call invokeInspect for {} key {}", spec, key);
+		Future<Specifier> result =
+				xService.submit(
+						new Runnable() {
 
-	private void invokeInspect(final int key, final Specifier spec) {
-		if (xService == null) {
-			inspectAndRelease(key, spec);
-		} else {
-			xService.execute(new Runnable() {
+							@Override
+							public void run() {
+								inspectAndRelease(key, spec);
+								logger.trace("finished out-line invokeInspect of {}", spec);
+							}
+						},spec);
 
-				@Override
-				public void run() {
-					inspectAndRelease(key, spec);
-				}
-				
-			});
-		}
+		logger.debug("finished invokeInspect of {}", spec);
+		return result;
 	}
 	
 	@Override
@@ -138,27 +145,16 @@ public class DatabaseXMLCache implements Cache {
 	public void linkFetchLog(int fetchLogID , int cacheKey) {
 		logger.info("link cache key {} type {} to fetch log id {}", new Object[] {cacheKey, wdt, fetchLogID});
 
-		try {
-			final Connection conn = ds.getConnection();
-			try {
-				PreparedStatement s = conn.prepareStatement(
+		JdbcTemplate template = new JdbcTemplate(ds);
+		int ct = template.update(
 						"UPDATE GW_DATA_PORTAL." + tablename + " " +
 						"SET fetchlog_ref = ? " +
-						"WHERE " + tablename+"_id = ? ");
-
-				s.setInt(1, fetchLogID);
-				s.setInt(2, cacheKey);
-
-				int ct = s.executeUpdate();
-				if (ct != 1) {
-					logger.warn("Failed to set fetchlog_ref to {} for cache row {}", fetchLogID, cacheKey);
-				}
-			} finally {
-				conn.close();
-			} 
-		} catch (SQLException e) {
-			logger.warn("Problem setting fetchlog_ref", e);
+						"WHERE " + tablename+"_id = ?",
+						fetchLogID, cacheKey);
+		if (ct != 1) {
+			logger.warn("Failed to set fetchlog_ref to {} for cache row {},ct is {}", new Object[] {fetchLogID, cacheKey,ct});
 		}
+
 	}
 	
 	public void inspectAndRelease(int key, Specifier spec) {
@@ -233,10 +229,22 @@ public class DatabaseXMLCache implements Cache {
 						pooledConn.close();
 						logger.info("saved data for {}, sz {} as {}[{}]", new Object[] {well, length,tablename,newkey});
 						
-						// this may end up as an aysnchronous invocation
-						invokeInspect(newkey, well);
+						Future<Specifier> future = invokeInspect(newkey, well);
+						
+						Specifier done = future.get(10, TimeUnit.MINUTES);
+						logger.info("Got finish for inspect of {}", done);
 					} catch (SQLException sqle) {
+						logger.warn("Problem (sql) in inspect of {}", well);
 						throw new IOException(sqle);
+					} catch (InterruptedException e) {
+						logger.warn("Problem (interrupt) in inspect of {}", well);
+						throw new IOException(e);
+					} catch (ExecutionException e) {
+						logger.warn("Problem (execution) in inspect of {}", well);
+						throw new IOException(e);
+					} catch (TimeoutException e) {
+						logger.warn("Problem (timeout) in inspect of {}", well);
+						throw new IOException(e);
 					}
 					
 				}

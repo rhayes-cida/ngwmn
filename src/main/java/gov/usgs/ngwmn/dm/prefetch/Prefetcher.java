@@ -78,9 +78,10 @@ public class Prefetcher implements Callable<PrefetchOutcome> {
 	}
 
 	private final WellDataType[] fetchTypes = {
-			WellDataType.WATERLEVEL,
-			WellDataType.QUALITY,
-			WellDataType.LOG
+			WellDataType.WATERLEVEL
+			//,
+			//WellDataType.QUALITY,
+			//WellDataType.LOG
 	};
 	
 	public PrefetchOutcome call() {
@@ -117,7 +118,7 @@ public class Prefetcher implements Callable<PrefetchOutcome> {
 			return PrefetchOutcome.INTERRUPTED;
 		}
 		
-		// start timer after the prelims are done
+		// start timer after the prelimsPrefetcher are done
 		Long endTime = null;
 		if (timeLimit != null) {
 			endTime = System.currentTimeMillis() + timeLimit;

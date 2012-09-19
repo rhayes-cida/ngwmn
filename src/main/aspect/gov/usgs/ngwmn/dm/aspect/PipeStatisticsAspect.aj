@@ -1,5 +1,7 @@
 package gov.usgs.ngwmn.dm.aspect;
 
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.concurrent.TimeUnit;
 
 import gov.usgs.ngwmn.dm.DataFetcher;
@@ -12,6 +14,8 @@ import gov.usgs.ngwmn.dm.prefetch.Prefetcher;
 import gov.usgs.ngwmn.dm.spec.Specifier;
 import gov.usgs.ngwmn.dm.harvest.WebRetriever;
 import gov.usgs.ngwmn.dm.cache.qw.DatabaseXMLCache;
+import gov.usgs.ngwmn.dm.io.CopyInvoker;
+import gov.usgs.ngwmn.dm.io.Invoker;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,6 +34,22 @@ public aspect PipeStatisticsAspect {
 	public void setEventBus(EventBus eventBus) {
 		this.fetchEventBus = eventBus;
 	}
+	
+	private void recordFetch(Pipeline p, long ct) {
+		p.stats.incrementCount(ct);
+		logger.debug("record fetch for {} returning {}", p, ct);
+		logger.debug("stats in invoke is {}", p.stats);
+
+		p.stats.markEnd(Status.DONE);
+
+		if (null == p.stats.getSpecifier()) {
+			// presume it was an aggregate, have to use some generalized recording mechanism
+			logger.info("after fetch of aggregate {}", p);
+		} else {
+			fetchEventBus.post(p.stats);
+		}
+	}
+
 
 	// Monitor pipeline setup
 	pointcut setInput(DataFetcher df, Specifier spec, Pipeline p) : 
@@ -44,7 +64,7 @@ public aspect PipeStatisticsAspect {
 		setInput(df, spec, p) 
 		&& ! prefetch()
 	{
-		logger.trace("ASPECT: Enter before setInput");
+		logger.trace("ASPECT: Enter before setInput not prefetch");
 		p.stats.setSpecifier(spec);
 		p.stats.setCalledBy(df.getClass());
 		logger.trace("ASPECT: Exit  before setInput");
@@ -54,7 +74,7 @@ public aspect PipeStatisticsAspect {
 		setInput(df, spec, p) 
 		&& prefetch()
 	{
-		logger.trace("ASPECT: Enter before setInput");
+		logger.trace("ASPECT: Enter before setInput prefetch");
 		p.stats.setSpecifier(spec);
 		p.stats.setCalledBy(gov.usgs.ngwmn.dm.PrefetchI.class);
 		logger.trace("ASPECT: Exit  before setInput");
@@ -84,20 +104,21 @@ public aspect PipeStatisticsAspect {
 	
 	after(Pipeline p) returning (long ct): invoke(p) {
 		logger.trace("ASPECT: Enter after invoke");
-		p.stats.incrementCount(ct);
-		logger.debug("stopped in invoke {} returning {}", p, ct);
-		logger.debug("stats in invoke is {}", p.stats);
-
-		p.stats.markEnd(Status.DONE);
-
-		if (null == p.stats.getSpecifier()) {
-			// presume it was an aggregate, have to use some generalized recording mechanism
-			logger.info("after invoke of aggregate {}", p);
-		} else {
-			fetchEventBus.post(p.stats);
-		}
+		// recordFetch(p,ct);
 		logger.trace("ASPECT: Exit  after invoke");
 	}
+	
+	pointcut copyInvoke(Pipeline p):
+		call(* Invoker.invoke(InputStream, OutputStream)) &&
+		// TODO add target qualifier for CopyInvoke?
+		cflow(invoke(p));
+		
+	after(Pipeline p) returning (long ct): copyInvoke(p) {
+		logger.trace("ASPECT: Enter after copy invoke");
+		recordFetch(p,ct);
+		logger.trace("ASPECT: Exit  after copy invoke");		
+	}
+		
 	
 	pointcut inspect(Pipeline p, int cacheKey, Specifier spec):
 		cflow(invoke(p)) &&
@@ -125,6 +146,7 @@ public aspect PipeStatisticsAspect {
 		logger.trace("ASPECT: Enter after withdraw");
 		// record that this fetch was inspected and found empty
 		if (spec.stats == null) {
+			logger.warn("After withdraw, no stats in spec {}", spec);
 			return;
 		}
 		
@@ -160,6 +182,7 @@ public aspect PipeStatisticsAspect {
 	after(int ck, Specifier spec, DatabaseXMLCache cache):publish(ck,spec,cache) {
 		logger.trace("ASPECT: Enter after publish");
 		if (spec.stats == null) {
+			logger.warn("After publish, No stats in specifier {}", spec);
 			return;
 		}
 
@@ -188,7 +211,7 @@ public aspect PipeStatisticsAspect {
 		logger.trace("ASPECT: Enter after publish:exception");
 		logger.debug("stopped in invoke {} throwing {}", p, e);
 		// System.out.println("throwing tjp=" + thisJointPoint);
-		p.stats.markEnd(Status.FAIL);
+		p.stats.markEndForce(Status.FAIL);
 		if (null == p.stats.getSpecifier()) {
 			// presume it was an aggregate, have to use somne generalized recording mechanism
 			logger.info("after invoke of aggregate {}", p);

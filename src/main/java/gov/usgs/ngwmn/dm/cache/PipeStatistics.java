@@ -124,6 +124,19 @@ public class PipeStatistics {
 		this.notifyAll();
 	}
 	
+	public synchronized void markEndForce(Status endStatus) {
+		if (status == endStatus) {
+			// already marked, let it ride
+			return;
+		}
+		end = System.currentTimeMillis();
+		if (status != Status.STARTED) {
+			// TODO warn? ("Improper pre-end status " + status);
+		}
+		status = endStatus;
+		this.notifyAll();
+	}
+	
 	public synchronized Long getElapsedMSec() {
 		if (start > 0 && end > 0) {
 			return end-start;
@@ -203,7 +216,9 @@ public class PipeStatistics {
 	}
 	
 	public void setFetchLog(FetchLog myLog) {
-		this.myLog.add(myLog);
+		if (this.myLog.isEmpty()) {
+			this.myLog.add(myLog);
+		}
 	}
 	
 	public synchronized Status overrideStatus(Status nv) {
