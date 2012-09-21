@@ -79,10 +79,9 @@ public class Prefetcher implements Callable<PrefetchOutcome> {
 	}
 
 	private final WellDataType[] fetchTypes = {
-			WellDataType.WATERLEVEL
-			//,
-			//WellDataType.QUALITY,
-			//WellDataType.LOG
+			WellDataType.WATERLEVEL,
+			WellDataType.QUALITY,
+			WellDataType.LOG
 	};
 	
 	public PrefetchOutcome call() {
