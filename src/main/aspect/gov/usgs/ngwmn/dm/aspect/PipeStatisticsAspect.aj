@@ -108,17 +108,41 @@ public aspect PipeStatisticsAspect {
 		logger.trace("ASPECT: Exit  after invoke");
 	}
 	
+	after(Pipeline p) throwing (Exception e) : invoke(p) {
+		logger.trace("ASPECT: Enter after publish:exception");
+		// recordFail(p, e);
+		logger.trace("ASPECT: Exit  after publish:exception");
+	}
+
+	private void recordFail(Pipeline p, Exception e) {
+		logger.debug("stopped in invoke {} throwing {}", p, e);
+		// System.out.println("throwing tjp=" + thisJointPoint);
+		p.stats.markEndForce(Status.FAIL);
+		if (null == p.stats.getSpecifier()) {
+			// presume it was an aggregate, have to use somne generalized recording mechanism
+			logger.info("after invoke of aggregate {}", p);
+		} else {
+			PipeStatisticsWithProblem pswp = new PipeStatisticsWithProblem(p.stats, e);
+			fetchEventBus.post(pswp);
+		}
+	}
+	
 	pointcut copyInvoke(Pipeline p):
 		call(* Invoker.invoke(InputStream, OutputStream)) &&
 		// TODO add target qualifier for CopyInvoke?
 		cflow(invoke(p));
 		
 	after(Pipeline p) returning (long ct): copyInvoke(p) {
-		logger.trace("ASPECT: Enter after copy invoke");
+		logger.trace("ASPECT: Enter after copy invoke normal");
 		recordFetch(p,ct);
-		logger.trace("ASPECT: Exit  after copy invoke");		
+		logger.trace("ASPECT: Exit  after copy invoke normal");		
 	}
 		
+	after(Pipeline p) throwing (Exception e) : copyInvoke(p) {
+		logger.trace("ASPECT: Enter after copy invoke exception");
+		recordFail(p, e);
+		logger.trace("ASPECT: Exit  after copy invoke exception");
+	}
 	
 	pointcut inspect(Pipeline p, int cacheKey, Specifier spec):
 		cflow(invoke(p)) &&
@@ -207,21 +231,6 @@ public aspect PipeStatisticsAspect {
 		logger.trace("ASPECT: Exit  after publish");
 	}
 
-	after(Pipeline p) throwing (Exception e) : invoke(p) {
-		logger.trace("ASPECT: Enter after publish:exception");
-		logger.debug("stopped in invoke {} throwing {}", p, e);
-		// System.out.println("throwing tjp=" + thisJointPoint);
-		p.stats.markEndForce(Status.FAIL);
-		if (null == p.stats.getSpecifier()) {
-			// presume it was an aggregate, have to use somne generalized recording mechanism
-			logger.info("after invoke of aggregate {}", p);
-		} else {
-			PipeStatisticsWithProblem pswp = new PipeStatisticsWithProblem(p.stats, e);
-			fetchEventBus.post(pswp);
-		}
-		logger.trace("ASPECT: Exit  after publish:exception");
-	}
-	
 	// special monitoring for web fetcher
 	// gov.usgs.ngwmn.dm.harvest.WebRetriever.WebInputSupplier.makeSupply(Specifier)
 	pointcut webfetch(WebRetriever.WebInputSupplier supplier):

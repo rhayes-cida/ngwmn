@@ -216,9 +216,7 @@ public class PipeStatistics {
 	}
 	
 	public void setFetchLog(FetchLog myLog) {
-		if (this.myLog.isEmpty()) {
-			this.myLog.add(myLog);
-		}
+		this.myLog.add(myLog);
 	}
 	
 	public synchronized Status overrideStatus(Status nv) {

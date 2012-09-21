@@ -23,6 +23,7 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.slf4j.MDC;
 
 
 public abstract class OutputStreamTransform extends FilterOutputStream {
@@ -69,30 +70,37 @@ public abstract class OutputStreamTransform extends FilterOutputStream {
 			throw new RuntimeException(e);
 		}
 		
+		final Map<?,?> mdc = MDC.getCopyOfContextMap();
+
 		Callable<Long> exec = new Callable<Long>() {
 			public Long call() throws Exception {
-	    		logger.trace("InputStream parser init started id-{} {}", id, OutputStreamTransform.this);
-	    		parser.setInputStream(pin);
-	    		logger.trace("InputStream parser init finished {}", this);
-	    		
-	    		logger.trace("parser started  {}", this);
 	    		long count=0;
-	    		Map<String,String> row;
-				while ( (row=parser.nextRow()) != null ) {
-					// we have to update headers every time because new headers could be discovered
-					// we also have another thread consuming rows as they are added 
-					// so that thread needs headers as soon as there are rows
-					headers.set( new ArrayList<Element>( parser.headers() ) );
-					
-					// add the new row to the row cache
-					Map<String,String> newRow = new HashMap<String,String>();
-					newRow.putAll(row);
-					rows.add(newRow);
-					count++;
-		    		logger.trace("parser row {}:{} ", count, newRow);
+	    		try {
+	    			MDC.setContextMap(mdc);
+	    			logger.trace("InputStream parser init started id-{} {}", id, OutputStreamTransform.this);
+	    			parser.setInputStream(pin);
+	    			logger.trace("InputStream parser init finished {}", this);
+
+	    			logger.trace("parser started  {}", this);
+	    			Map<String,String> row;
+	    			while ( (row=parser.nextRow()) != null ) {
+	    				// we have to update headers every time because new headers could be discovered
+	    				// we also have another thread consuming rows as they are added 
+	    				// so that thread needs headers as soon as there are rows
+	    				headers.set( new ArrayList<Element>( parser.headers() ) );
+
+	    				// add the new row to the row cache
+	    				Map<String,String> newRow = new HashMap<String,String>();
+	    				newRow.putAll(row);
+	    				rows.add(newRow);
+	    				count++;
+	    				logger.trace("parser row {}:{} ", count, newRow);
+	    			}
+	    			logger.trace("parser rows final {}",  rows);
+	    			logger.trace("parser finished {} {}", count, this);
+	    		} finally {
+					MDC.clear();
 				}
-	    		logger.trace("parser rows final {}",  rows);
-	    		logger.trace("parser finished {} {}", count, this);
 	    		return count;
 			}
 		};

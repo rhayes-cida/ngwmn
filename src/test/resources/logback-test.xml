@@ -6,12 +6,14 @@
 	    <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
 	  </encoder>
   </appender>
+  
+  <timestamp key="bySecond" datePattern="yyyyMMdd'T'HHmmss"/>
 
 	<appender name="file" class="ch.qos.logback.core.FileAppender">
-    	<File>/tmp/test.log</File>
-    	<Append>true</Append>
+    	<file>/tmp/test-${bySecond}.log</file>
+    	<append>true</append>
     	<layout class="ch.qos.logback.classic.PatternLayout">
-      		<Pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %class{0}:%L %M - %msg%n</Pattern>
+      		<pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %X{well} %class{0}:%L %M - %msg%n</pattern>
     	</layout>
   	</appender>
   <root level="warn">

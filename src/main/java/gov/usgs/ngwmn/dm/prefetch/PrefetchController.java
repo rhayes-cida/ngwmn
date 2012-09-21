@@ -4,6 +4,7 @@ import gov.usgs.ngwmn.dm.cache.Cleaner;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.Callable;
 import java.util.concurrent.Future;
 
@@ -11,6 +12,7 @@ import javax.management.ObjectName;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.jmx.export.MBeanExporter;
@@ -92,15 +94,22 @@ public class PrefetchController {
 		for (final String agency : agencies) {
 			logger.info("Launching for {}", agency);
 			
+			MDC.put("agency", agency);
+			final Map<?,?> mdc = MDC.getCopyOfContextMap();
 			Callable<PrefetchOutcome> task = new Callable<PrefetchOutcome>() {
 
 				@Override
 				public PrefetchOutcome call() throws Exception {
-					Prefetcher pf = makePrefetcher();
-					if (mbeanExporter != null) {
-						mbeanExporter.registerManagedResource(pf,new ObjectName("ngwmn.prefetcher", "agency", agency));
+					MDC.setContextMap(mdc);
+					try {
+						Prefetcher pf = makePrefetcher();
+						if (mbeanExporter != null) {
+							mbeanExporter.registerManagedResource(pf,new ObjectName("ngwmn.prefetcher", "agency", agency));
+						}
+						return pf.callForAgency(agency);	
+					} finally {
+						MDC.clear();
 					}
-					return pf.callForAgency(agency);					
 				}
 				
 			};

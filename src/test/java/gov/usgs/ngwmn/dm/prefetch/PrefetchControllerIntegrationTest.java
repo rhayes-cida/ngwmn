@@ -67,17 +67,20 @@ public class PrefetchControllerIntegrationTest extends ContextualTest {
 				System.err.printf("Exception %s\n", e);
 			}
 		}
-		// poll for one fetch to finish
+		// poll for all fetches to finish
 		while (true) {
-			System.out.println("Trolling for one task to finish");
+			System.out.println("Trolling for tasks to finish");
 			int finct = 0;
+			int unfinct = 0;
 			for (Future<PrefetchOutcome> oc : started) {
 				if (oc.isDone()) {
 					finct++;
+				} else {
+					unfinct++;
 				}
 			}
-			System.out.printf("Trolling, finct=%d\n", finct);
-			if (finct > 0) {
+			System.out.printf("Trolling, finct=%d unfinct=%d\n", finct, unfinct);
+			if (unfinct == 0) {
 				break;
 			}
 			// give them a chance to get something done

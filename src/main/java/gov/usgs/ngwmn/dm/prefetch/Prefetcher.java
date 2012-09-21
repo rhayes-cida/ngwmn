@@ -23,6 +23,7 @@ import java.util.concurrent.Callable;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.slf4j.MDC;
 
 public class Prefetcher implements Callable<PrefetchOutcome> {
 	private static final long HOUR = 1000*60*60;
@@ -126,44 +127,49 @@ public class Prefetcher implements Callable<PrefetchOutcome> {
 		logger.info("performing prefetch");
 		
 		for (WellStatus well : wellQueue) {
-			if (isQuitting() || Thread.interrupted()) {
-				logger.warn("Prefetch stopped");
-				outcome = PrefetchOutcome.LIMIT_TIME;
-				break;
-			}
-			
-			if (fetchLimit > 0 && tried >= fetchLimit) {
-				logger.info("hit fetch limit {}", tried);
-				outcome = PrefetchOutcome.LIMIT_COUNT;
-				break;
-			}
-			
-			if (endTime != null && System.currentTimeMillis() > endTime) {
-				logger.info("hit time limit after {} of {}", tried, fetchLimit);
-				outcome = PrefetchOutcome.LIMIT_TIME;
-				break;
-			}
-			
-			// check to see if well is marked in appropriate network
-			if (claimsToHaveData(well.well, well.type)) {
-				Specifier spec = makeSpec(well.well, well.type);
-				
-				logger.debug("pre-fetch of {}", spec);
-				Future<Long> f = dispatch(spec);
-							
-				try {
-					Long ct =  f.get();
-					logger.info("pre-fetched {} bytes for {}", ct, spec);
-				} catch (Exception x) {
-					logger.warn("Failed pre-fetch for " + spec, x);
+			MDC.put("well", well.toString());
+			try {
+
+				if (isQuitting() || Thread.interrupted()) {
+					logger.warn("Prefetch stopped");
+					outcome = PrefetchOutcome.LIMIT_TIME;
+					break;
 				}
-				tried++;
-			} else {
-				logger.info("Skipping well {} type {} due to flag", well.well.getMySiteid(), well.type);
-			}
-			
+
+				if (fetchLimit > 0 && tried >= fetchLimit) {
+					logger.info("hit fetch limit {}", tried);
+					outcome = PrefetchOutcome.LIMIT_COUNT;
+					break;
+				}
+
+				if (endTime != null && System.currentTimeMillis() > endTime) {
+					logger.info("hit time limit after {} of {}", tried, fetchLimit);
+					outcome = PrefetchOutcome.LIMIT_TIME;
+					break;
+				}
+
+				// check to see if well is marked in appropriate network
+				if (claimsToHaveData(well.well, well.type)) {
+					Specifier spec = makeSpec(well.well, well.type);
+
+					logger.debug("pre-fetch of {}", spec);
+					Future<Long> f = dispatch(spec);
+
+					try {
+						Long ct =  f.get();
+						logger.info("pre-fetched {} bytes for {}", ct, spec);
+					} catch (Exception x) {
+						logger.warn("Failed pre-fetch for " + spec, x);
+					}
+					tried++;
+				} else {
+					logger.info("Skipping well {} type {} due to flag", well.well.getMySiteid(), well.type);
+				}
+			} finally {
+				MDC.remove("well");
+			}			
 		}
-		
+
 		// update stats for other users
 		try {
 			cacheDAO.updateStatistics();
@@ -213,20 +219,30 @@ public class Prefetcher implements Callable<PrefetchOutcome> {
 	}
 	
 	private Future<Long> dispatch(final Specifier spec) {
+		final Map<?, ?> mdc = MDC.getCopyOfContextMap();
 		Future<Long> f = executor.submit(new Callable<Long>() {
 			public Long call() throws Exception {
+				logger.info("in dispatch0 for {}", spec);
 				try {
-					long count = 
-							broker.prefetchWellData(spec);
-					return count;
-				}
-				catch (InterruptedException ie) {
-					requestStop(ie);
-					return null;
-				}
-				catch (InterruptedIOException ioe) {
-					requestStop(ioe);
-					return null;
+					MDC.setContextMap(mdc);
+					try {
+						long count = 
+								broker.prefetchWellData(spec);
+						logger.info("out dispatch0 count{}", count);
+						return count;
+					}
+					catch (InterruptedException ie) {
+						logger.warn("out dispatch1", ie);
+						requestStop(ie);
+						return null;
+					}
+					catch (InterruptedIOException ioe) {
+						logger.warn("out dispatch2", ioe);
+						requestStop(ioe);
+						return null;
+					}
+				} finally {
+					MDC.clear();
 				}
 			}
 		});
@@ -242,9 +258,9 @@ public class Prefetcher implements Callable<PrefetchOutcome> {
 		@Override
 		public String toString() {
 			StringBuilder builder = new StringBuilder();
-			builder.append("WellStatus [")
+			builder.append("WellStatus[")
 					.append("well=").append((well==null)? "??" : well.getMySiteid())
-					.append(", type=").append(type)
+					.append(",type=").append(type)
 					.append("]");
 			return builder.toString();
 		}	

@@ -26,6 +26,7 @@ import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -39,6 +40,7 @@ import org.apache.commons.codec.binary.Hex;
 import org.apache.tomcat.dbcp.dbcp.DelegatingConnection;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.slf4j.MDC;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.lob.LobHandler;
 
@@ -84,14 +86,20 @@ public class DatabaseXMLCache implements Cache {
 	
 	private Future<Specifier> invokeInspect(final int key, final Specifier spec) {
 		logger.debug("call invokeInspect for {} key {}", spec, key);
+		final Map<?, ?> mdc = MDC.getCopyOfContextMap();
 		Future<Specifier> result =
 				xService.submit(
 						new Runnable() {
 
 							@Override
 							public void run() {
-								inspectAndRelease(key, spec);
-								logger.trace("finished out-line invokeInspect of {}", spec);
+								try {
+									MDC.setContextMap(mdc);
+									inspectAndRelease(key, spec);
+									logger.trace("finished out-line invokeInspect of {}", spec);
+								} finally {
+									MDC.clear();
+								}
 							}
 						},spec);
 
@@ -163,6 +171,7 @@ public class DatabaseXMLCache implements Cache {
 			boolean acceptable = false;
 			try {
 				acceptable = inspector.acceptable(key);
+				logger.trace("done checking contents of {}", key);
 			} catch (Exception e) {
 				logger.error("Problem in inspectAndRelease.inspect " + key + " for spec " + spec, e);
 			}
@@ -231,7 +240,7 @@ public class DatabaseXMLCache implements Cache {
 						
 						Future<Specifier> future = invokeInspect(newkey, well);
 						
-						Specifier done = future.get(10, TimeUnit.MINUTES);
+						Specifier done = future.get(5, TimeUnit.MINUTES);
 						logger.info("Got finish for inspect of {}", done);
 					} catch (SQLException sqle) {
 						logger.warn("Problem (sql) in inspect of {}", well);

@@ -19,6 +19,7 @@
 		<property name="wellDAO" 	ref="WellRegistryDAO"/>
 		<property name="cacheDAO" 	ref="CacheMetaDataDAO"/>
 		<property name="broker" 	ref="DataBroker"/>
+		<property name="threadCount" value="-1"/>
 	</bean>
     
     <bean id="PrefetchInstance" parent="Prefetcher" scope="prototype"/>

@@ -28,11 +28,12 @@ public class WaterLevelInspector implements Inspector {
 	public boolean acceptable(int cachekey) throws Exception {
 		Connection conn = ds.getConnection();
 		try {
+			logger.trace("start acceptable of {}", cachekey);
 			CallableStatement stat = conn.prepareCall("{call GW_DATA_PORTAL.INSPECT_WATERLEVEL_DATA(?)}");
 			stat.setInt(1, cachekey);
 			
 			boolean did = stat.execute();
-			logger.debug("finished update, got {}", did);
+			logger.debug("finished acceptable call for {}, got {}", cachekey, did);
 			
 			// It would be convenient if stored proc contained a select to supply this result set,
 			// except that's not easy in Oracle.
@@ -50,7 +51,7 @@ public class WaterLevelInspector implements Inspector {
 				Date lst = rs.getDate(3);
 				int ct = rs.getInt(4);
 				
-				logger.debug("Stats for waterlevel, id={} md5={}: ct {} min {} max {}",
+				logger.debug("Stats for waterlevel, cachekey={} md5={}: ct {} min {} max {}",
 						new Object[] {cachekey, md5, ct, frst, lst});
 				
 				totct += ct;
@@ -58,6 +59,7 @@ public class WaterLevelInspector implements Inspector {
 			
 			return totct > 0;
 		} finally {
+			logger.trace("finally acceptable for {}", cachekey);
 			conn.close();
 		}
 	}
