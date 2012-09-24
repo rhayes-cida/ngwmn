@@ -114,12 +114,12 @@ public class Prefetcher implements Callable<PrefetchOutcome> {
 		
 		Class<?> clazz = x.getClass();
 		try {
-			Method m = clazz.getMethod("getSize");
+			Method m = clazz.getMethod("size");
 			Object value = m.invoke(x);
 			v = (Number)value;
 		}
 		catch (Exception e) {
-			logger.info("Class {} has no getSize method", clazz.getName());
+			logger.info("Class {} has no size method", clazz.getName());
 		}
 		return v;
 	}
@@ -142,7 +142,7 @@ public class Prefetcher implements Callable<PrefetchOutcome> {
 		}
 		
 		if (logger.isDebugEnabled()) {
-			logger.debug("performing prefetch, q size{} timeLimit {} countLimit {} endtime {}",
+			logger.debug("performing prefetch, q size {} timeLimit {} countLimit {} endtime {}",
 				new Object[] {getSize(wellQueue), timeLimit, fetchLimit, new Date(endTime)});
 		}
 		
