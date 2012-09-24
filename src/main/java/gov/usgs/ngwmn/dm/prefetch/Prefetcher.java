@@ -10,6 +10,7 @@ import gov.usgs.ngwmn.dm.dao.WellRegistryDAO;
 import gov.usgs.ngwmn.dm.spec.Specifier;
 
 import java.io.InterruptedIOException;
+import java.lang.reflect.Method;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
@@ -107,6 +108,22 @@ public class Prefetcher implements Callable<PrefetchOutcome> {
 		return performPrefetch(wellQueue);
 	}
 
+	private Number getSize(Object x) {
+		// use reflection, quack quack.
+		Number v = null;
+		
+		Class<?> clazz = x.getClass();
+		try {
+			Method m = clazz.getMethod("getSize");
+			Object value = m.invoke(x);
+			v = (Number)value;
+		}
+		catch (Exception e) {
+			logger.info("Class {} has no getSize method", clazz.getName());
+		}
+		return v;
+	}
+	
 	private PrefetchOutcome performPrefetch(Iterable<WellStatus> wellQueue) 
 			throws RuntimeException 
 	{
@@ -123,7 +140,11 @@ public class Prefetcher implements Callable<PrefetchOutcome> {
 		if (timeLimit != null) {
 			endTime = System.currentTimeMillis() + timeLimit;
 		}
-		logger.info("performing prefetch");
+		
+		if (logger.isDebugEnabled()) {
+			logger.debug("performing prefetch, q size{} timeLimit {} countLimit {} endtime {}",
+				new Object[] {getSize(wellQueue), timeLimit, fetchLimit, new Date(endTime)});
+		}
 		
 		for (WellStatus well : wellQueue) {
 			MDC.put("well", well.toString());

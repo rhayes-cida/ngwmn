@@ -18,8 +18,8 @@ public class PrefetchControllerIntegrationTest extends ContextualTest {
 	
 	@BeforeClass
 	public static void setEnvironment() {
-		System.setProperty("ngwmn_prefetch_count_limit", "5");
-		System.setProperty("ngwmn_prefetch_ms_limit","2000000");
+		System.setProperty("ngwmn_prefetch_count_limit", "3");
+		System.setProperty("ngwmn_prefetch_ms_limit","20000");
 	}
 	
 	@Before
