@@ -3,7 +3,6 @@ package gov.usgs.ngwmn.dm.prefetch;
 import static org.junit.Assert.*;
 
 import java.util.List;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
 import gov.usgs.ngwmn.dm.dao.ContextualTest;
@@ -19,7 +18,7 @@ public class PrefetchControllerIntegrationTest extends ContextualTest {
 	
 	@BeforeClass
 	public static void setEnvironment() {
-		System.setProperty("ngwmn_prefetch_count_limit", "3");
+		System.setProperty("ngwmn_prefetch_count_limit", "5");
 		System.setProperty("ngwmn_prefetch_ms_limit","2000000");
 	}
 	
