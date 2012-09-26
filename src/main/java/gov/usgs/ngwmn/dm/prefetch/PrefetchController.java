@@ -27,6 +27,10 @@ public class PrefetchController {
 	
 	@Autowired
 	private ApplicationContext ctx;
+	public void setApplicationContext(ApplicationContext ctx) {
+		this.ctx = ctx;
+	}
+
 	@Autowired
 	private MBeanExporter mbeanExporter;
 	

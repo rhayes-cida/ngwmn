@@ -11,6 +11,8 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 public class PrefetchControllerIntegrationTest extends ContextualTest {
 
@@ -20,11 +22,15 @@ public class PrefetchControllerIntegrationTest extends ContextualTest {
 	public static void setEnvironment() {
 		System.setProperty("ngwmn_prefetch_count_limit", "3");
 		System.setProperty("ngwmn_prefetch_ms_limit","20000");
+		
 	}
 	
 	@Before
 	public void setUp() throws Exception {
-		victim = ctx.getBean(PrefetchController.class);
+		// Have to load my own so the system properties take effect.
+		ApplicationContext myCtx = new ClassPathXmlApplicationContext("applicationContextTest.xml");
+		victim = myCtx.getBean(PrefetchController.class);
+		victim.setApplicationContext(myCtx);
 	}
 
 	@After
@@ -63,7 +69,7 @@ public class PrefetchControllerIntegrationTest extends ContextualTest {
 				System.out.printf("Done, %s\n", oc.get());
 			}
 			catch (Exception e) {
-				System.err.printf("Exception %s\n", e);
+				e.printStackTrace();
 			}
 		}
 		// poll for all fetches to finish

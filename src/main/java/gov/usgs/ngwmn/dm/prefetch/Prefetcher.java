@@ -143,7 +143,7 @@ public class Prefetcher implements Callable<PrefetchOutcome> {
 		
 		if (logger.isDebugEnabled()) {
 			logger.debug("performing prefetch, q size {} timeLimit {} countLimit {} endtime {}",
-				new Object[] {getSize(wellQueue), timeLimit, fetchLimit, new Date(endTime)});
+				new Object[] {getSize(wellQueue), timeLimit, fetchLimit, (endTime == null)? null: new Date(endTime)});
 		}
 		
 		for (WellStatus well : wellQueue) {
