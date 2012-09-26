@@ -282,17 +282,17 @@ public class BasicServletTest extends ContextualTest {
 */
 
 	// Now repeat the tests; we expect to get cached results
-	@Test(timeout=3000) // TODO why is this sometime this slow on Windows
+	@Test(timeout=5000) // TODO why is this sometime this slow on Windows
 	public void testWithData_fromCacheShouldBeFast() throws Exception {
 		testWithData();
 	}
 	
-	@Test(timeout=3000) // TODO why is this sometime this slow on Windows
+	@Test(timeout=5000) // TODO why is this sometime this slow on Windows
 	public void testWithNoData_fromCacheShouldBeFast() throws Exception {
 		testWithNoData();
 	}
 
-	@Test(expected=HttpNotFoundException.class,timeout=3000)
+	@Test(expected=HttpNotFoundException.class,timeout=5000)
 	public void testNonSite_fromCacheShouldBeFast() throws Exception {
 		testNonSite();
 	}
