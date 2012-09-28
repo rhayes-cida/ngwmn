@@ -24,6 +24,7 @@ public class PrefetchController {
 	private Prefetcher prefetcher;
 	private Logger logger = LoggerFactory.getLogger(getClass());
 	private Cleaner cleaner;
+	private WaterlevelRankStatsWorker wlsWorker;
 	
 	@Autowired
 	private ApplicationContext ctx;
@@ -131,6 +132,13 @@ public class PrefetchController {
 		return multithreadOutcomes;
 	}
 	
+	// runs periodically.
+	/** Update the rank statistics for one waterlevel sample set (chosen at random).
+	 * 
+	 */
+	public void gatherWaterlevelRankStats() {
+		wlsWorker.updateOne();
+	}
 	
 	/**
 	 * Enable scheduling of the prefetch job -- may or may not start a prefetch job immediately,
@@ -183,6 +191,14 @@ public class PrefetchController {
 
 	public void setMbeanExporter(MBeanExporter mbeanExporter) {
 		this.mbeanExporter = mbeanExporter;
+	}
+
+	public WaterlevelRankStatsWorker getWaterlevelRankStatsWorker() {
+		return wlsWorker;
+	}
+
+	public void setWaterlevelRankStatsWorker(WaterlevelRankStatsWorker wlsWorker) {
+		this.wlsWorker = wlsWorker;
 	}
 	
 }

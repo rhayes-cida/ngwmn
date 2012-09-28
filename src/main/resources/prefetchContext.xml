@@ -25,18 +25,24 @@
     <bean id="PrefetchInstance" parent="Prefetcher" scope="prototype"/>
     
     <task:scheduled-tasks scheduler="scheduler">
-    									<!--  second minute hour day month weekday -->
+    														<!--  second minute hour day month weekday -->
 <!--     	<task:scheduled ref="Prefetcher" method="call" cron="0 21 ${ngwmn_prefetch_start_hour:22} * * ?"/> -->
     	<task:scheduled ref="PrefetchController" method="startInParallel" cron="0 40 ${ngwmn_prefetch_start_hour:22} * * ?"/>
+    	<task:scheduled ref="PrefetchController" method="gatherWaterlevelRankStats" fixed-delay="120000"/>
     </task:scheduled-tasks>
     
     <task:scheduler id="scheduler" pool-size="12"/>
+    
+    <bean id="WaterlevelRankStatsWorker" class="gov.usgs.ngwmn.dm.prefetch.WaterlevelRankStatsWorker">
+    	<property name="dataSource" ref="dataSource"/>
+    </bean>
     
     <bean id="PrefetchController" class="gov.usgs.ngwmn.dm.prefetch.PrefetchController">
     	<property name="scheduler" ref="scheduler"/>
     	<property name="prefetcher" ref="Prefetcher"/>
     	<property name="cleaner" ref="CacheCleaner"/>
     	<property name="mbeanExporter" ref="mbeanExporter"/>
+    	<property name="waterlevelRankStatsWorker" ref="WaterlevelRankStatsWorker"/>
     </bean>
     
 <!--     
