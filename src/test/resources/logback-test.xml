@@ -25,10 +25,12 @@
   <logger level="info"  name="org.apache.commons.httpclient" />
   <logger level="debug" name="gov.usgs.ngwmn.dm"/>
   <logger level="debug" name="gov.usgs.ngwmn.dm.io"/>
+<!--   
   <logger level="trace" name="gov.usgs.ngwmn.dm.prefetch"/>
   <logger level="trace" name="gov.usgs.ngwmn.dm.cache.qw.DatabaseXMLCache"/>
   <logger level="trace" name="gov.usgs.ngwmn.dm.aspect"/>
-<!--   
+ -->
+ <!--   
   <logger level="trace" name="gov.usgs.ngwmn.dm.io.transform"/>
   <logger level="trace" name="gov.usgs.ngwmn.dm.io.parse"/>
   <logger level="trace" name="gov.usgs.ngwmn.dm.visualization"/>
