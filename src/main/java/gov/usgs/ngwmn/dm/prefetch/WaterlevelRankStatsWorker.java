@@ -18,7 +18,7 @@ public class WaterlevelRankStatsWorker {
 	private DataSource ds;
 	
 	String query = " " +
-			"SELECT min(waterlevel_cache_id) " +
+			"SELECT max(waterlevel_cache_id) " +
 			"FROM gw_data_portal.waterlevel_cache_stats " +
 			"WHERE published = 'Y' " +
 			"AND sample_ct > 0 " +
@@ -40,6 +40,7 @@ public class WaterlevelRankStatsWorker {
 			@Override
 			public CallableStatement createCallableStatement(Connection con)
 					throws SQLException {
+				// TODO Should mark id as unrankable if stored procedure call fails
 				CallableStatement v = con.prepareCall("{call GW_DATA_PORTAL.GATHER_WATERLEVEL_ORDER_STATS(?)}");
 				v.setInt(1, id);
 				return v;
