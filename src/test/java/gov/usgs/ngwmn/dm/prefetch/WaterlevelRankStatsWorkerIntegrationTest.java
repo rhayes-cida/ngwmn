@@ -15,7 +15,7 @@ public class WaterlevelRankStatsWorkerIntegrationTest extends ContextualTest {
 		victim = ctx.getBean("WaterlevelRankStatsWorker", WaterlevelRankStatsWorker.class);
 	}
 	
-	@Test
+	@Test(timeout=300000)
 	public void testUpdateOne() {
 		int id = victim.updateOne();
 		

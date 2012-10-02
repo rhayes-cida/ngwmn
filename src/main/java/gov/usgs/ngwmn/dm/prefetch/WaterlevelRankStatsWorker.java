@@ -13,13 +13,12 @@ import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.CallableStatementCreator;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.SqlParameter;
-import org.springframework.jdbc.core.SqlParameterValue;
 
-import ch.qos.logback.classic.Logger;
+import org.slf4j.Logger;
 
 public class WaterlevelRankStatsWorker {
 
-	private org.slf4j.Logger logger = LoggerFactory.getLogger(getClass());
+	private Logger logger = LoggerFactory.getLogger(getClass());
 	
 	private DataSource ds;
 	
@@ -66,9 +65,12 @@ public class WaterlevelRankStatsWorker {
 			List<SqlParameter> params = Collections.emptyList();
 			template.call(new CallableStatementCreator() {
 
+				private Logger logger = LoggerFactory.getLogger(getClass());
+
 				@Override
 				public CallableStatement createCallableStatement(Connection con)
 						throws SQLException {
+					logger.info("Getting rank stats for {}", id);
 					// TODO Should mark id as unrankable if stored procedure call fails
 					CallableStatement v = con.prepareCall("{call GW_DATA_PORTAL.GATHER_WATERLEVEL_ORDER_STATS(?)}");
 					v.setInt(1, id);
