@@ -94,7 +94,9 @@ public class DatabaseXMLCache implements Cache {
 							@Override
 							public void run() {
 								try {
-									MDC.setContextMap(mdc);
+									if (mdc != null) {
+										MDC.setContextMap(mdc);
+									}
 									inspectAndRelease(key, spec);
 									logger.trace("finished out-line invokeInspect of {}", spec);
 								} finally {
