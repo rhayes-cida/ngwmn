@@ -53,6 +53,7 @@ public class WaterlevelRankStatsWorkerIntegrationTest extends ContextualTest {
 		Statistics monthly = victim.monthly_stats(obs);
 
 		assertNotNull(monthly);
+		
 		// Note that Date getMonth range is 0..11 not 1..12
 		assertEquals("max date in month", obs.getMonth(), getMonth(monthly.getMax_date()));
 		assertEquals("min date in month", obs.getMonth(), getMonth(monthly.getMin_date()));
