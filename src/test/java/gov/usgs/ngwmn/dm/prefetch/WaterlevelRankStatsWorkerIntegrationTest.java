@@ -1,8 +1,13 @@
 package gov.usgs.ngwmn.dm.prefetch;
 
 import static org.junit.Assert.*;
+
+import java.util.Date;
+
 import gov.usgs.ngwmn.dm.dao.ContextualTest;
 
+import org.joda.time.DateTime;
+import org.joda.time.JodaTimePermission;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -49,9 +54,14 @@ public class WaterlevelRankStatsWorkerIntegrationTest extends ContextualTest {
 
 		assertNotNull(monthly);
 		// Note that Date getMonth range is 0..11 not 1..12
-		assertEquals("max date in month", obs.getMonth(), monthly.getMax_date().getMonth()+1);
-		assertEquals("min date in month", obs.getMonth(), monthly.getMin_date().getMonth()+1);
+		assertEquals("max date in month", obs.getMonth(), getMonth(monthly.getMax_date()));
+		assertEquals("min date in month", obs.getMonth(), getMonth(monthly.getMin_date()));
 		assertEquals("cache id", id.intValue(), monthly.getWaterlevel_cache_id());
+	}
+	
+	private int getMonth(Date d) {
+		DateTime dt = new DateTime(d);
+		return dt.getMonthOfYear();
 	}
 	
 	@Test
