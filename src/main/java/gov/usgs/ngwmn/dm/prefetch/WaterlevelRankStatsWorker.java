@@ -7,6 +7,7 @@ import javax.sql.DataSource;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -93,12 +94,6 @@ public class WaterlevelRankStatsWorker {
 	}
 	
 	public Statistics monthly_stats(Observation obs) {
-		String month = String.valueOf(obs.getMonth());
-		
-		// beware; parameter substitution does not work for 'month' inside the XQuery text.
-		// Nor does the Oracle string concatenation operator.
-		// have to construct that part of the XQuery query here, by Java string construction.
-		
 		String query = "select \n" + 
 				"    cume_dist(:depth)\n" + 
 				"    within group (\n" + 
@@ -131,39 +126,41 @@ public class WaterlevelRankStatsWorker {
 				"	from \n" + 
 				"		gw_data_portal.waterlevel_cache qc,\n" + 
 				"	\n" + 
-				"		XMLTable(\n" + 
-				"		XMLNAMESPACES(\n" + 
+				// beginning of XQuery XMLTable
+				"	XMLTable(\n" + 
+				"	   XMLNAMESPACES(\n" + 
 				"		  'http://www.wron.net.au/waterml2' AS \"wml2\",\n" + 
 				"		  'http://www.opengis.net/om/2.0' AS \"om\",\n" + 
 				"		  'http://www.opengis.net/swe/2.0' AS \"swe\"),\n" + 
 				"		  \n" + 
-				"		'\n" + 
+				"		'   " + // start of XQuery expression
 				"\n" + 
 				"    for $r in //wml2:WaterMonitoringObservation/om:result/wml2:TimeSeries/wml2:element\n" + 
 				"\n" + 
-				"		let \n" + 
-				"      $p := $r/wml2:TimeValuePair,\n" + 
+				"	 let \n" + 
+				"       $p := $r/wml2:TimeValuePair,\n" + 
 				"    	$depth := $p/wml2:value/swe:Quantity/swe:value,\n" + 
 				"      	$dt := substring($p/wml2:time,1,10),\n" + 
 				"      	$dtclean := if ($dt castable as xs:date)\n" + 
 				"      				then $dt\n" + 
 				"      				else null,\n" + 
 				"      	$month := month-from-date(xs:date($dtclean))\n" + 
-				"    where $month = " +  month + "\n" + 
+				"    where $month = $mn \n" + 
 				"	 return\n" + 
-				"     <well>\n" + 
-				"     	<dt>{$dtclean}</dt>\n" + 
-				"     	<month>{$month}</month>\n" + 
-				"      <depth>{$depth}</depth>\n" + 
-				" 	</well>\n" + 
-				"		'\n" + 
+				"      <well>\n" + 
+				"        <dt>{$dtclean}</dt>\n" + 
+				"     	 <month>{$month}</month>\n" + 
+				"        <depth>{$depth}</depth>\n" + 
+				" 	   </well>\n" + 
+				"		'    " + // end of XQuery expression
 				"		  \n" + 
-				"		passing qc.xml\n" + 
+				"		passing qc.xml, :month as \"mn\" \n" + 
 				"		columns \n" + 
-				"      \"DT\" date path 'dt',\n" + 
+				"       \"DT\" date path 'dt',\n" + 
 				"    	\"MONTH\" number path 'month',\n" + 
-				"      \"DEPTH\" number path 'depth'\n" + 
+				"       \"DEPTH\" number path 'depth'\n" + 
 				"		) xq\n" + 
+				// end of XQuery XMLTable 
 				"    where qc.waterlevel_cache_id = :cacheId " +
 				"";
 		
@@ -267,13 +264,17 @@ public class WaterlevelRankStatsWorker {
 		    Map<String, ?> parameters = Collections.singletonMap("cacheId", id);
 
 			// insert new stats record, ok to fail if it's already there
-			jdbcTemplate.update(
-					"insert into gw_data_portal.waterlevel_data_stats( " + 
-					"	waterlevel_cache_id) " +
-					"values ( " +
-					"	:cacheId " +
-					")", parameters);
-			logger.debug("inserted record for cacheId {}", id);
+		    try {
+				jdbcTemplate.update(
+						"insert into gw_data_portal.waterlevel_data_stats( " + 
+						"	waterlevel_cache_id) " +
+						"values ( " +
+						"	:cacheId " +
+						")", parameters);
+				logger.debug("inserted record for cacheId {}", id);
+		    } catch (DuplicateKeyException dke) {
+		    	logger.info("waterlevel data stats already exists for {}, will update", id);
+		    }
 
 			Observation latest = latestObservation(id);
 			logger.debug("got latest observation: {}", latest);
