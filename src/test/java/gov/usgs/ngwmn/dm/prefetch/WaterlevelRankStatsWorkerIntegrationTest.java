@@ -4,12 +4,16 @@ import static org.junit.Assert.*;
 
 import java.util.Date;
 
+import javax.sql.DataSource;
+
 import gov.usgs.ngwmn.dm.dao.ContextualTest;
 
 import org.joda.time.DateTime;
 import org.joda.time.JodaTimePermission;
 import org.junit.Before;
 import org.junit.Test;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.simple.SimpleJdbcTemplate;
 
 public class WaterlevelRankStatsWorkerIntegrationTest extends ContextualTest {
 
@@ -18,6 +22,25 @@ public class WaterlevelRankStatsWorkerIntegrationTest extends ContextualTest {
 	@Before
 	public void setup() {
 		victim = ctx.getBean("WaterlevelRankStatsWorker", WaterlevelRankStatsWorker.class);
+	}
+	
+	@Before
+	public void make_room() {
+		DataSource ds = ctx.getBean("dataSource",DataSource.class);
+		JdbcTemplate jt = new JdbcTemplate(ds);
+		
+		int keeper = jt.queryForInt(
+				"select waterlevel_cache_id " + 
+				"from ( " + 
+				"  select" + 
+				"  waterlevel_cache_id, " + 
+				"  rank() over (order by waterlevel_cache_id desc) \"rank\" " + 
+				"  from " + 
+				"  gw_data_portal.waterlevel_cache_stats" + 
+				")" + 
+				"where \"rank\" = 4");
+		jt.update("delete from gw_data_portal.waterlevel_data_stats " +
+				"where waterlevel_cache_id > ?", keeper);
 	}
 	
 	@Test
