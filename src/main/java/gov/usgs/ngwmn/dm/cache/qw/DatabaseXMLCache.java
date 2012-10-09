@@ -25,6 +25,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
@@ -94,7 +95,7 @@ public class DatabaseXMLCache implements Cache {
 							@Override
 							public void run() {
 								try {
-									MDC.setContextMap(mdc);
+									MDC.setContextMap((mdc == null) ? Collections.emptyMap() : mdc);
 									inspectAndRelease(key, spec);
 									logger.trace("finished out-line invokeInspect of {}", spec);
 								} finally {
