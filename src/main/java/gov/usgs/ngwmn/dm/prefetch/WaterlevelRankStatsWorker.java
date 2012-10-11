@@ -250,12 +250,12 @@ public class WaterlevelRankStatsWorker {
 		if (backoff > 0) {
 			backoff--;
 			logger.trace("backing off ct = {}", backoff);
-			return -backoff;
+			return -2;
 		}
 				
-		if (logger.isInfoEnabled()) {
+		if (logger.isDebugEnabled()) {
 			int count = count();
-			logger.info("count of unranked published observations {}", count);
+			logger.debug("count of unranked published observations {}", count);
 		}
 
 		// get one waterlevel sample that needs to be updated
