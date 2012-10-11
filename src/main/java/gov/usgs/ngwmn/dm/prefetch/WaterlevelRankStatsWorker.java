@@ -341,10 +341,16 @@ public class WaterlevelRankStatsWorker {
 				"  ) ";
 		
 		try {
-			Integer val = jdbcTemplate.getJdbcOperations().queryForInt(latestSampleQuery);
+			int val = jdbcTemplate.getJdbcOperations().queryForInt(latestSampleQuery);
+			if (val == 0) {
+				// This is how queryForInt indicates an empty result
+				logger.info("No unstatted samples case 1");
+				return null;
+			}
 			logger.debug("found an un-statted sample, id = {}", val);
 			return val;
 		} catch (EmptyResultDataAccessException nothingToDo) {
+			logger.info("No unstatted samples case 2");
 			return null;
 		}
 	}
