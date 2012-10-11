@@ -60,7 +60,8 @@ public class WaterlevelRankStatsWorker {
 				"      				then $dt\n" + 
 				"      				else null,\n" + 
 				"      	$month := month-from-date(xs:date($dtclean))\n" + 
-				"    \n" + 
+				"    where exists($depth) and exists($dt) and exists($fulldate)\n" + 
+				"      \n" + 
 				"	 return\n" + 
 				"     <well>\n" + 
 				"      <timetext>{$fulldate}</timetext>\n" + 
@@ -87,10 +88,15 @@ public class WaterlevelRankStatsWorker {
 	    Map<String, ?> parameters = Collections.singletonMap("cacheId", cacheId);
 
 	    BeanPropertyRowMapper<Observation> bprm = new BeanPropertyRowMapper<Observation>(Observation.class);
-		Observation value = jdbcTemplate.queryForObject(query, parameters, bprm);
-		value.setCacheId(cacheId);
-		
-		return value;
+	    try {
+	    	Observation value = jdbcTemplate.queryForObject(query, parameters, bprm);
+	    	value.setCacheId(cacheId);
+
+	    	return value;
+	    } catch (EmptyResultDataAccessException ERDAE) {
+	    	logger.warn("No good data for {}", cacheId);
+	    	return null;
+	    }
 	}
 	
 	public Statistics monthly_stats(Observation obs) {
@@ -260,7 +266,7 @@ public class WaterlevelRankStatsWorker {
 
 		// get one waterlevel sample that needs to be updated
 		final Integer id = findOneSample();
-		if (id != null) {
+		if (id != null && id > 0) {
 		    Map<String, ?> parameters = Collections.singletonMap("cacheId", id);
 
 			// insert new stats record, ok to fail if it's already there
@@ -278,6 +284,10 @@ public class WaterlevelRankStatsWorker {
 
 			Observation latest = latestObservation(id);
 			logger.debug("got latest observation: {}", latest);
+			if (latest == null) {
+				logger.debug("latest is null f id {}", id);
+				return -3;
+			}
 			
 			SqlParameterSource latestParameters = new BeanPropertySqlParameterSource(latest);
 			jdbcTemplate.update(

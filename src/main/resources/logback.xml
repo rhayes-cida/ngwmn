@@ -22,6 +22,7 @@
   <logger name="httpclient.wire.content" level="WARN"/>
   <logger name="gov.usgs.ngwmn.dm.visualization" level="DEBUG" />
   <logger name="gov.usgs.ngwmn.dm.prefetch" level="DEBUG"/>
+  <logger name="org.springframework.jdbc.core.JdbcTemplate" level="INFO"/>
   
   <root level="debug">
   	<if condition=' ! p("user.name").equals("tomcat")'>
