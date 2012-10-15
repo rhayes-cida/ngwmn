@@ -128,6 +128,7 @@
     <security-role><role-name>admin</role-name></security-role>
     <security-role><role-name>manager</role-name></security-role>
     <security-role><role-name>debug</role-name></security-role>
+    <security-role><role-name>ngwmn</role-name></security-role>
     
   <!--  Spring integration -->
   <context-param>
