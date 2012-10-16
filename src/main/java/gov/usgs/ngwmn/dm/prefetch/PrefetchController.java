@@ -63,6 +63,7 @@ public class PrefetchController {
 		logger.info("Starting");
 		
 		cleanCache();
+		MDC.put("prefetch", "single");
 
 		Runnable task = new Runnable() {
 			
@@ -95,6 +96,7 @@ public class PrefetchController {
 		List<String> agencies = prefetcher.agencyCodes();
 		
 		cleanCache();
+		MDC.put("prefetch", "multi");
 		
 		for (final String agency : agencies) {
 			logger.info("Launching for {}", agency);

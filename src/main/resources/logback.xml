@@ -17,6 +17,16 @@
 	  </encoder>
   </appender>
 
+  <appender name="prefetch" class="ch.qos.logback.core.rolling.RollingFileAppender">
+    <filter class="gov.usgs.ngwmn.dm.prefetch.PrefetchLogFilter" />
+  	<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+      <fileNamePattern>${catalina.base:-.}/logs/ngwmn/prefetch.%d.log</fileNamePattern>
+    </rollingPolicy>
+  	  <encoder>
+	    <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} %mdc{prefetch} - %msg%n</pattern>
+	  </encoder>
+  </appender>
+
   <logger name="gov.usgs.ngwmn.dm.DataManagerServlet" level="DEBUG" />
   <logger name="com.base22" level="DEBUG"/>
   <logger name="httpclient.wire.content" level="WARN"/>
@@ -31,6 +41,7 @@
     	</then>
     </if>
     <appender-ref ref="NGWMN"/>
+    <appender-ref ref="prefetch"/>
   </root>
   
 </configuration>

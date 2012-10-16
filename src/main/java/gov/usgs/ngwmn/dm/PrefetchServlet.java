@@ -15,6 +15,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.slf4j.MDC;
 
 /**
  * Servlet implementation class WellListServlet
@@ -55,6 +56,7 @@ public class PrefetchServlet extends DataManagerServlet {
 		try {
 			response.setContentType("text/html");
 			
+			MDC.put("prefetch", "servlet");
 			ServletOutputStream puttee = response.getOutputStream();
 			try {
 				logger.info("Getting well data for {} with well name {}", spec, well_name);
