@@ -23,7 +23,7 @@
       <fileNamePattern>${catalina.base:-.}/logs/ngwmn/prefetch.%d.log</fileNamePattern>
     </rollingPolicy>
   	  <encoder>
-	    <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} %X{prefetch} - %msg%n</pattern>
+	    <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %mdc{prefetch} %logger{36} - %msg%n</pattern>
 	  </encoder>
   </appender>
 
