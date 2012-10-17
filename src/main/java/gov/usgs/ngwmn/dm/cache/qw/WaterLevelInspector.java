@@ -29,6 +29,24 @@ public class WaterLevelInspector implements Inspector {
 		Connection conn = ds.getConnection();
 		try {
 			logger.trace("start acceptable of {}", cachekey);
+			
+			if (logger.isDebugEnabled()) {
+				PreparedStatement q = conn.prepareStatement("SELECT md5 from GW_DATA_PORTAL.waterlevel_cache " +
+						"WHERE waterlevel_cache_id = ?");
+				q.setInt(1, cachekey);
+				
+				boolean got = false;
+				ResultSet rsq = q.executeQuery();
+				while (rsq.next()) {
+					String md5 = rsq.getString(1);
+					got = true;
+					logger.debug("md5 of waterlevel_cache[{}] is {}", cachekey, md5);
+				}
+				if ( ! got) {
+					logger.warn("no md5 found for waterlevel_cache[{}]", cachekey);
+				}
+			}
+			
 			CallableStatement stat = conn.prepareCall("{call GW_DATA_PORTAL.INSPECT_WATERLEVEL_DATA(?)}");
 			stat.setInt(1, cachekey);
 			

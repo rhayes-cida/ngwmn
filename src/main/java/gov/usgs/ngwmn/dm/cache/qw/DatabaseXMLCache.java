@@ -237,7 +237,7 @@ public class DatabaseXMLCache implements Cache {
 						// TODO Clean up clob?
 						blob.free();
 						pooledConn.close();
-						logger.info("saved data for {}, sz {} as {}[{}]", new Object[] {well, length,tablename,newkey});
+						logger.info("saved data for {}, sz {} as {}[{}] with md5 {}", new Object[] {well, length,tablename,newkey,hash});
 						
 						Future<Specifier> future = invokeInspect(newkey, well);
 						
