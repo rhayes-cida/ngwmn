@@ -24,6 +24,7 @@
 		<property name="threadCount" value="-1"/>
 	</bean>
     
+    <!-- Need a separate instance for each controller thread -->
     <bean id="PrefetchInstance" parent="Prefetcher" scope="prototype"/>
     
     <task:scheduled-tasks scheduler="scheduler">
