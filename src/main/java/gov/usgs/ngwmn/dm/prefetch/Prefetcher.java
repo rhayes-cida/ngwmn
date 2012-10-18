@@ -2,9 +2,12 @@ package gov.usgs.ngwmn.dm.prefetch;
 
 import gov.usgs.ngwmn.WellDataType;
 import gov.usgs.ngwmn.dm.PrefetchI;
+import gov.usgs.ngwmn.dm.cache.PipeStatistics;
 import gov.usgs.ngwmn.dm.dao.CacheMetaData;
 import gov.usgs.ngwmn.dm.dao.CacheMetaDataDAO;
 import gov.usgs.ngwmn.dm.dao.CacheMetaDataKey;
+import gov.usgs.ngwmn.dm.dao.FetchLog;
+import gov.usgs.ngwmn.dm.dao.FetchLogDAO;
 import gov.usgs.ngwmn.dm.dao.WellRegistry;
 import gov.usgs.ngwmn.dm.dao.WellRegistryDAO;
 import gov.usgs.ngwmn.dm.spec.Specifier;
@@ -35,6 +38,13 @@ public class Prefetcher implements Callable<PrefetchOutcome> {
 	private Long timeLimit = null;
 	
 	private ExecutorService executor = Executors.newSingleThreadExecutor();
+	private PrefetchI broker;
+	
+	private WellRegistryDAO wellDAO;
+	private CacheMetaDataDAO cacheDAO;
+	private FetchLogDAO fetchLogDAO;
+	
+	private PrefetchOutcome outcome = PrefetchOutcome.UNSTARTED;
 	
 	public synchronized void setThreadCount(int ct) {
 		if (executor != null) {
@@ -47,13 +57,6 @@ public class Prefetcher implements Callable<PrefetchOutcome> {
 		}
 	}
 	
-	private PrefetchI broker;
-	
-	private WellRegistryDAO wellDAO;
-	private CacheMetaDataDAO cacheDAO;
-	
-	private PrefetchOutcome outcome = PrefetchOutcome.UNSTARTED;
-
 	public int getFetchLimit() {
 		return fetchLimit;
 	}
@@ -183,6 +186,7 @@ public class Prefetcher implements Callable<PrefetchOutcome> {
 					}
 					tried++;
 				} else {
+					recordSkip(well, "Flag");
 					logger.info("Skipping well {} type {} due to flag", well.well.getMySiteid(), well.type);
 				}
 			} finally {
@@ -459,12 +463,33 @@ public class Prefetcher implements Callable<PrefetchOutcome> {
 				if ( ! tooRecent(well, horizon)) {
 					pq.add(well);
 				} else {
+					// record skip in fetch log
+					recordSkip(well,"Too recent");
 					logger.info("Skipped {} as too recent", well);
 				}
 			}
 		}
 		
 		return pq;
+	}
+	
+	FetchLog recordSkip(WellStatus well, String reason) {
+		FetchLog item = new FetchLog();
+		item.setWell(well.well);
+		WellDataType wdt = well.type.aliasFor;
+		item.setDataStream(wdt.toString());
+		item.setSpecifier(well.toString());
+		
+		item.setElapsedSec(0.0);
+		item.setStartedAt(new Date());
+		item.setCt(0L);
+		item.setFetcher(PrefetchI.class.getSimpleName());
+		item.setSource(reason);
+		item.setStatus(PipeStatistics.Status.SKIP.as4Char());
+		
+		fetchLogDAO.insertId(item);
+		
+		return item;
 	}
 	
 	private Iterable<WellStatus> populateWellQeueForAgency(String agency_cd) {
@@ -505,6 +530,7 @@ public class Prefetcher implements Callable<PrefetchOutcome> {
 				if ( ! tooRecent(well, horizon)) {
 					pq.add(well);
 				} else {
+					recordSkip(well,"Too recent");
 					logger.info("Skipped {} as fetched too recently", well);
 				}
 			}
@@ -579,5 +605,12 @@ public class Prefetcher implements Callable<PrefetchOutcome> {
 			c.setFetchPriority(100);
 		}
 		
+	}
+	
+	public FetchLogDAO getFetchLogDAO() {
+		return fetchLogDAO;
+	}
+	public void setFetchLogDAO(FetchLogDAO dao) {
+		this.fetchLogDAO = dao;
 	}
 }

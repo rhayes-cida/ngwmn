@@ -3,8 +3,11 @@ package gov.usgs.ngwmn.dm.prefetch;
 import gov.usgs.ngwmn.dm.cache.Cleaner;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 import java.util.concurrent.Callable;
 import java.util.concurrent.Future;
 
@@ -59,40 +62,57 @@ public class PrefetchController {
 	/**
 	 * Start the prefetch job immediately, without any scheduling.
 	 */
-	public void start() {
+	public synchronized void start() {
 		logger.info("Starting");
 		
 		cleanCache();
 		MDC.put("prefetch", "single");
+		final Map<?,?> mdc = MDC.getCopyOfContextMap();
+		
+		Callable<PrefetchOutcome> task = new Callable<PrefetchOutcome>() {
 
-		Runnable task = new Runnable() {
-			
 			@Override
-			public void run() {
-				prefetcher.allowRun();
-				prefetcher.call();
+			public PrefetchOutcome call() throws Exception {
+				MDC.setContextMap(mdc);
+				try {
+					Prefetcher pf = makePrefetcher();
+					if (mbeanExporter != null) {
+						mbeanExporter.registerManagedResource(pf,new ObjectName("ngwmn.prefetcher", "agency", "all"));
+					}
+					return pf.call();
+				} catch (Exception e) {
+					logger.error("Problem making prefetcher", e);
+					throw e;
+				} finally {
+					MDC.clear();
+				}
 			}
 		};
 		
-		// TODO clean out scheduled jobs?
-		// Would be best to remove all previously scheduled jobs, but that's not easy to do from here.
-		// ThreadPoolExecutor has some useful methods, if the Executor used by the scheduler is in
-		// fact that kind of executor.
-		
-		// This will fail if the scheduler is not enabled;
-		// because enabling the scheduler can have far-reaching effects,
-		// leave that decision to the user.
-		sked.execute(task);
+		multithreadOutcomes.put("all",sked.submit(task));
+
 	}
 	
-	private List<Future<PrefetchOutcome>> multithreadOutcomes = new ArrayList<Future<PrefetchOutcome>>();
+	// agency name is key, or "all" for all agencies
+	private Map<String,Future<PrefetchOutcome>> multithreadOutcomes = 
+			Collections.synchronizedMap(
+					new TreeMap<String,Future<PrefetchOutcome>>());
 	
 	private Prefetcher makePrefetcher() {
+		logger.trace("Context is {}", ctx);
 		return ctx.getBean("PrefetchInstance", Prefetcher.class);
 	}
 	
-	public synchronized List<Future<PrefetchOutcome>>  startInParallel() {
+	public synchronized Map<String, Future<PrefetchOutcome>>  startInParallel() {
 		logger.info("Start in parallel");
+		
+		if ( ! multithreadOutcomes.isEmpty()) {
+			if ( ! checkOutcomes()) {
+				logger.warn("Previous run not finished; I'll wait, thanks");
+				return multithreadOutcomes;
+			}
+		}
+		
 		List<String> agencies = prefetcher.agencyCodes();
 		
 		cleanCache();
@@ -113,7 +133,10 @@ public class PrefetchController {
 						if (mbeanExporter != null) {
 							mbeanExporter.registerManagedResource(pf,new ObjectName("ngwmn.prefetcher", "agency", agency));
 						}
-						return pf.callForAgency(agency);	
+						return pf.callForAgency(agency);
+					} catch (Exception e) {
+						logger.error("Problem running prefetcher for " + agency, e);
+						throw e;
 					} finally {
 						MDC.clear();
 					}
@@ -121,17 +144,44 @@ public class PrefetchController {
 				
 			};
 			
-			multithreadOutcomes.add(sked.submit(task));
+			multithreadOutcomes.put(agency,sked.submit(task));
 		}
 		
 		logger.info("Launched {} tasks", multithreadOutcomes.size());
 		if (logger.isDebugEnabled()) {
-			for (Future<PrefetchOutcome> f : multithreadOutcomes) {
-				logger.debug("future {} done: {}",f, f.isDone());
-			}
+			checkOutcomes();
 		}
 		
 		return multithreadOutcomes;
+	}
+
+	/**
+	 * 
+	 * @return true if all previous tasks are done
+	 */
+	public boolean checkOutcomes() {
+		boolean allDone = true;
+		// Have to get a bit fancy to avoid problems with modifying the map while iterating over it
+		Iterator<Map.Entry<String,Future<PrefetchOutcome>>> it = multithreadOutcomes.entrySet().iterator();
+		while (it.hasNext()) {
+			Map.Entry<String,Future<PrefetchOutcome>> me = it.next();
+			Future<PrefetchOutcome> f = me.getValue();
+			String agency = me.getKey();
+			boolean done = f.isDone();
+			logger.info("future {} for {} done: {}", new Object[] {f, agency, done});
+			if (done) {
+				try {
+					PrefetchOutcome outcome = f.get();
+					logger.info("outcome for {}: {}", agency, outcome);
+				} catch (Exception x) {
+					logger.warn("got exception instead of outcome for " + agency, x);
+				}
+				it.remove();
+			} else {
+				allDone = false;
+			}
+		}
+		return allDone;
 	}
 	
 	// runs periodically.

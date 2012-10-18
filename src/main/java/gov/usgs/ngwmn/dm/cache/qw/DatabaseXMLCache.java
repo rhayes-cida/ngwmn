@@ -289,7 +289,7 @@ public class DatabaseXMLCache implements Cache {
 			s.setString(2, site);
 			
 			int ct = s.executeUpdate();
-			logger.info("Unpublished {} for {}", ct, agency+":"+site);
+			logger.info("withdrew {} for {}", ct, agency+":"+site);
 			
 		} finally {
 			conn.close();

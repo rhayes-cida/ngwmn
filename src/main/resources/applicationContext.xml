@@ -20,8 +20,9 @@
 	-->
 	
 	<context:property-placeholder location="file:${HOME}/ngwmn.properties" ignore-resource-not-found="true" />
-		
+	<context:annotation-config/>
 	
+	<import resource="prefetchContext.xml"/>
 	
 	<!-- Note that the property reference ${gw_data_portal_pw} looks for a JNDI name java:comp/env/gw_data_portal_pw by default,
 		 it can be supplied in the above properties file instead if you wish.
@@ -239,8 +240,6 @@
 	<bean id="WellLogInspector"  class="gov.usgs.ngwmn.dm.cache.qw.WellLogInspector">
 		<property name="dataSource" ref="dataSource"/>
 	</bean>
-	
-	<import resource="prefetchContext.xml"/>
 	
 	<bean id="gwdp" class="java.lang.String">
 		<constructor-arg value="${ngwmn_cocoon}/gin/gwdp"></constructor-arg>

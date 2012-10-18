@@ -2,7 +2,10 @@ package gov.usgs.ngwmn.dm.prefetch;
 
 import static org.junit.Assert.*;
 
+import java.util.Collection;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.Future;
 
 import gov.usgs.ngwmn.dm.dao.ContextualTest;
@@ -62,40 +65,28 @@ public class PrefetchControllerIntegrationTest extends ContextualTest {
 
 	@Test
 	public void testMulti() {
-		List<Future<PrefetchOutcome>> started = victim.startInParallel();
+		Map<String, Future<PrefetchOutcome>> started = victim.startInParallel();
+		
 		assertNotNull(started);
-		for (Future<PrefetchOutcome> oc : started) {
-			try {
-				System.out.printf("Done, %s\n", oc.get());
-			}
-			catch (Exception e) {
-				e.printStackTrace();
-			}
+		
+		Collection<Future<PrefetchOutcome>> futures = null;
+		synchronized (started) {
+			futures = started.values();
 		}
-		// poll for all fetches to finish
-		while (true) {
+		
+		// poll for all fetches to finish			
+		while ( ! victim.checkOutcomes()) {
 			System.out.println("Trolling for tasks to finish");
-			int finct = 0;
-			int unfinct = 0;
-			for (Future<PrefetchOutcome> oc : started) {
-				if (oc.isDone()) {
-					finct++;
-				} else {
-					unfinct++;
-				}
-			}
-			System.out.printf("Trolling, finct=%d unfinct=%d\n", finct, unfinct);
-			if (unfinct == 0) {
-				break;
-			}
 			// give them a chance to get something done
 			try {
 				Thread.sleep(1000);
 			} catch (InterruptedException e) {
 				break;
-			}
+			}				
 		}
-		for (Future<PrefetchOutcome> oc : started) {
+		System.out.printf("Trolling done\n");
+		
+		for (Future<PrefetchOutcome> oc : futures) {
 			oc.cancel(true);
 			assertTrue("cancelled or finished one", oc.isDone());
 		}

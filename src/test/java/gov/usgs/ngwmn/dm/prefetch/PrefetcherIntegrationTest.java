@@ -10,6 +10,9 @@ import gov.usgs.ngwmn.WellDataType;
 import gov.usgs.ngwmn.dm.PrefetchI;
 import gov.usgs.ngwmn.dm.dao.CacheMetaData;
 import gov.usgs.ngwmn.dm.dao.ContextualTest;
+import gov.usgs.ngwmn.dm.dao.FetchLog;
+import gov.usgs.ngwmn.dm.dao.WellRegistry;
+import gov.usgs.ngwmn.dm.dao.WellRegistryDAO;
 import gov.usgs.ngwmn.dm.prefetch.Prefetcher.WellStatus;
 import gov.usgs.ngwmn.dm.spec.Specifier;
 
@@ -164,5 +167,35 @@ public class PrefetcherIntegrationTest extends ContextualTest {
 		assertEquals("first time is oldest", pastTime, ows1.cacheInfo.getMostRecentAttemptDt().getTime());
 		assertEquals("second time is now", now, ows2.cacheInfo.getMostRecentAttemptDt().getTime());
 		assertEquals("thirst timne is now", now, ows3.cacheInfo.getMostRecentAttemptDt().getTime());
+	}
+	
+	@Test
+	public void testRecordSkip() {
+		WellStatus well = new WellStatus();
+		well.type = WellDataType.LOG;
+		
+		// get a well
+		WellRegistryDAO wrDAO = ctx.getBean(WellRegistryDAO.class);
+		WellRegistry wr = wrDAO.findByKey("USGS", "007");
+		well.well = wr;
+		
+		well.cacheInfo = new CacheMetaData();
+		
+		FetchLog record = victim.recordSkip(well, "Test");
+		assertNotNull("fetch log item", record);
+		assertTrue("fetch log id", record.getFetchlogId() > 0);
+	}
+	
+	@Test
+	public void testMultipleInstantiation() {
+		Prefetcher p1 = ctx.getBean("PrefetchInstance", Prefetcher.class);
+		Prefetcher p2 = ctx.getBean("PrefetchInstance", Prefetcher.class);
+		
+		assertNotNull("p1", p1);
+		assertNotNull("p2", p2);
+		
+		assertFalse("two instances are the same", p1==p2);
+		assertFalse("p1 same as global", p1 == victim);
+		assertFalse("p2 same as global", p2 == victim);
 	}
 }

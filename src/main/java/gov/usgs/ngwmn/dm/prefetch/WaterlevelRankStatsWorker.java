@@ -258,6 +258,7 @@ public class WaterlevelRankStatsWorker {
 			logger.trace("backing off ct = {}", backoff);
 			return -2;
 		}
+		resetBackoff();
 				
 		if (logger.isDebugEnabled()) {
 			int count = count();
@@ -333,10 +334,29 @@ public class WaterlevelRankStatsWorker {
 			return id;
 		} else {
 			// nothing to do. Stall for a while.
-			backoff = 10;
+			backoff = nextBackoff();
 			logger.info("Nothing to do, will skip {} tries", backoff);
 			return -1;
 		}
+	}
+	
+	private static final int MIN_BACKOFF = 10;
+	private static final int MAX_BACKOFF = 100;
+	private int currentBackoff = MIN_BACKOFF;
+	
+	private int nextBackoff() {
+		currentBackoff *= 2;
+		if (currentBackoff > MAX_BACKOFF) {
+			currentBackoff = MAX_BACKOFF;
+		} else if (currentBackoff < MIN_BACKOFF) {
+			// safety check
+			currentBackoff = MIN_BACKOFF;
+		}
+		return currentBackoff;
+	}
+	
+	private void resetBackoff() {
+		currentBackoff = MIN_BACKOFF;
 	}
 
 	public Integer findOneSample() {

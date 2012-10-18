@@ -12,12 +12,14 @@
     ">
     
 	<context:property-placeholder ignore-unresolvable="true"/>
+	<context:annotation-config/>
 		
 	<bean id="Prefetcher" class="gov.usgs.ngwmn.dm.prefetch.Prefetcher" >
 		<property name="fetchLimit" value="${ngwmn_prefetch_count_limit:400}"/>
 		<property name="timeLimit" 	value="${ngwmn_prefetch_ms_limit:18000000}"/>
 		<property name="wellDAO" 	ref="WellRegistryDAO"/>
 		<property name="cacheDAO" 	ref="CacheMetaDataDAO"/>
+		<property name="fetchLogDAO" ref="FetchLogDAO"/>
 		<property name="broker" 	ref="DataBroker"/>
 		<property name="threadCount" value="-1"/>
 	</bean>
@@ -27,8 +29,9 @@
     <task:scheduled-tasks scheduler="scheduler">
     														<!--  second minute hour day month weekday -->
 <!--     	<task:scheduled ref="Prefetcher" method="call" cron="0 21 ${ngwmn_prefetch_start_hour:22} * * ?"/> -->
-    	<task:scheduled ref="PrefetchController" method="startInParallel" cron="0 40 ${ngwmn_prefetch_start_hour:22} * * ?"/>
-    	<task:scheduled ref="PrefetchController" method="gatherWaterlevelRankStats" fixed-delay="120000"/>
+<!--     	<task:scheduled ref="PrefetchController" method="startInParallel" cron="0 40 ${ngwmn_prefetch_start_hour:22} * * ?"/> -->
+    	<task:scheduled ref="PrefetchController" method="startInParallel" cron="0 */5 * * * ?"/>
+    	<task:scheduled ref="PrefetchController" method="gatherWaterlevelRankStats" fixed-delay="300000"/>
     </task:scheduled-tasks>
     
     <task:scheduler id="scheduler" pool-size="12"/>

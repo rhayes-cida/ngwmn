@@ -23,7 +23,8 @@ public class PipeStatistics {
 		STARTED(false),
 		FAIL(true),
 		DONE(true),
-		EMPY(true);
+		EMPY(true),
+		SKIP(true);
 	
 		private boolean done;
 		private boolean isDone() {

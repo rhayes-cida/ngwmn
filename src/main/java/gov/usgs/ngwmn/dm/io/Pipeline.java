@@ -94,7 +94,8 @@ public class Pipeline implements Flow {
 					Object oss_source = oss.getSource();
 					// ByteArrayOutputStream has an unfortunate implementation of toString....
 					if (oss_source instanceof ByteArrayOutputStream) {
-						oss_source = oss_source.getClass().toString();
+						int len = ((ByteArrayOutputStream)oss_source).size();
+						oss_source = oss_source.getClass().toString() + "[" + len + "]";
 					}
 					logger.debug("done with invoke, oss={}, oss.source={}", oss, oss_source);
 				}
