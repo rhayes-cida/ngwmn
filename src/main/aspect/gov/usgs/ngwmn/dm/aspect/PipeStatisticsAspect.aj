@@ -110,7 +110,7 @@ public aspect PipeStatisticsAspect {
 	
 	after(Pipeline p) throwing (Exception e) : invoke(p) {
 		logger.trace("ASPECT: Enter after publish:exception");
-		// recordFail(p, e);
+		recordFail(p, e);
 		logger.trace("ASPECT: Exit  after publish:exception");
 	}
 
@@ -140,7 +140,9 @@ public aspect PipeStatisticsAspect {
 		
 	after(Pipeline p) throwing (Exception e) : copyInvoke(p) {
 		logger.trace("ASPECT: Enter after copy invoke exception");
-		recordFail(p, e);
+		// TODO Why does this not get called?
+		// Replaced by invocation in after pipleline invoke.
+		// recordFail(p, e);
 		logger.trace("ASPECT: Exit  after copy invoke exception");
 	}
 	

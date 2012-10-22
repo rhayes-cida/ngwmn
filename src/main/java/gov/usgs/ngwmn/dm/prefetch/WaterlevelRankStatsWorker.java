@@ -7,6 +7,7 @@ import javax.sql.DataSource;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.TypeMismatchException;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
@@ -95,6 +96,9 @@ public class WaterlevelRankStatsWorker {
 	    	return value;
 	    } catch (EmptyResultDataAccessException ERDAE) {
 	    	logger.warn("No good data for {}", cacheId);
+	    	return null;
+	    } catch (TypeMismatchException tme) {
+	    	logger.warn("Type mismatch for " + cacheId, tme);
 	    	return null;
 	    }
 	}

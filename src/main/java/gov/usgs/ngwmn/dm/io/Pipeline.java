@@ -7,6 +7,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.concurrent.ExecutionException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -102,7 +103,7 @@ public class Pipeline implements Flow {
 				threw = false;
 			} catch (IOException ioe) {
 				setException(ioe);
-				logger.warn("Fail message={}", ioe.getMessage());
+				logger.warn("invoke Fail message={}", ioe.getMessage());
 				throw ioe;
 			} finally {
 				if (oss != null && oss.isInitialized()) {
@@ -111,6 +112,7 @@ public class Pipeline implements Flow {
 			}
 		// TODO maybe a catch here too?!
 		} finally {
+			logger.debug("finally in Pipeline.invoke, threw={}, exception={}", threw, getException());
 			if (iss != null && iss.isInitialized()) {
 				iss.end(threw);
 			}
