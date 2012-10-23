@@ -42,8 +42,8 @@ public class PrefetchConfigurationTest {
 		ApplicationContext ctx = new ClassPathXmlApplicationContext("applicationContextTest.xml");
 		
 		Prefetcher pef = ctx.getBean("Prefetcher", Prefetcher.class);
-		assertEquals("count", 400, pef.getFetchLimit());
-		assertEquals("time", 18000000L, pef.getTimeLimit().longValue());
+		assertEquals("count", 410, pef.getFetchLimit());
+		assertEquals("time", 600000L, pef.getTimeLimit().longValue());
 		
 		Object sked = ctx.getBean("scheduler");
 		assertNotNull("scheduler", sked);
