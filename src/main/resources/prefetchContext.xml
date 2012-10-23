@@ -11,7 +11,7 @@
 		http://www.springframework.org/schema/task 		http://www.springframework.org/schema/task/spring-task-3.1.xsd
     ">
     
-	<context:property-placeholder ignore-unresolvable="true"/>
+	<context:property-placeholder  ignore-unresolvable="true"/>
 	<context:annotation-config/>
 		
 	<bean id="Prefetcher" class="gov.usgs.ngwmn.dm.prefetch.Prefetcher" >
@@ -30,7 +30,7 @@
     <task:scheduled-tasks scheduler="scheduler">
     														<!--  second minute hour day month weekday -->
 <!--     	<task:scheduled ref="Prefetcher" method="call" cron="0 21 ${ngwmn_prefetch_start_hour:22} * * ?"/> -->
-    	<task:scheduled ref="PrefetchController" method="startInParallel" cron="0 13,43 * * * ?"/>
+    	<task:scheduled ref="PrefetchController" method="startInParallel" cron="0 23,53 * * * ?"/>
 <!--     	<task:scheduled ref="PrefetchController" method="startInParallel" cron="0 40 ${ngwmn_prefetch_start_hour:22} * * ?"/> -->
     	<task:scheduled ref="PrefetchController" method="gatherWaterlevelRankStats" fixed-delay="120000"/>
     </task:scheduled-tasks>
