@@ -6,16 +6,23 @@ import java.util.Date;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
+import org.springframework.test.context.ContextConfiguration;
 
 import com.ibm.icu.text.SimpleDateFormat;
 
 import gov.usgs.ngwmn.admin.stats.JitTree;
 import gov.usgs.ngwmn.dm.dao.ContextualTest;
 
+@ContextConfiguration({"classpath:applicationContextTest.xml","file:src/main/webapp/WEB-INF/SpringMVC-servlet.xml"})
 public class JITDataControllerIntegrationTest extends ContextualTest {
 
 	private JITDataController victim;
 	
+	@Autowired
+	protected ApplicationContext ctx;
+
 	@Before
 	public void setup() {
 		victim = ctx.getBean(JITDataController.class);
