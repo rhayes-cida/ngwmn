@@ -364,18 +364,21 @@ public class Prefetcher implements Callable<PrefetchOutcome> {
 		
 	};
 	
+	// Null dates default to the beginning of time
+	public static Date ensureDate(Date d) {
+		if (d == null) {
+			return new Date(0);
+		}
+		return d;
+	}
+	
 	private static Comparator<WellStatus> simpleWellCompare = new Comparator<WellStatus>() {
 
 		protected final transient Logger logger = LoggerFactory.getLogger(getClass());
 
 		private int compareDates(Date d1, Date d2) {
-			// Null dates default to the beginning of time
-			if (d1 == null) {
-				d1 = new Date(0);
-			}
-			if (d2 == null) {
-				d2 = new Date(0);
-			}
+			d1 = ensureDate(d1);
+			d2 = ensureDate(d2);
 			
 			return d1.compareTo(d2);
 		}
@@ -399,7 +402,7 @@ public class Prefetcher implements Callable<PrefetchOutcome> {
 					}
 				} catch (NullPointerException npe) {
 					// bail out, this is hopefully a test artifact
-					logger.warn("npe in comparator");
+					logger.warn("npe in comparator",npe);
 				}
 			}
 			
@@ -414,7 +417,7 @@ public class Prefetcher implements Callable<PrefetchOutcome> {
 				}
 			} catch (NullPointerException npe) {
 				// bail out, this is hopefully a test artifact
-				logger.warn("npe2 in comparator");				
+				logger.warn("npe2 in comparator",npe);				
 			}
 			
 			if (v == 0) {
@@ -492,7 +495,7 @@ public class Prefetcher implements Callable<PrefetchOutcome> {
 		return item;
 	}
 	
-	private Iterable<WellStatus> populateWellQeueForAgency(String agency_cd) {
+	public Iterable<WellStatus> populateWellQeueForAgency(String agency_cd) {
 		List<WellRegistry> allWells = wellDAO.selectByAgency(agency_cd);
 		
 		logger.debug("populating well queue with list of {} wells for agency {}", allWells.size(), agency_cd);
@@ -509,10 +512,15 @@ public class Prefetcher implements Callable<PrefetchOutcome> {
 		Date horizon = new Date(System.currentTimeMillis() - 2*HOUR);
 
 		List<CacheMetaData> cmd = cacheDAO.listByAgencyCd(agency_cd);
+		logger.info("Found {} CMD entries for {}", cmd.size(), agency_cd);
 		
 		Map<CacheMetaDataKey,CacheMetaData> mdMap = new HashMap<CacheMetaDataKey, CacheMetaData>(cmd.size());
 		for (CacheMetaData c : cmd) {
-			mdMap.put(c, c);
+			CacheMetaDataKey ck = c;
+			mdMap.put(ck, c);
+		}
+		if (cmd.size() < allWells.size()) {
+			logger.warn("Missing CMD for some wells for agency {}", agency_cd);
 		}
 		
 		for (WellRegistry wr : allWells) {
@@ -526,6 +534,12 @@ public class Prefetcher implements Callable<PrefetchOutcome> {
 				ck.setSiteNo(wr.getSiteNo());
 				ck.setDataType(dt.name());
 				well.cacheInfo = mdMap.get(ck);
+				
+				if (well.cacheInfo == null) {
+					logger.info("Missing CMD for {}", well);
+				} else {
+					logger.info("CMD last attempt for {} is {}", well, well.cacheInfo.getMostRecentAttemptDt());
+				}
 			
 				if ( ! tooRecent(well, horizon)) {
 					pq.add(well);

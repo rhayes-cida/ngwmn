@@ -91,7 +91,7 @@ public class CacheMetaDataKey {
 			return true;
 		if (obj == null)
 			return false;
-		if (getClass() != obj.getClass())
+		if ( ! (obj instanceof CacheMetaDataKey))
 			return false;
 		CacheMetaDataKey other = (CacheMetaDataKey) obj;
 		if (agencyCd == null) {

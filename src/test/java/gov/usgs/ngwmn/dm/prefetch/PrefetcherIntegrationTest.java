@@ -9,6 +9,7 @@ import java.util.PriorityQueue;
 import gov.usgs.ngwmn.WellDataType;
 import gov.usgs.ngwmn.dm.PrefetchI;
 import gov.usgs.ngwmn.dm.dao.CacheMetaData;
+import gov.usgs.ngwmn.dm.dao.CacheMetaDataKey;
 import gov.usgs.ngwmn.dm.dao.ContextualTest;
 import gov.usgs.ngwmn.dm.dao.FetchLog;
 import gov.usgs.ngwmn.dm.dao.WellRegistry;
@@ -17,7 +18,6 @@ import gov.usgs.ngwmn.dm.prefetch.Prefetcher.WellStatus;
 import gov.usgs.ngwmn.dm.spec.Specifier;
 
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 
 public class PrefetcherIntegrationTest extends ContextualTest {
@@ -132,21 +132,37 @@ public class PrefetcherIntegrationTest extends ContextualTest {
 		
 		final long now = System.currentTimeMillis();
 		final long pastTime = now - 2134;
+		WellRegistry wrMock = new WellRegistry() {
+
+			@Override
+			public String getAgencyCd() {
+				return "NOTANAGENCY";
+			}
+
+			@Override
+			public String getSiteNo() {
+				return "NOTASITE";
+			}
+			
+		};
 		
 		Prefetcher.WellStatus ws1 = new Prefetcher.WellStatus();
 		ws1.cacheInfo = new CacheMetaData();
 		ws1.type = WellDataType.CONSTRUCTION;
 		ws1.cacheInfo.setMostRecentAttemptDt(new Date(pastTime));
+		ws1.well = wrMock;
 		
 		Prefetcher.WellStatus ws2 = new Prefetcher.WellStatus();
 		ws2.cacheInfo = new CacheMetaData();
 		ws2.type = WellDataType.LITHOLOGY;
 		ws2.cacheInfo.setMostRecentAttemptDt(new Date(now));
+		ws2.well = wrMock;
 		
 		Prefetcher.WellStatus ws3 = new Prefetcher.WellStatus();
 		ws3.cacheInfo = new CacheMetaData();
-		ws3.cacheInfo.setMostRecentAttemptDt(new Date(now));
 		ws3.type = WellDataType.LOG;
+		ws3.cacheInfo.setMostRecentAttemptDt(new Date(now));
+		ws3.well = wrMock;
 
 		PriorityQueue<WellStatus> pq = new PriorityQueue<Prefetcher.WellStatus>(4,comp);
 		pq.add(ws1);
@@ -163,11 +179,85 @@ public class PrefetcherIntegrationTest extends ContextualTest {
 		assertNotNull(ows2);
 		assertNotNull(ows3);
 		assertNull(ows4);
+		assertNotSame(ows1, ows2);
+		assertNotSame(ows2, ows3);
 		
 		assertEquals("first time is oldest", pastTime, ows1.cacheInfo.getMostRecentAttemptDt().getTime());
 		assertEquals("second time is now", now, ows2.cacheInfo.getMostRecentAttemptDt().getTime());
 		assertEquals("thirst timne is now", now, ows3.cacheInfo.getMostRecentAttemptDt().getTime());
 	}
+	
+	@Test
+	public void testQueue_IL_EPA() {
+		String agency_cd = "IL EPA";
+		tryQueue(agency_cd);
+	}
+	
+	private Date getRecentest(CacheMetaData cmd) {
+		Date attempt = null;
+		if (cmd != null) {
+			attempt = cmd.getMostRecentAttemptDt();
+		}
+		return Prefetcher.ensureDate(attempt);
+	}
+	
+	@Test
+	public void testQueue_TWDB() {
+		String agency_cd = "TWDB";
+		tryQueue(agency_cd);
+	}
+
+	public void tryQueue(String agency_cd) {
+		Iterable<WellStatus> q = victim.populateWellQeueForAgency(agency_cd);
+		
+		// check that fetch items are in oldest-first order
+		WellStatus prev = null;
+		int pos = 0;
+		for (WellStatus cur : q) {
+			if (prev != null) {
+				Date dp = getRecentest(prev.cacheInfo);
+				Date dn = getRecentest(cur.cacheInfo);
+				if (dp.after(dn)) {
+					System.err.printf("trouble, %s after %s for wells %s, %s at position %d\n", dp, dn, prev, cur, pos);
+				}
+				assertFalse("wells not ordered by longest ago attempt order", 
+						dp.after(dn));
+			}
+			prev = cur;
+			pos++;
+		}
+	}
+	
+	@Test
+	public void testCMDMethods() {
+		CacheMetaData cmd1 = new CacheMetaData();
+		cmd1.setAgencyCd("Agency");
+		cmd1.setSiteNo("sight");
+		cmd1.setDataType("DT");
+		
+		CacheMetaData cmd2 = new CacheMetaData();
+		cmd2.setAgencyCd("Agency");
+		cmd2.setSiteNo("sight");
+		cmd2.setDataType("DT");
+		
+		assertEquals("hash code", cmd1.hashCode(), cmd2.hashCode());
+		assertTrue("equals", cmd1.equals(cmd2));
+		assertNotSame(cmd1,cmd2);
+		
+		CacheMetaDataKey cmd1k = cmd1;
+		CacheMetaDataKey cmd2k = cmd2;
+		
+		assertEquals("hash code", cmd1k.hashCode(), cmd2k.hashCode());
+		assertTrue("equals", cmd1k.equals(cmd2k));
+		assertNotSame(cmd1,cmd2);
+		
+		cmd2.setSiteNo("blind");
+		assertFalse("hash code", cmd1.hashCode() == cmd2.hashCode());
+		assertFalse("equals", cmd1.equals(cmd2));
+		assertNotSame(cmd1,cmd2);
+		
+	}
+	
 	
 	@Test
 	public void testRecordSkip() {

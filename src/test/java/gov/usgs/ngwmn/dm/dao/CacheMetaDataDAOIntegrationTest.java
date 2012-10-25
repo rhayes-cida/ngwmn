@@ -43,10 +43,12 @@ public class CacheMetaDataDAOIntegrationTest extends ContextualTest {
 
 	@Test
 	public void testSelectByAgency() {
-		List<CacheMetaData> dd = dao.listByAgencyCd("USGS");
+		String agencyCd = "USGS";
+		List<CacheMetaData> dd = dao.listByAgencyCd(agencyCd);
+		System.out.printf("Found %d well for %s\n", dd.size(), agencyCd);
 		assertFalse("empty", dd.isEmpty());
 		for (CacheMetaData md : dd) {
-			assertEquals("agency", "USGS", md.getAgencyCd());
+			assertEquals("agency", agencyCd, md.getAgencyCd());
 		}
 	}
 	
