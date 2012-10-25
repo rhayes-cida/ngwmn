@@ -396,6 +396,20 @@ public class Prefetcher implements Callable<PrefetchOutcome> {
 					if (v == 0) {
 						v = compareDates(c1.getMostRecentAttemptDt(), c2.getMostRecentAttemptDt());
 					}
+					if (c1.getMostRecentAttemptDt() != null && c2.getMostRecentAttemptDt() != null) {
+						if (v < 0) {
+							assert c1.getMostRecentAttemptDt().before(c2.getMostRecentAttemptDt());
+						}
+						if (v == 0) {
+							long ms1 = c1.getMostRecentAttemptDt().getTime();
+							long ms2 = c2.getMostRecentAttemptDt().getTime();
+							assert ms1 == ms2;
+							assert c1.getMostRecentAttemptDt().equals(c2.getMostRecentAttemptDt());
+						}
+						if (v > 0) {
+							assert c1.getMostRecentAttemptDt().after(c2.getMostRecentAttemptDt());
+						}
+					}
 					if (v == 0) {
 						// sense reversed, well with more recent data gets re-fetched
 						v = compareDates(c2.getLastDataDt(), c1.getLastDataDt());
