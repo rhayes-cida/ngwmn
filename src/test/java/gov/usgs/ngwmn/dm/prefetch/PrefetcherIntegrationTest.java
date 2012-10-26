@@ -172,6 +172,7 @@ public class PrefetcherIntegrationTest extends ContextualTest {
 		Prefetcher.WellStatus ows1 = pq.poll();
 		Prefetcher.WellStatus ows2 = pq.poll();
 		Prefetcher.WellStatus ows3 = pq.poll();
+		assertTrue("isEmpty", pq.isEmpty());
 		Prefetcher.WellStatus ows4 = pq.poll();
 		
 		assertNotNull(ows1);
@@ -208,20 +209,21 @@ public class PrefetcherIntegrationTest extends ContextualTest {
 	}
 
 	public void tryQueue(String agency_cd) {
-		Iterable<WellStatus> q = victim.populateWellQeueForAgency(agency_cd);
+		PriorityQueue<WellStatus> q = victim.populateWellQeueForAgency(agency_cd);
 		
 		// check that fetch items are in oldest-first order
 		WellStatus prev = null;
 		int pos = 0;
-		for (WellStatus cur : q) {
+		while ( ! q.isEmpty()) {
+			WellStatus cur = q.remove();
 			if (prev != null) {
-				Date dp = getRecentest(prev.cacheInfo);
-				Date dn = getRecentest(cur.cacheInfo);
-				if (dp.after(dn)) {
-					System.err.printf("trouble, %s after %s for wells %s, %s at position %d\n", dp, dn, prev, cur, pos);
+				Date dprev = getRecentest(prev.cacheInfo);
+				Date dcur = getRecentest(cur.cacheInfo);
+				if (dprev.after(dcur)) {
+					System.err.printf("trouble, prev %s after cur %s for wells %s, %s at position %d\n", dprev, dcur, prev, cur, pos);
 				}
 				assertFalse("wells not ordered by longest ago attempt order", 
-						dp.after(dn));
+						dprev.after(dcur));
 			}
 			prev = cur;
 			pos++;

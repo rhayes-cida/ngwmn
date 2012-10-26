@@ -20,6 +20,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.PriorityQueue;
+import java.util.Queue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
@@ -92,7 +93,7 @@ public class Prefetcher implements Callable<PrefetchOutcome> {
 		
 		outcome = PrefetchOutcome.RUNNING;
 		
-		Iterable<WellStatus> wellQueue = populateWellQeue();
+		PriorityQueue<WellStatus> wellQueue = populateWellQeue();
 		
 		return performPrefetch(wellQueue);
 	}
@@ -106,7 +107,7 @@ public class Prefetcher implements Callable<PrefetchOutcome> {
 		outcome = PrefetchOutcome.RUNNING;
 		
 		logger.debug("calling for agency {}", agency_cd);
-		Iterable<WellStatus> wellQueue = populateWellQeueForAgency(agency_cd);
+		Queue<WellStatus> wellQueue = populateWellQeueForAgency(agency_cd);
 		
 		return performPrefetch(wellQueue);
 	}
@@ -127,7 +128,7 @@ public class Prefetcher implements Callable<PrefetchOutcome> {
 		return v;
 	}
 	
-	private PrefetchOutcome performPrefetch(Iterable<WellStatus> wellQueue) 
+	private PrefetchOutcome performPrefetch(Queue<WellStatus> wellQueue) 
 			throws RuntimeException 
 	{
 		
@@ -149,7 +150,8 @@ public class Prefetcher implements Callable<PrefetchOutcome> {
 				new Object[] {getSize(wellQueue), timeLimit, fetchLimit, (endTime == null)? null: new Date(endTime)});
 		}
 		
-		for (WellStatus well : wellQueue) {
+		while ( ! wellQueue.isEmpty()) {
+			WellStatus well = wellQueue.remove();
 			MDC.put("well", well.toString());
 			try {
 
@@ -396,20 +398,6 @@ public class Prefetcher implements Callable<PrefetchOutcome> {
 					if (v == 0) {
 						v = compareDates(c1.getMostRecentAttemptDt(), c2.getMostRecentAttemptDt());
 					}
-					if (c1.getMostRecentAttemptDt() != null && c2.getMostRecentAttemptDt() != null) {
-						if (v < 0) {
-							assert c1.getMostRecentAttemptDt().before(c2.getMostRecentAttemptDt());
-						}
-						if (v == 0) {
-							long ms1 = c1.getMostRecentAttemptDt().getTime();
-							long ms2 = c2.getMostRecentAttemptDt().getTime();
-							assert ms1 == ms2;
-							assert c1.getMostRecentAttemptDt().equals(c2.getMostRecentAttemptDt());
-						}
-						if (v > 0) {
-							assert c1.getMostRecentAttemptDt().after(c2.getMostRecentAttemptDt());
-						}
-					}
 					if (v == 0) {
 						// sense reversed, well with more recent data gets re-fetched
 						v = compareDates(c2.getLastDataDt(), c1.getLastDataDt());
@@ -418,6 +406,10 @@ public class Prefetcher implements Callable<PrefetchOutcome> {
 					// bail out, this is hopefully a test artifact
 					logger.warn("npe in comparator",npe);
 				}
+			} else if (c1 == null && c2 != null && v == 0) {
+				v = -1;
+			} else if (c1 != null && c2 == null && v == 0) {
+				v = 1;
 			}
 			
 			try {
@@ -443,7 +435,7 @@ public class Prefetcher implements Callable<PrefetchOutcome> {
 		
 	};
 
-	private Iterable<WellStatus> populateWellQeue() {
+	private PriorityQueue<WellStatus> populateWellQeue() {
 		List<WellRegistry> allWells = wellDAO.selectAll();
 		PriorityQueue<WellStatus> pq = new PriorityQueue<WellStatus>(allWells.size(), wellCompare);
 		
@@ -509,7 +501,7 @@ public class Prefetcher implements Callable<PrefetchOutcome> {
 		return item;
 	}
 	
-	public Iterable<WellStatus> populateWellQeueForAgency(String agency_cd) {
+	public PriorityQueue<WellStatus> populateWellQeueForAgency(String agency_cd) {
 		List<WellRegistry> allWells = wellDAO.selectByAgency(agency_cd);
 		
 		logger.debug("populating well queue with list of {} wells for agency {}", allWells.size(), agency_cd);
@@ -537,6 +529,7 @@ public class Prefetcher implements Callable<PrefetchOutcome> {
 			logger.warn("Missing CMD for some wells for agency {}", agency_cd);
 		}
 		
+		int skipCt = 0;
 		for (WellRegistry wr : allWells) {
 			for (WellDataType dt : fetchTypes) {
 				WellStatus well = new WellStatus();
@@ -559,11 +552,12 @@ public class Prefetcher implements Callable<PrefetchOutcome> {
 					pq.add(well);
 				} else {
 					recordSkip(well,"Too recent");
+					skipCt++;
 					logger.info("Skipped {} as fetched too recently", well);
 				}
 			}
 		}
-		logger.info("Found {} data streams to fetch for agency {}", pq.size(), agency_cd);
+		logger.info("Found {} data streams to fetch for agency {} with {} skips", new Object[] {pq.size(), agency_cd, skipCt});
 		
 		return pq;
 	}
