@@ -27,10 +27,10 @@ public class FetchStatsAgencyGeneratorTest extends ContextualTest {
 		DataTable dt = victim.generateDataTable(null, null);
 		
 		assertTrue(dt.containsColumn("FETCH_DATE"));
-		assertTrue(dt.containsColumn("SUCCESS"));
+		assertTrue(dt.containsColumn("DONE"));
 		assertTrue(dt.containsColumn("EMPTY"));
 		assertTrue(dt.containsColumn("FAIL"));
-		assertTrue(dt.containsColumn("ATTEMPTS"));
+		assertTrue(dt.containsColumn("SKIP"));
 		
 		int nr = dt.getNumberOfRows();
 		assertTrue("some rows", nr > 0);
@@ -50,10 +50,10 @@ public class FetchStatsAgencyGeneratorTest extends ContextualTest {
 		DataTable dt = victim.generateDataTable(null, null);
 		
 		assertTrue(dt.containsColumn("FETCH_DATE"));
-		assertTrue(dt.containsColumn("SUCCESS"));
+		assertTrue(dt.containsColumn("DONE"));
 		assertTrue(dt.containsColumn("EMPTY"));
 		assertTrue(dt.containsColumn("FAIL"));
-		assertTrue(dt.containsColumn("ATTEMPTS"));
+		assertTrue(dt.containsColumn("SKIP"));
 		
 		int nr = dt.getNumberOfRows();
 		assertTrue("some rows", nr > 0);
@@ -73,10 +73,10 @@ public class FetchStatsAgencyGeneratorTest extends ContextualTest {
 		DataTable dt = victim.generateDataTable(null, null);
 		
 		assertTrue(dt.containsColumn("FETCH_DATE"));
-		assertTrue(dt.containsColumn("SUCCESS"));
+		assertTrue(dt.containsColumn("DONE"));
 		assertTrue(dt.containsColumn("EMPTY"));
 		assertTrue(dt.containsColumn("FAIL"));
-		assertTrue(dt.containsColumn("ATTEMPTS"));
+		assertTrue(dt.containsColumn("SKIP"));
 		
 		int nr = dt.getNumberOfRows();
 		assertTrue("no rows", nr == 0);

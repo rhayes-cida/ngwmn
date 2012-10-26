@@ -4,6 +4,7 @@ import gov.usgs.ngwmn.WellDataType;
 
 import java.sql.SQLException;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
 
 import javax.sql.DataSource;
@@ -24,83 +25,58 @@ public class FetchStatsDAO {
 		type = t;
 	}
 	
-	String timeSeriesQuery = 
-			"select "+
-
-			"trunc(fl.started_at) fetch_date, "+
-							
-			"(select count(*) from GW_DATA_PORTAL.%1$s_CACHE_STATS cs1 "+
-											 "where trunc(cs1.fetch_date) = trunc(fl.started_at) "+
-											 "and cs1.published = 'Y') success, "+
-							
-			"(select count(*) from GW_DATA_PORTAL.%1$s_CACHE_STATS cs2 "+
-											 "where trunc(cs2.fetch_date) = trunc(fl.started_at) "+
-											 "and cs2.published = 'N') \"EMPTY\", "+
-											 
-			"count(distinct fail_log.fetchlog_id) fail, "+
-
-			"count(*) attempts "+
-
-			"from "+
-			"(select * from GW_DATA_PORTAL.fetch_log "+
-			 "where fetch_log.data_stream = '%1$s' "+
-			 "and (fetcher = 'WebRetriever' or fetcher = 'PrefetchI') ) fl "+
-			 
-			 "left join GW_DATA_PORTAL.fetch_log fail_log "+
-			 "on (fail_log.fetchlog_id = fl.fetchlog_id and fail_log.status = 'FAIL') "+
-			 
-			"group by trunc(fl.started_at) "+
-			"order by trunc(fl.started_at) asc";
+	String timeSeriesQuery = "select * " + 
+			"from ( " + 
+			"  select status, trunc(started_at) FETCH_DATE " + 
+			"  from gw_data_portal.fetch_log " + 
+			"  where started_at is not null " +
+			"  and fetch_log.data_stream = :stream " + 
+			"  and fetcher = 'PrefetchI' " + 
+			"  ) " + 
+			"pivot( " + 
+			"  count(*) " + 
+			"  for status " + 
+			"  in ('DONE' as \"DONE\",'FAIL' as \"FAIL\",'EMPY' \"EMPTY\", 'SKIP' \"SKIP\") " + 
+			"  ) " + 
+			"order by FETCH_DATE desc";
 
 	String timeSeriesAgencyQuery = 
-			"select "+
-
-			"trunc(fl.started_at) fetch_date, "+
-							
-			"(select count(*) from GW_DATA_PORTAL.%1$s_CACHE_STATS cs1 "+
-											 "where trunc(cs1.fetch_date) = trunc(fl.started_at) " +
-											 "and agency_cd = :agency "+
-											 "and cs1.published = 'Y') success, "+
-							
-			"(select count(*) from GW_DATA_PORTAL.%1$s_CACHE_STATS cs2 "+
-											 "where trunc(cs2.fetch_date) = trunc(fl.started_at) " +
-											 "and agency_cd = :agency "+
-											 "and cs2.published = 'N') \"EMPTY\", "+
-											 
-			"count(distinct fail_log.fetchlog_id) fail, "+
-
-			"count(*) attempts "+
-
-			"from "+
-			"(select * from GW_DATA_PORTAL.fetch_log "+
-			 "where fetch_log.data_stream = '%1$s' " +
-			 "and agency_cd = :agency "+
-			 "and (fetcher = 'WebRetriever' or fetcher = 'PrefetchI') ) fl "+
-			 
-			 "left join GW_DATA_PORTAL.fetch_log fail_log "+
-			 "on (fail_log.fetchlog_id = fl.fetchlog_id and fail_log.status = 'FAIL') "+
-			 
-			"group by trunc(fl.started_at) "+
-			"order by trunc(fl.started_at) asc";
+			"select * " + 
+					"from ( " + 
+					"  select status, trunc(started_at) FETCH_DATE " + 
+					"  from gw_data_portal.fetch_log " + 
+					"  where started_at is not null " +
+					"  and fetch_log.data_stream = :stream " + 
+					"  and agency_cd = :agency "+
+					"  and fetcher = 'PrefetchI' " + 
+					"  ) " + 
+					"pivot( " + 
+					"  count(*) " + 
+					"  for status " + 
+					"  in ('DONE' as \"DONE\",'FAIL' as \"FAIL\",'EMPY' \"EMPTY\", 'SKIP' \"SKIP\") " + 
+					"  ) " + 
+					"order by FETCH_DATE desc";
 
 	public <T> T timeSeriesAgencyData(String agency, ResultSetExtractor<T> rse)
 	throws SQLException
 	{
 		NamedParameterJdbcTemplate template = new NamedParameterJdbcTemplate(datasource);
 		
-		Map<String,String> params = Collections.singletonMap("agency", agency);
-		String query = String.format(timeSeriesAgencyQuery, type.name());
-		T value = template.query(query, params,  rse);
+		Map<String,String> params = new HashMap<String,String>(2);
+		params.put("agency", agency);
+		params.put("stream", type.name());
+		T value = template.query(timeSeriesAgencyQuery, params,  rse);
 		
 		return value;
 	}
 	
 	public <T> T timeSeriesData(ResultSetExtractor<T> rse) 
 	throws SQLException {
-		JdbcTemplate t = new JdbcTemplate(datasource);
+		NamedParameterJdbcTemplate t = new NamedParameterJdbcTemplate(datasource);
 		
-		String query = String.format(timeSeriesQuery, type.name());
-		T value = t.query(query, rse);
+		Map<String,String> params = Collections.singletonMap("stream", type.name());
+
+		T value = t.query(timeSeriesQuery, params, rse);
 		
 		return value;
 		
