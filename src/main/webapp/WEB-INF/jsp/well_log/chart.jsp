@@ -70,7 +70,12 @@
     	    visualization.draw(data, options);
     	    
     	    var table = new google.visualization.Table(document.getElementById('stats_table'));
-            table.draw(data, {showRowNumber: false});
+            table.draw(data, {
+            	showRowNumber: false,
+            	sort: 'enable',
+            	sortColumn: 0,
+            	sortAscending: false
+            });
             
     	    var dyChart = new Dygraph.GVizChart(
     	    		document.getElementById('dygraphs_chart'));

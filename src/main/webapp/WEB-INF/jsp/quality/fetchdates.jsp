@@ -40,7 +40,12 @@
     	    var data = response.getDataTable();
     	    
     	    var table = new google.visualization.Table(document.getElementById('stats_table'));
-            table.draw(data, {showRowNumber: false});
+            table.draw(data, {
+            	showRowNumber: false,
+            	sort: 'enable',
+            	sortColumn: 2,
+            	sortAscending: false
+            });
             
     	  }
             

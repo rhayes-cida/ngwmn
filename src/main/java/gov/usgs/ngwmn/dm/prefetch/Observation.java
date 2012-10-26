@@ -6,7 +6,7 @@ public class Observation {
 	private int cacheId;
 	private int month;
 	private Date dt;
-	private double depth;
+	private Double depth;
 	
 	public int getCacheId() {
 		return cacheId;
@@ -26,10 +26,10 @@ public class Observation {
 	public void setDt(Date dt) {
 		this.dt = dt;
 	}
-	public double getDepth() {
+	public Double getDepth() {
 		return depth;
 	}
-	public void setDepth(double depth) {
+	public void setDepth(Double depth) {
 		this.depth = depth;
 	}
 	@Override
