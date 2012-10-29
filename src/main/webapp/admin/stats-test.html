@@ -18,9 +18,9 @@
       google.setOnLoadCallback(doQueries);
 
       function doQueries() {
-    	  // doQuery('quality');
+    	  doQuery('quality');
     	  // doQuery('well_log');
-    	  doQuery('waterlevel');
+    	  // doQuery('waterlevel');
       }
       
       function doQuery(t) {
@@ -43,13 +43,13 @@
     	    }
 
     	    var data = response.getDataTable();
-    	    var chart_id = 'chart_'+t;
+    	    var chart_id = 'chart';
     	    var chart_div = document.getElementById(chart_id);
     	    chart_div.innerHTML = '';
     	    // that draws plot into area  width = 960, height = 200,
     	    plotFetchOutcomes(data,chart_id);
     	    
-    	    var stats_div = document.getElementById('waterlevel_stats_table');
+    	    var stats_div = document.getElementById('stats_table');
     	    var table = new google.visualization.Table(stats_div);
     	    
             table.draw(data, {
@@ -71,16 +71,16 @@
 <textarea rows="20" cols="80" id="query">
 select toDate(FETCH_DATE), count(PUBLISHED) 
        group by toDate(FETCH_DATE) 
-       pivot AGENCY_CD
+       pivot STATUS
        label toDate(FETCH_DATE) "fetch date"
 </textarea>
 <button type="button"  onclick="doQueries(); return false;">Q</button>
 </form>
-<h1 id='streamgraph'>Publication counts</h1>
+<h1>Publication counts</h1>
 <h2>Water Level</h2>
-<div id="waterlevel_stats_table">
+<div id="stats_table">
 </div>
-<div class='gallery' id='chart_waterlevel'>
+<div class='gallery' id='chart'>
 <img src="/ngwmn/images/whirl.png" id='waterlevel_filler' alt="Chart goes here" height="200" width="960"/>
 </div>
 

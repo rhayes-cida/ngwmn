@@ -70,10 +70,7 @@ vis.selectAll("path")
     .enter().append("path")
     .style("fill", 
     		function(d,i) { 
-    			// alert("d[i] is " + d[i]);
-    			// alert("d.label is ", d.label);
-    			// alert("d[i].label is ", d[i].label);
-    			return clr(knownValues[i]);
+    			return clr(dataTable.getColumnLabel(i+1));
     		})
     .attr("d", area);
 
