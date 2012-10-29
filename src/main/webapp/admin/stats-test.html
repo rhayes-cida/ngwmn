@@ -12,14 +12,14 @@
     <script type="text/javascript">
     
       // Load the Visualization API.
-      google.load('visualization', '1.0');
+      google.load('visualization', '1.0', {'packages':['corechart','table']});
 
       // Set a callback to run when the Google Visualization API is loaded.
       google.setOnLoadCallback(doQueries);
 
       function doQueries() {
-    	  doQuery('quality');
-    	  doQuery('well_log');
+    	  // doQuery('quality');
+    	  // doQuery('well_log');
     	  doQuery('waterlevel');
       }
       
@@ -28,11 +28,9 @@
     			  "/ngwmn/stats/"+t+"/stats"
     			  );
     	  
-    	  query.setQuery(
-    			  'select toDate(FETCH_DATE), count(PUBLISHED) ' +
-    			  'group by toDate(FETCH_DATE) '+
-    			  'pivot STATUS ' +
-    			  'label toDate(FETCH_DATE) "fetch date"');
+    	  var qt = document.getElementById('query');
+    	  var q = qt.value;
+    	  query.setQuery(q);
     	  
     	  query.send(function(resp) {handleQueryResponse(resp,t);});
     	  
@@ -45,14 +43,22 @@
     	    }
 
     	    var data = response.getDataTable();
-    	    
     	    var chart_id = 'chart_'+t;
     	    var chart_div = document.getElementById(chart_id);
     	    chart_div.innerHTML = '';
     	    // that draws plot into area  width = 960, height = 200,
     	    plotFetchOutcomes(data,chart_id);
+    	    
+    	    var stats_div = document.getElementById('waterlevel_stats_table');
+    	    var table = new google.visualization.Table(stats_div);
+    	    
+            table.draw(data, {
+            	showRowNumber: false,
+            	sort: 'enable',
+            	sortColumn: 0,
+            	sortAscending: false
+            });
     	  }
-            
       </script>
       
     
@@ -61,17 +67,20 @@
     <div class="body">
       <div class="content">
 
-<h1 id='streamgraph'>Fetch outcomes</h1>
-<h2>Quality</h2>
-<div class='gallery' id='chart_quality'>
-<img src="/ngwmn/images/whirl.png" id='waterlevel_filler' alt="Chart goes here" height="200" width="960"/>
-</div>
+<form >
+<textarea rows="20" cols="80" id="query">
+select toDate(FETCH_DATE), count(PUBLISHED) 
+       group by toDate(FETCH_DATE) 
+       pivot AGENCY_CD
+       label toDate(FETCH_DATE) "fetch date"
+</textarea>
+<button type="button"  onclick="doQueries(); return false;">Q</button>
+</form>
+<h1 id='streamgraph'>Publication counts</h1>
 <h2>Water Level</h2>
-<div class='gallery' id='chart_waterlevel'>
-<img src="/ngwmn/images/whirl.png" id='waterlevel_filler' alt="Chart goes here" height="200" width="960"/>
+<div id="waterlevel_stats_table">
 </div>
-<h2>Well Log</h2>
-<div class='gallery' id='chart_well_log'>
+<div class='gallery' id='chart_waterlevel'>
 <img src="/ngwmn/images/whirl.png" id='waterlevel_filler' alt="Chart goes here" height="200" width="960"/>
 </div>
 

@@ -13,7 +13,7 @@ function dt2xy(dt) {
 	for (j = 1; j < dt.getNumberOfColumns(); j++) {
 		var vv = [];
 		for (i = 0; i < dt.getNumberOfRows(); i++) {
-			var tuple = {x: xx[i], y: (dt.getValue(i,j) || 0), row: i, column: j, v:  (dt.getValue(i,j) || 0)};
+			var tuple = {x: xx[i], y: (dt.getValue(i,j) || 0), row: i, column: j, v:  (dt.getValue(i,j) || 0), label: dt.getColumnLabel(j)};
 			vv[i] = tuple;
 		}
 		dataT.push(vv);
@@ -26,11 +26,12 @@ function plotFetchOutcomes(dataTable,id) {
 	
 var dataT = dt2xy(dataTable);
 
-var layout = d3.layout.stack().order('inside-out').offset("wiggle")(dataT);
+// var layout = d3.layout.stack().order('inside-out').offset("wiggle")(dataT);
+var layout = d3.layout.stack()(dataT);
 
 var n = dataTable.getNumberOfColumns()-1,
 	m = dataTable.getNumberOfRows(),
-    color = d3.interpolateRgb("#aad", "#556");
+    color = d3.interpolateRgb("#ff0000", "#0000ff");
 
 var width = 960,
     height = 200,
@@ -61,10 +62,19 @@ var vis = d3.select("#"+id)
     .attr("width", width)
     .attr("height", height);
 
+var knownValues = ['DONE','EMPY','FAIL','null','SKIP'];
+var clr = d3.scale.category10().domain(knownValues);
+
 vis.selectAll("path")
     .data(layout)
     .enter().append("path")
-    .style("fill", function() { return color(Math.random()); })
+    .style("fill", 
+    		function(d,i) { 
+    			// alert("d[i] is " + d[i]);
+    			// alert("d.label is ", d.label);
+    			// alert("d[i].label is ", d[i].label);
+    			return clr(knownValues[i]);
+    		})
     .attr("d", area);
 
 vis.selectAll("path")
