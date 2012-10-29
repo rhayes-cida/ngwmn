@@ -27,6 +27,8 @@ public class PrefetchRestServlet extends HttpServlet {
 	}
 
 	@SuppressWarnings("unchecked") // this is for getParameterNames cast into generics
+	// @edu.umd.cs.findbugs.annotations.SuppressWarnings(value="SF_SWITCH_FALLTHROUGH", 
+    // justification="Variation on Duff's Device")
 	@Override
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) 
 			throws ServletException, IOException 
