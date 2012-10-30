@@ -42,7 +42,7 @@ public class WaterQualityInspector implements Inspector {
 				return false;
 			} catch (java.sql.SQLDataException sqde) {
 				logger.warn("data exception, assuming no quality data for quality cache key {}", cachekey);
-				logger.warn("Problem", ix);
+				logger.warn("Problem", sqde);
 				return false;
 			}
 			logger.debug("finished update for {}, got {}", cachekey, did);
