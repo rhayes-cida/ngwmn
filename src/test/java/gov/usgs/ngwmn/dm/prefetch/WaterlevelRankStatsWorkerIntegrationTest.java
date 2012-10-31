@@ -105,6 +105,18 @@ public class WaterlevelRankStatsWorkerIntegrationTest extends ContextualTest {
 		assertNotNull("max date", total.getMax_date());
 	}
 	
+	@Test
+	public void testPCodeUpdate() {
+		Integer id = victim.findOneSample();
+		if (id == null) {
+			System.out.printf("Nothing in database to test, sorry");
+			return;
+		}
+		
+		victim.updatePCodeStats(id);
+		System.out.println("pcode ok for " + id);
+	}
+	
 	@Test(timeout=300000)
 	public void testUpdateOne() {
 		int id = victim.updateOne();

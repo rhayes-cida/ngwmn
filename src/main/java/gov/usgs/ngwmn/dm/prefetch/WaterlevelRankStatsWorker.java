@@ -335,6 +335,9 @@ public class WaterlevelRankStatsWorker {
 					totalParameters);
 			logger.debug("updated total stats for {} to {}", total.getWaterlevel_cache_id(), total);
 
+			updatePCodeStats(id);
+			logger.info("Updated pcode stats for {}", id);
+			
 			return id;
 		} else {
 			// nothing to do. Stall for a while.
@@ -405,6 +408,47 @@ public class WaterlevelRankStatsWorker {
 		final int count = template.queryForInt(countq);
 		
 		return count;
+	}
+	
+	public void updatePCodeStats(Integer id) {
+		String clean = 
+				"delete from gw_data_portal.waterlevel_pcode_stats" + 
+				"    where waterlevel_cache_id = :cacheId ";
+		String insert = 
+				"insert into gw_data_portal.waterlevel_pcode_stats(" + 
+				"	  waterlevel_cache_id," + 
+				"	  pcode," + 
+				"	  direction," + 
+				"     ct" + 
+				"    ) " + 
+				"	select " + 
+				"	  waterlevel_cache_id," + 
+				"	  pcode," + 
+				"	  direction," + 
+				"     count(*) ct" + 
+				"	from " + 
+				"		gw_data_portal.waterlevel_cache qc," + 
+				"		XMLTable(" + 
+				"		XMLNAMESPACES( " + 
+				"          'https://github.com/USGS-CIDA/ngwmn/sos' AS \"gwdp\")," + 
+				"		'for $r in //gwdp:nwis " + 
+				"		 return $r" + 
+				"		'" + 
+				"		  " + 
+				"		passing qc.xml" + 
+				"		columns " + 
+				"		\"PCODE\" varchar2(5) path 'data(@pcode)'," + 
+				"		\"DIRECTION\" varchar2(8) path 'data(@direction)'" + 
+				"		) xq" + 
+				"   where qc.waterlevel_cache_id = :cacheId " + 
+				"	group by waterlevel_cache_id,pcode, direction ";
+		
+	    Map<String, ?> parameters = Collections.singletonMap("cacheId", id);
+
+		int cleanCt = jdbcTemplate.update(clean, parameters);
+		int insCt = jdbcTemplate.update(insert, parameters);
+
+		logger.info("Updated pcode counts, cleaned {}, inserted {}", cleanCt, insCt);
 	}
 	
 	public void setDataSource(DataSource ds) {
