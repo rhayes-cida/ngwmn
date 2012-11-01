@@ -14,6 +14,7 @@ import gov.usgs.ngwmn.dm.spec.Specifier;
 
 import java.io.InterruptedIOException;
 import java.lang.reflect.Method;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
@@ -250,7 +251,7 @@ public class Prefetcher implements Callable<PrefetchOutcome> {
 			public Long call() throws Exception {
 				logger.info("in dispatch0 for {}", spec);
 				try {
-					MDC.setContextMap(mdc);
+					MDC.setContextMap((mdc == null) ? Collections.emptyMap() : mdc);
 					try {
 						long count = 
 								broker.prefetchWellData(spec);

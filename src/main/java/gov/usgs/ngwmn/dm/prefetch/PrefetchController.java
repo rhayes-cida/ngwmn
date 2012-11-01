@@ -73,7 +73,7 @@ public class PrefetchController {
 
 			@Override
 			public PrefetchOutcome call() throws Exception {
-				MDC.setContextMap(mdc);
+				MDC.setContextMap((mdc == null) ? Collections.emptyMap() : mdc);
 				try {
 					Prefetcher pf = makePrefetcher();
 					if (mbeanExporter != null) {
@@ -127,7 +127,7 @@ public class PrefetchController {
 
 				@Override
 				public PrefetchOutcome call() throws Exception {
-					MDC.setContextMap(mdc);
+					MDC.setContextMap((mdc == null) ? Collections.emptyMap() : mdc);
 					try {
 						Prefetcher pf = makePrefetcher();
 						if (mbeanExporter != null) {

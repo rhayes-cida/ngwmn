@@ -64,6 +64,12 @@ public class DataManagerServlet extends HttpServlet {
 			throws ServletException, IOException 
 	{
 		try {
+			int bufsize = resp.getBufferSize();
+			if (bufsize < 12*1024) {
+				resp.setBufferSize(12*1024);
+				logger.warn("bumped buffer size from {} to {}", bufsize, resp.getBufferSize());
+			}
+			
 			Specification spect = makeSpecification(req);
 			Supplier<OutputStream> outs = new HttpResponseSupplier(spect, resp);
 					

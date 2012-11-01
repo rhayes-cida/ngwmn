@@ -10,6 +10,7 @@ import java.io.OutputStream;
 import java.io.PipedInputStream;
 import java.io.PipedOutputStream;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -76,7 +77,8 @@ public abstract class OutputStreamTransform extends FilterOutputStream {
 			public Long call() throws Exception {
 	    		long count=0;
 	    		try {
-	    			MDC.setContextMap(mdc);
+					MDC.setContextMap((mdc == null) ? Collections.emptyMap() : mdc);
+	    			
 	    			logger.trace("InputStream parser init started id-{} {}", id, OutputStreamTransform.this);
 	    			parser.setInputStream(pin);
 	    			logger.trace("InputStream parser init finished {}", this);
@@ -109,7 +111,7 @@ public abstract class OutputStreamTransform extends FilterOutputStream {
 
 	@Override
     public void write(byte[] b, int off, int len) throws IOException {
-		logger.trace( new String(b) );
+		logger.trace("write bytes len {}", len );
     	pout.write(b, off, len);
     	processRow();
     }

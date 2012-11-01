@@ -31,6 +31,8 @@ public class CsvOutputStream extends OutputStreamTransform {
 		}
 		rowText.append('\n');
 		
+		logger.trace("formatted row {}", rowText.toString());
+
 		return rowText.toString();
 	}
 	
