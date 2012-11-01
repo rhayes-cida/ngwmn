@@ -11,13 +11,18 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public class ParallelFlowAggregator implements Flow {
 	FlowFactory 		   factory;
 	Iterable<Specifier>    specifiers;
 	Supplier<OutputStream> output;
 	
 	int parallex = 1;
-    
+	
+	private static final Logger logger = LoggerFactory.getLogger(ParallelFlowAggregator.class);
+
     public ParallelFlowAggregator(FlowFactory fac, Iterable<Specifier> specs, OutputStream out) {
     	factory    = fac;
     	specifiers = specs;
@@ -40,7 +45,11 @@ public class ParallelFlowAggregator implements Flow {
         List<Future<Void>> futures = exec.invokeAll(execs);
         
         for (Future<Void> future : futures) {
-			future.get(); // Since our current impl is Callable<Void> this just waits for finish
+        	try {
+        		future.get(); // Since our current impl is Callable<Void> this just waits for finish
+        	} catch (Exception e) {
+        		logger.warn("Problem getting future", e);
+        	}
         }
         return null;
     }

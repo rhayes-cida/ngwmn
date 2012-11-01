@@ -20,6 +20,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 
 import org.slf4j.Logger;
@@ -145,7 +146,7 @@ public abstract class OutputStreamTransform extends FilterOutputStream {
 
 	private void writeRow(List<Element> headers) throws IOException {
 		String rowText = formatRow(headers, null); // TODO add method without the row data formatHeaders
-		logger.trace("writeRow headers: {}", rowText);
+		logger.trace("writeRow headers: {}", rowText.toString());
 		out.write( rowText.toString().getBytes() );
 	}
 
@@ -158,6 +159,12 @@ public abstract class OutputStreamTransform extends FilterOutputStream {
 
     	while ( ! rows.isEmpty() || ! parserResult.isDone() ) {
     		processRow();
+    	}
+    	try {
+    		long ct = parserResult.get(100, TimeUnit.MILLISECONDS);
+    		logger.debug("done with rows, ct={}", ct);
+    	} catch (Exception e) {
+    		logger.warn("Problem encountered in OutputStreamTransform.finish", e);
     	}
 		
 		logger.trace("finished processing cached rows");
