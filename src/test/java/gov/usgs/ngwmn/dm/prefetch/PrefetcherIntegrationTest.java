@@ -5,6 +5,7 @@ import static org.junit.Assert.*;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.PriorityQueue;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import gov.usgs.ngwmn.WellDataType;
 import gov.usgs.ngwmn.dm.PrefetchI;
@@ -23,9 +24,9 @@ import org.junit.Test;
 public class PrefetcherIntegrationTest extends ContextualTest {
 
 	private Prefetcher victim;
-	private int ct = 0;
+	private AtomicInteger ct = new AtomicInteger(0);
 	private int delay = 0;
-		
+	
 	@Before
 	public void setup() {
 		victim = ctx.getBean("Prefetcher", Prefetcher.class);
@@ -33,7 +34,7 @@ public class PrefetcherIntegrationTest extends ContextualTest {
 			
 			@Override
 			public long prefetchWellData(Specifier spec) throws Exception {
-				ct++;
+				ct.incrementAndGet();
 				if (delay > 0) {
 					Thread.sleep(delay);
 				}
@@ -49,25 +50,27 @@ public class PrefetcherIntegrationTest extends ContextualTest {
 	
 	@Test
 	public void test_count() {
-		ct = 0;
+		ct.set(0);
 		delay = 0;
 		victim.setTimeLimit(null);
 		victim.setFetchLimit(10);
 		PrefetchOutcome outcome = 
 				victim.call();
-		assertTrue("tried lots", ct > 9);
+		System.err.printf("Tried this many: %d\n", ct.get());
+		assertTrue("tried lots", ct.get() > 9);
 		assertEquals(PrefetchOutcome.LIMIT_COUNT, outcome);
 	}
 	
 	@Test
 	public void test_time() {
-		ct = 0;
+		ct.set(0);
 		delay = 10;
 		victim.setTimeLimit(100L);
 		victim.setFetchLimit(1000000);
 		PrefetchOutcome outcome =
 				victim.call();
-		assertTrue("tried a few", ct < 20);
+		System.err.printf("Tried this many: %d\n", ct.get());
+		assertTrue("tried a few", ct.get() < 20);
 		assertEquals(PrefetchOutcome.LIMIT_TIME, outcome);
 	}
 
