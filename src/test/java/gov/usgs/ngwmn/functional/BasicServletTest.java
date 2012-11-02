@@ -28,9 +28,10 @@ public class BasicServletTest extends ContextualTest {
 	private static final String WELL_LIST_CSV         = "http://localhost:8080/ngwmn/data?"+PARAM_ENCODING+"=CSV&"+PARAM_AGENCY+"=USGS&"+PARAM_FEATURE+"=402734087033401&"+PARAM_FEATURE+"=402431075020801&"+PARAM_TYPE+"="+WellDataType.WATERLEVEL+"&"+PARAM_TYPE+"="+WellDataType.LITHOLOGY+"&"+PARAM_TYPE+"="+WellDataType.CONSTRUCTION+"&"+PARAM_TYPE+"="+WellDataType.QUALITY;
 //	private static final String WELL_LIST_CSV         = "http://localhost:8080/ngwmn/data?"+PARAM_ENCODING+"=CSV&"+PARAM_FEATURE+"=USGS:402734087033401&"+PARAM_FEATURE+"=NJGS:2288614&"+PARAM_TYPE+"="+WellDataType.WATERLEVEL;
 	private static final String WELL_LIST_DATA        = "http://localhost:8080/ngwmn/data?"+PARAM_FEATURE+"=USGS:402734087033401&"+PARAM_FEATURE+"=NJGS:2288614&"+PARAM_TYPE+"="+WellDataType.WATERLEVEL;
+/* Not meaningful 
 	private static final String WELL_WITH_DATA        = "http://localhost:8080/ngwmn/data?"+PARAM_AGENCY+"=USGS&"+PARAM_FEATURE+"=402734087033401&"+PARAM_TYPE+"="+WellDataType.ALL; // TODO ALL asdf
 	private static final String WELL_NO_DATA          = "http://localhost:8080/ngwmn/data?"+PARAM_AGENCY+"=NJGS&"+PARAM_FEATURE+"=2288614&"+PARAM_TYPE+"="+WellDataType.ALL; // TODO ALL asdf
-
+*/
 	@BeforeClass
 	public static void clearCache() {
 		// TODO on windows this is not the final destination for the cache. it is relative to the working dir
@@ -214,7 +215,7 @@ public class BasicServletTest extends ContextualTest {
 	}
 	
 	
-	@Test
+/*	@Test
 	public void testWithData() throws Exception {
 		ServletRunner sr = new ServletRunner( getClass().getResourceAsStream("/servlet-test-web.xml"), "/ngwmn");
 		
@@ -232,8 +233,9 @@ public class BasicServletTest extends ContextualTest {
 		System.out.printf("testWithData contentLength=%d,size=%d\n", resp.getContentLength(), body.length());
 		assertTrue("response size", body.length() > 1000);
 	}
+*/
 
-	@Test
+/*	@Test
 	public void testWithNoData() throws Exception {
 		// this site exists, but has no data (on 2012/03/23)
 		ServletRunner sr = new ServletRunner( getClass().getResourceAsStream("/servlet-test-web.xml"), "/ngwmn");
@@ -254,7 +256,8 @@ public class BasicServletTest extends ContextualTest {
 		// TODO We would prefer to get an HTTP error code here.
 		assertTrue("response size small 100 > " +body.length(), body.length() > 100); // was 1000 but csv format is much smaller than the original test result
 	}
-
+*/
+	
 	@Test(expected=HttpNotFoundException.class)
 	public void testNonSite() throws Exception {
 		// this site does not exist, so we expect an Exception when fetching
@@ -281,17 +284,19 @@ public class BasicServletTest extends ContextualTest {
 	}
 */
 
-	// Now repeat the tests; we expect to get cached results
+/*	// Now repeat the tests; we expect to get cached results
 	@Test(timeout=5000) // TODO why is this sometime this slow on Windows
 	public void testWithData_fromCacheShouldBeFast() throws Exception {
 		testWithData();
 	}
+*/	
 	
-	@Test(timeout=5000) // TODO why is this sometime this slow on Windows
+/*	@Test(timeout=5000) // TODO why is this sometime this slow on Windows
 	public void testWithNoData_fromCacheShouldBeFast() throws Exception {
 		testWithNoData();
 	}
-
+*/
+	
 	@Test(expected=HttpNotFoundException.class,timeout=5000)
 	public void testNonSite_fromCacheShouldBeFast() throws Exception {
 		testNonSite();
