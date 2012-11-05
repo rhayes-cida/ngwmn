@@ -6,13 +6,24 @@ xmlns:swe="http://www.opengis.net/swe/2.0"
 <xsl:output omit-xml-declaration="yes" indent="no" method="text" />
 <xsl:strip-space elements="*"/> 
 
-	<xsl:template match="/">AgencyCd, SiteNo, Time, Code, Value, Comment
+	<xsl:template match="/">AgencyCd, SiteNo, Time, Unit, Value, Comment
 <xsl:apply-templates select="//wml2:TimeSeries//wml2:TimeValuePair"></xsl:apply-templates>
 
 	</xsl:template>
 	
 	<xsl:template match="wml2:TimeValuePair">
-		<xsl:value-of select="'Agency'"/>,<xsl:value-of select="'Site'"/>,<xsl:value-of select=".//wml2:time"/>,<xsl:value-of select=".//swe:value"/><xsl:text>
+		<xsl:value-of select="'Agency'"/>
+		<xsl:text>,</xsl:text>
+		<xsl:value-of select="'Site'"/>
+		<xsl:text>,</xsl:text>
+		<xsl:value-of select=".//wml2:time"/>
+		<xsl:text>,</xsl:text>
+		<xsl:value-of select=".//swe:uom/@code"/>
+		<xsl:text>,</xsl:text>
+		<xsl:value-of select=".//swe:value"/>
+		<xsl:text>,</xsl:text>
+		<xsl:value-of select=".//wml2:comment"/>
+		<xsl:text>
 </xsl:text>
 	</xsl:template>
 
