@@ -32,7 +32,7 @@ import com.google.common.io.NullOutputStream;
 
 public class WaterlevelDBCacheTest extends ContextualTest {
 
-	private static final int SIZE = 4102;
+	private static final int SIZE = 4917;
 	private static final WellDataType TYPE = WellDataType.WATERLEVEL;
 	private static final String SITE = "402734087033401";
 	private static final String AGENCY = "USGS";
