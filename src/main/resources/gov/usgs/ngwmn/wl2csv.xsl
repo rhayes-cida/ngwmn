@@ -11,6 +11,7 @@
 	<xsl:template match="/">
 		<xsl:param name="agency" select="'Agency'" />
 		<xsl:param name="site" select="'Site'" />
+		<xsl:param name="elevation" />
 
 		<xsl:text>AgencyCd, SiteNo, Time, Parameter Code, Direction, Unit, Value, Mediated Value, Observation Method</xsl:text>
 		<xsl:text>&#xa;</xsl:text>
@@ -18,6 +19,7 @@
 		<xsl:apply-templates select="//wml2:TimeSeries//wml2:TimeValuePair">
 			<xsl:with-param name="agency" select="$agency" />
 			<xsl:with-param name="site" select="$site" />
+			<xsl:with-param name="elevation" select="$elevation"/>
 		</xsl:apply-templates>
 
 	</xsl:template>
@@ -25,6 +27,7 @@
 	<xsl:template match="wml2:TimeValuePair">
 		<xsl:param name="agency" />
 		<xsl:param name="site" />
+		<xsl:param name="elevation"/>
 
 		<xsl:value-of select="$agency" />
 		<xsl:text>,</xsl:text>
@@ -40,7 +43,7 @@
 		<xsl:text>,</xsl:text>
 		<xsl:value-of select=".//swe:value" />
 		<xsl:text>,</xsl:text>
-		<xsl:value-of select="mediator:mediate(number(.//swe:value),$agency,$site,string(.//gwdp:nwis/@direction))" />
+		<xsl:value-of select="mediator:mediate(number(.//swe:value),$elevation,string(.//gwdp:nwis/@direction))" />
 		<xsl:text>,</xsl:text>
 		<xsl:value-of select=".//wml2:comment" />
 		<xsl:text>&#xa;</xsl:text>
