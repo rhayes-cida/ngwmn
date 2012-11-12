@@ -117,7 +117,8 @@ public class WaterPortalPostParserFactory {
 					String[].class);
 	
 	public static final String[] WATERLEVEL_EXCLUSION_COLUMNS_NAME = new String[] {
-					"uom"};
+		"nwis",
+		"uom"};
 	
 	public static final String[] NO_EXCLUSION_COLUMNS = new String[] {};
 
@@ -133,7 +134,7 @@ public class WaterPortalPostParserFactory {
 		exclusions.put(LITHOLOGY,		LITHOLOGY_EXCLUSION_COLUMNS_NAME);
 		exclusions.put(CONSTRUCTION,	CONSTRUCTION_EXCLUSION_COLUMNS_NAME);
 		exclusions.put(WATERLEVEL,		WATERLEVEL_EXCLUSION_COLUMNS_NAME);
-		exclusions.put(REGISTRY, REGISTRY_EXCLUSION_COLUMNS_NAME);
+		exclusions.put(REGISTRY, 		REGISTRY_EXCLUSION_COLUMNS_NAME);
 		
 		
 		renameColumns = new HashMap<WellDataType, Map<String,String>>();
@@ -159,10 +160,11 @@ public class WaterPortalPostParserFactory {
 		renameColumns.put(LOG, logRenames);
 		
 		HashMap<String, String> levelRenames = new HashMap<String, String>();
-		levelRenames.put("time", "DateTime");
-		levelRenames.put("code", "Unit");
-		levelRenames.put("value", "Value");
-		levelRenames.put("comment", "ObservationMethod");
+		levelRenames.put("Time", "DateTime");
+		levelRenames.put("Code", "Unit");
+		levelRenames.put("Value", "Value");
+		levelRenames.put("Comment", "Observation Method");
+		levelRenames.put("Pcode", "Parameter Code");
 		renameColumns.put(WATERLEVEL, levelRenames);
 		
 		HashMap<String, String> qualityRenames = new HashMap<String, String>();
