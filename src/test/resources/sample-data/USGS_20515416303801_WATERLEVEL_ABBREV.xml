@@ -82,6 +82,22 @@
 					</wml2:domainExtent>
 					<wml2:defaultDataType codeSpace="http://usgs.gov/water/">InstVal
 					</wml2:defaultDataType>
+					
+					<!--  fake element to test transform -->
+					<wml2:element>
+						<wml2:TimeValuePair>
+							<wml2:time>1983-08-06T00:00:00.000</wml2:time>
+							<wml2:value>
+								<swe:Quantity>
+									<gwdp:nwis pcode="72019" direction="down" />
+									<swe:uom code="feet" />
+									<swe:value>11.043</swe:value>
+								</swe:Quantity>
+							</wml2:value>
+							<wml2:comment>Wild Guess</wml2:comment>
+						</wml2:TimeValuePair>
+					</wml2:element>
+
 					<wml2:element>
 						<wml2:TimeValuePair>
 							<wml2:time>1983-08-05T00:00:00.000</wml2:time>
