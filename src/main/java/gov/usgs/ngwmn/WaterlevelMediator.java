@@ -3,11 +3,12 @@ package gov.usgs.ngwmn;
 public class WaterlevelMediator {
 
 	public static Double mediate(Double value, String offset, String direction) {
-		System.err.printf("mediate(%s,%s,%s)\n", value, offset, direction);
+		/ System.err.printf("mediate(%s,%s,%s)\n", value, offset, direction);
 		
 		double wl;
 		// TODO Accept number as string, to preserve input precision
 		// TODO Is offset applied exactly when direction == up?
+		// TODO Take units input as well?
 		
 		if ("up".equals(direction)) {
 			wl = - value;
