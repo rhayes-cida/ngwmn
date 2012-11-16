@@ -18,6 +18,7 @@ import javax.xml.transform.Templates;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.TransformerFactoryConfigurationError;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 
@@ -53,6 +54,16 @@ public class XSLFilterOutputStream extends FilterOutputStream {
 		executor = e;
 	}
 
+	public void settransform(Source xform) throws Exception {
+		xformResourceName = xform.toString();
+		templates = loadXSLT(xform);		
+	}
+	
+	public void setTransform(InputStream xformStream, String xformName) throws Exception {
+		xformResourceName = xformName;
+		templates = loadXSLT(xformStream,xformName);
+	}
+	
 	public void setTransform(String xformName) throws Exception {
 		xformResourceName = xformName;
 		templates = loadXSLT(xformName);
@@ -119,25 +130,45 @@ public class XSLFilterOutputStream extends FilterOutputStream {
 		logger.trace("finished XSL processing");
 	}
 
-    private Templates loadXSLT(String xsltFile) throws TransformerConfigurationException, IOException {
-    	InputStream xin = getClass().getResourceAsStream(xsltFile);
+    private Templates loadXSLT(String xsltResource) 
+    		throws TransformerConfigurationException, IOException 
+    {
+    	InputStream xin = getClass().getResourceAsStream(xsltResource);
     	try {
-	    	Source xslSource = new StreamSource(xin);
-	
-	    	TransformerFactory transFact = TransformerFactory.newInstance();
-	    	// Can get more details by implementing ErrorListener transFact.setErrorListener(listener);
-    		logger.debug("Transformer factory class is {}", transFact.getClass());
-	    	Templates templates = transFact.newTemplates(xslSource);
-	
-	    	return templates;
-    	} catch (TransformerConfigurationException tce) {
-    		logger.error("Problem loading templates from " + xsltFile, tce);
-    		logger.error("java.home is {}", System.getProperty("java.home", "unknown"));
-    		throw tce;
+    		return loadXSLT(xin, xsltResource);
     	} finally {
     		xin.close();
     	}
     }
+
+	private Templates loadXSLT(Source xslSource)
+			throws TransformerFactoryConfigurationError,
+			TransformerConfigurationException
+	{
+		try {
+
+			TransformerFactory transFact = TransformerFactory.newInstance();
+			// Can get more details by implementing ErrorListener transFact.setErrorListener(listener);
+			logger.debug("Transformer factory class is {}", transFact.getClass());
+			Templates templates = transFact.newTemplates(xslSource);
+
+			return templates;
+		} catch (TransformerConfigurationException tce) {
+			logger.error("Problem loading templates from " + xslSource.getSystemId(), tce);
+			logger.error("java.home is {}", System.getProperty("java.home", "unknown"));
+			throw tce;
+		}
+	}
+
+	private Templates loadXSLT(InputStream xin, String xslName)
+			throws TransformerFactoryConfigurationError,
+			TransformerConfigurationException {
+		Source xslSource = new StreamSource(xin);
+		if (null == xslSource.getSystemId()) {
+			xslSource.setSystemId(xslName);
+		}
+		return loadXSLT(xslSource);
+	}
 
 	@Override
     public void close() throws IOException {

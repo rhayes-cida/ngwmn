@@ -18,13 +18,19 @@ public class XSLFilterOutputStreamTest {
 		XSLFilterOutputStream victim = new XSLFilterOutputStream(bos);
 		
 		victim.setExecutor(Executors.newSingleThreadExecutor());
-		victim.setTransform("/gov/usgs/ngwmn/dm/io/transform/TestStyleSheet.xsl");
+		InputStream xin = getClass().getResourceAsStream("/gov/usgs/ngwmn/dm/io/transform/TestStyleSheet.xsl");
+		try {
+			victim.setTransform(xin, "/gov/usgs/ngwmn/dm/io/transform/TestStyleSheet.xsl");
 
-		InputStream tis = getClass().getResourceAsStream("TestInput.xml");
-		
-		copy(tis,victim);
-		
-		victim.close();
+			InputStream tis = getClass().getResourceAsStream("TestInput.xml");
+			
+			copy(tis,victim);
+			
+			victim.close();
+			
+		} finally {
+			xin.close();
+		}
 		
 		String result = bos.toString();
 		
