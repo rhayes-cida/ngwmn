@@ -125,9 +125,15 @@ public class XSLFilterOutputStream extends FilterOutputStream {
 	    	Source xslSource = new StreamSource(xin);
 	
 	    	TransformerFactory transFact = TransformerFactory.newInstance();
+	    	// Can get more details by implementing ErrorListener transFact.setErrorListener(listener);
+    		logger.debug("Transformer factory class is {}", transFact.getClass());
 	    	Templates templates = transFact.newTemplates(xslSource);
 	
 	    	return templates;
+    	} catch (TransformerConfigurationException tce) {
+    		logger.error("Problem loading templates from " + xsltFile, tce);
+    		logger.error("java.home is {}", System.getProperty("java.home", "unknown"));
+    		throw tce;
     	} finally {
     		xin.close();
     	}
