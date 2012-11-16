@@ -23,7 +23,7 @@ public class XSLFilterOutputStreamTest {
 		URL src = getClass().getResource(TEST_STYLE_SHEET_XSL);
 		
 		if (src == null) {
-			fail("Missing resource " + TEST_STYLE_SHEET_XSL);
+			throw new RuntimeException("Missing resource " + TEST_STYLE_SHEET_XSL);
 		}
 		
 		try {
@@ -38,7 +38,7 @@ public class XSLFilterOutputStreamTest {
 			}
 			System.out.printf("succeeded in reading %d bytes from %s\n", ct, TEST_STYLE_SHEET_XSL);
 		} catch (Exception e) {
-			fail("Problem reading transform: " + e);
+			throw new RuntimeException("Problem reading transform", e);
 		}
 	}
 	
