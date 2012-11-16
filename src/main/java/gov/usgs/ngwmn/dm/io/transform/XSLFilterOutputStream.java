@@ -54,7 +54,7 @@ public class XSLFilterOutputStream extends FilterOutputStream {
 		executor = e;
 	}
 
-	public void settransform(Source xform) throws Exception {
+	public void setTransform(Source xform) throws Exception {
 		xformResourceName = xform.toString();
 		templates = loadXSLT(xform);		
 	}
