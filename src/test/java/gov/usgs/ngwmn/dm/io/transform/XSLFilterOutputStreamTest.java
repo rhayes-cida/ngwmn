@@ -6,23 +6,51 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.URL;
 import java.util.concurrent.Executors;
 
 import javax.xml.transform.stream.StreamSource;
 
+import org.junit.Before;
 import org.junit.Test;
 
 public class XSLFilterOutputStreamTest {
 
+	private static final String TEST_STYLE_SHEET_XSL = "/gov/usgs/ngwmn/dm/io/transform/TestStyleSheet.xsl";
+
+	@Before
+	public void preflight() {
+		URL src = getClass().getResource(TEST_STYLE_SHEET_XSL);
+		
+		if (src == null) {
+			fail("Missing resource " + TEST_STYLE_SHEET_XSL);
+		}
+		
+		try {
+			InputStream srcIn = src.openStream();
+			int ct = 0;
+			while (true) {
+				int c = srcIn.read();
+				if (c < 0) {
+					break;
+				}
+				ct++;
+			}
+			System.out.printf("succeeded in reading %d bytes from %s\n", ct, TEST_STYLE_SHEET_XSL);
+		} catch (Exception e) {
+			fail("Problem reading transform: " + e);
+		}
+	}
+	
 	@Test
 	public void testWithXSLResource() throws Exception {
 		ByteArrayOutputStream bos = new ByteArrayOutputStream();
 		XSLFilterOutputStream victim = new XSLFilterOutputStream(bos);
 		
 		victim.setExecutor(Executors.newSingleThreadExecutor());
-		InputStream xin = getClass().getResourceAsStream("/gov/usgs/ngwmn/dm/io/transform/TestStyleSheet.xsl");
+		InputStream xin = getClass().getResourceAsStream(TEST_STYLE_SHEET_XSL);
 		try {
-			victim.setTransform(xin, "/gov/usgs/ngwmn/dm/io/transform/TestStyleSheet.xsl");
+			victim.setTransform(xin, TEST_STYLE_SHEET_XSL);
 
 			InputStream tis = getClass().getResourceAsStream("TestInput.xml");
 			
@@ -46,8 +74,8 @@ public class XSLFilterOutputStreamTest {
 		
 		victim.setExecutor(Executors.newSingleThreadExecutor());
 		
-		InputStream xin = getClass().getResourceAsStream("/gov/usgs/ngwmn/dm/io/transform/TestStyleSheet.xsl");
-		StreamSource xform = new StreamSource(xin, "/gov/usgs/ngwmn/dm/io/transform/TestStyleSheet.xsl");
+		InputStream xin = getClass().getResourceAsStream(TEST_STYLE_SHEET_XSL);
+		StreamSource xform = new StreamSource(xin, TEST_STYLE_SHEET_XSL);
 		victim.setTransform(xform);
 
 		InputStream tis = getClass().getResourceAsStream("TestInput.xml");
