@@ -38,7 +38,7 @@
 		<xsl:text>,</xsl:text>
 		<xsl:value-of select="$site" />
 		<xsl:text>,</xsl:text>
-		<xsl:value-of select=".//wml2:time" />
+		<xsl:value-of select="mediator:csv_escape(string(.//wml2:time))" />
 		<xsl:text>,</xsl:text>
 		<xsl:value-of select=".//gwdp:nwis/@pcode" />
 		<xsl:text>,</xsl:text>
@@ -50,7 +50,7 @@
 		<xsl:text>,</xsl:text>
 		<xsl:value-of select="mediator:mediate(number(.//swe:value),$elevation,string(.//gwdp:nwis/@direction))" />
 		<xsl:text>,</xsl:text>
-		<xsl:value-of select=".//wml2:comment" />
+		<xsl:value-of select="mediator:csv_escape(string(.//wml2:comment))" />
 		<xsl:text>&#xa;</xsl:text>
 	</xsl:template>
 

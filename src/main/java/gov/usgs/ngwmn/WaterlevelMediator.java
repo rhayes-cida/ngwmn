@@ -21,6 +21,18 @@ public class WaterlevelMediator {
 			
 	}
 
+	public static String csv_escape(String v) {
+		if (v == null) {
+			return v;
+		}
+		if ( ! v.contains(",")) {
+			return v;
+		}
+		v = v.replace("\"", "\"\"");
+		v = "\"" + v + "\"";
+		return v;
+	}
+	
 	public static double applyOffset(double wl, String offset) {
 		if (offset != null && ! offset.isEmpty()) {
 			try {

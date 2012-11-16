@@ -91,7 +91,7 @@ public class DirectCSVOutputStreamTest {
 		
 		victim.setExecutor(Executors.newSingleThreadExecutor());
 		victim.setAgency("USGS");
-		victim.setSite("20515416303801");
+		victim.setSite("SAMPLE");
 		victim.setElevation(99.999);
 		victim.setWrittenHeaders(false);
 		
@@ -103,7 +103,7 @@ public class DirectCSVOutputStreamTest {
 		
 		String result = bos.toString();
 		
-		System.out.println(result);
+		// System.out.println(result);
 		
 		assertTrue("has header", result.contains("Mediated Value"));
 		assertFalse("has raw input", result.contains("Comment, with embedded commas, and some \"quoted text\" as well"));
