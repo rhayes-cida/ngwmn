@@ -16,9 +16,9 @@ import org.junit.Test;
 
 public class XSLFilterOutputStreamTest {
 
-	private static final String TEST_STYLE_SHEET_XSL = "/gov/usgs/ngwmn/dm/io/transform/TestStyleSheet.xsl";
+	private static final String TEST_STYLE_SHEET_XSL = "/TestStyleSheet.xsl";
 
-	// @Before
+	@Before
 	public void preflight() {
 		URL src = getClass().getResource(TEST_STYLE_SHEET_XSL);
 		
@@ -42,7 +42,7 @@ public class XSLFilterOutputStreamTest {
 		}
 	}
 	
-	// @Test
+	@Test
 	public void testWithXSLResource() throws Exception {
 		ByteArrayOutputStream bos = new ByteArrayOutputStream();
 		XSLFilterOutputStream victim = new XSLFilterOutputStream(bos);
@@ -52,7 +52,7 @@ public class XSLFilterOutputStreamTest {
 		try {
 			victim.setTransform(xin, TEST_STYLE_SHEET_XSL);
 
-			InputStream tis = getClass().getResourceAsStream("TestInput.xml");
+			InputStream tis = getClass().getResourceAsStream("/XSLTestInput.xml");
 			
 			copy(tis,victim);
 			
@@ -67,7 +67,7 @@ public class XSLFilterOutputStreamTest {
 		assertEquals("Now is the time\nfor all good men\nto party!\n", result);
 	}
 
-	// @Test
+	@Test
 	public void testWithXSLSource() throws Exception {
 		ByteArrayOutputStream bos = new ByteArrayOutputStream();
 		XSLFilterOutputStream victim = new XSLFilterOutputStream(bos);
@@ -78,7 +78,7 @@ public class XSLFilterOutputStreamTest {
 		StreamSource xform = new StreamSource(xin, TEST_STYLE_SHEET_XSL);
 		victim.setTransform(xform);
 
-		InputStream tis = getClass().getResourceAsStream("TestInput.xml");
+		InputStream tis = getClass().getResourceAsStream("/XSLTestInput.xml");
 
 		copy(tis,victim);
 
