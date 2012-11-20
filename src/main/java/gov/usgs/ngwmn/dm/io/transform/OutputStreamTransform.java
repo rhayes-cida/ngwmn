@@ -28,11 +28,13 @@ import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
 
 
-public abstract class OutputStreamTransform extends FilterOutputStream {
+public abstract class OutputStreamTransform 
+	extends FilterOutputStream 
+	implements HeaderWriter
+{
 	protected final transient Logger logger = LoggerFactory.getLogger(getClass());
 	
 	private OutputStream    pout;
-	protected boolean 		writtenHeaders;
 	private Future<Long>    parserResult;
 	private ExecutorService executor; // TODO this should be Spring-ed
 	private final AtomicReference<List<Element>> headers;
@@ -40,8 +42,8 @@ public abstract class OutputStreamTransform extends FilterOutputStream {
 	public int id;
 
 	private List<Element> overrideHeaders;
-	protected final List<HeaderWrittenListener> headerListeners;
-
+	private HeaderWriterHelper hwHelper = new HeaderWriterHelper();
+	
 	public abstract String formatRow(List<Element> headers, Map<String, String> rowData);
 	
 	
@@ -51,11 +53,10 @@ public abstract class OutputStreamTransform extends FilterOutputStream {
 		executor = Executors.newSingleThreadExecutor();
 		headers  = new AtomicReference<List<Element>>();
 		rows     = new LinkedBlockingQueue<Map<String,String>>();
-		headerListeners = new LinkedList<HeaderWrittenListener>();
 	}
 	
 	public void skipHeaders(boolean skipHeaders) {
-		writtenHeaders = skipHeaders;
+		setWrittenHeaders(skipHeaders);
 	}
 
 	public void setParser(Parser parser) {
@@ -128,7 +129,7 @@ public abstract class OutputStreamTransform extends FilterOutputStream {
 		Map<String, String> row = rows.poll();
 		if (row != null) {
 			List<Element> headList = getHeaders();
-			if ( ! writtenHeaders ) {
+			if ( ! isWrittenHeaders() ) {
 				writeRow(headList);
 				signalHeaderListeners();
 			}
@@ -200,19 +201,22 @@ public abstract class OutputStreamTransform extends FilterOutputStream {
 		return overrideHeaders;
 	}
 	
-	
+	@Override
 	public boolean addHeaderListener(HeaderWrittenListener listener) {
-		if (listener != null) {
-			return headerListeners.add(listener);
-		}
-		return false;
+		return hwHelper.addHeaderListener(listener);
 	}
+	
 	protected void signalHeaderListeners() {
-		writtenHeaders=true;
-
-		for (HeaderWrittenListener listener : headerListeners) {
-			listener.headersWritten();
-		}
+		hwHelper.signalHeaderListeners();
 	}
+	
+	protected boolean isWrittenHeaders() {
+		return hwHelper.isWrittenHeaders();
+	}
+	
+	private void setWrittenHeaders(boolean skipHeaders) {
+		hwHelper.setWrittenHeaders(skipHeaders);		
+	}
+
 }
 

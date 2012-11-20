@@ -1,17 +1,26 @@
 package gov.usgs.ngwmn.dm.io.transform;
 
+import java.io.IOException;
 import java.io.OutputStream;
 
 import javax.xml.transform.Transformer;
 
-public class DirectCSVOutputStream extends XSLFilterOutputStream {
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+public class DirectCSVOutputStream 
+	extends XSLFilterOutputStream
+	implements HeaderWrittenListener
+{
+
+	protected final transient Logger logger = LoggerFactory.getLogger(getClass());
 
 	protected boolean writtenHeaders = false;
 	protected String agency;
 	protected String site;
 	protected Double elevation;
 	
-	public DirectCSVOutputStream(OutputStream out) throws Exception {
+	public DirectCSVOutputStream(OutputStream out) throws IOException {
 		super(out);
 		setTransform("/gov/usgs/ngwmn/wl2csv.xsl");
 	}
@@ -38,6 +47,8 @@ public class DirectCSVOutputStream extends XSLFilterOutputStream {
 		if ( ! isWrittenHeaders()) {
 			t.setParameter("emit_header", "true");
 		}
+		logger.debug("Set transform parameters to agency={}, site={}, elevation={}, writtenHeaders={}", 
+				new Object[] { getAgency(), getSite(), getElevation(), isWrittenHeaders()});
 		super.setupTransform(t);
 	}
 
@@ -47,6 +58,11 @@ public class DirectCSVOutputStream extends XSLFilterOutputStream {
 
 	public void setWrittenHeaders(boolean writtenHeaders) {
 		this.writtenHeaders = writtenHeaders;
+	}
+
+	@Override
+	public void headersWritten() {
+		setWrittenHeaders(true);
 	}
 
 	public String getAgency() {
@@ -73,5 +89,4 @@ public class DirectCSVOutputStream extends XSLFilterOutputStream {
 		this.elevation = elevation;
 	}
 
-	
 }

@@ -54,22 +54,31 @@ public class XSLFilterOutputStream extends FilterOutputStream {
 		executor = e;
 	}
 
-	public void setTransform(Source xform) throws Exception {
+	public void setTransform(Source xform) throws IOException {
 		xformResourceName = xform.toString();
-		templates = loadXSLT(xform);		
+		try {
+			templates = loadXSLT(xform);	
+		} catch (Exception e) {
+			throw new IOException(e);
+		}
 	}
 	
-	public void setTransform(InputStream xformStream, String xformName) throws Exception {
+	public void setTransform(InputStream xformStream, String xformName) throws IOException  {
 		xformResourceName = xformName;
-		templates = loadXSLT(xformStream,xformName);
+		try {
+			templates = loadXSLT(xformStream,xformName);
+		} catch (Exception e) {
+			throw new IOException(e);
+		}
 	}
 	
-	public void setTransform(String xformName) throws Exception {
+	public void setTransform(String xformName) throws IOException {
 		xformResourceName = xformName;
-		templates = loadXSLT(xformName);
-
-		// TODO defer initialization until first write
-		// init();
+		try {
+			templates = loadXSLT(xformName);
+		} catch (Exception e) {
+			throw new IOException(e);
+		}
 	}
    
 	public synchronized void ensureInitialized() {
@@ -173,10 +182,10 @@ public class XSLFilterOutputStream extends FilterOutputStream {
 	@Override
     public void close() throws IOException {
 		try {
-			logger.trace("closing transformer");
+			logger.trace("closing pout");
 			pout.close(); // this triggers XSL completion
 			finish();
-			out.close();
+			// out.close();
 		} catch (IOException e) {
 			throw e;
 		} catch (Exception e) {
