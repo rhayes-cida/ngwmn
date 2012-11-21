@@ -46,11 +46,12 @@
 	        <property name="connectionCachingEnabled" value="true" />
 	        <property name="connectionCacheProperties">
       			<props merge="default">
-         			<prop key="MinLimit">3</prop>
+         			<prop key="MinLimit">0</prop>
          			<prop key="MaxLimit">20</prop>
          			<prop key="InitialLimit">1</prop>
-         			<prop key="InactivityTimeout">30</prop>
-         			<prop key="ValidateConnection">TRUE</prop>
+         			<prop key="InactivityTimeout">500</prop>
+         			<prop key="PropertyCheckInterval">300</prop>
+         			<prop key="ValidateConnection">true</prop>
       			</props>
  			</property>
 	</bean>
