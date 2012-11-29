@@ -173,6 +173,7 @@ public abstract class OutputStreamTransform
 	
 	@Override
     public void close() throws IOException {
+		logger.debug("close event, out={}", out);
 		try {
 			logger.trace("closing transformer");
 			pout.close(); // this must be done before flushing

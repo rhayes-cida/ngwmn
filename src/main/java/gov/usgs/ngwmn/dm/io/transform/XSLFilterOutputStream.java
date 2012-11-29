@@ -185,6 +185,7 @@ public class XSLFilterOutputStream extends FilterOutputStream {
 			logger.trace("closing pout");
 			pout.close(); // this triggers XSL completion
 			finish();
+			logger.debug("close event, out={}", out);
 			// out.close();
 		} catch (IOException e) {
 			throw e;
