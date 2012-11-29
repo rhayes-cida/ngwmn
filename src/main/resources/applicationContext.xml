@@ -29,32 +29,24 @@
 		 
 		 jdbc:oracle:thin:@//widev.er.usgs.gov:1521/widev.er.usgs.gov
 	 -->
-	<bean id="dataSource" 
-		
-	        class="oracle.jdbc.pool.OracleDataSource"
-	        destroy-method="close">
-			<property name="URL"
-	                  value="${ngwmn_cache_url}" />
-	        <property name="user" value="${ngwmn_cache_username}" />
-	        <property name="password" value="${ngwmn_cache_pw}" />
-	        <!--  ask Oracle JDBC driver to not convert DATE to TIMESTAMP please -->
-	       	<property name="connectionProperties">
-	        	<props>
-	        		<prop key="oracle.jdbc.mapDateToTimestamp">false</prop>
-	        	</props>
-	        </property>
-	        <property name="connectionCachingEnabled" value="true" />
-	        <property name="connectionCacheProperties">
-      			<props merge="default">
-         			<prop key="MinLimit">3</prop>
-         			<prop key="MaxLimit">20</prop>
-         			<prop key="InitialLimit">1</prop>
-         			<prop key="InactivityTimeout">30</prop>
-         			<prop key="ValidateConnection">TRUE</prop>
-      			</props>
- 			</property>
-	</bean>
-	
+	 
+	 <bean id="dataSource" 
+        class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close">
+        <!--  or org.apache.tomcat.dbcp.dbcp.BasicDataSource for the Tomcat variant -->
+    	<property name="driverClassName" value="oracle.jdbc.OracleDriver"/>
+    	<property name="url" value="${ngwmn_cache_url}"/>
+    	<property name="username" value="${ngwmn_cache_username}"/>
+    	<property name="password" value="${ngwmn_cache_pw}"/>
+    	
+    	         	<property name="minIdle" value="0"/>
+    	         	<property name="maxIdle" value="6"/>
+         			<property name="maxActive" value="10"/>
+         			<property name="initialSize" value="1"/>
+         			<property name="testWhileIdle" value="true"/>
+         			<property name="testOnReturn" value="true"/>
+         			<property name="validationQuery" value="SELECT SYSDATE FROM DUAL"/>
+    	
+		</bean>
 	
     <bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
   		<property name="dataSource" ref="dataSource" />

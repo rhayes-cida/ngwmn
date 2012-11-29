@@ -117,8 +117,15 @@ public class ResultSetDataTable extends DataTable {
 			
 		case DATETIME:
 			try {
-				oracle.sql.TIMESTAMP ts = (oracle.sql.TIMESTAMP)v;
-				Timestamp tsq = ts.timestampValue();
+				Timestamp tsq;
+				if (v instanceof oracle.sql.TIMESTAMP) {
+					oracle.sql.TIMESTAMP ts = (oracle.sql.TIMESTAMP)v;
+					tsq = ts.timestampValue();
+				} else if (v instanceof Timestamp) {
+					tsq = (Timestamp)v;
+				} else {
+					throw new RuntimeException("Unknown type to convert to DATETIME: " + v.getClass().getName());
+				}
 				// sigh. well out of date.
 				com.ibm.icu.util.GregorianCalendar cal = new com.ibm.icu.util.GregorianCalendar();
 				cal.setTime(tsq);
