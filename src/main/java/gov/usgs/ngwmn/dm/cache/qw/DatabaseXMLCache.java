@@ -148,6 +148,7 @@ public class DatabaseXMLCache implements Cache {
 		JdbcTemplate template = new JdbcTemplate(ds);
 		
 		int ct = template.update(sql,daysToRetain, countToRetain);
+		logger.info("Cleaned {} from {}", ct, tablename);
 		return ct;
 	}
 	
