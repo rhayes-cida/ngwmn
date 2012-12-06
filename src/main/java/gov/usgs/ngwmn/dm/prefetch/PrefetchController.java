@@ -63,14 +63,14 @@ public class PrefetchController {
 	 * Start the prefetch job immediately, without any scheduling.
 	 */
 	public synchronized void start() {
+		logger.info("Starting");
+		
+		cleanCache();
 		if ( isDisabled()) {
 			logger.info("start disabled");
 			return;
 		}
 		
-		logger.info("Starting");
-		
-		cleanCache();
 		MDC.put("prefetch", "single");
 		final Map<?,?> mdc = MDC.getCopyOfContextMap();
 		
@@ -109,11 +109,6 @@ public class PrefetchController {
 	}
 	
 	public synchronized Map<String, Future<PrefetchOutcome>>  startInParallel() {
-		if ( isDisabled()) {
-			logger.info("startInParallel disabled");
-			return Collections.emptyMap();
-		}
-
 		logger.info("Start in parallel");
 		
 		if ( ! multithreadOutcomes.isEmpty()) {
@@ -126,6 +121,11 @@ public class PrefetchController {
 		List<String> agencies = prefetcher.agencyCodes();
 		
 		cleanCache();
+		if ( isDisabled()) {
+			logger.info("startInParallel disabled");
+			return Collections.emptyMap();
+		}
+
 		MDC.put("prefetch", "multi");
 		
 		for (final String agency : agencies) {
