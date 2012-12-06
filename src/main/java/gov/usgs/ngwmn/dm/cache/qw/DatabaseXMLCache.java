@@ -145,11 +145,32 @@ public class DatabaseXMLCache implements Cache {
 ") "
 ;
 		
+		recordSpaceUsed();
+
 		JdbcTemplate template = new JdbcTemplate(ds);
 		
 		int ct = template.update(sql,daysToRetain, countToRetain);
 		logger.info("Cleaned {} from {}", ct, tablename);
+		
+		recordSpaceUsed();
+		
 		return ct;
+	}
+	
+	private void recordSpaceUsed() {
+		String sql = "insert into GW_DATA_PORTAL.xml_size_history(tablename,ts,bytes) \n" + 
+				"select table_name, current_timestamp, a.bytes \n" + 
+				"FROM dba_segments a JOIN dba_lobs b \n" + 
+				"USING (owner, segment_name) \n" + 
+				"WHERE b.table_name = ? and owner='GW_DATA_PORTAL'";
+		
+		JdbcTemplate template = new JdbcTemplate(ds);
+		int ct = template.update(sql, tablename);
+		if (ct == 1) {
+			logger.info("recorded current XML space for {}", tablename);
+		} else {
+			logger.warn("did not record current XML space for table {}, ct = {}", tablename, ct);
+		}
 	}
 	
 	public void linkFetchLog(int fetchLogID , int cacheKey) {

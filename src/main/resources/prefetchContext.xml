@@ -31,12 +31,10 @@
 <!--     	<task:scheduled ref="Prefetcher" method="call" cron="0 21 ${ngwmn_prefetch_start_hour:22} * * ?"/> -->
 <!--     	<task:scheduled ref="PrefetchController" method="startInParallel" cron="0 23,53 * * * ?"/> -->
 
- <!--
      <task:scheduled-tasks scheduler="scheduler">
     	<task:scheduled ref="PrefetchController" method="startInParallel" cron="0 40 ${ngwmn_prefetch_start_hour:22} * * ?"/>
     	<task:scheduled ref="PrefetchController" method="gatherWaterlevelRankStats" fixed-delay="120000"/>
     </task:scheduled-tasks> 
--->
     
     <task:scheduler id="scheduler" pool-size="12"/>
     
@@ -50,6 +48,7 @@
     	<property name="cleaner" ref="CacheCleaner"/>
     	<property name="mbeanExporter" ref="mbeanExporter"/>
     	<property name="waterlevelRankStatsWorker" ref="WaterlevelRankStatsWorker"/>
+    	<property name="disabled" value="${ngwmn_prefetch_disabled:false}"/>
     </bean>
     
 <!--     

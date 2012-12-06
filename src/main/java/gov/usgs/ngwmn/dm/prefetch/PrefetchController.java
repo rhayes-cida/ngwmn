@@ -2,7 +2,6 @@ package gov.usgs.ngwmn.dm.prefetch;
 
 import gov.usgs.ngwmn.dm.cache.Cleaner;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
@@ -28,6 +27,7 @@ public class PrefetchController {
 	private Logger logger = LoggerFactory.getLogger(getClass());
 	private Cleaner cleaner;
 	private WaterlevelRankStatsWorker wlsWorker;
+	private boolean disabled = false;
 	
 	@Autowired
 	private ApplicationContext ctx;
@@ -63,6 +63,11 @@ public class PrefetchController {
 	 * Start the prefetch job immediately, without any scheduling.
 	 */
 	public synchronized void start() {
+		if ( isDisabled()) {
+			logger.info("start disabled");
+			return;
+		}
+		
 		logger.info("Starting");
 		
 		cleanCache();
@@ -104,6 +109,11 @@ public class PrefetchController {
 	}
 	
 	public synchronized Map<String, Future<PrefetchOutcome>>  startInParallel() {
+		if ( isDisabled()) {
+			logger.info("startInParallel disabled");
+			return Collections.emptyMap();
+		}
+
 		logger.info("Start in parallel");
 		
 		if ( ! multithreadOutcomes.isEmpty()) {
@@ -189,7 +199,11 @@ public class PrefetchController {
 	 * 
 	 */
 	public void gatherWaterlevelRankStats() {
-		wlsWorker.updateOne();
+		if ( ! isDisabled()) {
+			wlsWorker.updateOne();
+		} else {
+			logger.trace("gatherWaterlevelRankStats disabled");
+		}
 	}
 	
 	/**
@@ -251,6 +265,14 @@ public class PrefetchController {
 
 	public void setWaterlevelRankStatsWorker(WaterlevelRankStatsWorker wlsWorker) {
 		this.wlsWorker = wlsWorker;
+	}
+
+	public boolean isDisabled() {
+		return disabled;
+	}
+
+	public void setDisabled(boolean disabled) {
+		this.disabled = disabled;
 	}
 	
 }
