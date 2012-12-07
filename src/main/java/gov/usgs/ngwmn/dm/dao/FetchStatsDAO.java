@@ -9,6 +9,9 @@ import java.util.Map;
 
 import javax.sql.DataSource;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
@@ -19,7 +22,8 @@ public class FetchStatsDAO {
 	
 	private DataSource datasource;
 	private WellDataType type;
-
+	private Logger logger = LoggerFactory.getLogger(getClass());
+	
 	public FetchStatsDAO(DataSource ds, WellDataType t) {
 		this.datasource = ds;
 		type = t;
@@ -65,9 +69,15 @@ public class FetchStatsDAO {
 		Map<String,String> params = new HashMap<String,String>(2);
 		params.put("agency", agency);
 		params.put("stream", type.name());
-		T value = template.query(timeSeriesAgencyQuery, params,  rse);
+		logger.debug("calling timeSeriesAgencyData({})", params);
+		try {
+			T value = template.query(timeSeriesAgencyQuery, params,  rse);
 		
-		return value;
+			return value;
+		} catch (DataAccessException sqe) {
+			logger.warn("Problem in timeSeriesAgencyData", sqe);
+			throw sqe;
+		}
 	}
 	
 	public <T> T timeSeriesData(ResultSetExtractor<T> rse) 
@@ -76,6 +86,7 @@ public class FetchStatsDAO {
 		
 		Map<String,String> params = Collections.singletonMap("stream", type.name());
 
+		logger.debug("calling timeSeriesData({})", params);
 		T value = t.query(timeSeriesQuery, params, rse);
 		
 		return value;

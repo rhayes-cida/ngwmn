@@ -19,6 +19,7 @@ import java.security.DigestOutputStream;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.sql.Blob;
+import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -42,7 +43,9 @@ import org.apache.tomcat.dbcp.dbcp.DelegatingConnection;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
+import org.springframework.jdbc.core.CallableStatementCreator;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.object.StoredProcedure;
 import org.springframework.jdbc.support.lob.LobHandler;
 
 
@@ -158,14 +161,8 @@ public class DatabaseXMLCache implements Cache {
 	}
 	
 	private void recordSpaceUsed() {
-		String sql = "insert into GW_DATA_PORTAL.xml_size_history(tablename,ts,bytes) \n" + 
-				"select table_name, current_timestamp, a.bytes \n" + 
-				"FROM dba_segments a JOIN dba_lobs b \n" + 
-				"USING (owner, segment_name) \n" + 
-				"WHERE b.table_name = ? and owner='GW_DATA_PORTAL'";
-		
 		JdbcTemplate template = new JdbcTemplate(ds);
-		int ct = template.update(sql, tablename);
+		int ct = template.update("{call gw_data_portal.GATHER_XML_SIZE_STATS(?)}", tablename);
 		if (ct == 1) {
 			logger.info("recorded current XML space for {}", tablename);
 		} else {
