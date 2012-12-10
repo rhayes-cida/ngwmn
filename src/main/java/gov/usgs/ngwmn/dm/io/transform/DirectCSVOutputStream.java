@@ -89,4 +89,17 @@ public class DirectCSVOutputStream
 		this.elevation = elevation;
 	}
 
+	@Override
+	public String toString() {
+		StringBuilder builder = new StringBuilder();
+		builder.append("DirectCSVOutputStream [xform=");
+		builder.append(xformResourceName);
+		builder.append(", out=");
+		builder.append(out);
+		builder.append("]");
+		return builder.toString();
+	}
+	
+	
+
 }

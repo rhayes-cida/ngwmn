@@ -65,7 +65,8 @@ public class TransformSupplier extends Supplier<OutputStream>
 		Supplier<OutputStream> value;
 		switch (dataType) {
 		case WATERLEVEL:
-			value = new SimpleSupplier<OutputStream>(oStream);
+			OutputStream unclosing = new UnclosingOutputStream(oStream);
+			value = new SimpleSupplier<OutputStream>(unclosing);
 			break;
 
 		default:
@@ -111,13 +112,13 @@ public class TransformSupplier extends Supplier<OutputStream>
 			default:   // Default to CSV
 			case CSV:
 				switch (dataType) {
-//				case WATERLEVEL:
-//					DirectCSVOutputStream directCSVOutputStream = new DirectCSVOutputStream(os);
-//					directCSVOutputStream.setExecutor(pipelineExecutor);
-//					directCSVOutputStream.setWrittenHeaders(skipHeaders);
-//					directCSVOutputStream.ensureInitialized();
-//					oStream = directCSVOutputStream;
-//					break;
+				case WATERLEVEL:
+					DirectCSVOutputStream directCSVOutputStream = new DirectCSVOutputStream(os);
+					directCSVOutputStream.setExecutor(pipelineExecutor);
+					directCSVOutputStream.setWrittenHeaders(skipHeaders);
+					directCSVOutputStream.ensureInitialized();
+					oStream = directCSVOutputStream;
+					break;
 				default:
 					oStream = new CsvOutputStream(os);
 					break;

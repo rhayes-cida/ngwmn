@@ -20,4 +20,15 @@ public class SimpleSupplier<T extends Closeable> extends Supplier<T> {
 	public T initialize() throws IOException {
 		return source;
 	}
+
+	@Override
+	public String toString() {
+		StringBuilder builder = new StringBuilder();
+		builder.append("SimpleSupplier(");
+		builder.append(source);
+		builder.append(")");
+		return builder.toString();
+	}
+	
+	
 }
