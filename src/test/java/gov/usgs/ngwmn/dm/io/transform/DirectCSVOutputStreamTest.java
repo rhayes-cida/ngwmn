@@ -84,6 +84,73 @@ public class DirectCSVOutputStreamTest {
 		
 	}
 	
+	private static class ClosingByteOutputStream extends ByteArrayOutputStream {
+		private boolean closed;
+
+		public ClosingByteOutputStream() {
+			super();
+			closed = false;
+		}
+
+		@Override
+		public void close() throws IOException {
+			super.close();
+			closed = true;
+		}
+
+		public synchronized void unclose() {
+			closed = false;
+		}
+		
+		public boolean isClosed() {
+			return closed;
+		}
+	}
+	
+	/**
+	 * Verify that initial output stream is not closed when the input is closed.
+	 * @throws Exception
+	 */
+	@Test
+	public void testJoin() throws Exception {
+		ClosingByteOutputStream bos = new ClosingByteOutputStream();
+		DirectCSVOutputStream victim1 = new DirectCSVOutputStream(bos);
+		
+		victim1.setExecutor(Executors.newSingleThreadExecutor());
+		victim1.setAgency("USGS");
+		victim1.setSite("SAMPLE");
+		victim1.setElevation(99.999);
+		victim1.setWrittenHeaders(false);
+		
+		InputStream tis1 = getClass().getResourceAsStream("/sample-data/USGS_SAMPLE_WATERLEVEL_COMMAS.xml");
+
+		copy(tis1,victim1);
+		
+		victim1.close();
+		
+		assertFalse("output closed", bos.isClosed());
+		
+		DirectCSVOutputStream victim2 = new DirectCSVOutputStream(bos);
+		victim2.setExecutor(Executors.newSingleThreadExecutor());
+		victim2.setAgency("USGS");
+		victim2.setSite("20515416303801");
+		victim2.setElevation(99.999);
+		victim2.setWrittenHeaders(true);
+		InputStream tis2 = getClass().getResourceAsStream("/sample-data/USGS_20515416303801_WATERLEVEL_ABBREV.xml");
+
+		copy(tis2,victim2);
+		
+		victim2.close();
+		
+		assertFalse("output closed", bos.isClosed());
+
+		String result = bos.toString();
+		
+		assertTrue("has first file", result.contains("SAMPLE"));
+		assertTrue("has second file", result.contains("20515416303801"));
+				
+	}
+	
 	@Test
 	public void testComma() throws Exception {
 		ByteArrayOutputStream bos = new ByteArrayOutputStream();

@@ -1,18 +1,19 @@
 package gov.usgs.ngwmn;
 
+import java.math.BigDecimal;
+
 public class WaterlevelMediator {
 
-	public static Double mediate(Double value, String offset, String direction) {
+	public static String mediate(String value, String offset, String direction) {
 		// System.err.printf("mediate(%s,%s,%s)\n", value, offset, direction);
 		
-		double wl;
+		String wl;
 		// TODO Accept number as string, to preserve input precision
 		// TODO Is offset applied exactly when direction == up?
 		// TODO Take units input as well?
 		
 		if ("up".equals(direction)) {
-			wl = - value;
-			wl = applyOffset(wl, offset);
+			wl = negateAndApplyOffset(value, offset);
 		} else  {
 			wl = value;
 		}
@@ -33,6 +34,17 @@ public class WaterlevelMediator {
 		return v;
 	}
 	
+	private static String negateAndApplyOffset(String value, String offset) {
+		BigDecimal v = new BigDecimal(value);
+		
+		v = v.negate();
+		if (offset != null && ! offset.isEmpty()) {
+			BigDecimal os = new BigDecimal(offset);
+			v = v.add(os);
+		}
+		return v.toString();
+	}
+
 	public static double applyOffset(double wl, String offset) {
 		if (offset != null && ! offset.isEmpty()) {
 			try {

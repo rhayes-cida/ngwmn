@@ -53,4 +53,17 @@ public class SpecifierEntry implements EntryDescription {
 		data.put("SiteNo",   spec.getFeatureID());
 		return data;
 	}
+
+	@Override
+	public String toString() {
+		StringBuilder builder = new StringBuilder();
+		builder.append("SpecifierEntry [spec=");
+		builder.append(spec);
+		builder.append(", ext=");
+		builder.append(ext);
+		builder.append("]");
+		return builder.toString();
+	}
+	
+	
 }
