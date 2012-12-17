@@ -1,5 +1,7 @@
 package gov.usgs.ngwmn.dm.io;
 
+import gov.usgs.ngwmn.dm.spec.Specifier;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -60,6 +62,11 @@ public class FilenameEntry implements EntryDescription {
 		builder.append(entryName);
 		builder.append("]");
 		return builder.toString();
+	}
+
+	@Override
+	public Specifier getSpecifier() {
+		return null;
 	}
 
 }

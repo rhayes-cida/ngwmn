@@ -1,5 +1,7 @@
 package gov.usgs.ngwmn.dm.io;
 
+import gov.usgs.ngwmn.dm.spec.Specifier;
+
 import java.util.Map;
 
 public interface EntryDescription {
@@ -21,4 +23,9 @@ public interface EntryDescription {
 	// when joining data into one file, it is useful to add tagging data columns
 	// for ngwmn the agency and site are not extracted from the files
 	Map<String,String> constColumns();
+	
+	/** May return null, if this entry does not pertain to a speciic well.
+	 * 
+	 */
+	Specifier getSpecifier();
 }

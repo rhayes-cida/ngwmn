@@ -3,12 +3,16 @@ package gov.usgs.ngwmn.dm.dao;
 import java.util.List;
 import javax.sql.DataSource;
 
+import org.springframework.beans.BeansException;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
 import org.springframework.jdbc.core.JdbcTemplate;
 
-public class WellRegistryDAO {
+public class WellRegistryDAO implements ApplicationContextAware {
 
 	private WellRegistryMapper mapper;
 	private DataSource dataSource;
+	private static ApplicationContext ctx;
 	
 	public WellRegistryDAO() {
 	}
@@ -84,4 +88,16 @@ public class WellRegistryDAO {
 		return v;
 	}
 	
+	public static WellRegistryDAO getInstance() {
+		if (ctx != null) {
+			return ctx.getBean(WellRegistryDAO.class);
+		}
+		return null;
+	}
+
+	@Override
+	public void setApplicationContext(ApplicationContext applicationContext)
+			throws BeansException {
+		ctx = applicationContext;
+	}
 }

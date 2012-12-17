@@ -64,6 +64,11 @@ public class SpecifierEntry implements EntryDescription {
 		builder.append("]");
 		return builder.toString();
 	}
+
+	@Override
+	public Specifier getSpecifier() {
+		return spec;
+	}
 	
 	
 }

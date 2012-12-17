@@ -65,8 +65,8 @@ public class TransformSupplier extends Supplier<OutputStream>
 		Supplier<OutputStream> value;
 		switch (dataType) {
 		case WATERLEVEL:
-			value = new CSVOutputStreamSupplier(oStream, pipelineExecutor, skipHeaders);
-
+			value = new CSVOutputStreamSupplier(oStream, pipelineExecutor, skipHeaders, entryDesc);
+			skipHeaders = true;
 			break;
 
 		default:
