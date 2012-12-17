@@ -40,6 +40,9 @@ public class SequentialJoiningAggregator extends SequentialFlowAggregator {
 	        	substream = new TransformSupplier(substream, type, encode);
 	        	substream = new JoiningSupplier<OutputStream>(substream);
 	        	
+	        	// TODO Need a different substream for XSL processing chain
+	        	// output is expected to be SupplyZipOutput which is OK
+	        	
 	        	// TODO this must be decoupled because we will want to send in lat-long and other resolvers
 				SpecResolver resolver = new WellListResolver();
 	        	Flow inner = new SequentialFlowAggregator(factory, resolver.specIterator(spect, type), substream);

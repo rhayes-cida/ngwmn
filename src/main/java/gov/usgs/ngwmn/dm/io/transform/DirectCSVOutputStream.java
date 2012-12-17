@@ -3,14 +3,16 @@ package gov.usgs.ngwmn.dm.io.transform;
 import java.io.IOException;
 import java.io.OutputStream;
 
+import javax.xml.transform.ErrorListener;
 import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class DirectCSVOutputStream 
 	extends XSLFilterOutputStream
-	implements HeaderWrittenListener
+	implements HeaderWrittenListener, ErrorListener
 {
 
 	protected final transient Logger logger = LoggerFactory.getLogger(getClass());
@@ -23,6 +25,7 @@ public class DirectCSVOutputStream
 	public DirectCSVOutputStream(OutputStream out) throws IOException {
 		super(out);
 		setTransform("/gov/usgs/ngwmn/wl2csv.xsl");
+		logger.debug("created");
 	}
 
 	/*
@@ -49,7 +52,12 @@ public class DirectCSVOutputStream
 		}
 		logger.debug("Set transform parameters to agency={}, site={}, elevation={}, writtenHeaders={}", 
 				new Object[] { getAgency(), getSite(), getElevation(), isWrittenHeaders()});
+		
+		t.setErrorListener(this);
 		super.setupTransform(t);
+		
+		logger.debug("setup Transform {}", t);
+
 	}
 
 	public boolean isWrittenHeaders() {
@@ -88,5 +96,36 @@ public class DirectCSVOutputStream
 	public void setElevation(Double elevation) {
 		this.elevation = elevation;
 	}
+
+	@Override
+	public String toString() {
+		StringBuilder builder = new StringBuilder();
+		builder.append("DirectCSVOutputStream [xform=");
+		builder.append(xformResourceName);
+		builder.append(", out=");
+		builder.append(out);
+		builder.append("]");
+		return builder.toString();
+	}
+
+	@Override
+	public void warning(TransformerException exception)
+			throws TransformerException {
+		logger.warn("transformer warning {}", exception.getMessageAndLocation());
+	}
+
+	@Override
+	public void error(TransformerException exception)
+			throws TransformerException {
+		logger.error("transformer error {}", exception.getMessageAndLocation());
+	}
+
+	@Override
+	public void fatalError(TransformerException exception)
+			throws TransformerException {
+		logger.error("transformer fatal {}", exception.getMessageAndLocation());		
+	}
+	
+	
 
 }

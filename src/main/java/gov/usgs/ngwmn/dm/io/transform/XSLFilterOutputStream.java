@@ -102,16 +102,53 @@ public class XSLFilterOutputStream extends FilterOutputStream {
 		Callable<Void> exec = new Callable<Void>() {
 			public Void call() throws Exception {
 				
-				MDC.setContextMap((mdc == null) ? Collections.emptyMap() : mdc);
+				try {
+					MDC.setContextMap((mdc == null) ? Collections.emptyMap() : mdc);
+	
+					Transformer t = templates.newTransformer();
+					setupTransform(t);
+					StreamResult result = new StreamResult(out);	// this goes to output channel
+					
+					StreamSource source;
+					if (logger.isDebugEnabled()) {
+						InputStream sin = new InputStream() {
+							long ct = 0;
+							
+							@Override
+							public int read() throws IOException {
+								int c = pin.read();
+								if (ct == 0) {
+									logger.debug("start reading {}", pin);
+								}
+								if (c < 0) {
+									logger.debug("eof for {} at {}", pin, ct);
+								} else {
+									ct++;
+									if (ct < 20) {
+										logger.trace("read {} ({}) pos {}", new Object[]{c, (char)c, ct});
+									}
+								}
+								return c;
+							}
 
-				Transformer t = templates.newTransformer();
-				setupTransform(t);
-				StreamResult result = new StreamResult(out);	// this goes to output channel
-				
-				StreamSource source = new StreamSource(pin);	// this is piped from write methods
-				
-				t.transform(source, result);
-								
+							@Override
+							public void close() throws IOException {
+								logger.debug("close for {} at pos {}", pin, ct);
+								super.close();
+							}
+							
+						};
+						source = new StreamSource(sin);	
+					} else {
+						source = new StreamSource(pin);	// this is piped from write methods
+					}
+					
+					t.transform(source, result);
+					logger.debug("transform done with {}", pin);
+				} catch (Exception e) {
+					logger.warn("Problem in transform by " + xformResourceName, e);
+					throw e;
+				}
 				return null;
 			}
 		};
@@ -130,7 +167,7 @@ public class XSLFilterOutputStream extends FilterOutputStream {
 
 	private void finish() throws IOException {
     	try {
-    		xformOutcome.get(100, TimeUnit.MILLISECONDS);
+    		xformOutcome.get(100, TimeUnit.SECONDS);
     		logger.debug("done with XSL");
     	} catch (Exception e) {
     		logger.warn("Problem encountered in finish", e);

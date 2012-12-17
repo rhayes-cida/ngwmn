@@ -12,6 +12,9 @@ import gov.usgs.ngwmn.dm.spec.Encoding;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.List;
+import java.util.concurrent.Executor;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,9 +27,11 @@ public class TransformSupplier extends Supplier<OutputStream>
 	protected Supplier<OutputStream> upstream;
 	protected EntryDescription entryDesc;
 	protected Encoding encoding;
-	protected OutputStreamTransform ost;
+	protected OutputStream oStream;
 	protected boolean skipHeaders;
 	protected WellDataType dataType;
+	protected ExecutorService pipelineExecutor = Executors.newSingleThreadExecutor();
+
 	
 	// this supplier will be a listener for the headers on the first entry
 	// it will supply subsequent entries with these headers to preserve column ordinal
@@ -49,21 +54,36 @@ public class TransformSupplier extends Supplier<OutputStream>
 		logger.trace("making entry for {}",entryDesc);
 		entryDesc.extension( encoding.extension() );
 		
-		if (ost == null) {
+		if (oStream == null) {
 			throw new RuntimeException("Cannot makeEntry on a uninitialized supplier.");
 		}
-		ost.addHeaderListener(this);
-		
-		Supplier<OutputStreamTransform> sos = new SimpleSupplier<OutputStreamTransform>(ost);
-		TransformEntrySupplier transformer;
-		if (skipHeaders) {
-			// we must have master headers by now because we are skipping them so we pass-on what we have
-			transformer  = new TransformEntrySupplier(sos, entryDesc, dataType, skipHeaders, masterHeaders);
-		} else {
-			// we need master headers so listen for them
-			transformer  = new TransformEntrySupplier(sos, entryDesc, dataType, skipHeaders, this);
+		if (oStream instanceof HeaderWriter) {
+			HeaderWriter hw = (HeaderWriter)oStream;
+			hw.addHeaderListener(this);
 		}
-		return transformer;
+		
+		Supplier<OutputStream> value;
+		switch (dataType) {
+		case WATERLEVEL:
+			value = new CSVOutputStreamSupplier(oStream, pipelineExecutor, skipHeaders);
+
+			break;
+
+		default:
+			OutputStreamTransform ost = (OutputStreamTransform)oStream;
+			Supplier<OutputStreamTransform> sos = new SimpleSupplier<OutputStreamTransform>(ost);
+			TransformEntrySupplier transformer;
+			if (skipHeaders) {
+				// we must have master headers by now because we are skipping them so we pass-on what we have
+				transformer  = new TransformEntrySupplier(sos, entryDesc, dataType, skipHeaders, masterHeaders);
+			} else {
+				// we need master headers so listen for them
+				transformer  = new TransformEntrySupplier(sos, entryDesc, dataType, skipHeaders, this);
+			}
+			value = transformer;		
+		}
+		
+		return value;
 	}
 	
 	
@@ -75,16 +95,32 @@ public class TransformSupplier extends Supplier<OutputStream>
 		switch (encoding) {
 			case NONE:
 				return os;
+				
 			case TSV:
-				ost = new TsvOutputStream(os);
+				switch (dataType) {
+				case WATERLEVEL:
+					throw new NotImplementedException();
+				default:
+					oStream = new TsvOutputStream(os);						
+				}
+
 				break;
+				
 			case XLSX: // TODO need to impl
 				throw new NotImplementedException();
+				
 			default:   // Default to CSV
 			case CSV:
-				ost = new CsvOutputStream(os);
+				switch (dataType) {
+				case WATERLEVEL:
+					oStream = os;
+					break;
+				default:
+					oStream = new CsvOutputStream(os);
+					break;
+				}
 		}
-		return ost;
+		return oStream;
 	}
 
 	@Override

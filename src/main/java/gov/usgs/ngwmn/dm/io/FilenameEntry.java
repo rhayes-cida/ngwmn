@@ -51,4 +51,15 @@ public class FilenameEntry implements EntryDescription {
 		return (constCols==null) ? new HashMap<String, String>() : constCols;
 	}
 
+	@Override
+	public String toString() {
+		StringBuilder builder = new StringBuilder();
+		builder.append("FilenameEntry [baseName=");
+		builder.append(baseName);
+		builder.append(", entryName=");
+		builder.append(entryName);
+		builder.append("]");
+		return builder.toString();
+	}
+
 }
