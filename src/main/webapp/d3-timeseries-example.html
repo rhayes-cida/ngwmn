@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="content-type" content="text/html;charset=utf-8">
+    <title>D3 Time Series</title>
+    
+    <style>
+
+body {
+  font: 10px sans-serif;
+}
+
+.axis path,
+.axis line {
+  fill: none;
+  stroke: #000;
+  shape-rendering: crispEdges;
+}
+
+.x.axis path {
+  display: none;
+}
+
+.line {
+  fill: none;
+  stroke: steelblue;
+  stroke-width: 1.5px;
+}
+
+</style>
+
+    <script type="text/javascript" src="./js/d3.v2.js?2.9.5"></script>
+    <script src='./js/scale.js' type='text/javascript'> </script>
+	
+    <script type="text/javascript" src="https://www.google.com/jsapi"></script>
+
+	<script type="text/javascript">
+	// munge a Google vis data table to a 2-dimensional array of (x,y) tuples
+	function dt2xy(dt) {
+		var dataT = [];
+		var i,j;
+
+		// first column is x, assumed to be date
+		var xx = [];
+		for (i = 0; i < dt.getNumberOfRows(); i++) {
+			xx[i] = (dt.getValue(i,0) || new Date(0));
+		}
+		
+		for (j = 1; j < dt.getNumberOfColumns(); j++) {
+			var vv = [];
+			for (i = 0; i < dt.getNumberOfRows(); i++) {
+				var tuple = {date: xx[i], value: (dt.getValue(i,j) || 0), row: i, column: j, v:  (dt.getValue(i,j) || 0), label: dt.getColumnLabel(j)};
+				vv[i] = tuple;
+			}
+			dataT.push(vv);
+		}
+		
+		return dataT;
+	}
+
+	
+	</script>
+
+<script type="text/javascript">
+	
+	// basic line chart, from the D3 gallery, see https://github.com/mbostock/d3/wiki/Gallery
+
+function plotFetchOutcomes(dataTable,id) {
+	
+var margin = {top: 20, right: 20, bottom: 30, left: 50},
+    width = 960 - margin.left - margin.right,
+    height = 500 - margin.top - margin.bottom;
+
+var x = d3.time.scale()
+    .range([0, width]);
+
+var y = d3.scale.linear()
+    .range([height, 0]);
+
+var xAxis = d3.svg.axis()
+    .scale(x)
+    .orient("bottom");
+
+var yAxis = d3.svg.axis()
+    .scale(y)
+    .orient("left");
+
+var svg = d3.select("#"+id)
+	.append("svg")
+    .attr("width", width + margin.left + margin.right)
+    .attr("height", height + margin.top + margin.bottom)
+  .append("g")
+    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+var dataT = dt2xy(dataTable);
+
+var line = d3.svg.line()
+    .x(function(d) { return x(d.date); })
+    .y(function(d) { return y(d.value); });
+
+  x.domain(d3.extent(dataT[0], function(d) { return d.date; }));
+  y.domain(d3.extent(dataT[0], function(d) { return d.value; }));
+
+  svg.append("g")
+      .attr("class", "x axis")
+      .attr("transform", "translate(0," + height + ")")
+      .call(xAxis);
+
+  svg.append("g")
+      .attr("class", "y axis")
+      .call(yAxis)
+    .append("text")
+      .attr("transform", "rotate(-90)")
+      .attr("y", 6)
+      .attr("dy", ".71em")
+      .style("text-anchor", "end")
+      .text("Count");
+  
+  var i;
+  
+  var colors = [
+		  "red",
+		  "blue",
+		  "orange",
+		  "green",
+		  "purple",
+		  "grey"
+  ];
+  
+  for (i = 0; i < dataT.length; i++) {
+  	svg.append("path")
+  		.datum(dataT[i])
+    	.attr("class", "line")
+	    .style("stroke", colors[i])
+      	.attr("d", line);
+  };
+  
+};
+
+
+	
+	</script>    
+    <script type="text/javascript">
+    
+    // This script uses the Google Visualization API to load data from the server into a Google
+    // DataTable, then calls 'plotFetchOutcomes' to display the data.
+    
+      // Load the Visualization API.
+      google.load('visualization', '1.0');
+
+      // Set a callback to run when the Google Visualization API is loaded.
+      google.setOnLoadCallback(doQueries);
+
+      function doQueries() {
+    	  doQuery('waterlevel');
+      }
+      
+      function doQuery(t) {
+    	  var query = new google.visualization.Query(
+    			  "/ngwmn/stats/"+t+"/stats"
+    			  );
+    	  
+    	  // This query is sent to server, handled by the Google Chart Tools Datasource library 
+    	  // https://developers.google.com/chart/interactive/docs/dev/implementing_data_source 
+    	  query.setQuery(
+    			  'select toDate(FETCH_DATE), count(PUBLISHED) ' +
+    			  'group by toDate(FETCH_DATE) '+
+    			  'pivot STATUS ' +
+    			  'label toDate(FETCH_DATE) "fetch date"');
+    	  
+    	  query.send(function(resp) {handleQueryResponse(resp,t);});
+    	  
+      }
+      
+      function handleQueryResponse(response,t) {
+    	    if (response.isError()) {
+    	      alert('Error in query: ' + response.getMessage() + ' ' + response.getDetailedMessage());
+    	      return;
+    	    }
+
+    	    var data = response.getDataTable();
+    	    
+    	    var chart_id = 'chart_'+t;
+    	    var chart_div = document.getElementById(chart_id);
+    	    chart_div.innerHTML = '';
+    	    // that draws plot into area  width = 960, height = 200,
+    	    plotFetchOutcomes(data,chart_id);
+    	  }
+            
+      </script>
+      
+    
+  </head>
+  <body>
+    <div class="body">
+      <div class="content">
+
+<h1 id='streamgraph'>Fetch Counts</h1>
+<div class='gallery' id='chart_waterlevel'>
+<img src="/ngwmn/images/whirl.png" id='waterlevel_filler' alt="Chart goes here" height="200" width="960"/>
+</div>
+
+    </div>
+  </div>
+  </body>
+</html>
