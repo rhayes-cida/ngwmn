@@ -12,12 +12,9 @@
 
 	<xsl:template match="/">
 		<xsl:param name="elevation">0.0</xsl:param>
-		<xsl:param name="emit_header" select="false()"/>
 
-		<xsl:if test="$emit_header">
-			<xsl:text>Time, Mediated Value</xsl:text>
-			<xsl:text>&#xa;</xsl:text>
-		</xsl:if>
+		<xsl:text>Time, Mediated Value</xsl:text>
+		<xsl:text>&#xa;</xsl:text>
 		
 		<xsl:apply-templates select="//wml2:TimeSeries//wml2:TimeValuePair">
 			<xsl:with-param name="elevation" select="$elevation"/>
