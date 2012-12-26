@@ -41,6 +41,10 @@
     	<constructor-arg ref="dataSource"/>
     </bean>
     
+    <bean id="CacheSizeController" class="gov.usgs.ngwmn.admin.CacheSizeController">
+        	<constructor-arg ref="dataSource"/>
+    </bean>
+    
     <bean id="JITDataController" class="gov.usgs.ngwmn.admin.JITDataController">
 		<property name="wellRegistryDAO" ref="WellRegistryDAO"/>
 		<property name="waterlevelStatsDAO" ref="WaterlevelStatsDAO"/>
