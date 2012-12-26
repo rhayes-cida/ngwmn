@@ -24,29 +24,6 @@
 	
 	<import resource="prefetchContext.xml"/>
 	
-	<!-- Note that the property reference ${gw_data_portal_pw} looks for a JNDI name java:comp/env/gw_data_portal_pw by default,
-		 it can be supplied in the above properties file instead if you wish.
-		 
-		 jdbc:oracle:thin:@//widev.er.usgs.gov:1521/widev.er.usgs.gov
-	 -->
-	 
-	 <bean id="dataSource" 
-        class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close">
-        <!--  or org.apache.tomcat.dbcp.dbcp.BasicDataSource for the Tomcat variant -->
-    	<property name="driverClassName" value="oracle.jdbc.OracleDriver"/>
-    	<property name="url" value="${ngwmn_cache_url}"/>
-    	<property name="username" value="${ngwmn_cache_username}"/>
-    	<property name="password" value="${ngwmn_cache_pw}"/>
-    	
-    	         	<property name="minIdle" value="0"/>
-    	         	<property name="maxIdle" value="6"/>
-         			<property name="maxActive" value="10"/>
-         			<property name="initialSize" value="1"/>
-         			<property name="testWhileIdle" value="true"/>
-         			<property name="testOnReturn" value="true"/>
-         			<property name="validationQuery" value="SELECT SYSDATE FROM DUAL"/>
-    	
-		</bean>
 	
     <bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
   		<property name="dataSource" ref="dataSource" />
@@ -278,6 +255,38 @@
     <property name="registrationBehaviorName" value="REGISTRATION_REPLACE_EXISTING"/>
   </bean>
 	
+	<beans profile="default">
+		<!-- Note that the property reference ${gw_data_portal_pw} looks for a JNDI name java:comp/env/gw_data_portal_pw by default,
+		 it can be supplied in the above properties file instead if you wish.
+		 
+		 jdbc:oracle:thin:@//widev.er.usgs.gov:1521/widev.er.usgs.gov
+	 -->
+	 
+		 <bean id="dataSource" 
+	        class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close">
+	        <!--  or org.apache.tomcat.dbcp.dbcp.BasicDataSource for the Tomcat variant -->
+	    	<property name="driverClassName" value="oracle.jdbc.OracleDriver"/>
+	    	<property name="url" value="${ngwmn_cache_url}"/>
+	    	<property name="username" value="${ngwmn_cache_username}"/>
+	    	<property name="password" value="${ngwmn_cache_pw}"/>
+	    	
+	    	         	<property name="minIdle" value="0"/>
+	    	         	<property name="maxIdle" value="6"/>
+	         			<property name="maxActive" value="10"/>
+	         			<property name="initialSize" value="1"/>
+	         			<property name="testWhileIdle" value="true"/>
+	         			<property name="testOnReturn" value="true"/>
+	         			<property name="validationQuery" value="SELECT SYSDATE FROM DUAL"/>
+	    	
+			</bean>
+	
+	</beans>
+	
+	<beans profile="tomcat-ds" >
+		<bean id="dataSource" class="org.springframework.jndi.JndiObjectFactoryBean">
+    		<property name="jndiName" value="java:comp/env/jdbc/GW_DATA_PORTAL"/>
+		</bean>
+	</beans>
 </beans>
 
        
