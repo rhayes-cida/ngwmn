@@ -16,6 +16,7 @@
 	<h1>National Ground Water Monitoring Network</h1>
 	<h2>Data Cache</h2>
 	<ul>
+		<li><a href="admin/cachesize.jsp">Cache Size</a></li>
 		<li>Water Level
 		<ul>
 		<li><a href="stats/waterlevel/chart">Fetch Statistics</a></li>
