@@ -29,7 +29,9 @@ Chart size graph
               div,
               "/ngwmn/stats/cache_size", 
               {
-                connectSeparatedPoints: true
+                connectSeparatedPoints: true,
+                ylabel: "Size (mB)",
+                logscale: false
               }
             );
 		}
