@@ -130,8 +130,8 @@
 			<ref bean="WaterlevelCache"/>
 		</list>
 		</property>
-		<property name="daysToKeep" value="90"/>
-		<property name="countToKeep" value="3"/>
+		<property name="daysToKeep" value="${ngwmn_cache_days_to_keep:90}"/>
+		<property name="countToKeep" value="${ngwmn_cache_count_to_keep:3}"/>
 	</bean>
 	
 	<bean id="WebRetriever"
