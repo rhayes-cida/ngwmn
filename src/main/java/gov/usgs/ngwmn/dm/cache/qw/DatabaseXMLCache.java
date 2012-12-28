@@ -115,7 +115,7 @@ public class DatabaseXMLCache implements Cache {
 		String sql = 
 "UPDATE gw_data_portal." + tablename + " c " +
 "SET xml         = NULL " +
-"WHERE published = 'R' " +
+"WHERE (published = 'R' or published = 'N') " +
 "AND xml        IS NOT NULL " +
 "AND NOT EXISTS " +
 "  (SELECT * " +
