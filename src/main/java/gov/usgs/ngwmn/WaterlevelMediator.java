@@ -8,8 +8,6 @@ public class WaterlevelMediator {
 		// System.err.printf("mediate(%s,%s,%s)\n", value, offset, direction);
 		
 		String wl;
-		// TODO Accept number as string, to preserve input precision
-		// TODO Is offset applied exactly when direction == up?
 		// TODO Take units input as well?
 		
 		if ("up".equals(direction)) {
