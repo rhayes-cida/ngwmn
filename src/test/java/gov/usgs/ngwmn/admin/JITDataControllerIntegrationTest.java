@@ -32,7 +32,7 @@ public class JITDataControllerIntegrationTest extends ContextualTest {
 	public void test1() throws Exception {
 		Date d;
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-		d = sdf.parse("2012-07-12");
+		d = sdf.parse("2012-12-29");
 		
 		JitTree result = victim.getTree(d);
 		

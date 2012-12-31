@@ -85,6 +85,15 @@ public class JITDataController {
 	private JitTree results(String agency, WellDataType wdt, final Date when) {
 		ResultSetExtractor<ResultCounts> rse = new ResultSetExtractor<JITDataController.ResultCounts>() {
 
+			private int safeGet(ResultSet rs, String col) {
+				try {
+					return rs.getInt(col);
+				} catch (SQLException sql) {
+					logger.warn("Problem getting int column named {}, will return 0", col);
+					return 0;
+				}
+			}
+			
 			@Override
 			public ResultCounts extractData(ResultSet rs) throws SQLException,
 					DataAccessException {
@@ -95,10 +104,10 @@ public class JITDataController {
 					java.sql.Date fd = rs.getDate("fetch_date");
 					if (fd.equals(when)) {
 						val = new ResultCounts();
-						val.success = rs.getInt("success");
-						val.empty = rs.getInt("EMPTY");
-						val.fail = rs.getInt("fail");
-						val.attempt = rs.getInt("attempts");
+						val.success = safeGet(rs,"SUCCESS");
+						val.empty = safeGet(rs,"EMPTY");
+						val.fail = safeGet(rs, "FAIL");
+						val.attempt = safeGet(rs, "ATTEMPTS");
 					}
 				}
 				return val;
