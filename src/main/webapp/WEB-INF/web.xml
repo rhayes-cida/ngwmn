@@ -109,7 +109,7 @@
 
     <servlet-mapping>
         <servlet-name>SpringMVCdata</servlet-name>
-        <url-pattern>/data/*</url-pattern>
+        <url-pattern>/direct/*</url-pattern>
     </servlet-mapping>
     
  	<security-constraint>
