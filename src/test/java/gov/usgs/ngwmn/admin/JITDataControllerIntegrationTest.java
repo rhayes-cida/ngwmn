@@ -39,4 +39,15 @@ public class JITDataControllerIntegrationTest extends ContextualTest {
 		assertNotNull("result tree", result);
 	}
 
+	@Test
+	public void test_empty() throws Exception {
+		Date d;
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+		d = sdf.parse("1066-12-29");
+		
+		JitTree result = victim.getTree(d);
+		
+		assertNotNull("result tree", result);
+	}
+
 }

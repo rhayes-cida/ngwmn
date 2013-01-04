@@ -4,6 +4,7 @@ import gov.usgs.ngwmn.WellDataType;
 
 import java.sql.SQLException;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -61,6 +62,22 @@ public class FetchStatsDAO {
 					"  ) " + 
 					"order by FETCH_DATE desc";
 
+	String dateAgencyQuery = 
+			"select * " + 
+					"from ( " + 
+					"  select status, trunc(started_at) FETCH_DATE " + 
+					"  from gw_data_portal.fetch_log " + 
+					"  where trunc(started_at) = :dt " +
+					"  and fetch_log.data_stream = :stream " + 
+					"  and agency_cd = :agency "+
+					"  and fetcher = 'PrefetchI' " + 
+					"  ) " + 
+					"pivot( " + 
+					"  count(*) " + 
+					"  for status " + 
+					"  in ('DONE' as \"DONE\",'FAIL' as \"FAIL\",'EMPY' \"EMPTY\", 'SKIP' \"SKIP\") " + 
+					"  ) ";
+
 	public <T> T timeSeriesAgencyData(String agency, ResultSetExtractor<T> rse)
 	throws SQLException
 	{
@@ -80,6 +97,28 @@ public class FetchStatsDAO {
 		}
 	}
 	
+	public <T> T dateAgencyData(String agency, Date d, ResultSetExtractor<T> rse)
+	throws SQLException
+	{
+		NamedParameterJdbcTemplate template = new NamedParameterJdbcTemplate(datasource);
+		
+		java.sql.Date sDte = new java.sql.Date(d.getTime());
+		
+		Map<String,Object> params = new HashMap<String,Object>(2);
+		params.put("agency", agency);
+		params.put("stream", type.name());
+		params.put("dt", sDte);
+		logger.debug("calling datedAgencyData({})", params);
+		try {
+			T value = template.query(dateAgencyQuery, params,  rse);
+		
+			return value;
+		} catch (DataAccessException sqe) {
+			logger.warn("Problem in timeSeriesAgencyData", sqe);
+			throw sqe;
+		}
+	}
+			
 	public <T> T timeSeriesData(ResultSetExtractor<T> rse) 
 	throws SQLException {
 		NamedParameterJdbcTemplate t = new NamedParameterJdbcTemplate(datasource);

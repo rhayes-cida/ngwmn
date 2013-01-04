@@ -101,23 +101,24 @@ public class JITDataController {
 				ResultCounts val = null;
 								
 				while (rs.next()) {
-					java.sql.Date fd = rs.getDate("fetch_date");
-					if (fd.equals(when)) {
-						val = new ResultCounts();
-						val.success = safeGet(rs,"SUCCESS");
-						val.empty = safeGet(rs,"EMPTY");
-						val.fail = safeGet(rs, "FAIL");
-						val.attempt = safeGet(rs, "ATTEMPTS");
+					if (val != null) {
+						logger.warn("Multiple results?");
 					}
+					val = new ResultCounts();
+					val.success = safeGet(rs,"DONE");
+					val.empty = safeGet(rs,"EMPTY");
+					val.fail = safeGet(rs, "FAIL");
+					val.attempt = val.success + val.empty + val.fail;
 				}
 				return val;
 			}
 		};
+		
 		ResultCounts rc = null;
 		FetchStatsDAO dao = forWDT(wdt);
 		if (dao != null) {
 			try {
-				rc = dao.timeSeriesAgencyData(agency, rse);
+				rc = dao.dateAgencyData(agency, when, rse);
 			}
 			catch (SQLException sqe) {
 				logger.warn("Problem getting fetch counts", sqe);
