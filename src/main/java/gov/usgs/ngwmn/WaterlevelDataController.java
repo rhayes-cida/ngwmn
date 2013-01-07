@@ -72,6 +72,8 @@ public class WaterlevelDataController {
 			exists = false;
 		}
 		
+		logger.info("Providing csv data for {}, exists? {}", spec, exists);
+		
 		if ( ! exists) {
 			// See if changing _ to space in agency name will fix it
 			// maybe it a problem with space in agency name?
