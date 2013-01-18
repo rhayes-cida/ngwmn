@@ -28,7 +28,10 @@ import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
 
 
-public abstract class OutputStreamTransform extends FilterOutputStream {
+public abstract class OutputStreamTransform 
+	extends FilterOutputStream 
+	implements HeaderWriter
+	{
 	protected final transient Logger logger = LoggerFactory.getLogger(getClass());
 	
 	private OutputStream    pout;
@@ -200,7 +203,7 @@ public abstract class OutputStreamTransform extends FilterOutputStream {
 		return overrideHeaders;
 	}
 	
-	
+	@Override
 	public boolean addHeaderListener(HeaderWrittenListener listener) {
 		if (listener != null) {
 			return headerListeners.add(listener);
