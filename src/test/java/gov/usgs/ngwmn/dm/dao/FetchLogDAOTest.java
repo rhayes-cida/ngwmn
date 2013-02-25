@@ -37,6 +37,25 @@ public class FetchLogDAOTest extends ContextualTest {
 		return entry;
 	}
 	
+	@Test
+	public void testBigProblem() {
+		StringBuilder pb = new StringBuilder();
+		while (pb.length() < 500) {
+			pb.append("Too long a problem\n");
+		}
+		String problem = pb.toString();
+		
+		FetchLog entry = new FetchLog();
+		// NJGS:2288614
+		entry.setAgencyCd(AGENCY_CD);
+		entry.setSiteNo(SITE_NO);
+		entry.setCt(null);
+		entry.setFetcher(getClass().getSimpleName());
+		entry.setProblem(problem);
+		dao.insertId(entry);
+		assertNotNull(entry.getFetchlogId());
+		assertTrue("has a problem", entry.getProblem().startsWith("Too long a problem"));
+	}
 	
 	@Test
 	public void testSelectByWell() {
