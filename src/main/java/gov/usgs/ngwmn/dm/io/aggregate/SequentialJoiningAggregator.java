@@ -34,7 +34,14 @@ public class SequentialJoiningAggregator extends SequentialFlowAggregator {
 	        for (WellDataType type : spect.getDataTypes()) {
 	        	logger.info("Getting wells data for {}", type);
 	        	
-	        	EntryDescription desc = new FilenameEntry( type.toString() );
+	        	EntryDescription desc;
+	        	// TODO Perhaps move this to WellDaatType enum?
+	        	if (type == WellDataType.REGISTRY) {
+	        		// overrule file name
+	        		desc = new FilenameEntry( "SiteInfo" );
+	        	} else {
+		        	desc = new FilenameEntry( type.toString() );
+	        	}
 	        	desc.extension( encode.extension() ); // TODO I would like to see this in the transform but the zip entry is made sooner at the moment and might not have to be.
 	        	Supplier<OutputStream> substream  = output.makeEntry(desc);
 	        	substream = new TransformSupplier(substream, type, encode);
