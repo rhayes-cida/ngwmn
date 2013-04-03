@@ -38,7 +38,7 @@ public class SequentialJoiningAggregator extends SequentialFlowAggregator {
 	        	// TODO Perhaps move this to WellDaatType enum?
 	        	if (type == WellDataType.REGISTRY) {
 	        		// overrule file name
-	        		desc = new FilenameEntry( "SiteInfo" );
+	        		desc = new FilenameEntry( "SITE_INFO" );
 	        	} else {
 		        	desc = new FilenameEntry( type.toString() );
 	        	}
