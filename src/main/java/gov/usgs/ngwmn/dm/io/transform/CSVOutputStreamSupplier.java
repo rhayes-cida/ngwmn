@@ -41,11 +41,19 @@ public class CSVOutputStreamSupplier extends Supplier<OutputStream> {
 	public OutputStream initialize() throws IOException {
 		OutputStream value = null;
 
+		Specifier spec = ed.getSpecifier();
+
 		DirectCSVOutputStream directCSVOutputStream;
-		directCSVOutputStream = new DirectCSVOutputStream(destination);
+		if (spec != null && spec.isBoundedDates()) {
+			DirectCSVOutputStreamWithDates dateBoundedStream = new DirectCSVOutputStreamWithDates(destination);
+			dateBoundedStream.setBeginDate(spec.getBeginDate());
+			dateBoundedStream.setEndDate(spec.getEndDate());
+			directCSVOutputStream = dateBoundedStream;
+		} else {
+			directCSVOutputStream = new DirectCSVOutputStream(destination);
+		}
 		directCSVOutputStream.setExecutor(executor);
 		directCSVOutputStream.setWrittenHeaders(skipHeaders);
-		Specifier spec = ed.getSpecifier();
 		logger.debug("initialize stream for specifier {}", spec);
 		if (spec != null) {
 			directCSVOutputStream.setAgency(spec.getAgencyID());

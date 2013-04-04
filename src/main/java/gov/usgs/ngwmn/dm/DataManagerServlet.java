@@ -24,6 +24,8 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.joda.time.DateMidnight;
+import org.joda.time.LocalDate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
@@ -149,6 +151,18 @@ public class DataManagerServlet extends HttpServlet {
 			spect.setEncode( Encoding.valueOf(encoding) );
 		}
 
+		String beginDate = req.getParameter("beginDate");
+		if (beginDate != null) {
+			DateMidnight ld = new DateMidnight(beginDate);
+			spect.setBeginDate(ld.toDate());
+		}
+		
+		String endDate = req.getParameter("endDate");
+		if (endDate != null) {
+			DateMidnight ld = new DateMidnight(endDate);
+			spect.setEndDate(ld.toDate());
+		}
+		
 		// TODO parse out BBox and other timeSeriesQuery params
 		
 		precheckWells(spect);

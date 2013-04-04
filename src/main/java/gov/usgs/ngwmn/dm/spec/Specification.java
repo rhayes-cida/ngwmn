@@ -3,6 +3,7 @@ package gov.usgs.ngwmn.dm.spec;
 import gov.usgs.ngwmn.WellDataType;
 
 import java.util.Collection;
+import java.util.Date;
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -25,6 +26,8 @@ public class Specification {
 
 	private boolean bundled = true; // TODO true by default for now until we decide we would like offer unbundled
 	
+	private Date beginDate;
+	private Date endDate;
 	
 	private final EnumSet<WellDataType> dataTypes;
 	// Delineated list of agency well IDs
@@ -47,6 +50,9 @@ public class Specification {
 		WellDataType type = spec.getTypeID();
 		dataTypes.add(type);
 		
+		spec.setBeginDate(beginDate);
+		spec.setEndDate(endDate);
+		
 		if (knownWells.add(spec)) {
 			wellIDs.get(type).add(spec);
 			return true;
@@ -67,6 +73,7 @@ public class Specification {
 		}
 		return size; 
 	}
+	
 	public boolean isEmpty() {
 		boolean empty = true;
 		
@@ -76,6 +83,7 @@ public class Specification {
 		
 		return empty;
 	}
+	
 	public int getWellTotalSize() {
 		int size = 0;
 		
@@ -86,9 +94,7 @@ public class Specification {
 		return size;
 	}
 	
-	
-	
-	
+
 	public Encoding getEncode() {
 		return encode;
 	}
@@ -102,6 +108,20 @@ public class Specification {
 	}
 	public void setBundled(boolean bundled) {
 		this.bundled = bundled;
+	}
+
+	public void setBeginDate(Date date) {
+		beginDate = date;
+		for (Specifier s: knownWells) {
+			s.setBeginDate(date);
+		}
+	}
+	
+	public void setEndDate(Date date) {
+		endDate = date;
+		for (Specifier s: knownWells) {
+			s.setEndDate(date);
+		}
 	}
 	
 

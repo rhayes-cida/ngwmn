@@ -6,6 +6,7 @@ import gov.usgs.ngwmn.dm.dao.WellRegistry;
 import gov.usgs.ngwmn.dm.dao.WellRegistryKey;
 
 import java.security.InvalidParameterException;
+import java.util.Date;
 
 import com.google.common.base.Strings;
 
@@ -13,6 +14,9 @@ public class Specifier {
 	private final String agencyID;
 	private final String featureID;
 	private final WellDataType typeID;
+	
+	private Date beginDate;
+	private Date endDate;
 	
 	
 	public Specifier(String agencyID, String featureID, WellDataType typeID) {
@@ -95,7 +99,25 @@ public class Specifier {
 			return false;
 		return true;
 	}
+
+	public Date getBeginDate() {
+		return beginDate;
+	}
+
+	public void setBeginDate(Date beginDate) {
+		this.beginDate = beginDate;
+	}
+
+	public Date getEndDate() {
+		return endDate;
+	}
+
+	public void setEndDate(Date endDate) {
+		this.endDate = endDate;
+	}
 	
-	
+	public boolean isBoundedDates() {
+		return beginDate != null || endDate != null;
+	}
 }
 
