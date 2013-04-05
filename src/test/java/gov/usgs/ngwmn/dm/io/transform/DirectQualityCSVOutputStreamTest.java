@@ -11,18 +11,21 @@ import java.util.concurrent.Executors;
 
 import org.junit.Test;
 
-public class DirectCSVOutputStreamTest {
+import com.ibm.icu.text.SimpleDateFormat;
+
+public class DirectQualityCSVOutputStreamTest {
+
+	private SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
 
 	@Test
 	public void testSample() throws Exception {
 		ByteArrayOutputStream bos = new ByteArrayOutputStream();
-		DirectCSVOutputStream victim = new DirectCSVOutputStream(bos);
+		DirectQualityCSVOutputStream victim = new DirectQualityCSVOutputStream(bos);
 		
 		victim.setExecutor(Executors.newSingleThreadExecutor());
 		victim.setAgency("USGS");
-		victim.setSite("20515416303801");
-		victim.setElevation(99.999);
-		InputStream tis = getClass().getResourceAsStream("/sample-data/USGS_20515416303801_WATERLEVEL_ABBREV.xml");
+		victim.setSite("402734087033401");
+		InputStream tis = getClass().getResourceAsStream("/sample-data/USGS_402734087033401_QUALITY.xml");
 		
 		copy(tis,victim);
 		
@@ -30,22 +33,24 @@ public class DirectCSVOutputStreamTest {
 		
 		String result = bos.toString();
 		
-		assertTrue("has header", result.contains("Mediated Value"));
-		assertTrue("has timestamp", result.contains("1983-08-25"));
-		assertTrue("has value", result.contains("up,ft,14.04"));
+		assertTrue("has header", result.contains("Sample Fraction"));
+		assertTrue("has timestamp", result.contains("1957-08-27"));
+		assertTrue("has timestamp", result.contains("1962-09-12"));
+		assertTrue("has timestamp", result.contains("1965-04-14"));
+		assertTrue("has timestamp", result.contains("2001-03-29"));
+		assertTrue("has value", result.contains("32.0,mg/l"));
 	}
 
 	@Test
 	public void testSkipHeaders() throws Exception {
 		ByteArrayOutputStream bos = new ByteArrayOutputStream();
-		DirectCSVOutputStream victim = new DirectCSVOutputStream(bos);
+		DirectQualityCSVOutputStream victim = new DirectQualityCSVOutputStream(bos);
 		
 		victim.setExecutor(Executors.newSingleThreadExecutor());
 		victim.setAgency("USGS");
-		victim.setSite("20515416303801");
-		victim.setElevation(99.999);
+		victim.setSite("402734087033401");
 		victim.setWrittenHeaders(true);
-		InputStream tis = getClass().getResourceAsStream("/sample-data/USGS_20515416303801_WATERLEVEL_ABBREV.xml");
+		InputStream tis = getClass().getResourceAsStream("/sample-data/USGS_402734087033401_QUALITY.xml");
 		
 		copy(tis,victim);
 		
@@ -53,20 +58,19 @@ public class DirectCSVOutputStreamTest {
 		
 		String result = bos.toString();
 		
-		assertFalse("has header", result.contains("Mediated Value"));
-		assertTrue("has timestamp", result.contains("1983-08-25"));
-		assertTrue("has value", result.contains("up,ft,14.04"));
+		assertFalse("has header", result.contains("Sample Fraction"));
+		assertTrue("has timestamp", result.contains("2001-03-29,10:57:00,EST"));
+		assertTrue("has value", result.contains("Silica,29.9,mg/l"));
 	}
 
 	@Test
 	public void testEmpty() throws Exception {
 		ByteArrayOutputStream bos = new ByteArrayOutputStream();
-		DirectCSVOutputStream victim = new DirectCSVOutputStream(bos);
+		DirectQualityCSVOutputStream victim = new DirectQualityCSVOutputStream(bos);
 		
 		victim.setExecutor(Executors.newSingleThreadExecutor());
 		victim.setAgency("USGS");
 		victim.setSite("20515416303801");
-		victim.setElevation(99.999);
 		victim.setWrittenHeaders(false);
 		
 		byte[] emptyBuf = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<nothing/>\n".getBytes();
@@ -78,9 +82,9 @@ public class DirectCSVOutputStreamTest {
 		
 		String result = bos.toString();
 		
-		assertTrue("has header", result.contains("Mediated Value"));
-		assertFalse("has timestamp", result.contains("1983-08-25"));
-		assertFalse("has value", result.contains("up,ft,14.04"));
+		assertTrue("has header", result.contains("USGS PCode"));
+		assertFalse("has timestamp", result.contains("2001-03-29,10:57:00,EST"));
+		assertFalse("has value", result.contains("Total dissolved solids,255,mg/l"));
 		
 	}
 	
@@ -114,15 +118,14 @@ public class DirectCSVOutputStreamTest {
 	@Test
 	public void testJoin() throws Exception {
 		ClosingByteOutputStream bos = new ClosingByteOutputStream();
-		DirectCSVOutputStream victim1 = new DirectCSVOutputStream(bos);
+		DirectQualityCSVOutputStream victim1 = new DirectQualityCSVOutputStream(bos);
 		
 		victim1.setExecutor(Executors.newSingleThreadExecutor());
 		victim1.setAgency("USGS");
-		victim1.setSite("SAMPLE");
-		victim1.setElevation(99.999);
+		victim1.setSite("402734087033401");
 		victim1.setWrittenHeaders(false);
 		
-		InputStream tis1 = getClass().getResourceAsStream("/sample-data/USGS_SAMPLE_WATERLEVEL_COMMAS.xml");
+		InputStream tis1 = getClass().getResourceAsStream("/sample-data/USGS_402734087033401_QUALITY.xml");
 
 		copy(tis1,victim1);
 		
@@ -130,13 +133,12 @@ public class DirectCSVOutputStreamTest {
 		
 		assertFalse("output closed", bos.isClosed());
 		
-		DirectCSVOutputStream victim2 = new DirectCSVOutputStream(bos);
+		DirectQualityCSVOutputStream victim2 = new DirectQualityCSVOutputStream(bos);
 		victim2.setExecutor(Executors.newSingleThreadExecutor());
 		victim2.setAgency("USGS");
-		victim2.setSite("20515416303801");
-		victim2.setElevation(99.999);
+		victim2.setSite("385650074531101");
 		victim2.setWrittenHeaders(true);
-		InputStream tis2 = getClass().getResourceAsStream("/sample-data/USGS_20515416303801_WATERLEVEL_ABBREV.xml");
+		InputStream tis2 = getClass().getResourceAsStream("/sample-data/USGS_385650074531101_QUALITY.xml");
 
 		copy(tis2,victim2);
 		
@@ -146,38 +148,40 @@ public class DirectCSVOutputStreamTest {
 
 		String result = bos.toString();
 		
-		assertTrue("has first file", result.contains("SAMPLE"));
-		assertTrue("has second file", result.contains("20515416303801"));
+		assertTrue("has first file", result.contains("402734087033401"));
+		assertTrue("has first file data", result.contains("Magnesium,11.6,mg/l"));
+		assertTrue("has second file", result.contains("385650074531101"));
+		assertTrue("has second file data", result.contains("USGS TWRI 5-A1/1989"));
 				
 	}
-	
+		
 	@Test
-	public void testComma() throws Exception {
+	public void testDateLimits() throws Exception {
 		ByteArrayOutputStream bos = new ByteArrayOutputStream();
-		DirectCSVOutputStream victim = new DirectCSVOutputStream(bos);
+		DirectQualityCSVOutputStream victim = new DirectQualityCSVOutputStream(bos);
 		
 		victim.setExecutor(Executors.newSingleThreadExecutor());
 		victim.setAgency("USGS");
-		victim.setSite("SAMPLE");
-		victim.setElevation(99.999);
-		victim.setWrittenHeaders(false);
-		
-		InputStream tis = getClass().getResourceAsStream("/sample-data/USGS_SAMPLE_WATERLEVEL_COMMAS.xml");
+		victim.setSite("402734087033401");
+		victim.setBeginDate(sdf.parse("1960-01-01"));
+		victim.setEndDate(sdf.parse("1970-01-01"));
 
+		InputStream tis = getClass().getResourceAsStream("/sample-data/USGS_402734087033401_QUALITY.xml");
+		
 		copy(tis,victim);
 		
 		victim.close();
 		
 		String result = bos.toString();
 		
-		// System.out.println(result);
-		
-		assertTrue("has header", result.contains("Mediated Value"));
-		assertFalse("has raw input", result.contains("Comment, with embedded commas, and some \"quoted text\" as well"));
-		assertTrue("has escaped commas", result.contains("\"Comment, with embedded commas, and some \"\"quoted text\"\" as well\""));
-		
+		assertTrue("has header", result.contains("Sample Fraction"));
+		assertFalse("has timestamp", result.contains("1957-08-27"));
+		assertTrue("has timestamp", result.contains("1962-09-12"));
+		assertTrue("has timestamp", result.contains("1965-04-14"));
+		assertFalse("has timestamp", result.contains("2001-03-29"));
+		assertTrue("has value", result.contains("32.0,mg/l"));
 	}
-	
+
 	private void copy(InputStream is, OutputStream os) throws IOException {
 		while (true) {
 			int c = is.read();

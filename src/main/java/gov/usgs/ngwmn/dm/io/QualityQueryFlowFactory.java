@@ -1,35 +1,15 @@
 package gov.usgs.ngwmn.dm.io;
 
+import javax.sql.DataSource;
+
 import gov.usgs.ngwmn.WellDataType;
 
 public class QualityQueryFlowFactory extends QueryFlowFactory {
-
-	/* expected columns:
-AgencyCd
-SiteNo
-Date
-Time
-TimeZone
-CharacteristicName
-Value
-Unit
-ResultStatus
-ValueType
-USGSPCode
-SampleFraction
-ResultComment
-TemperatureBasis
-DetectionCondition
-MethodIdentifier
-MethodContext
-MethodName
-MethodDescription
-QuantitationLimitType
-QuantitationLimitValue
-QuantitationLimitUnit
-
-	 */
 	
+	public QualityQueryFlowFactory(DataSource datasource) {
+		super(datasource);
+	}
+
 /*
  * Parser mapping:
  
@@ -121,7 +101,7 @@ QuantitationLimitUnit
 	}
 
 	public static void main(String[] argv) {
-		QualityQueryFlowFactory ego = new QualityQueryFlowFactory();
+		QualityQueryFlowFactory ego = new QualityQueryFlowFactory(null);
 		System.out.print(ego.getQuery());
 		System.out.println(";");
 	}

@@ -23,9 +23,9 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.sql.DataSource;
 
 import org.joda.time.DateMidnight;
-import org.joda.time.LocalDate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
@@ -45,6 +45,7 @@ public class DataManagerServlet extends HttpServlet {
 	
 	protected DataBroker db;
 	protected ApplicationContext ctx;
+	protected DataSource dataSource;
 	
 	@Override
 	public void init(ServletConfig config) throws ServletException {
@@ -52,6 +53,7 @@ public class DataManagerServlet extends HttpServlet {
 		ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(config.getServletContext());
 		
 		db = ctx.getBean("DataBroker", DataBroker.class);
+		dataSource = ctx.getBean("dataSource", DataSource.class);
 	}
 
 	/* (non-Javadoc)
@@ -81,7 +83,7 @@ public class DataManagerServlet extends HttpServlet {
 				if ( ! spect.getDataTypes().contains(WellDataType.ALL)  // TODO ALL asdf
 						&& spect.isBundled() ) {
 					outs = new SupplyZipOutput(outs);
-					exec = new SequentialJoiningAggregator(db, spect, outs);
+					exec = new SequentialJoiningAggregator(db, spect, outs, dataSource);
 				// TODO ALL asdf
 				} else {
 					// TODO initial impl of single unbundled request

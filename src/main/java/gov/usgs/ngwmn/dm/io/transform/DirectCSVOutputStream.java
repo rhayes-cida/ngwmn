@@ -2,15 +2,17 @@ package gov.usgs.ngwmn.dm.io.transform;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.Date;
 
 import javax.xml.transform.ErrorListener;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
 
+import org.joda.time.LocalDate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class DirectCSVOutputStream 
+public abstract class DirectCSVOutputStream 
 	extends XSLFilterOutputStream
 	implements HeaderWrittenListener, ErrorListener
 {
@@ -20,21 +22,14 @@ public class DirectCSVOutputStream
 	protected boolean writtenHeaders = false;
 	protected String agency;
 	protected String site;
-	protected Double elevation;
-	
-	public DirectCSVOutputStream(OutputStream out) throws IOException {
+	protected Date beginDate;
+	protected Date endDate;
+		
+	public DirectCSVOutputStream(String transform, OutputStream out) throws IOException {
 		super(out);
-		setTransform("/gov/usgs/ngwmn/wl2csv.xsl");
+		setTransform(transform);
 		logger.debug("created");
 	}
-
-	/*
-	 * 	<xsl:param name="agency" select="'Agency'" />
-		<xsl:param name="site" select="'Site'" />
-		<xsl:param name="elevation">0.0</xsl:param>
-		<xsl:param name="emit_header" select="false()"/>
-	 */
-	
 	
 	@Override
 	protected void setupTransform(Transformer t) {
@@ -44,14 +39,20 @@ public class DirectCSVOutputStream
 		if (getSite() != null) {
 			t.setParameter("site",getSite());
 		}
-		if (getElevation() != null) {
-			t.setParameter("elevation", String.valueOf(getElevation()));
-		}
 		if ( ! isWrittenHeaders()) {
 			t.setParameter("emit_header", "true");
 		}
+		if (getBeginDate() != null) {
+			LocalDate dBegin = new LocalDate(getBeginDate());
+			t.setParameter("beginDate", dBegin.toString());
+		}
+		if (getEndDate() != null) {
+			LocalDate dEnd = new LocalDate(getEndDate());
+			t.setParameter("endDate", dEnd.toString());			
+		}
+
 		logger.debug("Set transform parameters to agency={}, site={}, elevation={}, writtenHeaders={}", 
-				new Object[] { getAgency(), getSite(), getElevation(), isWrittenHeaders()});
+				new Object[] { getAgency(), getSite(), isWrittenHeaders()});
 		
 		t.setErrorListener(this);
 		super.setupTransform(t);
@@ -89,14 +90,6 @@ public class DirectCSVOutputStream
 		this.site = site;
 	}
 
-	public Double getElevation() {
-		return elevation;
-	}
-
-	public void setElevation(Double elevation) {
-		this.elevation = elevation;
-	}
-
 	@Override
 	public String toString() {
 		StringBuilder builder = new StringBuilder();
@@ -124,6 +117,22 @@ public class DirectCSVOutputStream
 	public void fatalError(TransformerException exception)
 			throws TransformerException {
 		logger.error("transformer fatal {}", exception.getMessageAndLocation());		
+	}
+
+	public Date getBeginDate() {
+		return beginDate;
+	}
+
+	public void setBeginDate(Date beginDate) {
+		this.beginDate = beginDate;
+	}
+
+	public Date getEndDate() {
+		return endDate;
+	}
+
+	public void setEndDate(Date endDate) {
+		this.endDate = endDate;
 	}
 	
 	

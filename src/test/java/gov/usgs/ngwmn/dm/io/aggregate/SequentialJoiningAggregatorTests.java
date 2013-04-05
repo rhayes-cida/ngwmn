@@ -25,6 +25,8 @@ import java.util.Set;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
+import javax.sql.DataSource;
+
 import org.junit.Test;
 
 
@@ -44,7 +46,7 @@ public class SequentialJoiningAggregatorTests {
 		Supplier<OutputStream> upstream;
 		upstream = new SimpleSupplier<OutputStream>(baos);
 		upstream = new SupplyZipOutput(upstream);
-
+		DataSource ds = null;
 		
 		FlowFactory fac = new FlowFactory() {
 			@Override
@@ -89,10 +91,10 @@ public class SequentialJoiningAggregatorTests {
 		spect.addWell( new Specifier("a","1234567a",WellDataType.WATERLEVEL) );
 		spect.addWell( new Specifier("a","1234567b",WellDataType.WATERLEVEL) );
 		
-		spect.addWell( new Specifier("a","1234567c",WellDataType.QUALITY) );
-		spect.addWell( new Specifier("a","1234567d",WellDataType.QUALITY) );
+		spect.addWell( new Specifier("a","1234567c",WellDataType.LITHOLOGY) );
+		spect.addWell( new Specifier("a","1234567d",WellDataType.LITHOLOGY) );
 		
-		new SequentialJoiningAggregator(fac,spect,upstream).call();
+		new SequentialJoiningAggregator(fac,spect,upstream,ds).call();
 		
 		File file = new File("/tmp","dataSJA.zip");
 		FileOutputStream fos = new FileOutputStream(file);
@@ -102,7 +104,7 @@ public class SequentialJoiningAggregatorTests {
 		
 		Set<String> expectedNames = new HashSet<String>();
 		expectedNames.add("WATERLEVEL.csv");
-		expectedNames.add("QUALITY.csv");
+		expectedNames.add("LITHOLOGY.csv");
 		ByteArrayInputStream bais = new ByteArrayInputStream(baos.toByteArray());
 		ZipInputStream zis = new ZipInputStream(bais);
 		for (String name : expectedNames) {
@@ -114,7 +116,7 @@ public class SequentialJoiningAggregatorTests {
 		zis.close();
 
 		int size = baos.toByteArray().length;
-		assertTrue("expecting around 400 bytes but was " + size, size<450 && size>375);
+		assertTrue("expecting around 350 bytes but was " + size, size<400 && size>325);
 		
 	}
 }

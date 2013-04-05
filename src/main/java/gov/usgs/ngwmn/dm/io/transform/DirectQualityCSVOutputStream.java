@@ -2,19 +2,15 @@ package gov.usgs.ngwmn.dm.io.transform;
 
 import java.io.IOException;
 import java.io.OutputStream;
-import java.util.Date;
 
 import javax.xml.transform.Transformer;
 
 import org.joda.time.LocalDate;
 
-public class DirectCSVOutputStreamWithDates extends DirectCSVOutputStream {
-	private Date beginDate;
-	private Date endDate;
+public class DirectQualityCSVOutputStream extends DirectCSVOutputStream {
 	
-	public DirectCSVOutputStreamWithDates(OutputStream out) throws IOException {
-		super(out);
-		setTransform("/gov/usgs/ngwmn/wl2csv-dates.xsl");
+	public DirectQualityCSVOutputStream(OutputStream out) throws IOException {
+		super("/gov/usgs/ngwmn/qw2csv-dates.xsl",out);
 		logger.debug("created");
 	}
 
@@ -32,26 +28,10 @@ public class DirectCSVOutputStreamWithDates extends DirectCSVOutputStream {
 		}
 	}
 
-	public Date getBeginDate() {
-		return beginDate;
-	}
-
-	public void setBeginDate(Date beginDate) {
-		this.beginDate = beginDate;
-	}
-
-	public Date getEndDate() {
-		return endDate;
-	}
-
-	public void setEndDate(Date endDate) {
-		this.endDate = endDate;
-	}
-
 	@Override
 	public String toString() {
 		StringBuilder builder = new StringBuilder();
-		builder.append("DirectCSVOutputStreamWithDates [");
+		builder.append("DirectWaterlevelCSVOutputStream [");
 		builder.append("beginDate=");
 		builder.append(beginDate);
 		builder.append(", endDate=");

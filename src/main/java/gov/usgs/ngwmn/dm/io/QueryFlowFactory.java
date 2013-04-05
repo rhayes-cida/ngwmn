@@ -6,6 +6,7 @@ import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import javax.sql.DataSource;
@@ -22,6 +23,7 @@ import gov.usgs.ngwmn.dm.io.aggregate.FlowFactory;
 import gov.usgs.ngwmn.dm.spec.Specifier;
 
 /** Produce the results of SQL query as a CSV stream.
+ * Can be shared between threads.
  * 
  * @author rhayes
  *
@@ -29,9 +31,14 @@ import gov.usgs.ngwmn.dm.spec.Specifier;
 public abstract class QueryFlowFactory implements FlowFactory {
 
 	private DataSource datasource;
-	private Specifier spec;
-	private Supplier<OutputStream> sos;
 	
+	private SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+	
+	public QueryFlowFactory(DataSource datasource) {
+		super();
+		this.datasource = datasource;
+	}
+
 	abstract String getQuery();
 	
 	/** Throw an exception if the type is not as expected
@@ -46,14 +53,15 @@ public abstract class QueryFlowFactory implements FlowFactory {
 		private String site;
 		private Date beginDate;
 		private Date endDate;
+		private Supplier<OutputStream> sos;
 		
-		QueryFlow() {
+		QueryFlow(Specifier spec, Supplier<OutputStream> sos) {
 			agency = spec.getAgencyID();
 			site = spec.getFeatureID();
 			beginDate = spec.getBeginDate();
 			endDate = spec.getEndDate();
+			this.sos = sos;
 		}
-		
 		
 		@Override
 		public Void call() throws Exception {
@@ -82,7 +90,16 @@ public abstract class QueryFlowFactory implements FlowFactory {
 				String query = getQuery();
 	
 				JdbcTemplate t = new JdbcTemplate(datasource);
-				valu = t.query(query, rse, agency, site, beginDate, endDate);
+				
+				String bd_s = null;
+				if (beginDate != null) {
+					bd_s = sdf.format(beginDate);
+				}
+				String ed_s = null;
+				if (endDate != null) {
+					ed_s = sdf.format(endDate);
+				}
+				valu = t.query(query, rse, agency, site, bd_s, ed_s);
 			} finally {
 				writer.close();
 			}
@@ -98,10 +115,7 @@ public abstract class QueryFlowFactory implements FlowFactory {
 		
 		checkType(spec.getTypeID());
 		
-		this.spec = spec;
-		this.sos = out;
-		
-		return new QueryFlow();
+		return new QueryFlow(spec,out);
 	}
 
 	public void setDatasource(DataSource datasource) {

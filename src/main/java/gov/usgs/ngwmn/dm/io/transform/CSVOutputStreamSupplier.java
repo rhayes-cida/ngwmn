@@ -43,14 +43,10 @@ public class CSVOutputStreamSupplier extends Supplier<OutputStream> {
 
 		Specifier spec = ed.getSpecifier();
 
-		DirectCSVOutputStream directCSVOutputStream;
+		DirectCSVOutputStream directCSVOutputStream = new DirectWaterlevelCSVOutputStream(destination);
 		if (spec != null && spec.isBoundedDates()) {
-			DirectCSVOutputStreamWithDates dateBoundedStream = new DirectCSVOutputStreamWithDates(destination);
-			dateBoundedStream.setBeginDate(spec.getBeginDate());
-			dateBoundedStream.setEndDate(spec.getEndDate());
-			directCSVOutputStream = dateBoundedStream;
-		} else {
-			directCSVOutputStream = new DirectCSVOutputStream(destination);
+			directCSVOutputStream.setBeginDate(spec.getBeginDate());
+			directCSVOutputStream.setEndDate(spec.getEndDate());
 		}
 		directCSVOutputStream.setExecutor(executor);
 		directCSVOutputStream.setWrittenHeaders(skipHeaders);
@@ -65,7 +61,7 @@ public class CSVOutputStreamSupplier extends Supplier<OutputStream> {
 				if (well != null) {
 					Double elevation = well.getAltVa();
 					logger.debug("Discovered elevation {} for {}", elevation, well);
-					directCSVOutputStream.setElevation(elevation);
+					((DirectWaterlevelCSVOutputStream)directCSVOutputStream).setElevation(elevation);
 				}
 			}
 		}

@@ -29,8 +29,13 @@ col = [		("AgencyCd","AgencyCd"),
 ]
 
 fmt = "\"%s\" varchar(80) path '%s',"
+
+fmt="""
+<xsl:value-of select="normalize-space(%s)" />
+<xsl:text>,</xsl:text>"""
+
 for c in col:
-	path = c[0].replace("/","/*:")
-	path = path.replace("Result/","")
-	print fmt % (c[1],path)
+	# path = c[0].replace("/","/*:")
+	path = c[0].replace("Result/","./")
+	print fmt % (path,)
 
