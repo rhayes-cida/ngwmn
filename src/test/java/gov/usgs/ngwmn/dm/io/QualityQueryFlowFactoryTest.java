@@ -40,4 +40,17 @@ public class QualityQueryFlowFactoryTest extends ContextualTest {
 		assertTrue("pass", true);
 	}
 
+	// TODO This shows that the detection condition needs to be trimmed -- as do all the columns, really.
+	@Test
+	public void testMakeFlowMuchData() throws Exception {
+		Specifier spec = new Specifier("IL EPA","P406197",WellDataType.QUALITY);
+
+		Supplier<OutputStream> out = new SimpleSupplier<OutputStream>(System.out);
+		Flow x = victim.makeFlow(spec, out);
+		
+		x.call();
+		
+		assertTrue("pass", true);
+	}
+	
 }

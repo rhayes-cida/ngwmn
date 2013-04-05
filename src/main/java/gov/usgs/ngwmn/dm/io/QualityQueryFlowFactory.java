@@ -83,21 +83,21 @@ QuantitationLimitUnit
 				"\"Date\" varchar(80) path '*:date',\n" + 
 				"\"Time\" varchar(80) path '*:time',\n" + 
 				"\"TimeZone\" varchar(80) path '*:zone',\n" + 
-				"\"CharacteristicName\" varchar(80) path '*:ResultDescription/*:CharacteristicName',\n" + 
-				"\"Value\" varchar(80) path '*:ResultDescription/*:ResultMeasure/*:ResultMeasureValue',\n" + 
-				"\"Unit\" varchar(80) path '*:ResultDescription/*:ResultMeasure/*:MeasureUnitCode',\n" + 
-				"\"ResultStatus\" varchar(80) path '*:ResultDescription/*:ResultStatusIdentifier',\n" + 
-				"\"ValueType\" varchar(80) path '*:ResultDescription/*:ResultValueTypeName',\n" + 
+				"\"CharacteristicName\" varchar(80) path 'normalize-space(*:ResultDescription/*:CharacteristicName)',\n" + 
+				"\"Value\" varchar(80) path 'normalize-space(*:ResultDescription/*:ResultMeasure/*:ResultMeasureValue)',\n" + 
+				"\"Unit\" varchar(80) path 'normalize-space(*:ResultDescription/*:ResultMeasure/*:MeasureUnitCode)',\n" + 
+				"\"ResultStatus\" varchar(80) path 'normalize-space(*:ResultDescription/*:ResultStatusIdentifier)',\n" + 
+				"\"ValueType\" varchar(80) path 'normalize-space(*:ResultDescription/*:ResultValueTypeName)',\n" + 
 				"\"USGSPCode\" varchar(80) path '*:ResultDescription/*:USGSPCode',\n" + 
-				"\"SampleFraction\" varchar(80) path '*:ResultDescription/*:ResultSampleFractionText',\n" + 
-				"\"ResultComment\" varchar(80) path '*:ResultDescription/*:ResultCommentText',\n" + 
-				"\"TemperatureBasis\" varchar(80) path '*:ResultDescription/*:ResultTemperatureBasisText',\n" + 
-				"\"DetectionCondition\" varchar(80) path '*:ResultDescription/*:ResultDetectionConditionText',\n" + 
+				"\"SampleFraction\" varchar(80) path 'normalize-space(*:ResultDescription/*:ResultSampleFractionText)',\n" + 
+				"\"ResultComment\" varchar(80) path 'normalize-space(*:ResultDescription/*:ResultCommentText)',\n" + 
+				"\"TemperatureBasis\" varchar(80) path 'normalize-space(*:ResultDescription/*:ResultTemperatureBasisText)',\n" + 
+				"\"DetectionCondition\" varchar(80) path 'normalize-space(*:ResultDescription/*:ResultDetectionConditionText)',\n" + 
 				"\"MethodIdentifier\" varchar(80) path '*:ResultAnalyticalMethod/*:MethodIdentifier',\n" + 
-				"\"MethodContext\" varchar(80) path '*:ResultAnalyticalMethod/*:MethodIdentifierContext',\n" + 
+				"\"MethodContext\" varchar(80) path 'normalize-space(*:ResultAnalyticalMethod/*:MethodIdentifierContext)',\n" + 
 				"\"MethodName\" varchar(80) path '*:ResultAnalyticalMethod/*:MethodName',\n" + 
-				"\"MethodDescription\" varchar(80) path '*:ResultAnalyticalMethod/*:MethodDescriptionText',\n" + 
-				"\"QuantitationLimitType\" varchar(80) path '*:ResultLabInformation/*:ResultDetectionQuantitationLimit/*:DetectionQuantitationLimitTypeName',\n" + 
+				"\"MethodDescription\" varchar(80) path 'normalize-space(*:ResultAnalyticalMethod/*:MethodDescriptionText)',\n" + 
+				"\"QuantitationLimitType\" varchar(80) path 'normalize-space(*:ResultLabInformation/*:ResultDetectionQuantitationLimit/*:DetectionQuantitationLimitTypeName)',\n" + 
 				"\"QuantitationLimitValue\" varchar(80) path '*:ResultLabInformation/*:ResultDetectionQuantitationLimit/*:DetectionQuantitationLimitMeasure/*:MeasureValue',\n" + 
 				"\"QuantitationLimitUnit\" varchar(80) path '*:ResultLabInformation/*:ResultDetectionQuantitationLimit/*:DetectionQuantitationLimitMeasure/*:MeasureUnitCode'\n" + 
 				"		) xq\n" + 
