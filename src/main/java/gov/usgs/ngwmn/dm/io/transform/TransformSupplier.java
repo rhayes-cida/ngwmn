@@ -65,10 +65,15 @@ public class TransformSupplier extends Supplier<OutputStream>
 		Supplier<OutputStream> value;
 		switch (dataType) {
 		case WATERLEVEL:
-			value = new CSVOutputStreamSupplier(oStream, pipelineExecutor, skipHeaders, entryDesc);
+			value = new DirectWaterlevelCSVOutputStreamSupplier(oStream, pipelineExecutor, skipHeaders, entryDesc);
 			skipHeaders = true;
 			break;
 
+		case QUALITY:
+			value = new DirectQualityCSVOutputStreamSupplier(oStream, pipelineExecutor, skipHeaders, entryDesc);
+			skipHeaders = true;
+			break;
+			
 		default:
 			OutputStreamTransform ost = (OutputStreamTransform)oStream;
 			Supplier<OutputStreamTransform> sos = new SimpleSupplier<OutputStreamTransform>(ost);
@@ -99,6 +104,7 @@ public class TransformSupplier extends Supplier<OutputStream>
 			case TSV:
 				switch (dataType) {
 				case WATERLEVEL:
+				case QUALITY:
 					throw new NotImplementedException();
 				default:
 					oStream = new TsvOutputStream(os);						
@@ -113,6 +119,7 @@ public class TransformSupplier extends Supplier<OutputStream>
 			case CSV:
 				switch (dataType) {
 				case WATERLEVEL:
+				case QUALITY:
 					oStream = os;
 					break;
 				default:

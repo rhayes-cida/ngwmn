@@ -20,12 +20,10 @@ import javax.sql.DataSource;
 public class SequentialJoiningAggregator extends SequentialFlowAggregator {
 
     protected Specification spect;
-    private DataSource dataSource;
 	
-    public SequentialJoiningAggregator(FlowFactory fac, Specification specification, Supplier<OutputStream> out, DataSource ds) {
+    public SequentialJoiningAggregator(FlowFactory fac, Specification specification, Supplier<OutputStream> out) {
     	super(fac, null, out);
     	spect = specification;
-    	dataSource = ds;
     }
     
     @Override
@@ -55,16 +53,9 @@ public class SequentialJoiningAggregator extends SequentialFlowAggregator {
 	        	// TODO Need a different substream for XSL processing chain
 	        	// output is expected to be SupplyZipOutput which is OK
 	        	
-	        	FlowFactory ff = factory;
-	        	if (type == WellDataType.QUALITY) {
-		        	// TODO Do something to make sure data in cache is fresh
-	        		QualityQueryFlowFactory qf = new QualityQueryFlowFactory(dataSource);
-	        		ff = qf;
-	        	}
-	        	
 	        	// TODO this must be decoupled because we will want to send in lat-long and other resolvers
 				SpecResolver resolver = new WellListResolver();
-	        	Flow inner = new SequentialFlowAggregator(ff, resolver.specIterator(spect, type), substream);
+	        	Flow inner = new SequentialFlowAggregator(factory, resolver.specIterator(spect, type), substream);
 	        	inner.call();
 	        }
 	        

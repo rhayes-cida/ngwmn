@@ -46,7 +46,6 @@ public class SequentialJoiningAggregatorTests {
 		Supplier<OutputStream> upstream;
 		upstream = new SimpleSupplier<OutputStream>(baos);
 		upstream = new SupplyZipOutput(upstream);
-		DataSource ds = null;
 		
 		FlowFactory fac = new FlowFactory() {
 			@Override
@@ -94,7 +93,7 @@ public class SequentialJoiningAggregatorTests {
 		spect.addWell( new Specifier("a","1234567c",WellDataType.LITHOLOGY) );
 		spect.addWell( new Specifier("a","1234567d",WellDataType.LITHOLOGY) );
 		
-		new SequentialJoiningAggregator(fac,spect,upstream,ds).call();
+		new SequentialJoiningAggregator(fac,spect,upstream).call();
 		
 		File file = new File("/tmp","dataSJA.zip");
 		FileOutputStream fos = new FileOutputStream(file);

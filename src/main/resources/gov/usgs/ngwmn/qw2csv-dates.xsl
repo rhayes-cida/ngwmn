@@ -56,54 +56,71 @@
 <xsl:text>,</xsl:text>
 
 <xsl:value-of select="normalize-space(./wqx:ResultDescription/wqx:CharacteristicName)" />
+<xsl:value-of select="normalize-space(./ResultDescription/CharacteristicName)" />
 <xsl:text>,</xsl:text>
 
 <xsl:value-of select="normalize-space(./wqx:ResultDescription/wqx:ResultMeasure/wqx:ResultMeasureValue)" />
+<xsl:value-of select="normalize-space(./ResultDescription/ResultMeasure/ResultMeasureValue)" />
 <xsl:text>,</xsl:text>
 
 <xsl:value-of select="normalize-space(./wqx:ResultDescription/wqx:ResultMeasure/wqx:MeasureUnitCode)" />
+<xsl:value-of select="normalize-space(./ResultDescription/ResultMeasure/MeasureUnitCode)" />
 <xsl:text>,</xsl:text>
 
 <xsl:value-of select="normalize-space(./wqx:ResultDescription/wqx:ResultStatusIdentifier)" />
+<xsl:value-of select="normalize-space(./ResultDescription/ResultStatusIdentifier)" />
 <xsl:text>,</xsl:text>
 
 <xsl:value-of select="normalize-space(./wqx:ResultDescription/wqx:ResultValueTypeName)" />
+<xsl:value-of select="normalize-space(./ResultDescription/ResultValueTypeName)" />
 <xsl:text>,</xsl:text>
 
 <xsl:value-of select="normalize-space(./wqx:ResultDescription/wqx:USGSPCode)" />
+<xsl:value-of select="normalize-space(./ResultDescription/USGSPCode)" />
 <xsl:text>,</xsl:text>
 
 <xsl:value-of select="normalize-space(./wqx:ResultDescription/wqx:ResultSampleFractionText)" />
+<xsl:value-of select="normalize-space(./ResultDescription/ResultSampleFractionText)" />
 <xsl:text>,</xsl:text>
 
 <xsl:value-of select="normalize-space(./wqx:ResultDescription/wqx:ResultCommentText)" />
+<xsl:value-of select="normalize-space(./ResultDescription/ResultCommentText)" />
 <xsl:text>,</xsl:text>
 
 <xsl:value-of select="normalize-space(./wqx:ResultDescription/wqx:ResultTemperatureBasisText)" />
+<xsl:value-of select="normalize-space(./ResultDescription/ResultTemperatureBasisText)" />
 <xsl:text>,</xsl:text>
 
 <xsl:value-of select="normalize-space(./wqx:ResultDescription/wqx:ResultDetectionConditionText)" />
+<xsl:value-of select="normalize-space(./ResultDescription/ResultDetectionConditionText)" />
 <xsl:text>,</xsl:text>
 
 <xsl:value-of select="normalize-space(./wqx:ResultAnalyticalMethod/wqx:MethodIdentifier)" />
+<xsl:value-of select="normalize-space(./ResultAnalyticalMethod/MethodIdentifier)" />
 <xsl:text>,</xsl:text>
 
 <xsl:value-of select="normalize-space(./wqx:ResultAnalyticalMethod/wqx:MethodIdentifierContext)" />
+<xsl:value-of select="normalize-space(./ResultAnalyticalMethod/MethodIdentifierContext)" />
 <xsl:text>,</xsl:text>
 
 <xsl:value-of select="normalize-space(./wqx:ResultAnalyticalMethod/wqx:MethodName)" />
+<xsl:value-of select="normalize-space(./ResultAnalyticalMethod/MethodName)" />
 <xsl:text>,</xsl:text>
 
 <xsl:value-of select="normalize-space(./wqx:ResultAnalyticalMethod/wqx:MethodDescriptionText)" />
+<xsl:value-of select="normalize-space(./ResultAnalyticalMethod/MethodDescriptionText)" />
 <xsl:text>,</xsl:text>
 
 <xsl:value-of select="normalize-space(./wqx:ResultLabInformation/wqx:ResultDetectionQuantitationLimit/wqx:DetectionQuantitationLimitTypeName)" />
+<xsl:value-of select="normalize-space(./ResultLabInformation/ResultDetectionQuantitationLimit/DetectionQuantitationLimitTypeName)" />
 <xsl:text>,</xsl:text>
 
 <xsl:value-of select="normalize-space(./wqx:ResultLabInformation/wqx:ResultDetectionQuantitationLimit/wqx:DetectionQuantitationLimitMeasure/wqx:MeasureValue)" />
+<xsl:value-of select="normalize-space(./ResultLabInformation/ResultDetectionQuantitationLimit/DetectionQuantitationLimitMeasure/MeasureValue)" />
 <xsl:text>,</xsl:text>
 
 <xsl:value-of select="normalize-space(./wqx:ResultLabInformation/wqx:ResultDetectionQuantitationLimit/wqx:DetectionQuantitationLimitMeasure/wqx:MeasureUnitCode)" />
+<xsl:value-of select="normalize-space(./ResultLabInformation/ResultDetectionQuantitationLimit/DetectionQuantitationLimitMeasure/MeasureUnitCode)" />
 <xsl:text>,</xsl:text>
 		<xsl:text>&#xa;</xsl:text>
 		</xsl:if>

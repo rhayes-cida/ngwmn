@@ -16,7 +16,7 @@ import gov.usgs.ngwmn.dm.spec.Specifier;
 /* A replacement for TransformEntrySupplier, but not tied to the old XML-to-CSV flattener
  * 
  */
-public class CSVOutputStreamSupplier extends Supplier<OutputStream> {
+public class DirectWaterlevelCSVOutputStreamSupplier extends Supplier<OutputStream> {
 	protected final transient Logger logger = LoggerFactory.getLogger(getClass());
 
 	private OutputStream destination;
@@ -26,7 +26,7 @@ public class CSVOutputStreamSupplier extends Supplier<OutputStream> {
 	// TODO This is horrible reach-around
 	private WellRegistryDAO registry;
 	
-	public CSVOutputStreamSupplier(OutputStream destination,
+	public DirectWaterlevelCSVOutputStreamSupplier(OutputStream destination,
 			ExecutorService executor, boolean skipHeaders, EntryDescription entryDesc) {
 		super();
 		this.destination = destination;
@@ -43,7 +43,7 @@ public class CSVOutputStreamSupplier extends Supplier<OutputStream> {
 
 		Specifier spec = ed.getSpecifier();
 
-		DirectCSVOutputStream directCSVOutputStream = new DirectWaterlevelCSVOutputStream(destination);
+		DirectWaterlevelCSVOutputStream directCSVOutputStream = new DirectWaterlevelCSVOutputStream(destination);
 		if (spec != null && spec.isBoundedDates()) {
 			directCSVOutputStream.setBeginDate(spec.getBeginDate());
 			directCSVOutputStream.setEndDate(spec.getEndDate());
@@ -61,7 +61,7 @@ public class CSVOutputStreamSupplier extends Supplier<OutputStream> {
 				if (well != null) {
 					Double elevation = well.getAltVa();
 					logger.debug("Discovered elevation {} for {}", elevation, well);
-					((DirectWaterlevelCSVOutputStream)directCSVOutputStream).setElevation(elevation);
+					directCSVOutputStream.setElevation(elevation);
 				}
 			}
 		}

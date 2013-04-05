@@ -16,16 +16,7 @@ public class DirectQualityCSVOutputStream extends DirectCSVOutputStream {
 
 	@Override
 	protected void setupTransform(Transformer t) {
-		super.setupTransform(t);
-		
-		if (getBeginDate() != null) {
-			LocalDate dBegin = new LocalDate(getBeginDate());
-			t.setParameter("beginDate", dBegin.toString());
-		}
-		if (getEndDate() != null) {
-			LocalDate dEnd = new LocalDate(getEndDate());
-			t.setParameter("endDate", dEnd.toString());			
-		}
+		super.setupTransform(t);		
 	}
 
 	@Override

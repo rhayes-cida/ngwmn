@@ -182,6 +182,32 @@ public class DirectQualityCSVOutputStreamTest {
 		assertTrue("has value", result.contains("32.0,mg/l"));
 	}
 
+	@Test
+	public void test_IL_EPA() throws Exception {
+		ByteArrayOutputStream bos = new ByteArrayOutputStream();
+		DirectQualityCSVOutputStream victim = new DirectQualityCSVOutputStream(bos);
+		
+		victim.setExecutor(Executors.newSingleThreadExecutor());
+		victim.setAgency("IL_EPA");
+		victim.setSite("P406197");
+		victim.setBeginDate(sdf.parse("2000-01-01"));
+		victim.setEndDate(sdf.parse("2008-01-01"));
+
+		InputStream tis = getClass().getResourceAsStream("/sample-data/IL_EPA_P406197_QUALITY.xml");
+		
+		copy(tis,victim);
+		
+		victim.close();
+		
+		String result = bos.toString();
+		
+		assertTrue("has header", result.contains("Sample Fraction"));
+		assertTrue("has timestamp", result.contains("2004-01-06"));
+		assertTrue(result.contains("RUN TIME PRIOR TO SAMPLING (MIN)"));
+		assertTrue(result.contains("COLIFORM (TCR)"));
+		assertTrue(result.contains("1,1,1-TRICHLOROETHANE"));
+	}
+	
 	private void copy(InputStream is, OutputStream os) throws IOException {
 		while (true) {
 			int c = is.read();
