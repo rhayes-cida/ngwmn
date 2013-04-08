@@ -51,8 +51,8 @@ public abstract class DirectCSVOutputStream
 			t.setParameter("endDate", dEnd.toString());			
 		}
 
-		logger.debug("Set transform parameters to agency={}, site={}, elevation={}, writtenHeaders={}", 
-				new Object[] { getAgency(), getSite(), isWrittenHeaders()});
+		logger.debug("Set transform parameters to agency={}, site={}, elevation={}, writtenHeaders={}, begindate{}, endDate={}", 
+				new Object[] { getAgency(), getSite(), isWrittenHeaders(), getBeginDate(), getEndDate()});
 		
 		t.setErrorListener(this);
 		super.setupTransform(t);

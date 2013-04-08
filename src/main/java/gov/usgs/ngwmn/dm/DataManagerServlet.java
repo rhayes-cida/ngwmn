@@ -163,6 +163,7 @@ public class DataManagerServlet extends HttpServlet {
 		}
 		
 		// TODO parse out BBox and other timeSeriesQuery params
+		logger.info("Created Specification {}", spect);
 		
 		precheckWells(spect);
 		

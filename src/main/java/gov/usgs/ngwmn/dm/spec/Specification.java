@@ -123,6 +123,25 @@ public class Specification {
 			s.setEndDate(date);
 		}
 	}
+
+	@Override
+	public String toString() {
+		StringBuilder builder = new StringBuilder();
+		builder.append("Specification [encode=");
+		builder.append(encode);
+		builder.append(", bundled=");
+		builder.append(bundled);
+		builder.append(", beginDate=");
+		builder.append(beginDate);
+		builder.append(", endDate=");
+		builder.append(endDate);
+		builder.append(", dataTypes=");
+		builder.append(dataTypes);
+		builder.append(", knownWells=");
+		builder.append(knownWells);
+		builder.append("]");
+		return builder.toString();
+	}
 	
 
 }
