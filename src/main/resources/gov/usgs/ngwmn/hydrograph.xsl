@@ -25,7 +25,7 @@
 	<xsl:template match="wml2:TimeValuePair">
 		<xsl:param name="elevation"/>
 
-		<xsl:value-of select="mediator:csv_escape(string(.//wml2:time))" />
+		<xsl:value-of select="mediator:csv_escape(string(.//wml2:time),',')" />
 		<xsl:text>,</xsl:text>
 		<xsl:text>-</xsl:text>
 		<xsl:value-of select="mediator:mediate(string(.//swe:value),$elevation,string(.//gwdp:nwis/@direction))" />

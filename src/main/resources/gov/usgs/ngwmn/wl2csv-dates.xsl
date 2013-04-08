@@ -18,9 +18,18 @@
 		<xsl:param name="emit_header" select="false()"/>
 		<xsl:param name="beginDate" />
 		<xsl:param name="endDate" />
+		<xsl:param name="separator" select="','"/>
 
 		<xsl:if test="$emit_header">
-			<xsl:text>AgencyCd, SiteNo, Time, Parameter Code, Direction, Unit, Value, Mediated Value, Observation Method</xsl:text>
+			<xsl:text>AgencyCd</xsl:text><xsl:value-of select="$separator"/>
+			<xsl:text>SiteNo</xsl:text><xsl:value-of select="$separator"/>
+			<xsl:text>Time</xsl:text><xsl:value-of select="$separator"/>
+			<xsl:text>Parameter Code</xsl:text><xsl:value-of select="$separator"/>
+			<xsl:text>Direction</xsl:text><xsl:value-of select="$separator"/>
+			<xsl:text>Unit</xsl:text><xsl:value-of select="$separator"/>
+			<xsl:text>Value</xsl:text><xsl:value-of select="$separator"/>
+			<xsl:text>Mediated Value</xsl:text><xsl:value-of select="$separator"/>
+			<xsl:text>Observation Method</xsl:text><xsl:value-of select="$separator"/>
 			<xsl:text>&#xa;</xsl:text>
 		</xsl:if>
 		
@@ -30,6 +39,7 @@
 			<xsl:with-param name="elevation" select="$elevation"/>
 			<xsl:with-param name="beginDate" select="$beginDate"/>
 			<xsl:with-param name="endDate" select="$endDate"/>
+			<xsl:with-param name="separator" select="$separator"/>
 		</xsl:apply-templates>
 
 	</xsl:template>
@@ -40,26 +50,35 @@
 		<xsl:param name="elevation"/>
 		<xsl:param name="beginDate"/>
 		<xsl:param name="endDate"/>
+		<xsl:param name="separator"/>
 
 		<xsl:if test="mediator:between($beginDate,string(./wml2:time),$endDate)">
-		<xsl:value-of select="$agency" />
-		<xsl:text>,</xsl:text>
-		<xsl:value-of select="$site" />
-		<xsl:text>,</xsl:text>
-		<xsl:value-of select="mediator:csv_escape(string(.//wml2:time))" />
-		<xsl:text>,</xsl:text>
-		<xsl:value-of select=".//gwdp:nwis/@pcode" />
-		<xsl:text>,</xsl:text>
-		<xsl:value-of select=".//gwdp:nwis/@direction" />
-		<xsl:text>,</xsl:text>
-		<xsl:value-of select=".//swe:uom/@code" />
-		<xsl:text>,</xsl:text>
-		<xsl:value-of select=".//swe:value" />
-		<xsl:text>,</xsl:text>
-		<xsl:value-of select="mediator:mediate(string(.//swe:value),$elevation,string(.//gwdp:nwis/@direction))" />
-		<xsl:text>,</xsl:text>
-		<xsl:value-of select="mediator:csv_escape(string(.//wml2:comment))" />
-		<xsl:text>&#xa;</xsl:text>
+			<xsl:value-of select="$agency" />
+			<xsl:value-of select="$separator"/>
+			
+			<xsl:value-of select="$site" />
+			<xsl:value-of select="$separator"/>
+			
+			<xsl:value-of select="mediator:csv_escape(string(.//wml2:time),string($separator))" />
+			<xsl:value-of select="$separator"/>
+			
+			<xsl:value-of select=".//gwdp:nwis/@pcode" />
+			<xsl:value-of select="$separator"/>
+			
+			<xsl:value-of select=".//gwdp:nwis/@direction" />
+			<xsl:value-of select="$separator"/>
+			
+			<xsl:value-of select=".//swe:uom/@code" />
+			<xsl:value-of select="$separator"/>
+			
+			<xsl:value-of select=".//swe:value" />
+			<xsl:value-of select="$separator"/>
+			
+			<xsl:value-of select="mediator:mediate(string(.//swe:value),$elevation,string(.//gwdp:nwis/@direction))" />
+			<xsl:value-of select="$separator"/>
+			
+			<xsl:value-of select="mediator:csv_escape(string(.//wml2:comment), string($separator))" />
+			<xsl:text>&#xa;</xsl:text>
 		</xsl:if>
 	</xsl:template>
 

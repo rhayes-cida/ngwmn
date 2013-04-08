@@ -25,11 +25,11 @@ public class WaterlevelMediator {
 			
 	}
 
-	public static String csv_escape(String v) {
+	public static String csv_escape(String v, String separator) {
 		if (v == null) {
 			return v;
 		}
-		if ( ! v.contains(",")) {
+		if ( ! v.contains(separator)) {
 			return v;
 		}
 		v = v.replace("\"", "\"\"");

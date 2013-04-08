@@ -162,6 +162,12 @@ public class DataManagerServlet extends HttpServlet {
 			spect.setEndDate(ld.toDate());
 		}
 		
+		String fileType = req.getParameter("fileType");
+		if (fileType != null) {
+			Encoding enc = Encoding.valueOf(fileType.toUpperCase());
+			spect.setEncode(enc);
+		}
+				
 		// TODO parse out BBox and other timeSeriesQuery params
 		logger.info("Created Specification {}", spect);
 		

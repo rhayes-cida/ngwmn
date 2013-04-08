@@ -52,6 +52,7 @@ public class Specification {
 		
 		spec.setBeginDate(beginDate);
 		spec.setEndDate(endDate);
+		spec.setEncoding(getEncode());
 		
 		if (knownWells.add(spec)) {
 			wellIDs.get(type).add(spec);
@@ -100,8 +101,10 @@ public class Specification {
 	}
 	public void setEncode(Encoding encode) {
 		this.encode = encode;
+		for (Specifier s: knownWells) {
+			s.setEncoding(encode);
+		}
 	}
-
 
 	public boolean isBundled() {
 		return bundled;

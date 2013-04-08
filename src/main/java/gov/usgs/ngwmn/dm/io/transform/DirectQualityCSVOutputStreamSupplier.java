@@ -7,8 +7,6 @@ import java.util.concurrent.ExecutorService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import gov.usgs.ngwmn.dm.dao.WellRegistry;
-import gov.usgs.ngwmn.dm.dao.WellRegistryDAO;
 import gov.usgs.ngwmn.dm.io.EntryDescription;
 import gov.usgs.ngwmn.dm.io.Supplier;
 import gov.usgs.ngwmn.dm.spec.Specifier;
@@ -49,6 +47,7 @@ public class DirectQualityCSVOutputStreamSupplier extends Supplier<OutputStream>
 		directCSVOutputStream.setWrittenHeaders(skipHeaders);
 		logger.debug("initialize stream for specifier {}", spec);
 		if (spec != null) {
+			directCSVOutputStream.setEncoding(spec.getEncoding());
 			directCSVOutputStream.setAgency(spec.getAgencyID());
 			directCSVOutputStream.setSite(spec.getFeatureID());
 		}

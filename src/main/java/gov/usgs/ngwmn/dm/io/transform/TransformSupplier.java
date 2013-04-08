@@ -105,7 +105,8 @@ public class TransformSupplier extends Supplier<OutputStream>
 				switch (dataType) {
 				case WATERLEVEL:
 				case QUALITY:
-					throw new NotImplementedException();
+					oStream = os;
+					break;
 				default:
 					oStream = new TsvOutputStream(os);						
 				}

@@ -52,6 +52,7 @@ public class DirectWaterlevelCSVOutputStreamSupplier extends Supplier<OutputStre
 		directCSVOutputStream.setWrittenHeaders(skipHeaders);
 		logger.debug("initialize stream for specifier {}", spec);
 		if (spec != null) {
+			directCSVOutputStream.setEncoding(spec.getEncoding());
 			directCSVOutputStream.setAgency(spec.getAgencyID());
 			directCSVOutputStream.setSite(spec.getFeatureID());
 

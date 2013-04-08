@@ -1,5 +1,7 @@
 package gov.usgs.ngwmn.dm.io.transform;
 
+import gov.usgs.ngwmn.dm.spec.Encoding;
+
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Date;
@@ -24,6 +26,7 @@ public abstract class DirectCSVOutputStream
 	protected String site;
 	protected Date beginDate;
 	protected Date endDate;
+	protected Encoding encoding;
 		
 	public DirectCSVOutputStream(String transform, OutputStream out) throws IOException {
 		super(out);
@@ -51,6 +54,12 @@ public abstract class DirectCSVOutputStream
 			t.setParameter("endDate", dEnd.toString());			
 		}
 
+		if (getEncoding() != null) {
+			if (getEncoding().getSeparator() != null) {
+				t.setParameter("separator", encoding.getSeparator());
+			}
+		}
+		
 		logger.debug("Set transform parameters to agency={}, site={}, elevation={}, writtenHeaders={}, begindate{}, endDate={}", 
 				new Object[] { getAgency(), getSite(), isWrittenHeaders(), getBeginDate(), getEndDate()});
 		
@@ -133,6 +142,14 @@ public abstract class DirectCSVOutputStream
 
 	public void setEndDate(Date endDate) {
 		this.endDate = endDate;
+	}
+
+	public Encoding getEncoding() {
+		return encoding;
+	}
+
+	public void setEncoding(Encoding encoding) {
+		this.encoding = encoding;
 	}
 	
 	

@@ -18,6 +18,7 @@ public class Specifier {
 	private Date beginDate;
 	private Date endDate;
 	
+	private Encoding encoding;
 	
 	public Specifier(String agencyID, String featureID, WellDataType typeID) {
 		this.agencyID = agencyID;
@@ -97,6 +98,8 @@ public class Specifier {
 			return false;
 		if (typeID != other.typeID)
 			return false;
+		if (encoding != other.encoding) 
+			return false;
 		return true;
 	}
 
@@ -119,5 +122,14 @@ public class Specifier {
 	public boolean isBoundedDates() {
 		return beginDate != null || endDate != null;
 	}
+
+	public Encoding getEncoding() {
+		return encoding;
+	}
+
+	public void setEncoding(Encoding separator) {
+		this.encoding = separator;
+	}
+
 }
 
