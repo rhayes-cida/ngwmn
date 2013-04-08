@@ -26,6 +26,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.Callable;
+import java.util.concurrent.TimeUnit;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -152,8 +153,12 @@ public class Prefetcher implements Callable<PrefetchOutcome> {
 		}
 		
 		while ( ! wellQueue.isEmpty()) {
+			logger.debug("Getting next well, q size={}", wellQueue.size());
 			WellStatus well = wellQueue.remove();
+
+			logger.debug("Got well, q size={}", well);
 			MDC.put("well", well.toString());
+			
 			try {
 
 				if (isQuitting() || Thread.interrupted()) {
@@ -182,7 +187,8 @@ public class Prefetcher implements Callable<PrefetchOutcome> {
 					Future<Long> f = dispatch(spec);
 
 					try {
-						Long ct =  f.get();
+						// Half an hour is too long for any one fetch.
+						Long ct =  f.get(30, TimeUnit.MINUTES);
 						logger.info("pre-fetched {} bytes for {}", ct, spec);
 					} catch (Exception x) {
 						logger.warn("Failed pre-fetch for " + spec, x);
@@ -199,16 +205,19 @@ public class Prefetcher implements Callable<PrefetchOutcome> {
 
 		// update stats for other users
 		try {
+			logger.debug("Updating stats");
 			cacheDAO.updateStatistics();
+			logger.debug("Done stats");
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
 		
+		logger.info("Done, outcome={}", outcome);
 		if (outcome == PrefetchOutcome.RUNNING) {
 			outcome = PrefetchOutcome.FINISHED;
 		}
-		logger.info("Done");
 		
+		logger.info("Returning outcome={}", outcome);
 		return outcome;
 	}
 	

@@ -33,8 +33,8 @@
   <logger name="gov.usgs.ngwmn.dm.visualization" level="DEBUG" />
   <logger name="gov.usgs.ngwmn.dm.prefetch" level="DEBUG"/>
   <logger name="org.springframework.jdbc.core.JdbcTemplate" level="INFO"/>
-  <logger name="gov.usgs.ngwmn.dm.aspect" level="TRACE"/>
-  <logger name="gov.usgs.ngwmn.dm.io" level="TRACE"/>
+  <logger name="gov.usgs.ngwmn.dm.aspect" level="INFO"/>
+  <logger name="gov.usgs.ngwmn.dm.io" level="INFO"/>
 	  
   <root level="info">
   	<if condition=' ! p("user.name").equals("tomcat")'>
