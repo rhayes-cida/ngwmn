@@ -10,6 +10,7 @@ import java.util.TreeMap;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
 
 import javax.management.ObjectName;
 
@@ -29,7 +30,8 @@ public class PrefetchController {
 	private Cleaner cleaner;
 	private WaterlevelRankStatsWorker wlsWorker;
 	private boolean disabled = false;
-	
+	private Long timeLimit;
+
 	@Autowired
 	private ApplicationContext ctx;
 	public void setApplicationContext(ApplicationContext ctx) {
@@ -192,7 +194,12 @@ public class PrefetchController {
 			logger.info("future {} for {} done: {}", new Object[] {f, agency, done});
 			if (done) {
 				try {
-					PrefetchOutcome outcome = f.get();
+					PrefetchOutcome outcome;
+					if (getTimeLimit() != null) {
+						outcome = f.get(getTimeLimit(), TimeUnit.MILLISECONDS);
+					} else {
+						outcome = f.get();
+					}
 					logger.info("outcome for {}: {}", agency, outcome);
 					finishedOutcomes.put(agency, outcome);
 				} catch (Exception x) {
@@ -241,6 +248,8 @@ public class PrefetchController {
 
 	public void setScheduler(ThreadPoolTaskScheduler sked) {
 		this.sked = sked;
+		sked.setDaemon(true);
+		sked.setThreadGroupName("PrefetchThreadGroup");
 		sked.setWaitForTasksToCompleteOnShutdown(true);
 	}
 	
@@ -288,5 +297,11 @@ public class PrefetchController {
 		this.disabled = disabled;
 	}
 	
+	public Long getTimeLimit() {
+		return timeLimit;
+	}
+	public void setTimeLimit(Long timeLimit) {
+		this.timeLimit = timeLimit;
+	}
 }
 
