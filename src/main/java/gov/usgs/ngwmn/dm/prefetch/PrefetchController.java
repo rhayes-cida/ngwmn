@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.concurrent.Callable;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Future;
 
 import javax.management.ObjectName;
@@ -102,10 +103,20 @@ public class PrefetchController {
 	private Map<String,Future<PrefetchOutcome>> multithreadOutcomes = 
 			Collections.synchronizedMap(
 					new TreeMap<String,Future<PrefetchOutcome>>());
+	private Map<String, PrefetchOutcome> finishedOutcomes = new ConcurrentHashMap<String, PrefetchOutcome>();
 	
 	private Prefetcher makePrefetcher() {
 		logger.trace("Context is {}", ctx);
 		return ctx.getBean("PrefetchInstance", Prefetcher.class);
+	}
+	
+	public String getOutcomes() {
+		boolean done = checkOutcomes();
+		Map<String,Object> allOutcomes = new TreeMap<String,Object>();
+		allOutcomes.putAll(finishedOutcomes);
+		allOutcomes.putAll(multithreadOutcomes);
+		allOutcomes.put("_done", done);
+		return allOutcomes.toString();
 	}
 	
 	public synchronized Map<String, Future<PrefetchOutcome>>  startInParallel() {
@@ -183,8 +194,10 @@ public class PrefetchController {
 				try {
 					PrefetchOutcome outcome = f.get();
 					logger.info("outcome for {}: {}", agency, outcome);
+					finishedOutcomes.put(agency, outcome);
 				} catch (Exception x) {
 					logger.warn("got exception instead of outcome for " + agency, x);
+					finishedOutcomes.put(agency, PrefetchOutcome.PROBLEM);
 				}
 				it.remove();
 			} else {

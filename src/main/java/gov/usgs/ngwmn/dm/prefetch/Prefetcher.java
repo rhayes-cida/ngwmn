@@ -10,10 +10,12 @@ import gov.usgs.ngwmn.dm.dao.FetchLog;
 import gov.usgs.ngwmn.dm.dao.FetchLogDAO;
 import gov.usgs.ngwmn.dm.dao.WellRegistry;
 import gov.usgs.ngwmn.dm.dao.WellRegistryDAO;
+import gov.usgs.ngwmn.dm.prefetch.Prefetcher.WellStatus;
 import gov.usgs.ngwmn.dm.spec.Specifier;
 
 import java.io.InterruptedIOException;
 import java.lang.reflect.Method;
+import java.text.MessageFormat;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
@@ -22,6 +24,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.PriorityQueue;
 import java.util.Queue;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
@@ -46,6 +49,8 @@ public class Prefetcher implements Callable<PrefetchOutcome> {
 	private WellRegistryDAO wellDAO;
 	private CacheMetaDataDAO cacheDAO;
 	private FetchLogDAO fetchLogDAO;
+	
+	private Map<String,Future<Long>> waitingFor = new ConcurrentHashMap<String, Future<Long>>();
 	
 	private PrefetchOutcome outcome = PrefetchOutcome.UNSTARTED;
 	
@@ -90,6 +95,10 @@ public class Prefetcher implements Callable<PrefetchOutcome> {
 			WellDataType.QUALITY,
 			WellDataType.LOG
 	};
+
+	private WellStatus wellStatus;
+
+	private Integer queueSize;
 	
 	public PrefetchOutcome call() {
 		
@@ -130,6 +139,25 @@ public class Prefetcher implements Callable<PrefetchOutcome> {
 		return v;
 	}
 	
+	public Integer getQueueSize() {
+		return queueSize;
+	}
+	private void setQueueSize(Integer i) {
+		queueSize = i;
+	}
+	public WellStatus getWell() {
+		return wellStatus;
+	}
+	private void setWellForReporting(WellStatus ws) {
+		wellStatus = ws;
+	}
+	public PrefetchOutcome getOutcome() {
+		return outcome;
+	}
+	public String getWaitingFor() {
+		return waitingFor.toString();
+	}
+		
 	private PrefetchOutcome performPrefetch(Queue<WellStatus> wellQueue) 
 			throws RuntimeException 
 	{
@@ -154,11 +182,14 @@ public class Prefetcher implements Callable<PrefetchOutcome> {
 		
 		while ( ! wellQueue.isEmpty()) {
 			logger.debug("Getting next well, q size={}", wellQueue.size());
+			setQueueSize(wellQueue.size());
 			WellStatus well = wellQueue.remove();
 
 			logger.debug("Got well, q size={}", well);
-			MDC.put("well", well.toString());
+			setWellForReporting(well);
 			
+			MDC.put("well", well.toString());
+						
 			try {
 
 				if (isQuitting() || Thread.interrupted()) {
@@ -185,13 +216,15 @@ public class Prefetcher implements Callable<PrefetchOutcome> {
 
 					logger.debug("pre-fetch of {}", spec);
 					Future<Long> f = dispatch(spec);
-
+					waitingFor.put(spec.toString(), f);
 					try {
 						// Half an hour is too long for any one fetch.
 						Long ct =  f.get(30, TimeUnit.MINUTES);
 						logger.info("pre-fetched {} bytes for {}", ct, spec);
 					} catch (Exception x) {
 						logger.warn("Failed pre-fetch for " + spec, x);
+					} finally {
+						waitingFor.remove(spec.toString());
 					}
 					tried++;
 				} else {

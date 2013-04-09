@@ -112,6 +112,18 @@
         <url-pattern>/direct/*</url-pattern>
     </servlet-mapping>
     
+    <servlet>
+    	<servlet-name>JmxMiniConsoleServlet</servlet-name>
+    	<servlet-class>
+        	org.jminix.console.servlet.MiniConsoleServlet
+    	</servlet-class>
+	</servlet> 
+
+	<servlet-mapping>
+    	<servlet-name>JmxMiniConsoleServlet</servlet-name>
+    		<url-pattern>/jmx/*</url-pattern>
+	</servlet-mapping>
+	      
  	<security-constraint>
       <display-name>Diagnostics Security Constraint</display-name>
       <web-resource-collection>
@@ -119,6 +131,7 @@
          <url-pattern>/admin/*</url-pattern>
          <url-pattern>/stats/*</url-pattern>
          <url-pattern>/wells/*</url-pattern>
+         <url-pattern>/jmx/*</url-pattern>
       </web-resource-collection>
       <auth-constraint>
          <role-name>tomcat</role-name>
