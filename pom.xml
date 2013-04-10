@@ -312,6 +312,10 @@
 		        		<include>**/functional/**</include>
 		        		<include>**/*IntegrationTest.java</include>
 		        	</includes>
+		        	<excludes>
+		        		<!-- too dependent on data providers -->
+		        		<exclude>**/PrefetchControllerIntegrationTest.java</exclude>
+		        	</excludes>
 		        	<testFailureIgnore>true</testFailureIgnore>
 		        </configuration>
 		        <executions>
