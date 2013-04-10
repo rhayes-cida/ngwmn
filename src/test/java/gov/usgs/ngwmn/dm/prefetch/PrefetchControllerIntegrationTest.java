@@ -3,9 +3,7 @@ package gov.usgs.ngwmn.dm.prefetch;
 import static org.junit.Assert.*;
 
 import java.util.Collection;
-import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.Future;
 
 import gov.usgs.ngwmn.dm.dao.ContextualTest;

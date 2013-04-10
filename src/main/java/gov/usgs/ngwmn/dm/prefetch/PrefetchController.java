@@ -1,6 +1,7 @@
 package gov.usgs.ngwmn.dm.prefetch;
 
 import gov.usgs.ngwmn.dm.cache.Cleaner;
+import gov.usgs.ngwmn.dm.dao.CacheMetaDataDAO;
 
 import java.util.Collections;
 import java.util.Iterator;
@@ -31,6 +32,9 @@ public class PrefetchController {
 	private WaterlevelRankStatsWorker wlsWorker;
 	private boolean disabled = false;
 	private Long timeLimit;
+	
+	@Autowired
+	private CacheMetaDataDAO cacheDAO;
 
 	@Autowired
 	private ApplicationContext ctx;
@@ -74,6 +78,8 @@ public class PrefetchController {
 			return;
 		}
 		
+		updateCacheStats();
+
 		MDC.put("prefetch", "single");
 		final Map<?,?> mdc = MDC.getCopyOfContextMap();
 		
@@ -141,6 +147,8 @@ public class PrefetchController {
 
 		MDC.put("prefetch", "multi");
 		
+		updateCacheStats();
+		
 		for (final String agency : agencies) {
 			logger.info("Launching for {}", agency);
 			
@@ -176,6 +184,17 @@ public class PrefetchController {
 		}
 		
 		return multithreadOutcomes;
+	}
+
+	private void updateCacheStats() {
+		// make sure we're working with fresh statistics
+		logger.info("Updating cache neta data");
+		try {
+			cacheDAO.updateCacheMetaData();
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+		logger.info("Updated cache neta data");
 	}
 
 	/**
@@ -242,7 +261,7 @@ public class PrefetchController {
 		return ! getScheduler().getScheduledExecutor().isShutdown();
 	}
 	
-	public ThreadPoolTaskScheduler getScheduler() {
+	private ThreadPoolTaskScheduler getScheduler() {
 		return sked;
 	}
 
@@ -257,32 +276,16 @@ public class PrefetchController {
 		return sked.getClass().toString();
 	}
 
-	public Prefetcher getPrefetcher() {
-		return prefetcher;
-	}
-
 	public void setPrefetcher(Prefetcher prefetcher) {
 		this.prefetcher = prefetcher;
-	}
-
-	public Cleaner getCleaner() {
-		return cleaner;
 	}
 
 	public void setCleaner(Cleaner cleaner) {
 		this.cleaner = cleaner;
 	}
 
-	public MBeanExporter getMbeanExporter() {
-		return mbeanExporter;
-	}
-
 	public void setMbeanExporter(MBeanExporter mbeanExporter) {
 		this.mbeanExporter = mbeanExporter;
-	}
-
-	public WaterlevelRankStatsWorker getWaterlevelRankStatsWorker() {
-		return wlsWorker;
 	}
 
 	public void setWaterlevelRankStatsWorker(WaterlevelRankStatsWorker wlsWorker) {
@@ -303,5 +306,10 @@ public class PrefetchController {
 	public void setTimeLimit(Long timeLimit) {
 		this.timeLimit = timeLimit;
 	}
+	
+	public void setCacheDAO(CacheMetaDataDAO cacheDAO) {
+		this.cacheDAO = cacheDAO;
+	}
+
 }
 

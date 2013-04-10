@@ -10,12 +10,10 @@ import gov.usgs.ngwmn.dm.dao.FetchLog;
 import gov.usgs.ngwmn.dm.dao.FetchLogDAO;
 import gov.usgs.ngwmn.dm.dao.WellRegistry;
 import gov.usgs.ngwmn.dm.dao.WellRegistryDAO;
-import gov.usgs.ngwmn.dm.prefetch.Prefetcher.WellStatus;
 import gov.usgs.ngwmn.dm.spec.Specifier;
 
 import java.io.InterruptedIOException;
 import java.lang.reflect.Method;
-import java.text.MessageFormat;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
@@ -50,6 +48,11 @@ public class Prefetcher implements Callable<PrefetchOutcome> {
 	private CacheMetaDataDAO cacheDAO;
 	private FetchLogDAO fetchLogDAO;
 	
+	private WellStatus wellStatus;
+	private Integer queueSize;
+	private Integer fetchCount;
+	private Integer remaining;
+	
 	private Map<String,Future<Long>> waitingFor = new ConcurrentHashMap<String, Future<Long>>();
 	
 	private PrefetchOutcome outcome = PrefetchOutcome.UNSTARTED;
@@ -78,6 +81,7 @@ public class Prefetcher implements Callable<PrefetchOutcome> {
 	public void setTimeLimit(Long timeLimit) {
 		this.timeLimit = timeLimit;
 	}
+	
 	public void setBroker(PrefetchI broker) {
 		this.broker = broker;
 	}
@@ -96,10 +100,6 @@ public class Prefetcher implements Callable<PrefetchOutcome> {
 			WellDataType.LOG
 	};
 
-	private WellStatus wellStatus;
-
-	private Integer queueSize;
-	
 	public PrefetchOutcome call() {
 		
 		outcome = PrefetchOutcome.RUNNING;
@@ -139,30 +139,45 @@ public class Prefetcher implements Callable<PrefetchOutcome> {
 		return v;
 	}
 	
-	public Integer getQueueSize() {
+	public synchronized Integer getQueueSize() {
 		return queueSize;
 	}
-	private void setQueueSize(Integer i) {
+	private synchronized void setQueueSize(Integer i) {
 		queueSize = i;
 	}
-	public WellStatus getWell() {
+	public synchronized Integer getFetchCount() {
+		return fetchCount;
+	}
+	private synchronized void setFetchCount(Integer i) {
+		fetchCount = i;
+	}
+	
+	public synchronized WellStatus getWell() {
 		return wellStatus;
 	}
-	private void setWellForReporting(WellStatus ws) {
+	private synchronized void setWellForReporting(WellStatus ws) {
 		wellStatus = ws;
 	}
-	public PrefetchOutcome getOutcome() {
+	public synchronized PrefetchOutcome getOutcome() {
 		return outcome;
 	}
-	public String getWaitingFor() {
+	public synchronized String getWaitingFor() {
 		return waitingFor.toString();
 	}
 		
+	public synchronized Integer getRemaining() {
+		return remaining;
+	}
+	private synchronized void setRemaining(Integer remaining) {
+		this.remaining = remaining;
+	}
+
 	private PrefetchOutcome performPrefetch(Queue<WellStatus> wellQueue) 
 			throws RuntimeException 
 	{
 		
-		int tried = 0;
+		int fetched = 0;
+		setFetchCount(fetched);
 
 		if (isQuitting() || Thread.interrupted()) {
 			logger.warn("Prefetcher stopped");
@@ -180,10 +195,13 @@ public class Prefetcher implements Callable<PrefetchOutcome> {
 				new Object[] {getSize(wellQueue), timeLimit, fetchLimit, (endTime == null)? null: new Date(endTime)});
 		}
 		
+		setQueueSize(wellQueue.size());
+		setRemaining(wellQueue.size());
+		
 		while ( ! wellQueue.isEmpty()) {
 			logger.debug("Getting next well, q size={}", wellQueue.size());
-			setQueueSize(wellQueue.size());
 			WellStatus well = wellQueue.remove();
+			setRemaining(wellQueue.size());
 
 			logger.debug("Got well, q size={}", well);
 			setWellForReporting(well);
@@ -198,14 +216,14 @@ public class Prefetcher implements Callable<PrefetchOutcome> {
 					break;
 				}
 
-				if (fetchLimit > 0 && tried >= fetchLimit) {
-					logger.info("hit fetch limit {}", tried);
+				if (fetchLimit > 0 && fetched >= fetchLimit) {
+					logger.info("hit fetch limit {}", fetched);
 					outcome = PrefetchOutcome.LIMIT_COUNT;
 					break;
 				}
 
 				if (endTime != null && System.currentTimeMillis() > endTime) {
-					logger.info("hit time limit after {} of {}", tried, fetchLimit);
+					logger.info("hit time limit after {} of {}", fetched, fetchLimit);
 					outcome = PrefetchOutcome.LIMIT_TIME;
 					break;
 				}
@@ -221,12 +239,12 @@ public class Prefetcher implements Callable<PrefetchOutcome> {
 						// Half an hour is too long for any one fetch.
 						Long ct =  f.get(30, TimeUnit.MINUTES);
 						logger.info("pre-fetched {} bytes for {}", ct, spec);
+						setFetchCount(++fetched);
 					} catch (Exception x) {
 						logger.warn("Failed pre-fetch for " + spec, x);
 					} finally {
 						waitingFor.remove(spec.toString());
 					}
-					tried++;
 				} else {
 					recordSkip(well, "Flag");
 					logger.info("Skipping well {} type {} due to flag", well.well.getMySiteid(), well.type);
@@ -335,11 +353,11 @@ public class Prefetcher implements Callable<PrefetchOutcome> {
 		}	
 	}
 
-	public Comparator<WellStatus> getWellComparator() {
+	/* package */ Comparator<WellStatus> getWellComparator() {
 		return wellCompare;
 	}
 	
-	public Comparator<WellStatus> getSimpleWellComparator() {
+	/* package */ Comparator<WellStatus> getSimpleWellComparator() {
 		return simpleWellCompare;
 	}
 	
@@ -551,13 +569,6 @@ public class Prefetcher implements Callable<PrefetchOutcome> {
 		
 		PriorityQueue<WellStatus> pq = new PriorityQueue<WellStatus>(allWells.size(), simpleWellCompare);
 		
-		// make sure we're working with fresh statistics
-		try {
-			cacheDAO.updateCacheMetaData();
-		} catch (Exception e) {
-			throw new RuntimeException(e);
-		}
-		
 		Date horizon = new Date(System.currentTimeMillis() - 2*HOUR);
 
 		List<CacheMetaData> cmd = cacheDAO.listByAgencyCd(agency_cd);
@@ -672,9 +683,6 @@ public class Prefetcher implements Callable<PrefetchOutcome> {
 		
 	}
 	
-	public FetchLogDAO getFetchLogDAO() {
-		return fetchLogDAO;
-	}
 	public void setFetchLogDAO(FetchLogDAO dao) {
 		this.fetchLogDAO = dao;
 	}
