@@ -254,6 +254,8 @@ public class Prefetcher implements Callable<PrefetchOutcome> {
 			}			
 		}
 
+		setRemaining(wellQueue.size());
+
 		// update stats for other users
 		try {
 			logger.debug("Updating stats");
