@@ -79,12 +79,17 @@
             
     	    var dyChart = new Dygraph.GVizChart(
     	    		document.getElementById('dygraphs_chart'));
+    	    var rightNow = new Date();
+    	    var then = new Date();
+    	    then.setDate(rightNow.getDate() - 14);
+    	    
     	    var dyOptions = {
     	    		hideOverlayOnMouseOut: false,
     	    	      labelsDivStyles: { border: '1px solid black' },
     	    	      title: 'Fetch Statistics',
     	    	      xlabel: 'Date',
     	    	      ylabel: 'Count',
+    	    	      dateWindow: [then,rightNow],
     	    	      showRangeSelector: true
     	    	    }
     	    dyChart.draw(data, dyOptions);

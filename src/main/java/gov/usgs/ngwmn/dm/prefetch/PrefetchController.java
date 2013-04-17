@@ -4,6 +4,7 @@ import gov.usgs.ngwmn.dm.cache.Cleaner;
 import gov.usgs.ngwmn.dm.dao.CacheMetaDataDAO;
 
 import java.util.Collections;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -104,6 +105,7 @@ public class PrefetchController {
 		};
 		
 		multithreadOutcomes.put("all",sked.submit(task));
+		startedAt = new Date();
 
 	}
 	
@@ -112,6 +114,7 @@ public class PrefetchController {
 			Collections.synchronizedMap(
 					new TreeMap<String,Future<PrefetchOutcome>>());
 	private Map<String, PrefetchOutcome> finishedOutcomes = new ConcurrentHashMap<String, PrefetchOutcome>();
+	private Date startedAt = null;
 	
 	private Prefetcher makePrefetcher() {
 		logger.trace("Context is {}", ctx);
@@ -124,6 +127,7 @@ public class PrefetchController {
 		allOutcomes.putAll(finishedOutcomes);
 		allOutcomes.putAll(multithreadOutcomes);
 		allOutcomes.put("_done", done);
+		allOutcomes.put("started at", startedAt);
 		return allOutcomes.toString();
 	}
 	
@@ -183,6 +187,7 @@ public class PrefetchController {
 			checkOutcomes();
 		}
 		
+		startedAt = new Date();
 		return multithreadOutcomes;
 	}
 
@@ -197,11 +202,15 @@ public class PrefetchController {
 		logger.info("Updated cache neta data");
 	}
 
+	public synchronized Date getStartedAt() {
+		return startedAt;
+	}
+	
 	/**
 	 * 
 	 * @return true if all previous tasks are done
 	 */
-	public boolean checkOutcomes() {
+	public synchronized boolean checkOutcomes() {
 		boolean allDone = true;
 		// Have to get a bit fancy to avoid problems with modifying the map while iterating over it
 		Iterator<Map.Entry<String,Future<PrefetchOutcome>>> it = multithreadOutcomes.entrySet().iterator();
@@ -229,6 +238,9 @@ public class PrefetchController {
 			} else {
 				allDone = false;
 			}
+		}
+		if (allDone) {
+			startedAt = null;
 		}
 		return allDone;
 	}
