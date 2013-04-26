@@ -30,7 +30,7 @@ public class DirectWaterlevelCSVOutputStreamTest {
 		
 		String result = bos.toString();
 		
-		assertTrue("has header", result.contains("Mediated Value"));
+		assertTrue("has header", result.contains("Depth to Water Below Land Surface in ft"));
 		assertTrue("has timestamp", result.contains("1983-08-25"));
 		assertTrue("has value", result.contains("up,ft,14.04"));
 	}
@@ -53,7 +53,7 @@ public class DirectWaterlevelCSVOutputStreamTest {
 		
 		String result = bos.toString();
 		
-		assertFalse("has header", result.contains("Mediated Value"));
+		assertFalse("has header", result.contains("Direction"));
 		assertTrue("has timestamp", result.contains("1983-08-25"));
 		assertTrue("has value", result.contains("up,ft,14.04"));
 	}
@@ -78,7 +78,7 @@ public class DirectWaterlevelCSVOutputStreamTest {
 		
 		String result = bos.toString();
 		
-		assertTrue("has header", result.contains("Mediated Value"));
+		assertTrue("has header", result.contains("Original Direction"));
 		assertFalse("has timestamp", result.contains("1983-08-25"));
 		assertFalse("has value", result.contains("up,ft,14.04"));
 		
@@ -172,7 +172,7 @@ public class DirectWaterlevelCSVOutputStreamTest {
 		
 		// System.out.println(result);
 		
-		assertTrue("has header", result.contains("Mediated Value"));
+		assertTrue("has header", result.contains("Original Unit"));
 		assertFalse("has raw input", result.contains("Comment, with embedded commas, and some \"quoted text\" as well"));
 		assertTrue("has escaped commas", result.contains("\"Comment, with embedded commas, and some \"\"quoted text\"\" as well\""));
 		

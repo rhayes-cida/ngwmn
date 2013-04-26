@@ -37,7 +37,7 @@ public class DirectWaterlevelCSVOutputStreamWithDatesTest {
 		
 		String result = bos.toString();
 		
-		assertTrue("has header", result.contains("Mediated Value"));
+		assertTrue("has header", result.contains("Depth to Water Below Land Surface in ft"));
 		assertFalse("has before timestamp", result.contains("1983-08-25"));
 		assertTrue("has during timestamp", result.contains("1984-01-15"));
 		assertFalse("has after timestamp", result.contains("2004-06-18"));
@@ -65,7 +65,7 @@ public class DirectWaterlevelCSVOutputStreamWithDatesTest {
 		
 		String result = bos.toString();
 		
-		assertFalse("has header", result.contains("Mediated Value"));
+		assertFalse("has header", result.contains("Original"));
 		assertTrue("has timestamp", result.contains("1983-08-25"));
 		assertFalse("has timestamp", result.contains("2004-06-21"));
 		assertTrue("has value", result.contains("up,ft,14.04"));
