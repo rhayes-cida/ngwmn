@@ -24,11 +24,11 @@
 			<xsl:text>AgencyCd</xsl:text><xsl:value-of select="$separator"/>
 			<xsl:text>SiteNo</xsl:text><xsl:value-of select="$separator"/>
 			<xsl:text>Time</xsl:text><xsl:value-of select="$separator"/>
-			<xsl:text>Parameter Code</xsl:text><xsl:value-of select="$separator"/>
-			<xsl:text>Direction</xsl:text><xsl:value-of select="$separator"/>
-			<xsl:text>Unit</xsl:text><xsl:value-of select="$separator"/>
-			<xsl:text>Value</xsl:text><xsl:value-of select="$separator"/>
-			<xsl:text>Mediated Value</xsl:text><xsl:value-of select="$separator"/>
+			<xsl:text>Original Parameter</xsl:text><xsl:value-of select="$separator"/>
+			<xsl:text>Original Direction</xsl:text><xsl:value-of select="$separator"/>
+			<xsl:text>Original Unit</xsl:text><xsl:value-of select="$separator"/>
+			<xsl:text>Original Value</xsl:text><xsl:value-of select="$separator"/>
+			<xsl:text>Depth to Water Below Land Surface in ft.</xsl:text><xsl:value-of select="$separator"/>
 			<xsl:text>Observation Method</xsl:text><xsl:value-of select="$separator"/>
 			<xsl:text>&#xa;</xsl:text>
 		</xsl:if>
