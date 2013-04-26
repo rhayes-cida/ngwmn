@@ -1,25 +1,60 @@
 package gov.usgs.ngwmn.admin;
 
+import gov.usgs.ngwmn.WaterlevelMediator;
+import gov.usgs.ngwmn.dm.dao.WellRegistry;
+import gov.usgs.ngwmn.dm.dao.WellRegistryDAO;
+
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.Writer;
+import java.math.BigDecimal;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.List;
 
 import javax.sql.DataSource;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowCallbackHandler;
+import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 @Controller
-@RequestMapping("/csv")
 public class CSVController {
 
+	public static class WLSample {
+
+		public String time;
+		public BigDecimal value;
+		public BigDecimal original_value;
+		public String units;
+		public String comment;
+		public Boolean up;
+		
+		public WLSample(String time, BigDecimal value, String units,
+				BigDecimal orig_value, String comment, Boolean up) {
+			this.time = time;
+			this.value = value;
+			this.original_value = orig_value;
+			this.units = units;
+			this.comment = comment;
+			this.up = up;
+		}
+		
+	};
+	
 	private DataSource datasource;
+	protected final transient Logger logger = LoggerFactory.getLogger(getClass());
+
+	@Autowired
+	private WellRegistryDAO registry;
 
 	public CSVController(DataSource datasource) {
 		this.datasource = datasource;
@@ -47,15 +82,98 @@ public class CSVController {
 		return val;
 	}
 	
-	/** Produce waterlevels for the given site, in format expected by Dygraphs:
-	 * first line has headers: time,value
-	 * then data as comma-separated values, with negative values
+	/** Produce waterlevels for the given site, in JSON format
 
 	 * @param agency
 	 * @param site
 	 * @throws IOException
 	 */
-	@RequestMapping("waterlevel/{agency}/{site}")
+	@RequestMapping("/json/waterlevel/{agency}/{site}") 
+	@ResponseBody
+	public List<WLSample>  generateJSON(
+			@PathVariable String agency,
+			@PathVariable String site) 
+	throws IOException {
+		
+		// TODO Add pcode
+		
+		String query = 
+				"	select" +
+				" 	  xq.*	from " +
+				"		gw_data_portal.waterlevel_cache qc," +
+				"		XMLTable(" +
+				"		XMLNAMESPACES(" +
+				"		  'http://www.wron.net.au/waterml2' AS \"wml2\"," +
+				"		  'http://www.opengis.net/om/2.0' AS \"om\"," +
+				"		  'http://www.opengis.net/swe/2.0' AS \"swe\"," +
+				"		  'https://github.com/USGS-CIDA/ngwmn/sos' as \"gwdp\"" +
+				"		)," +
+				"		'for $r in //wml2:WaterMonitoringObservation/om:result/wml2:TimeSeries/wml2:element" +
+				"		let " +
+				"		$p := $r/wml2:TimeValuePair" +
+				"		return $p" +
+				"		'" +
+				"		passing qc.xml" +
+				"		columns " +
+				"		\"DT\" varchar2(12) path 'ora:replace(substring(wml2:time,1,10),\"-00\",\"-01\")'," +
+				"    	\"FULLDATE\" varchar2(40) path 'wml2:time'," +
+				"		\"VAL\" number path 'wml2:value/swe:Quantity/swe:value'," +
+				"		\"UNITS\" varchar(40) path 'wml2:value/swe:Quantity/swe:uom/@code'," +
+				"    	\"COMMENT\" varchar(80) path 'wml2:comment'," +
+				"		\"DIRECTION\" varchar(12) path './/gwdp:nwis/@direction'" +
+				"		) xq" +
+				"	where qc.waterlevel_cache_id = ? " +
+				"	order by xq.FULLDATE asc ";
+		
+		JdbcTemplate t = new JdbcTemplate(datasource);
+		
+		WellRegistry well = registry.findByKey(agency, site);
+		Double altitude = (well != null) ? well.getAltVa() : null;
+		BigDecimal offset = null;
+		if (altitude != null) {
+			offset = BigDecimal.valueOf(altitude);
+		}
+		
+		final BigDecimal foffset = offset;
+		
+		final WaterlevelMediator mediator = new WaterlevelMediator();
+		
+		long id = getCacheID(t, agency, site);
+		
+		logger.debug("Extracting waterlevel json object for cache id {} (site {})", id, agency+":"+site);
+		
+		List<WLSample> value = t.query(query, new RowMapper<WLSample>() {
+			@Override
+			public WLSample mapRow(ResultSet rs, int rowNum) throws SQLException {
+				
+				String time = rs.getString("FULLDATE");
+				BigDecimal value = rs.getBigDecimal("VAL");
+				String units = rs.getString("UNITS");
+				String comment = rs.getString("COMMENT");
+				String direction = rs.getString("DIRECTION");
+				
+				Boolean up = ("up".equals(direction));
+				
+				BigDecimal mediated_value = null;
+				if (  value != null) {
+					mediated_value = mediator.mediate(value, foffset, direction);
+ 				}
+				
+				return new WLSample(time,mediated_value,units,value,comment,up);
+			}
+		}, id);
+		
+		return value;
+			
+	}
+
+	/** Produce waterlevels for the given site, in simple csv as expected by dygraphs
+
+	 * @param agency
+	 * @param site
+	 * @throws IOException
+	 */
+	@RequestMapping("/csv/waterlevel/{agency}/{site}")
 	public void generateTable(
 			@PathVariable String agency,
 			@PathVariable String site,
@@ -93,6 +211,8 @@ public class CSVController {
 		
 		long id = getCacheID(t, agency, site);
 		
+		logger.debug("Extracting waterlevel data for cache id {} (site {})", id, agency+":"+site);
+		
 		final PrintWriter pw = new PrintWriter(writer);
 		pw.println("time,value");
 
@@ -115,4 +235,5 @@ public class CSVController {
 			}
 		}, id);
 	}
+
 }

@@ -25,6 +25,22 @@ public class WaterlevelMediator {
 			
 	}
 
+	public BigDecimal mediate(BigDecimal value, BigDecimal offset, String direction) {
+		BigDecimal wl;
+		
+		if ("up".equals(direction)) {
+			wl = value.negate();
+			if (offset != null) {
+				wl = wl.add(offset);
+			}
+		} else  {
+			wl = value;
+		}
+		
+		return wl;
+		
+	}
+	
 	public static String csv_escape(String v, String separator) {
 		if (v == null) {
 			return v;
