@@ -112,9 +112,7 @@ public class CSVController {
 				"		  'http://www.opengis.net/swe/2.0' AS \"swe\"," +
 				"		  'https://github.com/USGS-CIDA/ngwmn/sos' as \"gwdp\"" +
 				"		)," +
-				"		'for $r in //wml2:WaterMonitoringObservation/om:result/wml2:TimeSeries/wml2:element" +
-				"		let " +
-				"		$p := $r/wml2:TimeValuePair" +
+				"		'for $p in //wml2:TimeValuePair" +
 				"		return $p" +
 				"		'" +
 				"		passing qc.xml" +
