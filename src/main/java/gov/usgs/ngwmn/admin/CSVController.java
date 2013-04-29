@@ -119,16 +119,16 @@ public class CSVController {
 				"		'" +
 				"		passing qc.xml" +
 				"		columns " +
-				"		\"DT\" varchar2(12) path 'ora:replace(substring(wml2:time,1,10),\"-00\",\"-01\")'," +
 				"    	\"FULLDATE\" varchar2(40) path 'wml2:time'," +
 				"		\"VAL\" number path 'wml2:value/swe:Quantity/swe:value'," +
 				"		\"UNITS\" varchar(40) path 'wml2:value/swe:Quantity/swe:uom/@code'," +
 				"    	\"COMMENT\" varchar(80) path 'wml2:comment'," +
-				"		\"DIRECTION\" varchar(12) path './/gwdp:nwis/@direction'," +
-				"       \"PCODE\" varchar(5) path './/gwdp:nwis/@pcode' " +
+				"		\"DIRECTION\" varchar(12) path 'wml2:value/swe:Quantity/gwdp:nwis/@direction'," +
+				"       \"PCODE\" varchar(5) path 'wml2:value/swe:Quantity/gwdp:nwis/@pcode' " +
 				"		) xq" +
 				"	where qc.waterlevel_cache_id = ? " +
-				"	order by xq.FULLDATE asc ";
+				"	order by xq.FULLDATE asc " +
+				"";
 		
 		JdbcTemplate t = new JdbcTemplate(datasource);
 		
