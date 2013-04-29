@@ -37,27 +37,31 @@ public class CSVController {
 		public String units;
 		public String comment;
 		public Boolean up;
+		public String pcode;
 		
 		public WLSample(String time, BigDecimal value, String units,
-				BigDecimal orig_value, String comment, Boolean up) {
+				BigDecimal orig_value, String comment, Boolean up, String pcode) {
 			this.time = time;
 			this.value = value;
 			this.original_value = orig_value;
 			this.units = units;
 			this.comment = comment;
 			this.up = up;
+			this.pcode = pcode;
 		}
 		
 	};
 	
+	@Autowired
 	private DataSource datasource;
-	protected final transient Logger logger = LoggerFactory.getLogger(getClass());
 
 	@Autowired
 	private WellRegistryDAO registry;
 
-	public CSVController(DataSource datasource) {
-		this.datasource = datasource;
+	protected final transient Logger logger = LoggerFactory.getLogger(getClass());
+
+	
+	public CSVController() {
 	}
 
 	private long getCacheID(JdbcTemplate t, String agency, String site) {
@@ -95,7 +99,7 @@ public class CSVController {
 			@PathVariable String site) 
 	throws IOException {
 		
-		// TODO Add pcode
+		// XPaths from wl2csv-dates.xsl
 		
 		String query = 
 				"	select" +
@@ -120,7 +124,8 @@ public class CSVController {
 				"		\"VAL\" number path 'wml2:value/swe:Quantity/swe:value'," +
 				"		\"UNITS\" varchar(40) path 'wml2:value/swe:Quantity/swe:uom/@code'," +
 				"    	\"COMMENT\" varchar(80) path 'wml2:comment'," +
-				"		\"DIRECTION\" varchar(12) path './/gwdp:nwis/@direction'" +
+				"		\"DIRECTION\" varchar(12) path './/gwdp:nwis/@direction'," +
+				"       \"PCODE\" varchar(5) path './/gwdp:nwis/@pcode' " +
 				"		) xq" +
 				"	where qc.waterlevel_cache_id = ? " +
 				"	order by xq.FULLDATE asc ";
@@ -141,6 +146,7 @@ public class CSVController {
 		long id = getCacheID(t, agency, site);
 		
 		logger.debug("Extracting waterlevel json object for cache id {} (site {})", id, agency+":"+site);
+		long commence = System.nanoTime();
 		
 		List<WLSample> value = t.query(query, new RowMapper<WLSample>() {
 			@Override
@@ -151,6 +157,7 @@ public class CSVController {
 				String units = rs.getString("UNITS");
 				String comment = rs.getString("COMMENT");
 				String direction = rs.getString("DIRECTION");
+				String pcode = rs.getString("PCODE");
 				
 				Boolean up = ("up".equals(direction));
 				
@@ -159,10 +166,13 @@ public class CSVController {
 					mediated_value = mediator.mediate(value, foffset, direction);
  				}
 				
-				return new WLSample(time,mediated_value,units,value,comment,up);
+				return new WLSample(time,mediated_value,units,value,comment,up, pcode);
 			}
 		}, id);
 		
+		long finish = System.nanoTime();
+		
+		logger.debug("Query done, count={} elapsed={}", value.size(), (finish-commence)/1.0e9);
 		return value;
 			
 	}

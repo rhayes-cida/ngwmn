@@ -37,10 +37,6 @@
 
     <bean id="TrialController" class="gov.usgs.ngwmn.admin.TrialMVCController"/>
     
-    <bean id="CSVController" class="gov.usgs.ngwmn.admin.CSVController">
-    	<constructor-arg ref="dataSource"/>
-    </bean>
-    
     <bean id="CacheSizeController" class="gov.usgs.ngwmn.admin.CacheSizeController">
         	<constructor-arg ref="dataSource"/>
     </bean>

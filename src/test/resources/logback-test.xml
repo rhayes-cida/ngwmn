@@ -25,6 +25,7 @@
   <logger level="info"  name="org.apache.commons.httpclient" />
   <logger level="debug" name="gov.usgs.ngwmn.dm"/>
   <logger level="debug" name="gov.usgs.ngwmn.dm.io"/>
+  <logger level="debug" name="gov.usgs.ngwmn.admin.CSVController"/>
 <!--   
   <logger level="trace" name="gov.usgs.ngwmn.dm.prefetch"/>
   <logger level="trace" name="gov.usgs.ngwmn.dm.cache.qw.DatabaseXMLCache"/>

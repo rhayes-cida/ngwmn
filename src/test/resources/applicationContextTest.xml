@@ -15,6 +15,9 @@
 		<constructor-arg value="java.util.concurrent.ExecutorService"/>
 	</bean>
  -->
+ 
+	<!--  duplicated here from servlet context, for testing -->
+	<bean id="CSVController" class="gov.usgs.ngwmn.admin.CSVController"/>	    
 	
     <beans profile="default">
 	    <bean id="dataSource"
@@ -68,6 +71,7 @@
 	        	</props>
 	        </property>
 	    </bean>
+	    
     </beans>
     
 </beans>
