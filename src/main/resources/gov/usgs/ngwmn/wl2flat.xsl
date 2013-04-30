@@ -6,10 +6,11 @@
 	xmlns:swe="http://www.opengis.net/swe/2.0" 
 	xmlns:gwdp="https://github.com/USGS-CIDA/ngwmn/sos"
 	xmlns:xs="http://www.w3.org/2001/XMLSchema"
+	
+	exclude-result-prefixes="xsl wml2 mediator swe gwdp xs"
 	>
 	
 	<xsl:output omit-xml-declaration="no" indent="yes" method="xml" />
-	<xsl:strip-space elements="*" />
 
 	<xsl:template match="/">
 		<xsl:param name="agency" select="'Agency'" />
