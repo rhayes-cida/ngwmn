@@ -14,11 +14,8 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
 import javax.xml.transform.Source;
-import javax.xml.transform.Templates;
+// import javax.xml.transform.Templates;
 import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerConfigurationException;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.TransformerFactoryConfigurationError;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 
@@ -47,38 +44,22 @@ public class XSLFilterOutputStream extends FilterOutputStream {
 	protected Future<Void> xformOutcome;
 	private ExecutorService executor;
 
-	protected String xformResourceName;
-	protected Templates templates; // TODO Optimize, make this a shared resource
-		
+	protected XSLHelper xslHelper = new XSLHelper();
+
 	public void setExecutor(ExecutorService e) {
 		executor = e;
 	}
 
 	public void setTransform(Source xform) throws IOException {
-		xformResourceName = xform.toString();
-		try {
-			templates = loadXSLT(xform);	
-		} catch (Exception e) {
-			throw new IOException(e);
-		}
+		xslHelper.setTransform(xform);
 	}
 	
 	public void setTransform(InputStream xformStream, String xformName) throws IOException  {
-		xformResourceName = xformName;
-		try {
-			templates = loadXSLT(xformStream,xformName);
-		} catch (Exception e) {
-			throw new IOException(e);
-		}
+		xslHelper.setTransform(xformStream, xformName);
 	}
 	
 	public void setTransform(String xformName) throws IOException {
-		xformResourceName = xformName;
-		try {
-			templates = loadXSLT(xformName);
-		} catch (Exception e) {
-			throw new IOException(e);
-		}
+		xslHelper.setTransform(xformName);
 	}
    
 	public synchronized void ensureInitialized() {
@@ -105,7 +86,7 @@ public class XSLFilterOutputStream extends FilterOutputStream {
 				try {
 					MDC.setContextMap((mdc == null) ? Collections.emptyMap() : mdc);
 	
-					Transformer t = templates.newTransformer();
+					Transformer t = xslHelper.getTemplates().newTransformer();
 					setupTransform(t);
 					StreamResult result = new StreamResult(out);	// this goes to output channel
 					
@@ -146,7 +127,7 @@ public class XSLFilterOutputStream extends FilterOutputStream {
 					t.transform(source, result);
 					logger.debug("transform done with {}", pin);
 				} catch (Exception e) {
-					logger.warn("Problem in transform by " + xformResourceName, e);
+					logger.warn("Problem in transform by " + xslHelper.getXformResourceName(), e);
 					throw e;
 				}
 				return null;
@@ -174,46 +155,6 @@ public class XSLFilterOutputStream extends FilterOutputStream {
     	}
 		
 		logger.trace("finished XSL processing");
-	}
-
-    private Templates loadXSLT(String xsltResource) 
-    		throws TransformerConfigurationException, IOException 
-    {
-    	InputStream xin = getClass().getResourceAsStream(xsltResource);
-    	try {
-    		return loadXSLT(xin, xsltResource);
-    	} finally {
-    		xin.close();
-    	}
-    }
-
-	private Templates loadXSLT(Source xslSource)
-			throws TransformerFactoryConfigurationError,
-			TransformerConfigurationException
-	{
-		try {
-
-			TransformerFactory transFact = TransformerFactory.newInstance();
-			// Can get more details by implementing ErrorListener transFact.setErrorListener(listener);
-			logger.debug("Transformer factory class is {}", transFact.getClass());
-			Templates templates = transFact.newTemplates(xslSource);
-
-			return templates;
-		} catch (TransformerConfigurationException tce) {
-			logger.error("Problem loading templates from " + xslSource.getSystemId(), tce);
-			logger.error("java.home is {}", System.getProperty("java.home", "unknown"));
-			throw tce;
-		}
-	}
-
-	private Templates loadXSLT(InputStream xin, String xslName)
-			throws TransformerFactoryConfigurationError,
-			TransformerConfigurationException {
-		Source xslSource = new StreamSource(xin);
-		if (null == xslSource.getSystemId()) {
-			xslSource.setSystemId(xslName);
-		}
-		return loadXSLT(xslSource);
 	}
 
 	@Override

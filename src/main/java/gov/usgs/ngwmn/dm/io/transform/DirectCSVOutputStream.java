@@ -103,7 +103,7 @@ public abstract class DirectCSVOutputStream
 	public String toString() {
 		StringBuilder builder = new StringBuilder();
 		builder.append("DirectCSVOutputStream [xform=");
-		builder.append(xformResourceName);
+		builder.append(xslHelper.getXformResourceName());
 		builder.append(", out=");
 		builder.append(out);
 		builder.append("]");

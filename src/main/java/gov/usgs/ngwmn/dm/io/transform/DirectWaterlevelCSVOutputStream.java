@@ -31,7 +31,7 @@ public class DirectWaterlevelCSVOutputStream extends DirectCSVOutputStream {
 		builder.append(", endDate=");
 		builder.append(endDate);
 		builder.append(", xformResourceName=");
-		builder.append(xformResourceName);
+		builder.append(xslHelper.getXformResourceName());
 		builder.append(", out=");
 		builder.append(out);
 		builder.append(", agency=");

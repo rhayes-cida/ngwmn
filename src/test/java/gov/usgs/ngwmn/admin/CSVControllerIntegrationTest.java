@@ -52,5 +52,17 @@ public class CSVControllerIntegrationTest extends ContextualTest {
 			assertNotNull("pcode", sample.pcode);
 		}
 	}
-	// TODO need a well with non-null pcodes
+	
+	@Test
+	public void testFlatXML() throws Exception {
+		Writer w = new StringWriter();
+
+		victim.flatXML("USGS", "392754074270101",w);
+		assertFalse("empty", w.toString().isEmpty());
+		assertTrue("direction", w.toString().contains("direction"));
+		assertTrue("mediated-value", w.toString().contains("mediated-value"));	
+		assertTrue("agency", w.toString().contains("USGS"));
+		assertTrue("site", w.toString().contains("392754074270101"));
+
+	}
 }

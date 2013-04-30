@@ -3,8 +3,10 @@ package gov.usgs.ngwmn.admin;
 import gov.usgs.ngwmn.WaterlevelMediator;
 import gov.usgs.ngwmn.dm.dao.WellRegistry;
 import gov.usgs.ngwmn.dm.dao.WellRegistryDAO;
+import gov.usgs.ngwmn.dm.io.transform.XSLHelper;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.PrintWriter;
 import java.io.Writer;
 import java.math.BigDecimal;
@@ -13,14 +15,22 @@ import java.sql.SQLException;
 import java.util.List;
 
 import javax.sql.DataSource;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerConfigurationException;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.stream.StreamResult;
+import javax.xml.transform.stream.StreamSource;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataAccessException;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.jdbc.core.RowCallbackHandler;
 import org.springframework.jdbc.core.RowMapper;
+import org.springframework.jdbc.support.lob.LobHandler;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -57,6 +67,9 @@ public class CSVController {
 
 	@Autowired
 	private WellRegistryDAO registry;
+	
+	@Autowired
+	private LobHandler lobHandler;
 
 	protected final transient Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -86,6 +99,69 @@ public class CSVController {
 		return val;
 	}
 	
+	@RequestMapping(value="/flatXML/waterlevel/{agency}/{site}",
+			produces="text/xml")
+	public void flatXML(		
+			@PathVariable String agency,
+			@PathVariable String site,			
+			final Writer writer) 
+		throws Exception
+	{
+		JdbcTemplate t = new JdbcTemplate(datasource);
+		String query = "SELECT cachetable.xml.getCLOBVal() " +
+				"FROM GW_DATA_PORTAL.waterlevel_cache cachetable " +
+				"WHERE cachetable.agency_cd = ? " +
+				"and cachetable.site_no = ? " +
+				"AND cachetable.published = 'Y' " +
+				"AND cachetable.xml IS NOT NULL " +
+				"ORDER BY cachetable.fetch_date DESC ";
+		
+		logger.debug("Extracting waterlevel flat xml for site {}", agency+":"+site);
+		long commence = System.nanoTime();
+
+		final XSLHelper xslHelper = new XSLHelper();
+		xslHelper.setTransform("/gov/usgs/ngwmn/wl2flat.xsl"); // so much for final...
+		
+		final Double elevation = getElevation(agency,site);
+		final Transformer xform = xslHelper.getTemplates().newTransformer();
+		if (elevation != null) {
+			xform.setParameter("elevation", String.valueOf(elevation));
+		}
+		xform.setParameter("agency", agency);
+		xform.setParameter("site", site);
+		
+		ResultSetExtractor<Void> rse = new ResultSetExtractor<Void>() {
+
+			@Override
+			public Void extractData(ResultSet rs) throws SQLException,
+					DataAccessException {
+				try {
+
+					while (rs.next()) {
+						InputStream stream = lobHandler.getClobAsAsciiStream(rs, 1);
+							
+							StreamResult result = new StreamResult(writer);
+							StreamSource source = new StreamSource(stream);
+							
+							xform.transform(source, result);
+	
+					}
+					return null;
+				} catch (TransformerConfigurationException e) {
+					throw new RuntimeException(e);
+				} catch (TransformerException e) {
+					throw new RuntimeException(e);
+				}
+			}
+			
+		};
+		t.query(query, rse, agency, site);
+		
+		long finish = System.nanoTime();
+		logger.debug("flat xml done, elapsed={}", (finish-commence)/1.0e9);
+
+	}
+
 	/** Produce waterlevels for the given site, in JSON format
 
 	 * @param agency
@@ -132,8 +208,7 @@ public class CSVController {
 		
 		JdbcTemplate t = new JdbcTemplate(datasource);
 		
-		WellRegistry well = registry.findByKey(agency, site);
-		Double altitude = (well != null) ? well.getAltVa() : null;
+		Double altitude = getElevation(agency, site);
 		BigDecimal offset = null;
 		if (altitude != null) {
 			offset = BigDecimal.valueOf(altitude);
@@ -175,6 +250,12 @@ public class CSVController {
 		logger.debug("Query done, count={} elapsed={}", value.size(), (finish-commence)/1.0e9);
 		return value;
 			
+	}
+
+	private Double getElevation(String agency, String site) {
+		WellRegistry well = registry.findByKey(agency, site);
+		Double altitude = (well != null) ? well.getAltVa() : null;
+		return altitude;
 	}
 
 	/** Produce waterlevels for the given site, in simple csv as expected by dygraphs
