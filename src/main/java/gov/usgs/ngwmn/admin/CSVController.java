@@ -140,10 +140,10 @@ public class CSVController {
 					while (rs.next()) {
 						InputStream stream = lobHandler.getClobAsAsciiStream(rs, 1);
 							
-							StreamResult result = new StreamResult(writer);
-							StreamSource source = new StreamSource(stream);
+						StreamResult result = new StreamResult(writer);
+						StreamSource source = new StreamSource(stream);
 							
-							xform.transform(source, result);
+						xform.transform(source, result);
 	
 					}
 					return null;
@@ -162,11 +162,14 @@ public class CSVController {
 
 	}
 
+	@Deprecated
 	/** Produce waterlevels for the given site, in JSON format
 
 	 * @param agency
 	 * @param site
 	 * @throws IOException
+	 * 
+	 * @deprecated due to terrible performance.
 	 */
 	@RequestMapping("/json/waterlevel/{agency}/{site}") 
 	@ResponseBody
@@ -254,11 +257,14 @@ public class CSVController {
 		return altitude;
 	}
 
+	@Deprecated
 	/** Produce waterlevels for the given site, in simple csv as expected by dygraphs
 
 	 * @param agency
 	 * @param site
 	 * @throws IOException
+	 * 
+	 * @deprecated in favor of flatXML which is a lot faster
 	 */
 	@RequestMapping("/csv/waterlevel/{agency}/{site}")
 	public void generateTable(
