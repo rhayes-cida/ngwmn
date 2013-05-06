@@ -14,6 +14,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.sql.DataSource;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerConfigurationException;
@@ -32,6 +34,7 @@ import org.springframework.jdbc.core.RowCallbackHandler;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.support.lob.LobHandler;
 import org.springframework.stereotype.Controller;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -104,7 +107,7 @@ public class CSVController {
 	public void flatXML(		
 			@PathVariable String agency,
 			@PathVariable String site,			
-			final Writer writer) 
+			HttpServletResponse response) 
 		throws Exception
 	{
 		JdbcTemplate t = new JdbcTemplate(datasource);
@@ -129,6 +132,9 @@ public class CSVController {
 		}
 		xform.setParameter("agency", agency);
 		xform.setParameter("site", site);
+		
+		response.setContentType("text/xml");
+		final Writer writer = response.getWriter();
 		
 		ResultSetExtractor<Void> rse = new ResultSetExtractor<Void>() {
 
