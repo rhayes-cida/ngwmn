@@ -133,6 +133,7 @@ public class CSVController {
 		xform.setParameter("agency", agency);
 		xform.setParameter("site", site);
 		
+		logger.debug("Getting writer");
 		response.setContentType("text/xml");
 		final Writer writer = response.getWriter();
 		
