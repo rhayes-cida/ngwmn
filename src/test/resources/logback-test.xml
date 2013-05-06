@@ -13,7 +13,7 @@
     	<file>/tmp/test-${bySecond}.log</file>
     	<append>true</append>
     	<layout class="ch.qos.logback.classic.PatternLayout">
-      		<pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %X{well} %class{0}:%L %M - %msg%n</pattern>
+      		<pattern>%d [%thread] %-5level %X{well} %class{0}:%L %M - %msg%n</pattern>
     	</layout>
   	</appender>
   <root level="warn">
