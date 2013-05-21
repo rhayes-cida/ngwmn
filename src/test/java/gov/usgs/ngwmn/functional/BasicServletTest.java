@@ -112,8 +112,8 @@ public class BasicServletTest extends ContextualTest {
 		}
 		String body = resp.getText();
 		System.out.printf("contentLength=%d,size=%d\n", resp.getContentLength(), body.length());
-		assertTrue("response size too big", body.length() < 850);
-		assertTrue("response size too small", body.length() > 100);
+		assertTrue("response size too big", body.length() < 70000);
+		assertTrue("response size too small", body.length() > 64000);
 		
 		File file = new File("/tmp","dataCsvLOG.zip");
 		FileOutputStream fos = new FileOutputStream(file);
