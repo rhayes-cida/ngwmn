@@ -11,6 +11,7 @@ import gov.usgs.ngwmn.dm.spec.Specification;
 import gov.usgs.ngwmn.dm.spec.Specifier;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.security.InvalidParameterException;
 import java.util.Collections;
@@ -53,6 +54,15 @@ public class DataManagerServlet extends HttpServlet {
 		db = ctx.getBean("DataBroker", DataBroker.class);
 	}
 
+	private void addDataDictionary(SupplyZipOutput zouts) throws IOException {
+		InputStream dd = getClass().getResourceAsStream("/DataDictionary.pdf");
+		try {
+			zouts.addStream("Data Dictionary.pdf", "text/pdf", dd);
+		} finally {
+			dd.close();
+		}
+	}
+
 	/* (non-Javadoc)
 	 * @see javax.servlet.http.HttpServlet#doGet(javax.servlet.http.HttpServletRequest, javax.servlet.http.HttpServletResponse)
 	 * 
@@ -73,13 +83,19 @@ public class DataManagerServlet extends HttpServlet {
 			
 			Specification spect = makeSpecification(req);
 			Supplier<OutputStream> outs = new HttpResponseSupplier(spect, resp);
-					
+			SupplyZipOutput zouts = null;
+			
 			try {
 				
 				Flow exec = null;
 				if ( ! spect.getDataTypes().contains(WellDataType.ALL)  // TODO ALL asdf
 						&& spect.isBundled() ) {
-					outs = new SupplyZipOutput(outs);
+					outs = zouts = new SupplyZipOutput(outs);
+					
+					if (spect.hasData()) {
+						addDataDictionary(zouts);
+					}
+
 					exec = new SequentialJoiningAggregator(db, spect, outs);
 				// TODO ALL asdf
 				} else {
