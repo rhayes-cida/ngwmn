@@ -23,11 +23,17 @@ public class SupplyZipOutput extends Supplier<OutputStream> {
 		this.os = os;
 	}
 
+	private synchronized ZipOutputStream init() throws IOException {
+		if (oz == null) {
+			oz = new ZipOutputStream( os.begin() );
+		}
+		return oz;
+	}
 	
 	@Override
 	public OutputStream initialize() throws IOException {
 		logger.debug("initialize : zip output stream");
-		return oz = new ZipOutputStream( os.begin() );
+		return oz = init();
 	}
 
 	/**
@@ -45,15 +51,17 @@ public class SupplyZipOutput extends Supplier<OutputStream> {
 	}
 	
 	protected ZipOutputStream getZip() {
-		// TODO the test suites never call this with oz==null - it might be dead code
-		if (oz == null) {
-			throw new NullPointerException("call to getZip prior to source initialization.");
+		try {
+			return init();
+		} catch (IOException ioe) {
+			logger.warn("Failed getting zip", ioe);
+			throw new RuntimeException(ioe);
 		}
-		return oz;
 	}
 
 
 	public void addStream(String name, String mimeType, InputStream dd) throws IOException {
+		logger.debug("Adding stream for {}", name);
 		ZipOutputStream zip = getZip();
 		
 		ZipEntryOutputStream zos = new ZipEntryOutputStream(zip, name);

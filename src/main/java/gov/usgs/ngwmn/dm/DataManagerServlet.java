@@ -54,6 +54,15 @@ public class DataManagerServlet extends HttpServlet {
 		db = ctx.getBean("DataBroker", DataBroker.class);
 	}
 
+	private void addDataDictionary(SupplyZipOutput zouts) throws IOException {
+		InputStream dd = getClass().getResourceAsStream("/DataDictionary.pdf");
+		try {
+			zouts.addStream("Data Dictionary.pdf", "text/pdf", dd);
+		} finally {
+			dd.close();
+		}
+	}
+
 	/* (non-Javadoc)
 	 * @see javax.servlet.http.HttpServlet#doGet(javax.servlet.http.HttpServletRequest, javax.servlet.http.HttpServletResponse)
 	 * 
@@ -82,6 +91,11 @@ public class DataManagerServlet extends HttpServlet {
 				if ( ! spect.getDataTypes().contains(WellDataType.ALL)  // TODO ALL asdf
 						&& spect.isBundled() ) {
 					outs = zouts = new SupplyZipOutput(outs);
+					
+					if (spect.hasData()) {
+						addDataDictionary(zouts);
+					}
+
 					exec = new SequentialJoiningAggregator(db, spect, outs);
 				// TODO ALL asdf
 				} else {
@@ -91,14 +105,6 @@ public class DataManagerServlet extends HttpServlet {
 				}
 				exec.call();
 				
-				if (zouts != null && spect.hasData()) {
-					InputStream dd = getClass().getResourceAsStream("DataDictionary.pdf");
-					try {
-						zouts.addStream("Data Dictionary.pdf", "text/pdf", dd);
-					} finally {
-						dd.close();
-					}
-				}
 			} catch (SiteNotFoundException nse) {
 				// this may fail, if detected after output buffer has been flushed
 				resp.resetBuffer();
