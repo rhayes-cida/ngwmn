@@ -145,6 +145,14 @@ public class Specification {
 		builder.append("]");
 		return builder.toString();
 	}
+
+	public boolean hasData() {
+		return dataTypes.contains(WellDataType.CONSTRUCTION)
+				|| dataTypes.contains(WellDataType.LITHOLOGY)
+				|| dataTypes.contains(WellDataType.LOG)
+				|| dataTypes.contains(WellDataType.QUALITY)
+				|| dataTypes.contains(WellDataType.WATERLEVEL);
+	}
 	
 
 }

@@ -2,11 +2,15 @@ package gov.usgs.ngwmn.dm.io;
 
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.google.common.io.ByteStreams;
 
 
 public class SupplyZipOutput extends Supplier<OutputStream> {
@@ -46,5 +50,17 @@ public class SupplyZipOutput extends Supplier<OutputStream> {
 			throw new NullPointerException("call to getZip prior to source initialization.");
 		}
 		return oz;
+	}
+
+
+	public void addStream(String name, String mimeType, InputStream dd) throws IOException {
+		ZipOutputStream zip = getZip();
+		
+		ZipEntryOutputStream zos = new ZipEntryOutputStream(zip, name);
+		try {
+			ByteStreams.copy(dd, zos);
+		} finally {
+			zos.close();
+		}
 	}
 }
