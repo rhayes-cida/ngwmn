@@ -2,10 +2,10 @@ package gov.usgs.ngwmn;
 
 
 public enum WellDataType {
+	REGISTRY	("text/xml", "xml", null, "row", false),
 	WATERLEVEL  ("text/xml", "xml", null, "TimeValuePair"),
 	QUALITY     ("text/xml", "xml", null, "Result"),
 	LOG         ("text/xml", "xml", null, "logElement|construction"),
-	REGISTRY	("text/xml", "xml", null, "row", false),
 	LITHOLOGY   ("text/xml", "xml", LOG,  "logElement"),
 	CONSTRUCTION("text/xml", "xml", LOG,  "construction"),
 	ALL			("application/zip", "zip", null, "n/a", false); // TODO ALL asdf
