@@ -486,7 +486,7 @@ public class DataManagerServletTests {
 		Collection<WellDataType> types = spec.getDataTypes();
 		
 		String asString = types.toString();
-		assertEquals("[REGISTRY, LITHOLOGY, WATERLEVEL]", asString);
+		assertEquals("[REGISTRY, WATERLEVEL, LITHOLOGY]", asString);
 		
 	}
 	

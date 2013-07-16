@@ -92,9 +92,9 @@ public class DataManagerServlet extends HttpServlet {
 						&& spect.isBundled() ) {
 					outs = zouts = new SupplyZipOutput(outs);
 					
-					if (spect.hasData()) {
+					// if (spect.hasData()) {
 						addDataDictionary(zouts);
-					}
+					// }
 
 					exec = new SequentialJoiningAggregator(db, spect, outs);
 				// TODO ALL asdf
