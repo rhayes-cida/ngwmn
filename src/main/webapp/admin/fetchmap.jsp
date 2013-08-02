@@ -55,7 +55,7 @@
 	      var queryOpts = {};
 	      
 	      var sqlQuery = document.getElementById('q').value;
-	      var url = '/ngwmn/stats/data?query=' + encodeURIComponent(sqlQuery);
+	      var url = '/ngwmn_cache/stats/data?query=' + encodeURIComponent(sqlQuery);
 	      
 	      query && query.abort();
 	      

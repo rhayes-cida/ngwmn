@@ -263,7 +263,7 @@
 	</dependencies>
 
 	<build>
-		<finalName>ngwmn</finalName>
+		<finalName>ngwmn_cache</finalName>
 		<pluginManagement>
 			<plugins>
 				<plugin>

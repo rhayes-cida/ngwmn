@@ -60,6 +60,10 @@ public class CSVControllerIntegrationTest extends ContextualTest {
 		MockHttpServletResponse resp = new MockHttpServletResponse();
 		
 		victim.flatXML("USGS", "392754074270101",resp);
+		
+		String contentType = resp.getContentType();
+		assertEquals("text/xml", contentType);
+		
 		String content = resp.getContentAsString();
 		
 		assertFalse("empty", content.isEmpty());

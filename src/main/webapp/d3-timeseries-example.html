@@ -157,7 +157,7 @@ var line = d3.svg.line()
       
       function doQuery(t) {
     	  var query = new google.visualization.Query(
-    			  "/ngwmn/stats/"+t+"/stats"
+    			  "/ngwmn_cache/stats/"+t+"/stats"
     			  );
     	  
     	  // This query is sent to server, handled by the Google Chart Tools Datasource library 
@@ -197,7 +197,7 @@ var line = d3.svg.line()
 
 <h1 id='streamgraph'>Fetch Counts</h1>
 <div class='gallery' id='chart_waterlevel'>
-<img src="/ngwmn/images/whirl.png" id='waterlevel_filler' alt="Chart goes here" height="200" width="960"/>
+<img src="/ngwmn_cache/images/whirl.png" id='waterlevel_filler' alt="Chart goes here" height="200" width="960"/>
 </div>
 
     </div>

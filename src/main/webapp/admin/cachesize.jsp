@@ -27,7 +27,7 @@ Chart size graph
             var div = document.getElementById("chart_div");
         	g = new Dygraph(
               div,
-              "/ngwmn/stats/cache_size", 
+              "/ngwmn_cache/stats/cache_size", 
               {
                 connectSeparatedPoints: true,
                 ylabel: "Size (mB)",
