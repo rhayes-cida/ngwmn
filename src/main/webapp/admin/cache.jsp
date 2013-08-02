@@ -19,7 +19,7 @@
 </head>
 <body>
 
-	<h1><a href="/ngwmn">National Ground Water Monitoring Network</a></h1>
+	<h1><a href="/ngwmn_cache">National Ground Water Monitoring Network</a></h1>
 	<h2>Data Cache</h2>
 	<p>
 		(<a href="cachestats.jsp">Daily data fetch statistics</a>)

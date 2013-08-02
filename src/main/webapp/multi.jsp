@@ -17,7 +17,7 @@
 	<h2>Multi-Site download demo</h2>
 	<form method="GET"
 		action="
-		http://cida-wiwsc-javadevp.er.usgs.gov:8080/ngwmn/data?agencyID=USGS&listOfWells=402734087033401&listOfWells=402431075020801&type=WATERLEVEL">
+		http://cida-wiwsc-javadevp.er.usgs.gov:8080/ngwmn_cache/data?agencyID=USGS&listOfWells=402734087033401&listOfWells=402431075020801&type=WATERLEVEL">
 		<input name="type" value="WATERLEVEL" type="hidden" />
 		<input type="submit" value="download" />
 		<table>
