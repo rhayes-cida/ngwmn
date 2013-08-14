@@ -1,18 +1,19 @@
 package gov.usgs.ngwmn.sos;
 
 import gov.usgs.ngwmn.NotImplementedException;
+import gov.usgs.ngwmn.dm.io.transform.XSLHelper;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.Date;
-import java.util.regex.Pattern;
+import java.text.MessageFormat;
 
 import javax.servlet.http.HttpServletResponse;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.stream.StreamResult;
+import javax.xml.transform.stream.StreamSource;
 
-import org.apache.commons.httpclient.HttpClient;
-import org.apache.commons.httpclient.HttpStatus;
-import org.apache.commons.httpclient.methods.PostMethod;
-import org.springframework.format.annotation.DateTimeFormat;
-import org.springframework.format.annotation.DateTimeFormat.ISO;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -46,8 +47,27 @@ public class SOSService {
 	public void getFOI_byId(
 			@RequestParam String featureId,
 			HttpServletResponse response
-			) {
+			)
+		throws Exception
+	{
+		GeoserverFeatureSource featureSource = new GeoserverFeatureSource();
+		
+		// variable parameters
+		// TODO fix param name and perhaps value
+		featureSource.addParameter("featureOfInterest", featureId);
 
+		try {
+			InputStream is = featureSource.getStream();
+			
+			response.setContentType("text/xml");
+			OutputStream os = response.getOutputStream();
+
+			// copy from stream to response, filtering through xsl transform
+			copyThroughTransform(is,os, "/gov/usgs/ngwmn/hydrograph.xsl");
+		}
+		finally {
+			featureSource.close();
+		}
 	}
 	
 	// example URL $BASE?REQUEST=GetFeatureOfInterest&VERSION=2.0.0&SERVICE=SOS&spatialFilter=om:featureOfInterest/*/sams:shape,-116,50.5,-114.3,51.6&namespaces=xmlns(sams,http://www.opengis.net/samplingSpatial/2.0),xmlns(om,http://www.opengis.net/om/2.0)
@@ -55,53 +75,54 @@ public class SOSService {
 	public void getFOI_bySpatialFilter(
 			@RequestParam String spatialFilter,
 			HttpServletResponse response
-			) {
+			)  throws Exception
+	{
 		String[] part = spatialFilter.split(",");
 		if ( ! "om:featureOfInterest/*/sams:shape".equals(part[0]) ) {
 			throw new RuntimeException("bad filter");
 		}
 		for (int i = 1; i <= 4; i++) {
+			// just for validation
 			Double.parseDouble(part[i]);
 		}
 		
-		// generate params for GeoServer WFS request, example:
-/*		SERVICE:WFS
-		VERSION:1.0.0
-		srsName:EPSG:4326
-		outputFormat:GML2
-		typeName:ngwmn:VW_GWDP_GEOSERVER
-		CQL_FILTER:((QW_SN_FLAG = '1') OR (WL_SN_FLAG = '1')) AND (BBOX(GEOM,-101.333008,34.269568,-99.838867,35.459421))
-		*/
+		// extra params for GeoServer WFS request, example:
 		// use the original input strings for fidelity
 		String cql_filter = MessageFormat.format("(BBOX(GEOM,{1},{2},{3,{4}))",
 				part[1],part[2], part[3], part[4]);
 		String srsName = "EPSG:4326";
 		
-		HttpClient client = new HttpClient();
-		PostMethod method = new PostMethod("http://cida-wiwsc-ngwmndev.er.usgs.gov:8080/ngwmn/geoserver/wfs?request=GetFeature");
-		method.addParameter("SERVICE", "WFS");
-		method.addParameter("VERSION", "1.0.0");
-		method.addParameter("outputFormat","GML2");
-		method.addParameter("typeName","ngwmn:VW_GWDP_GEOSERVER");
+		GeoserverFeatureSource featureSource = new GeoserverFeatureSource();
 		
 		// variable parameters
-		method.addParameter("srsName", srsName);
-		method.addParameter("CQL_FILTER", cql_filter);
+		featureSource.addParameter("srsName", srsName);
+		featureSource.addParameter("CQL_FILTER", cql_filter);
 
 		try {
-			int statusCode = client.executeMethod(method);
+			InputStream is = featureSource.getStream();
 			
-			if (statusCode != HttpStatus.SC_OK) {
-				throw new RuntimeException("status " + statusCode);
-			}
-			
-			InputStream stream = method.getResponseBodyAsStream();
-			
+			response.setContentType("text/xml");
+			OutputStream os = response.getOutputStream();
+
 			// copy from stream to response, filtering through xsl transform
+			copyThroughTransform(is,os, "/gov/usgs/ngwmn/hydrograph.xsl");
 		}
 		finally {
-			method.releaseConnection();
+			featureSource.close();
 		}
+	}
+
+	public static void copyThroughTransform(InputStream is, OutputStream os,
+			String xformName) throws IOException, TransformerException {
+		XSLHelper xslHelper = new XSLHelper();
+		xslHelper.setTransform(xformName);
+		
+		Transformer t = xslHelper.getTemplates().newTransformer();
+		StreamResult result = new StreamResult(os);
+		StreamSource source = new StreamSource(is);	
+
+		t.transform(source, result);
+
 	}
 	
 	
