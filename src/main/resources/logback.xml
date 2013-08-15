@@ -37,7 +37,8 @@
   <logger name="org.springframework.jdbc.core.JdbcTemplate" level="INFO"/>
   <logger name="gov.usgs.ngwmn.dm.aspect" level="INFO"/>
   <logger name="gov.usgs.ngwmn.dm.io" level="INFO"/>
-	  
+  <logger name="gov.usgs.ngwmn.sos" level="DEBUG"/>
+  
   <root level="info">
   	<if condition=' ! p("user.name").equals("tomcat")'>
   		<then>
