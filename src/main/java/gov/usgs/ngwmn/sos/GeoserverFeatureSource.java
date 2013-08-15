@@ -10,11 +10,15 @@ import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.httpclient.NameValuePair;
 import org.apache.commons.httpclient.methods.PostMethod;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class GeoserverFeatureSource implements Closeable {
 
 	private String baseURL = "http://cida-wiwsc-ngwmndev.er.usgs.gov:8080/ngwmn/geoserver";
 	private List<NameValuePair> extraParams = new ArrayList<NameValuePair>();
+
+	static private Logger logger = LoggerFactory.getLogger(GeoserverFeatureSource.class);
 
 	private HttpClient client;
 	private PostMethod method;
@@ -47,6 +51,8 @@ public class GeoserverFeatureSource implements Closeable {
 		for (NameValuePair nvp : extraParams) {
 			method.addParameter(nvp);
 		}
+		
+		logger.info("trying to fetch some data from {} with params {}", method.getURI(), method.getParameters());
 		
 		int statusCode = client.executeMethod(method);
 		

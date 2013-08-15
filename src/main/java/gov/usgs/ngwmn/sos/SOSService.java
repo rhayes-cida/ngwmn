@@ -14,12 +14,16 @@ import javax.xml.transform.TransformerException;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
-@Controller("sos")
+@Controller
 public class SOSService {
+
+	static private Logger logger = LoggerFactory.getLogger(SOSService.class);
 
 	@RequestMapping(params={"REQUEST=GetCapabilities"})
 	public void getCapabilities(
@@ -43,7 +47,7 @@ public class SOSService {
 	// implement on the back of geoserver
 	// two forms of input: featureId or bounding box
 	// example URL $BASE?REQUEST=GetFeatureOfInterest&VERSION=2.0.0&SERVICE=SOS&featureOfInterest=ab.mon.45
-	@RequestMapping(params={"REQUEST=GetFeatureOfInterest","featureOfInterest"})
+	@RequestMapping(params={"REQUEST=GetFeatureOfInterest","featureId"})
 	public void getFOI_byId(
 			@RequestParam String featureId,
 			HttpServletResponse response
@@ -51,6 +55,8 @@ public class SOSService {
 		throws Exception
 	{
 		GeoserverFeatureSource featureSource = new GeoserverFeatureSource();
+		
+		logger.info("GetFeatureOfInterest,featureId={}", featureId);
 		
 		// variable parameters
 		// TODO fix param name and perhaps value
