@@ -31,6 +31,8 @@ public class SOSService {
 
 	static private Logger logger = LoggerFactory.getLogger(SOSService.class);
 
+	private String baseURL;
+	
 	@RequestMapping(params={"REQUEST=GetCapabilities"})
 	public void getCapabilities(
 			OutputStream out
@@ -46,8 +48,12 @@ public class SOSService {
 			HttpServletResponse response
 			)
 	{
-		
+		// TODO Implement by fetching from self-URL for raw data, passing thru wml1.9 to wml2 transform
+		throw new NotImplementedException();
 	}
+	
+	// TODO Add binding for XML document input 
+	
 	
 	// GetFeatureOfInterest
 	// implement on the back of geoserver
@@ -61,7 +67,7 @@ public class SOSService {
 			)
 		throws Exception
 	{
-		GeoserverFeatureSource featureSource = new GeoserverFeatureSource();
+		GeoserverFeatureSource featureSource = new GeoserverFeatureSource(getBaseURL());
 		
 		logger.info("GetFeatureOfInterest");
 		
@@ -159,8 +165,19 @@ public class SOSService {
 			logger.debug("Got {} bytes of output", countingOs.getCount());
 		}
 	}
+
+	public String getBaseURL() {
+		return baseURL;
+	}
+
+	public void setBaseURL(String baseURL) {
+		this.baseURL = baseURL;
+		logger.info("Will use base URL {}", this.baseURL);
+	}
 	
 	
 	// GetDataAvailability
 	// later
+	
+	
 }

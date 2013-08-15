@@ -15,7 +15,7 @@ import org.slf4j.LoggerFactory;
 
 public class GeoserverFeatureSource implements Closeable {
 
-	private String baseURL = "http://cida-wiwsc-ngwmndev.er.usgs.gov:8080/ngwmn/geoserver";
+	private String baseURL; // example "http://cida-wiwsc-ngwmndev.er.usgs.gov:8080/ngwmn/geoserver";
 	private List<NameValuePair> extraParams = new ArrayList<NameValuePair>();
 
 	static private Logger logger = LoggerFactory.getLogger(GeoserverFeatureSource.class);
@@ -23,7 +23,8 @@ public class GeoserverFeatureSource implements Closeable {
 	private HttpClient client;
 	private PostMethod method;
 	
-	public GeoserverFeatureSource() {
+	public GeoserverFeatureSource(String base) {
+		baseURL = base;
 	}
 	
 	public GeoserverFeatureSource addParameter(String name, String value) {
