@@ -37,6 +37,7 @@ public class SOSService {
 	public void getCapabilities(
 			OutputStream out
 	) {
+		// TODO deliver static file
 		throw new NotImplementedException();
 	}
 	
@@ -49,6 +50,10 @@ public class SOSService {
 			)
 	{
 		// TODO Implement by fetching from self-URL for raw data, passing thru wml1.9 to wml2 transform
+		
+		// raw data URL will be like /ngwmn_cache/data/$AGENCY/$SITE/WATERLEVEL
+		// example http://cida-wiwsc-ngwmndev.er.usgs.gov:8080/ngwmn_cache/data/TWDB/6550504/WATERLEVEL
+		
 		throw new NotImplementedException();
 	}
 	
