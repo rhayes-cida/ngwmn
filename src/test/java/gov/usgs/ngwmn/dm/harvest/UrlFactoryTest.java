@@ -17,7 +17,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 @ContextConfiguration({"classpath:urlFactoryContext.xml"})
 public class UrlFactoryTest {
 
-	private static final String BASE_URL = "http://cida-wiwsc-javadevp.er.usgs.gov:8080/cocoon";
+	private static final String BASE_URL = "http://cida-wiwsc-ngwmndev.er.usgs.gov:8080/cocoon";
 
 	@Autowired
 	protected ApplicationContext ctx;

@@ -30,6 +30,8 @@ import com.google.common.io.CountingOutputStream;
 @Controller
 public class SOSService {
 
+	public static final String FEATURE_PREFIX = "VW_GWDP_GEOSERVER";
+
 	static private Logger logger = LoggerFactory.getLogger(SOSService.class);
 
 	private String baseURL;
@@ -53,11 +55,11 @@ public class SOSService {
 	{
 		// Implement by fetching from self-URL for raw data, passing thru wml1.9 to wml2 transform
 		
-		String baseURL = request.getMethod() + "://" + request.getLocalName() + ":" + request.getLocalPort() + "/" + request.getContextPath();
+		String baseURL = "http" + "://" + request.getLocalName() + ":" + request.getLocalPort() + "/" + request.getContextPath();
 		
-		String[] idParts = featureOfInterest.split(":");
+		SiteID site = SiteID.fromFid(featureOfInterest);
 		
-		Waterlevel19DataSource source = new Waterlevel19DataSource(baseURL, idParts[0], idParts[1]);
+		Waterlevel19DataSource source = new Waterlevel19DataSource(baseURL, site.agency, site.site);
 		
 		try {
 			InputStream is = source.getStream();
@@ -76,7 +78,6 @@ public class SOSService {
 		finally {
 			source.close();
 		}
-		throw new NotImplementedException();
 	}
 	
 	// TODO Add binding for XML document input 
@@ -102,9 +103,11 @@ public class SOSService {
 		int filterCt = 0;
 		
 		if (featureOfInterest != null) {
-			// TODO fix param name and perhaps value
+			SiteID site = SiteID.fromFid(featureOfInterest);
+			logger.debug("Filter for site {}", site);
+			
 			featureSource.addParameter("featureID", featureOfInterest);
-			logger.debug("Added filter fid={}", featureOfInterest);
+			logger.debug("Added filter featureID={}", featureOfInterest);
 			filterCt++;
 		}
 		
@@ -202,7 +205,44 @@ public class SOSService {
 		logger.info("Will use base URL {}", this.baseURL);
 	}
 	
+	public static class SiteID {
+		public final String agency;
+		public final String site;
+		
+		// fid is like VW_GWDP_GEOSERVER.NJGS.2288614
+		// site id is like NJGS:2288614
+		// (agency:site)
+
+		public SiteID(String agency, String site) {
+			super();
+			this.agency = agency;
+			this.site = site;
+		}
+		
+		public String getFid() {
+			return FEATURE_PREFIX + "." + agency + "." + site;
+		}
+		
+		public String toString() {
+			return agency + ":" + site;
+		}
+		
+		public static SiteID fromFid(String fid) {
+			String[] parts = fid.split("\\.");
+			// Check first part
+			if ( ! FEATURE_PREFIX.equals(parts[0])) {
+				throw new IllegalArgumentException("Expected " + FEATURE_PREFIX + ", got " + parts[0]);
+			}
+			return new SiteID(parts[1], parts[2]);
+		}
+		
+		public static SiteID fromID(String siteId) {
+			String[] parts = siteId.split(":");
+			return new SiteID(parts[0], parts[1]);
+		}
+	}
 	
+
 	// GetDataAvailability
 	// later
 	
