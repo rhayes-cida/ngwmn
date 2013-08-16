@@ -15,13 +15,16 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
+import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import com.google.common.io.CountingInputStream;
@@ -44,12 +47,18 @@ public class SOSService {
 		throw new NotImplementedException();
 	}
 	
-	@RequestMapping(params={"!REQUEST"})
+	@RequestMapping(params={"!REQUEST"},method={RequestMethod.POST})
 	public void processXmlParams(
 			HttpServletRequest request,
+			@RequestBody DOMSource dom,
 			HttpServletResponse response
 	) {
 		// TODO parse parameters out of XML input, call methods in this class
+		
+		logger.info("Input node is {} of type {}", dom.getNode().getNodeName(), dom.getNode().getNodeType());
+		
+		
+		
 		throw new NotImplementedException();
 	}
 	
