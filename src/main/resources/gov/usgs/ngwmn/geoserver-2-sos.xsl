@@ -43,7 +43,7 @@
 	
 	<xsl:template match="ngwmn:VW_GWDP_GEOSERVER">
 	<sos:featureMember>
-		<sams:SF_SpatialSamplingFeature gml:id="{translate(ngwmn:MY_SITEID/text(),':','.')}">
+		<sams:SF_SpatialSamplingFeature gml:id="VW_GWDP_GEOSERVER.{translate(ngwmn:MY_SITEID/text(),':','.')}">
 			<xsl:apply-templates select="ngwmn:SITE_NAME"/>
 			<gml:identifier codeSpace="urn:ngwmn">/sites/<xsl:value-of select="ngwmn:MY_SITEID/text()"/></gml:identifier>
 			<sf:type

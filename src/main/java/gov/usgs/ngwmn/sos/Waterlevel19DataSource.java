@@ -33,11 +33,11 @@ public class Waterlevel19DataSource implements Closeable {
 		site = s;
 	}
 	
-	public InputStream getStream() throws Exception {
+	public synchronized InputStream getStream() throws Exception {
 		// data URL will be like /ngwmn_cache/data/$AGENCY/$SITE/WATERLEVEL
 		// example http://cida-wiwsc-ngwmndev.er.usgs.gov:8080/ngwmn_cache/data/TWDB/6550504/WATERLEVEL
 		client = new HttpClient();
-		String url = MessageFormat.format("{}/data/{1}/{2}/WATERLEVEL", baseURL, agency, site);
+		String url = MessageFormat.format("{0}/data/{1}/{2}/WATERLEVEL", baseURL, agency, site);
 		method = new GetMethod(url);
 
 		logger.info("trying to fetch some data from {} ", method.getURI());
@@ -55,9 +55,11 @@ public class Waterlevel19DataSource implements Closeable {
 	}
 
 	@Override
-	public void close() throws IOException {
-		method.releaseConnection();
-		method = null;
+	public synchronized void close() throws IOException {
+		if (method != null) {
+			method.releaseConnection();
+			method = null;
+		}
 	}
 
 	public String getBaseURL() {
