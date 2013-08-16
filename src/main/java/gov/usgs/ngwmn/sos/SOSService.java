@@ -16,6 +16,7 @@ import java.util.Enumeration;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletContext;
+import javax.servlet.ServletException;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletRequestWrapper;
@@ -50,6 +51,18 @@ public class SOSService {
 		throw new NotImplementedException();
 	}
 	
+	/**
+	 * Use internal calls to get the WaterML2 observations.
+	 * Might perform better than going out to the network by filtering a full URL.
+	 * Might be more complex, too.
+	 * 
+	 * @param featureId
+	 * @param ctx
+	 * @param request
+	 * @param response
+	 * @throws ServletException
+	 * @throws IOException
+	 */
 	@RequestMapping(params={"REQUEST=GetObservation"})
 	public void getObservation(
 			@RequestParam String featureId,
@@ -58,9 +71,9 @@ public class SOSService {
 			ServletContext ctx,
 			HttpServletRequest request,
 			HttpServletResponse response
-			)
+			) throws ServletException, IOException
 	{
-		// TODO Implement by fetching from self-URL for raw data, passing thru wml1.9 to wml2 transform
+		// Implement by fetching from self-URL for raw data, passing thru wml1.9 to wml2 transform
 		
 		// raw data URL will be like /ngwmn_cache/data/$AGENCY/$SITE/WATERLEVEL
 		// example http://cida-wiwsc-ngwmndev.er.usgs.gov:8080/ngwmn_cache/data/TWDB/6550504/WATERLEVEL
@@ -70,7 +83,8 @@ public class SOSService {
 
 			@Override
 			public String getHeader(String name) {
-				// This only works 
+				// This only works if the mapped servlet, which might be DataRestServlet, respects the full accept header
+				// with subtype. It might do so directly, or it might do so with the help of a ServletFilter.
 				if ("Accept".equalsIgnoreCase(name)) {
 					return "text/xml;subtype=WaterML/2.0";
 				}
@@ -91,7 +105,7 @@ public class SOSService {
 			
 		};
 		
-		dispatcher.forward(request, response);
+		dispatcher.forward(req, response);
 		
 		// throw new NotImplementedException();
 	}
