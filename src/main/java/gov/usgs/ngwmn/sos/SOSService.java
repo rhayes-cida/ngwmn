@@ -29,11 +29,22 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import com.google.common.io.CountingInputStream;
 import com.google.common.io.CountingOutputStream;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import javax.xml.xpath.XPath;
+import javax.xml.xpath.XPathConstants;
+import javax.xml.xpath.XPathExpressionException;
+import javax.xml.xpath.XPathFactory;
+import org.w3c.dom.Document;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 @Controller
 public class SOSService {
 
 	public static final String FEATURE_PREFIX = "VW_GWDP_GEOSERVER";
+	public static final String BOUNDING_BOX_PREFIX = "om:featureOfInterest/*/sams:shape";
 
 	static private Logger logger = LoggerFactory.getLogger(SOSService.class);
 
@@ -57,7 +68,47 @@ public class SOSService {
 		
 		logger.info("Input node is {} of type {}", dom.getNode().getNodeName(), dom.getNode().getNodeType());
 		
+		XPath xPath = XPathFactory.newInstance().newXPath();
+		Document doc = (Document) dom.getNode();
+		Node rootnode = doc.getDocumentElement();
 		
+		// determine operation
+		String opname = rootnode.getLocalName();
+		
+		// determine parameters
+		// multiple features of interest comma delimited
+		List<String> featureOfInterest = new ArrayList();
+		// will preserve document order
+		List<String> boundingBoxCoords = new ArrayList();
+		try {
+			String lowerCorners = (String)xPath.evaluate(
+				"//*:lowerCorner/text()",
+				rootnode, 
+				XPathConstants.STRING);
+			if (lowerCorners != null && !lowerCorners.trim().isEmpty()) {
+				String[] coords = lowerCorners.split(" +");
+				boundingBoxCoords.addAll(Arrays.asList(coords));
+			}
+
+			String upperCorners = (String)xPath.evaluate(
+				"//*:upperCorner/text()",
+				rootnode, 
+				XPathConstants.STRING);
+			if (upperCorners != null && !upperCorners.trim().isEmpty()) {
+				String[] coords = upperCorners.split(" +");
+				boundingBoxCoords.addAll(Arrays.asList(coords));
+			}
+
+			String featuresOfInterest = (String)xPath.evaluate(
+				"//*:featureOfInterest",
+				rootnode, 
+				XPathConstants.STRING);
+
+		}
+		catch (XPathExpressionException xee) {
+			throw new RuntimeException ("Bad XPath expression in code", xee);
+		}
+			
 		
 		throw new NotImplementedException();
 	}
@@ -134,7 +185,7 @@ public class SOSService {
 		
 		if (spatialFilter != null) {
 			String[] part = spatialFilter.split(",");
-			if ( ! "om:featureOfInterest/*/sams:shape".equals(part[0]) ) {
+			if ( ! SOSService.BOUNDING_BOX_PREFIX.equals(part[0]) ) {
 				throw new RuntimeException("bad filter");
 			}
 			for (int i = 1; i <= 4; i++) {
@@ -146,7 +197,6 @@ public class SOSService {
 			// use the original input strings for fidelity
 			String cql_filter = MessageFormat.format("(BBOX(GEOM,{0},{1},{2},{3}))",
 					part[1],part[2], part[3], part[4]);
-			srsName = "EPSG:4326";
 				
 			featureSource.addParameter("srsName", srsName);
 			featureSource.addParameter("CQL_FILTER", cql_filter);
