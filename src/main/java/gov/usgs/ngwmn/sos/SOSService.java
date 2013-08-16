@@ -2,16 +2,25 @@ package gov.usgs.ngwmn.sos;
 
 import gov.usgs.ngwmn.NotImplementedException;
 import gov.usgs.ngwmn.dm.io.TeeInputStream;
+import gov.usgs.ngwmn.dm.io.transform.XSLFilterOutputStream;
 import gov.usgs.ngwmn.dm.io.transform.XSLHelper;
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.FilterOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.text.MessageFormat;
+import java.util.Enumeration;
 
+import javax.servlet.RequestDispatcher;
+import javax.servlet.ServletContext;
+import javax.servlet.ServletOutputStream;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletRequestWrapper;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpServletResponseWrapper;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.stream.StreamResult;
@@ -46,6 +55,8 @@ public class SOSService {
 			@RequestParam String featureId,
 			// @RequestParam(required=false) @DateTimeFormat(iso=ISO.DATE) Date startDate,
 			// @RequestParam(required=false) @DateTimeFormat(iso=ISO.DATE) Date endDate,
+			ServletContext ctx,
+			HttpServletRequest request,
 			HttpServletResponse response
 			)
 	{
@@ -53,12 +64,45 @@ public class SOSService {
 		
 		// raw data URL will be like /ngwmn_cache/data/$AGENCY/$SITE/WATERLEVEL
 		// example http://cida-wiwsc-ngwmndev.er.usgs.gov:8080/ngwmn_cache/data/TWDB/6550504/WATERLEVEL
+		RequestDispatcher dispatcher = ctx.getRequestDispatcher("/data/TWDB/6550504/WATERLEVEL");
 		
-		throw new NotImplementedException();
+		HttpServletRequest req = new HttpServletRequestWrapper(request) {
+
+			@Override
+			public String getHeader(String name) {
+				// This only works 
+				if ("Accept".equalsIgnoreCase(name)) {
+					return "text/xml;subtype=WaterML/2.0";
+				}
+				return super.getHeader(name);
+			}
+
+			@Override
+			public Enumeration getHeaderNames() {
+				// TODO Do we need to override?
+				return super.getHeaderNames();
+			}
+
+			@Override
+			public Enumeration getHeaders(String name) {
+				// TODO Do we need to override?
+				return super.getHeaders(name);
+			}
+			
+		};
+		
+		dispatcher.forward(request, response);
+		
+		// throw new NotImplementedException();
 	}
 	
 	// TODO Add binding for XML document input 
-	
+	@RequestMapping(params={"!REQUEST"})
+	public void operationByPost() {
+		// TODO Parse XML request body, which will be something like <sos:GetObservation>
+		throw new NotImplementedException();
+	}
+
 	
 	// GetFeatureOfInterest
 	// implement on the back of geoserver
