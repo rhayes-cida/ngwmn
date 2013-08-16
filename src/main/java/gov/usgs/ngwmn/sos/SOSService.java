@@ -11,7 +11,6 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.text.MessageFormat;
 
-import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.xml.transform.Transformer;
@@ -45,7 +44,7 @@ public class SOSService {
 	
 	@RequestMapping(params={"REQUEST=GetObservation"})
 	public void getObservation(
-			@RequestParam String featureId,
+			@RequestParam String featureOfInterest,
 			// @RequestParam(required=false) @DateTimeFormat(iso=ISO.DATE) Date startDate,
 			// @RequestParam(required=false) @DateTimeFormat(iso=ISO.DATE) Date endDate,
 			HttpServletRequest request,
@@ -56,7 +55,7 @@ public class SOSService {
 		
 		String baseURL = request.getMethod() + "://" + request.getLocalName() + ":" + request.getLocalPort() + "/" + request.getContextPath();
 		
-		String[] idParts = featureId.split(":");
+		String[] idParts = featureOfInterest.split(":");
 		
 		Waterlevel19DataSource source = new Waterlevel19DataSource(baseURL, idParts[0], idParts[1]);
 		
