@@ -44,6 +44,16 @@ public class SOSService {
 		throw new NotImplementedException();
 	}
 	
+	@RequestMapping(params={"!REQUEST"})
+	public void processXmlParams(
+			HttpServletRequest request,
+			HttpServletResponse response
+	) {
+		// TODO parse parameters out of XML input, call methods in this class
+		throw new NotImplementedException();
+	}
+	
+	
 	@RequestMapping(params={"REQUEST=GetObservation"})
 	public void getObservation(
 			@RequestParam String featureOfInterest,
@@ -139,6 +149,8 @@ public class SOSService {
 		if (filterCt == 0) {
 			logger.warn("No filters for WFS request, may get lots of data");
 		}
+		
+		// TODO It seems that geoserver may not accept the two filters in conjunction
 		
 		try {
 			InputStream is = featureSource.getStream();
