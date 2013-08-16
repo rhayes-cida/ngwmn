@@ -82,6 +82,7 @@ public class SOSService {
 	
 	// TODO Add binding for XML document input 
 	
+	// TODO Make param names case-insensitive (might require use of filter)
 	
 	// GetFeatureOfInterest
 	// implement on the back of geoserver
@@ -91,6 +92,7 @@ public class SOSService {
 	public void getFOI_byId(
 			@RequestParam(required=false) String featureOfInterest,
 			@RequestParam(required=false) String spatialFilter,
+			@RequestParam(required=false, defaultValue="EPSG:4326") String srsName,
 			HttpServletResponse response
 			)
 		throws Exception
@@ -123,9 +125,9 @@ public class SOSService {
 		
 			// extra params for GeoServer WFS request, example:
 			// use the original input strings for fidelity
-			String cql_filter = MessageFormat.format("(BBOX(GEOM,{1},{2},{3},{4}))",
+			String cql_filter = MessageFormat.format("(BBOX(GEOM,{0},{1},{2},{3}))",
 					part[1],part[2], part[3], part[4]);
-			String srsName = "EPSG:4326";
+			srsName = "EPSG:4326";
 				
 			featureSource.addParameter("srsName", srsName);
 			featureSource.addParameter("CQL_FILTER", cql_filter);
