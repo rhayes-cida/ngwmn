@@ -11,16 +11,20 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.text.MessageFormat;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
+import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import com.google.common.io.CountingInputStream;
@@ -29,25 +33,75 @@ import com.google.common.io.CountingOutputStream;
 @Controller
 public class SOSService {
 
+	public static final String FEATURE_PREFIX = "VW_GWDP_GEOSERVER";
+
 	static private Logger logger = LoggerFactory.getLogger(SOSService.class);
 
+	private String baseURL;
+	
 	@RequestMapping(params={"REQUEST=GetCapabilities"})
 	public void getCapabilities(
 			OutputStream out
 	) {
+		// TODO deliver static file
 		throw new NotImplementedException();
 	}
 	
+	@RequestMapping(params={"!REQUEST"},method={RequestMethod.POST})
+	public void processXmlParams(
+			HttpServletRequest request,
+			@RequestBody DOMSource dom,
+			HttpServletResponse response
+	) {
+		// TODO parse parameters out of XML input, call methods in this class
+		
+		logger.info("Input node is {} of type {}", dom.getNode().getNodeName(), dom.getNode().getNodeType());
+		
+		
+		
+		throw new NotImplementedException();
+	}
+	
+	
 	@RequestMapping(params={"REQUEST=GetObservation"})
 	public void getObservation(
-			@RequestParam String featureId,
+			@RequestParam String featureOfInterest,
 			// @RequestParam(required=false) @DateTimeFormat(iso=ISO.DATE) Date startDate,
 			// @RequestParam(required=false) @DateTimeFormat(iso=ISO.DATE) Date endDate,
+			HttpServletRequest request,
 			HttpServletResponse response
-			)
+			) throws Exception
 	{
+		// Implement by fetching from self-URL for raw data, passing thru wml1.9 to wml2 transform
 		
+		String baseURL = "http" + "://" + request.getLocalName() + ":" + request.getLocalPort() + "/" + request.getContextPath();
+		
+		SiteID site = SiteID.fromFid(featureOfInterest);
+		
+		Waterlevel19DataSource source = new Waterlevel19DataSource(baseURL, site.agency, site.site);
+		
+		try {
+			InputStream is = source.getStream();
+			
+			response.setContentType("text/xml");
+			OutputStream os = response.getOutputStream();
+
+			// copy from stream to response, filtering through xsl transform
+			copyThroughTransform(is,os, "/gov/usgs/ngwmn/wl2waterml2.xslt");
+			logger.debug("done");
+		}
+		catch (Exception e) {
+			logger.warn("Problem", e);
+			throw e;
+		}
+		finally {
+			source.close();
+		}
 	}
+	
+	// TODO Add binding for XML document input 
+	
+	// TODO Make param names case-insensitive (might require use of filter)
 	
 	// GetFeatureOfInterest
 	// implement on the back of geoserver
@@ -55,23 +109,26 @@ public class SOSService {
 	// example URL $BASE?REQUEST=GetFeatureOfInterest&VERSION=2.0.0&SERVICE=SOS&featureOfInterest=ab.mon.45
 	@RequestMapping(params={"REQUEST=GetFeatureOfInterest"})
 	public void getFOI_byId(
-			@RequestParam(required=false) String featureId,
+			@RequestParam(required=false) String featureOfInterest,
 			@RequestParam(required=false) String spatialFilter,
+			@RequestParam(required=false, defaultValue="EPSG:4326") String srsName,
 			HttpServletResponse response
 			)
 		throws Exception
 	{
-		GeoserverFeatureSource featureSource = new GeoserverFeatureSource();
+		GeoserverFeatureSource featureSource = new GeoserverFeatureSource(getBaseURL());
 		
 		logger.info("GetFeatureOfInterest");
 		
 		// optional filters
 		int filterCt = 0;
 		
-		if (featureId != null) {
-			// TODO fix param name and perhaps value
-			featureSource.addParameter("featureID", featureId);
-			logger.debug("Added filter fid={}", featureId);
+		if (featureOfInterest != null) {
+			SiteID site = SiteID.fromFid(featureOfInterest);
+			logger.debug("Filter for site {}", site);
+			
+			featureSource.addParameter("featureID", featureOfInterest);
+			logger.debug("Added filter featureID={}", featureOfInterest);
 			filterCt++;
 		}
 		
@@ -87,9 +144,9 @@ public class SOSService {
 		
 			// extra params for GeoServer WFS request, example:
 			// use the original input strings for fidelity
-			String cql_filter = MessageFormat.format("(BBOX(GEOM,{1},{2},{3,{4}))",
+			String cql_filter = MessageFormat.format("(BBOX(GEOM,{0},{1},{2},{3}))",
 					part[1],part[2], part[3], part[4]);
-			String srsName = "EPSG:4326";
+			srsName = "EPSG:4326";
 				
 			featureSource.addParameter("srsName", srsName);
 			featureSource.addParameter("CQL_FILTER", cql_filter);
@@ -101,6 +158,8 @@ public class SOSService {
 		if (filterCt == 0) {
 			logger.warn("No filters for WFS request, may get lots of data");
 		}
+		
+		// TODO It seems that geoserver may not accept the two filters in conjunction
 		
 		try {
 			InputStream is = featureSource.getStream();
@@ -159,8 +218,56 @@ public class SOSService {
 			logger.debug("Got {} bytes of output", countingOs.getCount());
 		}
 	}
+
+	public String getBaseURL() {
+		return baseURL;
+	}
+
+	public void setBaseURL(String baseURL) {
+		this.baseURL = baseURL;
+		logger.info("Will use base URL {}", this.baseURL);
+	}
 	
+	public static class SiteID {
+		public final String agency;
+		public final String site;
+		
+		// fid is like VW_GWDP_GEOSERVER.NJGS.2288614
+		// site id is like NJGS:2288614
+		// (agency:site)
+
+		public SiteID(String agency, String site) {
+			super();
+			this.agency = agency;
+			this.site = site;
+		}
+		
+		public String getFid() {
+			return FEATURE_PREFIX + "." + agency + "." + site;
+		}
+		
+		public String toString() {
+			return agency + ":" + site;
+		}
+		
+		public static SiteID fromFid(String fid) {
+			String[] parts = fid.split("\\.");
+			// Check first part
+			if ( ! FEATURE_PREFIX.equals(parts[0])) {
+				throw new IllegalArgumentException("Expected " + FEATURE_PREFIX + ", got " + parts[0]);
+			}
+			return new SiteID(parts[1], parts[2]);
+		}
+		
+		public static SiteID fromID(String siteId) {
+			String[] parts = siteId.split(":");
+			return new SiteID(parts[0], parts[1]);
+		}
+	}
 	
+
 	// GetDataAvailability
 	// later
+	
+	
 }

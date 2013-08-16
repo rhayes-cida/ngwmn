@@ -43,10 +43,10 @@ public abstract class ContextualTest extends IntegrationTest {
 	public static void setupNaming() throws Exception {
 		final SimpleNamingContextBuilder builder = new SimpleNamingContextBuilder();
 		builder.bind(FileCache.BASEDIR_JNDI_NAME, basedir);
-		// builder.bind("java:comp/env/ngwmn_cocoon", "http://cida-wiwsc-javadevp.er.usgs.gov:8080/cocoon");
+		// builder.bind("java:comp/env/ngwmn_cocoon", "http://cida-wiwsc-ngwmndev.er.usgs.gov:8080/cocoon");
 		// In the web context, a jndi resolver is configured automatically
 		// set it up as a system property for now
-		System.setProperty("ngwmn_cocoon", "http://cida-wiwsc-javadevp.er.usgs.gov:8080/cocoon");
+		System.setProperty("ngwmn_cocoon", "http://cida-wiwsc-ngwmndev.er.usgs.gov:8080/cocoon");
 
 		try {
 			builder.activate();
@@ -54,7 +54,7 @@ public abstract class ContextualTest extends IntegrationTest {
 			// Set the required value into the existing context instead
 			InitialContext ctx = new InitialContext();
 			ctx.bind(FileCache.BASEDIR_JNDI_NAME, basedir);
-			ctx.bind("java:comp/env/ngwmn_cocoon", "http://cida-wiwsc-javadevp.er.usgs.gov:8080/cocoon");
+			ctx.bind("java:comp/env/ngwmn_cocoon", "http://cida-wiwsc-ngwmndev.er.usgs.gov:8080/cocoon");
 		}
 	}
 	
