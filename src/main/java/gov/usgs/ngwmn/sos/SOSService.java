@@ -11,6 +11,8 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.text.MessageFormat;
 
+import javax.servlet.ServletContext;
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
@@ -46,14 +48,35 @@ public class SOSService {
 			@RequestParam String featureId,
 			// @RequestParam(required=false) @DateTimeFormat(iso=ISO.DATE) Date startDate,
 			// @RequestParam(required=false) @DateTimeFormat(iso=ISO.DATE) Date endDate,
+			HttpServletRequest request,
 			HttpServletResponse response
-			)
+			) throws Exception
 	{
-		// TODO Implement by fetching from self-URL for raw data, passing thru wml1.9 to wml2 transform
+		// Implement by fetching from self-URL for raw data, passing thru wml1.9 to wml2 transform
 		
-		// raw data URL will be like /ngwmn_cache/data/$AGENCY/$SITE/WATERLEVEL
-		// example http://cida-wiwsc-ngwmndev.er.usgs.gov:8080/ngwmn_cache/data/TWDB/6550504/WATERLEVEL
+		String baseURL = request.getMethod() + "://" + request.getLocalName() + ":" + request.getLocalPort() + "/" + request.getContextPath();
 		
+		String[] idParts = featureId.split(":");
+		
+		Waterlevel19DataSource source = new Waterlevel19DataSource(baseURL, idParts[0], idParts[1]);
+		
+		try {
+			InputStream is = source.getStream();
+			
+			response.setContentType("text/xml");
+			OutputStream os = response.getOutputStream();
+
+			// copy from stream to response, filtering through xsl transform
+			copyThroughTransform(is,os, "/gov/usgs/ngwmn/wl2waterml2.xslt");
+			logger.debug("done");
+		}
+		catch (Exception e) {
+			logger.warn("Problem", e);
+			throw e;
+		}
+		finally {
+			source.close();
+		}
 		throw new NotImplementedException();
 	}
 	
@@ -66,7 +89,7 @@ public class SOSService {
 	// example URL $BASE?REQUEST=GetFeatureOfInterest&VERSION=2.0.0&SERVICE=SOS&featureOfInterest=ab.mon.45
 	@RequestMapping(params={"REQUEST=GetFeatureOfInterest"})
 	public void getFOI_byId(
-			@RequestParam(required=false) String featureId,
+			@RequestParam(required=false) String featureOfInterest,
 			@RequestParam(required=false) String spatialFilter,
 			HttpServletResponse response
 			)
@@ -79,10 +102,10 @@ public class SOSService {
 		// optional filters
 		int filterCt = 0;
 		
-		if (featureId != null) {
+		if (featureOfInterest != null) {
 			// TODO fix param name and perhaps value
-			featureSource.addParameter("featureID", featureId);
-			logger.debug("Added filter fid={}", featureId);
+			featureSource.addParameter("featureID", featureOfInterest);
+			logger.debug("Added filter fid={}", featureOfInterest);
 			filterCt++;
 		}
 		
@@ -98,7 +121,7 @@ public class SOSService {
 		
 			// extra params for GeoServer WFS request, example:
 			// use the original input strings for fidelity
-			String cql_filter = MessageFormat.format("(BBOX(GEOM,{1},{2},{3,{4}))",
+			String cql_filter = MessageFormat.format("(BBOX(GEOM,{1},{2},{3},{4}))",
 					part[1],part[2], part[3], part[4]);
 			String srsName = "EPSG:4326";
 				
