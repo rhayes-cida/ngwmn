@@ -33,13 +33,13 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
-import javax.xml.namespace.NamespaceContext;
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 import org.springframework.util.xml.SimpleNamespaceContext;
 import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -66,54 +66,13 @@ public class SOSService {
 			HttpServletRequest request,
 			@RequestBody DOMSource dom,
 			HttpServletResponse response
-	) {
-		// TODO parse parameters out of XML input, call methods in this class
-		
-		logger.info("Input node is {} of type {}", dom.getNode().getNodeName(), dom.getNode().getNodeType());
-		
-		XPath xPath = XPathFactory.newInstance().newXPath();
+	) throws IOException
+	{
 		Document doc = (Document) dom.getNode();
-		Node rootnode = doc.getDocumentElement();
-		
-		// determine operation
-		String opname = rootnode.getLocalName();
-		
-		// determine parameters
-		// multiple features of interest comma delimited
-		List<String> featureOfInterest = new ArrayList();
-		// will preserve document order
-		List<String> boundingBoxCoords = new ArrayList();
-		try {
-			String lowerCorners = (String)xPath.evaluate(
-				"//*:lowerCorner/text()",
-				rootnode, 
-				XPathConstants.STRING);
-			if (lowerCorners != null && !lowerCorners.trim().isEmpty()) {
-				String[] coords = lowerCorners.split(" +");
-				boundingBoxCoords.addAll(Arrays.asList(coords));
-			}
 
-			String upperCorners = (String)xPath.evaluate(
-				"//*:upperCorner/text()",
-				rootnode, 
-				XPathConstants.STRING);
-			if (upperCorners != null && !upperCorners.trim().isEmpty()) {
-				String[] coords = upperCorners.split(" +");
-				boundingBoxCoords.addAll(Arrays.asList(coords));
-			}
-
-			String featuresOfInterest = (String)xPath.evaluate(
-				"//*:featureOfInterest",
-				rootnode, 
-				XPathConstants.STRING);
-
-		}
-		catch (XPathExpressionException xee) {
-			throw new RuntimeException ("Bad XPath expression in code", xee);
-		}
-			
+		XMLParameterExtractor xtractor = new XMLParameterExtractor(doc);
 		
-		throw new NotImplementedException();
+		xtractor.callService(request, response);
 	}
 	
 	
@@ -163,9 +122,7 @@ public class SOSService {
 			source.close();
 		}
 	}
-	
-	// TODO Add binding for XML document input 
-	
+		
 	// TODO Make param names case-insensitive (might require use of filter)
 	
 	// GetFeatureOfInterest
@@ -173,7 +130,7 @@ public class SOSService {
 	// two forms of filter: featureId or bounding box
 	// example URL $BASE?REQUEST=GetFeatureOfInterest&VERSION=2.0.0&SERVICE=SOS&featureOfInterest=ab.mon.45
 	@RequestMapping(params={"REQUEST=GetFeatureOfInterest"})
-	public void getFOI_byId(
+	public void getFOI(
 			@RequestParam(required=false) String featureOfInterest,
 			@RequestParam(required=false) String spatialFilter,
 			@RequestParam(required=false, defaultValue="EPSG:4326") String srsName,
@@ -336,12 +293,12 @@ public class SOSService {
 	/**
 	 * NOT threadsafe, but multithreaded access is not anticipated.
 	 */
-	public class xmlParameterExtractor {
+	public class XMLParameterExtractor {
 		
 		private XPath xPath;
-		private Node rootnode;
+		private Element rootnode;
 		
-		public xmlParameterExtractor(Document docParams) {
+		public XMLParameterExtractor(Document docParams) {
 			if (docParams == null) {
 				throw new IllegalArgumentException (
 						"Parameter 'docParams' not permitted to be null.");
@@ -361,7 +318,7 @@ public class SOSService {
 		}
 
 		
-		private void callService(
+		void callService(
 				HttpServletRequest request, 
 				HttpServletResponse response) 
 				throws IOException {
@@ -392,7 +349,7 @@ public class SOSService {
 						featureParam = join(",", features);
 					}
 					try {
-						getFOI_byId(featureParam, spatialParam, srsName, response);			
+						getFOI(featureParam, spatialParam, srsName, response);			
 					}
 					catch (Exception e) {
 						throw new RuntimeException (e);
@@ -432,10 +389,10 @@ public class SOSService {
 			// extract featureOfInterest parameters
 			String corners;
 			try {
-					boolean hasSpatialFilter = (Boolean)xPath.evaluate(
-						"//sos.spatialFilter",
-						rootnode, 
-						XPathConstants.BOOLEAN);
+					Boolean hasSpatialFilter = (Boolean)xPath.evaluate(
+							"boolean(//sos:spatialFilter)",
+							rootnode, 
+							XPathConstants.BOOLEAN);
 
 					if ( ! hasSpatialFilter) {
 						return null;
@@ -474,7 +431,7 @@ public class SOSService {
 			// extract featureOfInterest parameters
 			try {
 				NodeList featuresOfInterest = (NodeList)xPath.evaluate(
-					"//*[local-name() = 'featureOfInterest']",
+					"//sos:featureOfInterest",
 					rootnode, 
 					XPathConstants.NODESET);
 				List<String> features = new ArrayList<>(featuresOfInterest.getLength());
