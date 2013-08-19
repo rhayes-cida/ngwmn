@@ -15,22 +15,39 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
+import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import com.google.common.io.CountingInputStream;
 import com.google.common.io.CountingOutputStream;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
+import javax.xml.namespace.NamespaceContext;
+import javax.xml.xpath.XPath;
+import javax.xml.xpath.XPathConstants;
+import javax.xml.xpath.XPathExpressionException;
+import javax.xml.xpath.XPathFactory;
+import org.springframework.util.xml.SimpleNamespaceContext;
+import org.w3c.dom.Document;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 @Controller
 public class SOSService {
 
 	public static final String FEATURE_PREFIX = "VW_GWDP_GEOSERVER";
+	public static final String BOUNDING_BOX_PREFIX = "om:featureOfInterest/*/sams:shape";
 
 	static private Logger logger = LoggerFactory.getLogger(SOSService.class);
 
@@ -44,6 +61,70 @@ public class SOSService {
 		throw new NotImplementedException();
 	}
 	
+	@RequestMapping(params={"!REQUEST"},method={RequestMethod.POST})
+	public void processXmlParams(
+			HttpServletRequest request,
+			@RequestBody DOMSource dom,
+			HttpServletResponse response
+	) {
+		// TODO parse parameters out of XML input, call methods in this class
+		
+		logger.info("Input node is {} of type {}", dom.getNode().getNodeName(), dom.getNode().getNodeType());
+		
+		XPath xPath = XPathFactory.newInstance().newXPath();
+		Document doc = (Document) dom.getNode();
+		Node rootnode = doc.getDocumentElement();
+		
+		// determine operation
+		String opname = rootnode.getLocalName();
+		
+		// determine parameters
+		// multiple features of interest comma delimited
+		List<String> featureOfInterest = new ArrayList();
+		// will preserve document order
+		List<String> boundingBoxCoords = new ArrayList();
+		try {
+			String lowerCorners = (String)xPath.evaluate(
+				"//*:lowerCorner/text()",
+				rootnode, 
+				XPathConstants.STRING);
+			if (lowerCorners != null && !lowerCorners.trim().isEmpty()) {
+				String[] coords = lowerCorners.split(" +");
+				boundingBoxCoords.addAll(Arrays.asList(coords));
+			}
+
+			String upperCorners = (String)xPath.evaluate(
+				"//*:upperCorner/text()",
+				rootnode, 
+				XPathConstants.STRING);
+			if (upperCorners != null && !upperCorners.trim().isEmpty()) {
+				String[] coords = upperCorners.split(" +");
+				boundingBoxCoords.addAll(Arrays.asList(coords));
+			}
+
+			String featuresOfInterest = (String)xPath.evaluate(
+				"//*:featureOfInterest",
+				rootnode, 
+				XPathConstants.STRING);
+
+		}
+		catch (XPathExpressionException xee) {
+			throw new RuntimeException ("Bad XPath expression in code", xee);
+		}
+			
+		
+		throw new NotImplementedException();
+	}
+	
+	
+	/**
+	 * Prepares and sends a string argument to the equivalent GeoServer method
+	 * (GeoServer implements the OGC Web Feature Service.)
+	 * @param featureOfInterest a comma-separated list of SOS Feature IDs
+	 * @param request
+	 * @param response
+	 * @throws Exception 
+	 */
 	@RequestMapping(params={"REQUEST=GetObservation"})
 	public void getObservation(
 			@RequestParam String featureOfInterest,
@@ -51,7 +132,7 @@ public class SOSService {
 			// @RequestParam(required=false) @DateTimeFormat(iso=ISO.DATE) Date endDate,
 			HttpServletRequest request,
 			HttpServletResponse response
-			) throws Exception
+			) throws IOException
 	{
 		// Implement by fetching from self-URL for raw data, passing thru wml1.9 to wml2 transform
 		
@@ -71,9 +152,12 @@ public class SOSService {
 			copyThroughTransform(is,os, "/gov/usgs/ngwmn/wl2waterml2.xslt");
 			logger.debug("done");
 		}
+		catch (IOException ioe) {
+			logger.warn("Problem", ioe);
+			throw ioe;
+		}
 		catch (Exception e) {
-			logger.warn("Problem", e);
-			throw e;
+			throw new RuntimeException(e);
 		}
 		finally {
 			source.close();
@@ -115,7 +199,7 @@ public class SOSService {
 		
 		if (spatialFilter != null) {
 			String[] part = spatialFilter.split(",");
-			if ( ! "om:featureOfInterest/*/sams:shape".equals(part[0]) ) {
+			if ( ! SOSService.BOUNDING_BOX_PREFIX.equals(part[0]) ) {
 				throw new RuntimeException("bad filter");
 			}
 			for (int i = 1; i <= 4; i++) {
@@ -127,7 +211,6 @@ public class SOSService {
 			// use the original input strings for fidelity
 			String cql_filter = MessageFormat.format("(BBOX(GEOM,{0},{1},{2},{3}))",
 					part[1],part[2], part[3], part[4]);
-			srsName = "EPSG:4326";
 				
 			featureSource.addParameter("srsName", srsName);
 			featureSource.addParameter("CQL_FILTER", cql_filter);
@@ -139,6 +222,8 @@ public class SOSService {
 		if (filterCt == 0) {
 			logger.warn("No filters for WFS request, may get lots of data");
 		}
+		
+		// TODO It seems that geoserver may not accept the two filters in conjunction
 		
 		try {
 			InputStream is = featureSource.getStream();
@@ -248,5 +333,181 @@ public class SOSService {
 	// GetDataAvailability
 	// later
 	
+	/**
+	 * NOT threadsafe, but multithreaded access is not anticipated.
+	 */
+	public class xmlParameterExtractor {
+		
+		private XPath xPath;
+		private Node rootnode;
+		
+		public xmlParameterExtractor(Document docParams) {
+			if (docParams == null) {
+				throw new IllegalArgumentException (
+						"Parameter 'docParams' not permitted to be null.");
+			}
+			xPath = XPathFactory.newInstance().newXPath();
+			rootnode = docParams.getDocumentElement();
+			
+			// register namespaces with the XPath processor
+			SimpleNamespaceContext nc = new SimpleNamespaceContext();
+			nc.bindNamespaceUri("sos", "http://www.opengis.net/sos/2.0");
+			nc.bindNamespaceUri("fes", "http://www.opengis.net/fes/2.0");
+			nc.bindNamespaceUri("gml", "http://www.opengis.net/gml/3.2");
+			nc.bindNamespaceUri("swe", "http://www.opengis.net/swe/2.0");
+			nc.bindNamespaceUri("swes", "http://www.opengis.net/swes/2.0");
+			xPath.setNamespaceContext(nc);
+			
+		}
+
+		
+		private void callService(
+				HttpServletRequest request, 
+				HttpServletResponse response) 
+				throws IOException {
+			
+			String opname = getSOSRequest();
+			
+			switch (opname) {
+				case "GetFeatureOfInterest": {
+					
+					BoundingBox bbox = getSOSBoundingBox();
+					String srsName = null;
+					String spatialParam = null;
+					if (bbox != null) {
+						srsName = bbox.getSrsName();
+						
+						String[] corners = bbox.getCoordinates();
+						spatialParam = joinvar(",",
+								SOSService.BOUNDING_BOX_PREFIX, 
+								corners[0], 
+								corners[1], 
+								corners[2], 
+								corners[3]);
+					}
+					
+					List<String> features = getSOSFeatures();
+					String featureParam = null;
+					if ( ! features.isEmpty()) {
+						featureParam = join(",", features);
+					}
+					try {
+						getFOI_byId(featureParam, spatialParam, srsName, response);			
+					}
+					catch (Exception e) {
+						throw new RuntimeException (e);
+					}
+					break;
+				}
+				case "GetObservation": {
+					List<String> features = getSOSFeatures();
+					if (features.isEmpty()) {
+						response.sendError(400, 
+								"GetObservation requires Feature ID input.");
+					}
+					else {
+						String featuresParam = join(",", features);
+						getObservation(featuresParam, request, response);
+					}
+					break;
+				}
+				case "GetCapabilities": {
+					response.setContentType("text/xml");
+					getCapabilities(response.getOutputStream());
+					break;
+				}
+				default: {
+					response.sendError(400, "Root node '" + opname 
+							+ "' is not a recognized Request");
+				}
+			}
+		}
+		
+		/**
+		 * TODO clarify returns
+		 * @return 
+		 */
+		public BoundingBox getSOSBoundingBox() {
+			
+			// extract featureOfInterest parameters
+			String corners;
+			try {
+					boolean hasSpatialFilter = (Boolean)xPath.evaluate(
+						"//sos.spatialFilter",
+						rootnode, 
+						XPathConstants.BOOLEAN);
+
+					if ( ! hasSpatialFilter) {
+						return null;
+					}	
+							
+					String lowerCorner = (String)xPath.evaluate(
+						"//sos:spatialFilter/fes:Intersects/gml:Envelope/gml:lowerCorner/text()",
+						rootnode, 
+						XPathConstants.STRING);
+				
+					String upperCorner = (String)xPath.evaluate(
+						"//sos:spatialFilter/fes:Intersects/gml:Envelope/gml:upperCorner/text()",
+						rootnode, 
+						XPathConstants.STRING);
+					
+					String srsName = (String)xPath.evaluate(
+						"//sos:spatialFilter//*/@srsName",
+						rootnode, 
+						XPathConstants.STRING);
+					
+				
+					corners = lowerCorner + " " + upperCorner;
+					
+					BoundingBox bbox = new BoundingBox(srsName, corners.split(" "));
+					return bbox;
+			}
+			catch (XPathExpressionException xee) {
+				throw new RuntimeException("Faulty xpath expression.", xee);
+			}
+
+			
+		}
 	
+		public List<String> getSOSFeatures() {
+			
+			// extract featureOfInterest parameters
+			try {
+				NodeList featuresOfInterest = (NodeList)xPath.evaluate(
+					"//*[local-name() = 'featureOfInterest']",
+					rootnode, 
+					XPathConstants.NODESET);
+				List<String> features = new ArrayList<>(featuresOfInterest.getLength());
+				for (int indx = 0; indx < featuresOfInterest.getLength(); indx++) {
+					Node curNode = featuresOfInterest.item(indx);
+					if (!curNode.getTextContent().trim().isEmpty()) {
+						features.add(curNode.getTextContent().trim());
+					}
+				}
+
+				return features;
+			}
+			catch (XPathExpressionException xee) {
+				throw new RuntimeException("Faulty xpath expression.", xee);
+			}
+		}
+		
+		public String join(String separator, Collection<String> items) {
+			StringBuilder b = new StringBuilder();
+			String sep = "";
+			for (String item : items) {
+				b.append(sep).append(item);
+				sep = separator;
+			}
+			return b.toString();
+		}
+		
+		public String joinvar(final String sep, String... items) {
+			return join(sep, Arrays.asList(items));
+		}
+
+		public String getSOSRequest() {
+			return rootnode.getLocalName();
+		}
+	}
 }
