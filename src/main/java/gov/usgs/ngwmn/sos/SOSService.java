@@ -341,7 +341,7 @@ public class SOSService {
 		private XPath xPath;
 		private Node rootnode;
 		
-		private xmlParameterExtractor(Document docParams) {
+		public xmlParameterExtractor(Document docParams) {
 			if (docParams == null) {
 				throw new IllegalArgumentException (
 						"Parameter 'docParams' not permitted to be null.");
@@ -372,7 +372,31 @@ public class SOSService {
 				case "GetFeatureOfInterest": {
 					
 					BoundingBox bbox = getSOSBoundingBox();
+					String srsName = null;
+					String spatialParam = null;
+					if (bbox != null) {
+						srsName = bbox.getSrsName();
+						
+						String[] corners = bbox.getCoordinates();
+						spatialParam = joinvar(",",
+								SOSService.BOUNDING_BOX_PREFIX, 
+								corners[0], 
+								corners[1], 
+								corners[2], 
+								corners[3]);
+					}
 					
+					List<String> features = getSOSFeatures();
+					String featureParam = null;
+					if ( ! features.isEmpty()) {
+						featureParam = join(",", features);
+					}
+					try {
+						getFOI_byId(featureParam, spatialParam, srsName, response);			
+					}
+					catch (Exception e) {
+						throw new RuntimeException (e);
+					}
 					break;
 				}
 				case "GetObservation": {
@@ -400,7 +424,7 @@ public class SOSService {
 		}
 		
 		/**
-		 * 
+		 * TODO clarify returns
 		 * @return 
 		 */
 		public BoundingBox getSOSBoundingBox() {
