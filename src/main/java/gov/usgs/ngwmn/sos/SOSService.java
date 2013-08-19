@@ -31,11 +31,14 @@ import com.google.common.io.CountingInputStream;
 import com.google.common.io.CountingOutputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
+import javax.xml.namespace.NamespaceContext;
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
+import org.springframework.util.xml.SimpleNamespaceContext;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -114,6 +117,14 @@ public class SOSService {
 	}
 	
 	
+	/**
+	 * Prepares and sends a string argument to the equivalent GeoServer method
+	 * (GeoServer implements the OGC Web Feature Service.)
+	 * @param featureOfInterest a comma-separated list of SOS Feature IDs
+	 * @param request
+	 * @param response
+	 * @throws Exception 
+	 */
 	@RequestMapping(params={"REQUEST=GetObservation"})
 	public void getObservation(
 			@RequestParam String featureOfInterest,
@@ -121,7 +132,7 @@ public class SOSService {
 			// @RequestParam(required=false) @DateTimeFormat(iso=ISO.DATE) Date endDate,
 			HttpServletRequest request,
 			HttpServletResponse response
-			) throws Exception
+			) throws IOException
 	{
 		// Implement by fetching from self-URL for raw data, passing thru wml1.9 to wml2 transform
 		
@@ -141,9 +152,12 @@ public class SOSService {
 			copyThroughTransform(is,os, "/gov/usgs/ngwmn/wl2waterml2.xslt");
 			logger.debug("done");
 		}
+		catch (IOException ioe) {
+			logger.warn("Problem", ioe);
+			throw ioe;
+		}
 		catch (Exception e) {
-			logger.warn("Problem", e);
-			throw e;
+			throw new RuntimeException(e);
 		}
 		finally {
 			source.close();
@@ -319,5 +333,157 @@ public class SOSService {
 	// GetDataAvailability
 	// later
 	
+	/**
+	 * NOT threadsafe, but multithreaded access is not anticipated.
+	 */
+	public class xmlParameterExtractor {
+		
+		private XPath xPath;
+		private Node rootnode;
+		
+		private xmlParameterExtractor(Document docParams) {
+			if (docParams == null) {
+				throw new IllegalArgumentException (
+						"Parameter 'docParams' not permitted to be null.");
+			}
+			xPath = XPathFactory.newInstance().newXPath();
+			rootnode = docParams.getDocumentElement();
+			
+			// register namespaces with the XPath processor
+			SimpleNamespaceContext nc = new SimpleNamespaceContext();
+			nc.bindNamespaceUri("sos", "http://www.opengis.net/sos/2.0");
+			nc.bindNamespaceUri("fes", "http://www.opengis.net/fes/2.0");
+			nc.bindNamespaceUri("gml", "http://www.opengis.net/gml/3.2");
+			nc.bindNamespaceUri("swe", "http://www.opengis.net/swe/2.0");
+			nc.bindNamespaceUri("swes", "http://www.opengis.net/swes/2.0");
+			xPath.setNamespaceContext(nc);
+			
+		}
+
+		
+		private void callService(
+				HttpServletRequest request, 
+				HttpServletResponse response) 
+				throws IOException {
+			
+			String opname = getSOSRequest();
+			
+			switch (opname) {
+				case "GetFeatureOfInterest": {
+					
+					BoundingBox bbox = getSOSBoundingBox();
+					
+					break;
+				}
+				case "GetObservation": {
+					List<String> features = getSOSFeatures();
+					if (features.isEmpty()) {
+						response.sendError(400, 
+								"GetObservation requires Feature ID input.");
+					}
+					else {
+						String featuresParam = join(",", features);
+						getObservation(featuresParam, request, response);
+					}
+					break;
+				}
+				case "GetCapabilities": {
+					response.setContentType("text/xml");
+					getCapabilities(response.getOutputStream());
+					break;
+				}
+				default: {
+					response.sendError(400, "Root node '" + opname 
+							+ "' is not a recognized Request");
+				}
+			}
+		}
+		
+		/**
+		 * 
+		 * @return 
+		 */
+		public BoundingBox getSOSBoundingBox() {
+			
+			// extract featureOfInterest parameters
+			String corners;
+			try {
+					boolean hasSpatialFilter = (Boolean)xPath.evaluate(
+						"//sos.spatialFilter",
+						rootnode, 
+						XPathConstants.BOOLEAN);
+
+					if ( ! hasSpatialFilter) {
+						return null;
+					}	
+							
+					String lowerCorner = (String)xPath.evaluate(
+						"//sos:spatialFilter/fes:Intersects/gml:Envelope/gml:lowerCorner/text()",
+						rootnode, 
+						XPathConstants.STRING);
+				
+					String upperCorner = (String)xPath.evaluate(
+						"//sos:spatialFilter/fes:Intersects/gml:Envelope/gml:upperCorner/text()",
+						rootnode, 
+						XPathConstants.STRING);
+					
+					String srsName = (String)xPath.evaluate(
+						"//sos:spatialFilter//*/@srsName",
+						rootnode, 
+						XPathConstants.STRING);
+					
+				
+					corners = lowerCorner + " " + upperCorner;
+					
+					BoundingBox bbox = new BoundingBox(srsName, corners.split(" "));
+					return bbox;
+			}
+			catch (XPathExpressionException xee) {
+				throw new RuntimeException("Faulty xpath expression.", xee);
+			}
+
+			
+		}
 	
+		public List<String> getSOSFeatures() {
+			
+			// extract featureOfInterest parameters
+			try {
+				NodeList featuresOfInterest = (NodeList)xPath.evaluate(
+					"//*[local-name() = 'featureOfInterest']",
+					rootnode, 
+					XPathConstants.NODESET);
+				List<String> features = new ArrayList<>(featuresOfInterest.getLength());
+				for (int indx = 0; indx < featuresOfInterest.getLength(); indx++) {
+					Node curNode = featuresOfInterest.item(indx);
+					if (!curNode.getTextContent().trim().isEmpty()) {
+						features.add(curNode.getTextContent().trim());
+					}
+				}
+
+				return features;
+			}
+			catch (XPathExpressionException xee) {
+				throw new RuntimeException("Faulty xpath expression.", xee);
+			}
+		}
+		
+		public String join(String separator, Collection<String> items) {
+			StringBuilder b = new StringBuilder();
+			String sep = "";
+			for (String item : items) {
+				b.append(sep).append(item);
+				sep = separator;
+			}
+			return b.toString();
+		}
+		
+		public String joinvar(final String sep, String... items) {
+			return join(sep, Arrays.asList(items));
+		}
+
+		public String getSOSRequest() {
+			return rootnode.getLocalName();
+		}
+	}
 }
