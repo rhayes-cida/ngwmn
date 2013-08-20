@@ -26,7 +26,12 @@ public class BoundingBox {
 			try {
 				Double.parseDouble(coord);
 			}
-			catch (NullPointerException | NumberFormatException nfe) {
+			catch (NumberFormatException nfe) {
+				throw new IllegalArgumentException (
+						"Coordinates must be non-null numeric strings. "
+						+ "Passed: " + coord);
+			}
+			catch (NullPointerException npe) {
 				throw new IllegalArgumentException (
 						"Coordinates must be non-null numeric strings. "
 						+ "Passed: " + coord);

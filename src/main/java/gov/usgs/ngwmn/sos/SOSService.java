@@ -325,8 +325,8 @@ public class SOSService {
 			
 			String opname = getSOSRequest();
 			
-			switch (opname) {
-				case "GetFeatureOfInterest": {
+			// switch (opname) {
+				if ( "GetFeatureOfInterest".equals(opname)) {
 					
 					BoundingBox bbox = getSOSBoundingBox();
 					String srsName = null;
@@ -354,9 +354,10 @@ public class SOSService {
 					catch (Exception e) {
 						throw new RuntimeException (e);
 					}
-					break;
+					// break;
 				}
-				case "GetObservation": {
+				else if ("GetObservation".equals(opname)) {
+				// case "GetObservation": {
 					List<String> features = getSOSFeatures();
 					if (features.isEmpty()) {
 						response.sendError(400, 
@@ -366,19 +367,21 @@ public class SOSService {
 						String featuresParam = join(",", features);
 						getObservation(featuresParam, request, response);
 					}
-					break;
+					// break;
 				}
-				case "GetCapabilities": {
+				else if ("GetCapabilities".equals(opname)) {
+				// case "GetCapabilities": {
 					response.setContentType("text/xml");
 					getCapabilities(response.getOutputStream());
-					break;
+					// break;
 				}
-				default: {
+				else {
+				// default: {
 					response.sendError(400, "Root node '" + opname 
 							+ "' is not a recognized Request");
 				}
 			}
-		}
+		
 		
 		/**
 		 * TODO clarify returns
@@ -434,7 +437,7 @@ public class SOSService {
 					"//sos:featureOfInterest",
 					rootnode, 
 					XPathConstants.NODESET);
-				List<String> features = new ArrayList<>(featuresOfInterest.getLength());
+				List<String> features = new ArrayList<String>(featuresOfInterest.getLength());
 				for (int indx = 0; indx < featuresOfInterest.getLength(); indx++) {
 					Node curNode = featuresOfInterest.item(indx);
 					if (!curNode.getTextContent().trim().isEmpty()) {
