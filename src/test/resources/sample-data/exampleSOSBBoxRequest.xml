@@ -14,8 +14,9 @@ http://www.opengis.net/gml/3.2 http://schemas.opengis.net/gml/3.2.1/gml.xsd
              <fes:Intersects>
                     <fes:ValueReference>sams:shape</fes:ValueReference>
                     <gml:Envelope srsName="urn:ogc:def:crs:EPSG::4326">
-                           <gml:lowerCorner>50.5 -116</gml:lowerCorner>
-                           <gml:upperCorner>51.6 -114.3</gml:upperCorner>
+                    <!--  -100,32,-99.3,30 -->
+                           <gml:lowerCorner>-99 30</gml:lowerCorner>
+                           <gml:upperCorner>-100 32</gml:upperCorner>
                     </gml:Envelope>
              </fes:Intersects>
        </sos:spatialFilter>
