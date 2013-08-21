@@ -48,10 +48,10 @@ public class SOSService {
 
 	public static final String FEATURE_PREFIX = "VW_GWDP_GEOSERVER";
 	public static final String BOUNDING_BOX_PREFIX = "om:featureOfInterest/*/sams:shape";
-
+	
 	static private Logger logger = LoggerFactory.getLogger(SOSService.class);
 
-	private String baseURL;
+	private String geoserverURL;
 	
 	@RequestMapping(params={"REQUEST=GetCapabilities"})
 	public void getCapabilities(
@@ -95,11 +95,11 @@ public class SOSService {
 	{
 		// Implement by fetching from self-URL for raw data, passing thru wml1.9 to wml2 transform
 		
-		String baseURL = "http" + "://" + request.getLocalName() + ":" + request.getLocalPort() + "/" + request.getContextPath();
+		String thisServletURL = "http" + "://" + request.getLocalName() + ":" + request.getLocalPort() + "/" + request.getContextPath();
 		
 		SiteID site = SiteID.fromFid(featureOfInterest);
 		
-		Waterlevel19DataSource source = new Waterlevel19DataSource(baseURL, site.agency, site.site);
+		Waterlevel19DataSource source = new Waterlevel19DataSource(thisServletURL, site.agency, site.site);
 		
 		try {
 			InputStream is = source.getStream();
@@ -138,7 +138,7 @@ public class SOSService {
 			)
 		throws Exception
 	{
-		GeoserverFeatureSource featureSource = new GeoserverFeatureSource(getBaseURL());
+		GeoserverFeatureSource featureSource = new GeoserverFeatureSource(getGeoserverURL());
 		
 		logger.info("GetFeatureOfInterest");
 		
@@ -181,6 +181,9 @@ public class SOSService {
 		}
 		
 		// TODO It seems that geoserver may not accept the two filters in conjunction
+		if (spatialFilter != null && featureOfInterest != null) {
+			logger.warn("Sending geoserver a WFS request with both spatial and FOI filters");
+		}
 		
 		try {
 			InputStream is = featureSource.getStream();
@@ -240,13 +243,13 @@ public class SOSService {
 		}
 	}
 
-	public String getBaseURL() {
-		return baseURL;
+	public String getGeoserverURL() {
+		return geoserverURL;
 	}
 
-	public void setBaseURL(String baseURL) {
-		this.baseURL = baseURL;
-		logger.info("Will use base URL {}", this.baseURL);
+	public void setGeoserverURL(String gsURL) {
+		this.geoserverURL = gsURL;
+		logger.info("Will use geoserver URL {}", this.geoserverURL);
 	}
 	
 	public static class SiteID {
