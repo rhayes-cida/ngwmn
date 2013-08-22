@@ -5,21 +5,10 @@ import static org.junit.Assert.*;
 import java.io.ByteArrayOutputStream;
 import java.io.FileInputStream;
 import java.io.InputStream;
-import java.io.OutputStream;
 
-import org.junit.After;
-import org.junit.Before;
 import org.junit.Test;
 
 public class WFSServiceTest {
-
-	@Before
-	public void setUp() throws Exception {
-	}
-
-	@After
-	public void tearDown() throws Exception {
-	}
 
 	@Test
 	public void testTransform_1() throws Exception {
