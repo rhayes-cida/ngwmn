@@ -16,6 +16,7 @@ Transform the existing Cocoon waterlevel output to validating WaterML 2.0.
 	xmlns:sams="http://www.opengis.net/samplingSpatial/2.0"
 	xmlns:sf="http://www.opengis.net/sampling/2.0"
 	xmlns:swe="http://www.opengis.net/swe/2.0" 
+	xmlns:sos="http://www.opengis.net/sos/2.0"
 	
 	xmlns:wml2-prelim="http://www.wron.net.au/waterml2"
 	
@@ -33,6 +34,7 @@ Transform the existing Cocoon waterlevel output to validating WaterML 2.0.
 	exclude-result-prefixes="wml2-prelim h fn wfs gwml functx gml-unversioned gwdp "
 	
 	xsi:schemaLocation="
+	http://www.opengis.net/sos/2.0 http://schemas.opengis.net/sos/2.0/sos.xsd
 	http://www.opengis.net/waterml/2.0 http://schemas.opengis.net/waterml/2.0/waterml2.xsd
 	http://www.opengis.net/gml/3.2 http://schemas.opengis.net/gml/3.2.1/gml.xsd
 	http://www.opengis.net/om/2.0 http://schemas.opengis.net/om/2.0/observation.xsd
@@ -50,7 +52,7 @@ Transform the existing Cocoon waterlevel output to validating WaterML 2.0.
 	<xsl:key name="TimeValuePair" match="wml2-prelim:TimeValuePair" use=".//gwdp:nwis/@pcode"/>
 	
 	<xsl:template match="om:ObservationCollection">
-		<wml2:Collection
+	<sos:GetObservationResponse
 		
 			xsi:schemaLocation="
 	http://www.opengis.net/waterml/2.0 http://schemas.opengis.net/waterml/2.0/waterml2.xsd
@@ -60,6 +62,13 @@ Transform the existing Cocoon waterlevel output to validating WaterML 2.0.
 	http://www.isotc211.org/2005/gco http://www.isotc211.org/2005/gco/gco.xsd
 	http://www.isotc211.org/2005/gmd http://www.isotc211.org/2005/gmd/gmd.xsd
 " 
+	
+	
+	>
+<!-- some optional stuff here -->
+       <sos:observationData>
+		<wml2:Collection
+	
 		gml:id="{(.//@gml-unversioned:id)[1]}"
 		>
 		
@@ -125,7 +134,7 @@ Transform the existing Cocoon waterlevel output to validating WaterML 2.0.
 			
 			<om:observedProperty xlink:href="urn:ogc:def:property:OGC:GroundWaterLevel"/>
 			
-			<om:featureOfInterest xlink:title="{.//om:featureOfInterest/@xlink:title}" xlink:href="{.//om:featureOfInterest/@xlink:href}">
+			<om:featureOfInterest xlink:title="{.//om:featureOfInterest/@xlink:title}" xlink:href="{encode-for-uri(.//om:featureOfInterest/@xlink:href)}">
 				<wml2:MonitoringPoint gml:id="{generate-id((.//om:parameter//gml-unversioned:Point)[1])}">
 				 	<sf:sampledFeature xlink:href="{.//gmd:identificationInfo/@xlink:href}"/>
 				
@@ -159,7 +168,7 @@ Transform the existing Cocoon waterlevel output to validating WaterML 2.0.
 						</wml2:TimeseriesMetadata>
 					</wml2:metadata>
 					<wml2:defaultPointMetadata>
-					
+					 	<wml2:uom code="foot" xlink:href="http://www.opengis.net/def/uom/UCUM/0/foot" xlink:title="feet below land surface"/>
 						<wml2:DefaultTVPMeasurementMetadata>
 							<xsl:apply-templates select=".//gwdp:nwis"/>
 							<wml2:interpolationType xlink:href="http://www.opengis.net/def/waterml/2.0/interpolationType/Continuous" xlink:title="Continuous"/>
@@ -187,7 +196,8 @@ Transform the existing Cocoon waterlevel output to validating WaterML 2.0.
 		
 		
 		</wml2:Collection>
-		
+		       </sos:observationData>
+		</sos:GetObservationResponse>
 	</xsl:template>
 	
 	
@@ -214,8 +224,7 @@ Transform the existing Cocoon waterlevel output to validating WaterML 2.0.
 						</wml2:DefaultTVPMeasurementMetadata>
 						
 					</wml2:defaultPointMetadata>
-		
-					
+						<wml2:uom code="foot" xlink:href="http://www.opengis.net/def/uom/UCUM/0/foot" xlink:title="feet below land surface"/>
 						<xsl:apply-templates select=".//wml2-prelim:TimeValuePair"/>
 				</wml2:MeasurementTimeseries>
 	
