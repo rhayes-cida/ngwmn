@@ -22,67 +22,67 @@ import org.xml.sax.SAXParseException;
 public class SOSServiceXMLExtractorTest {
 	
 	public static final String BASIC_BOUNDING_BOX = 
-"<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
-"<sos:GetFeatureOfInterest  service=\"SOS\" version=\"2.0.0\" xmlns:sos=\"http://www.opengis.net/sos/2.0\" xmlns:fes=\"http://www.opengis.net/fes/2.0\" xmlns:gml=\"http://www.opengis.net/gml/3.2\" xmlns:sams=\"http://www.opengis.net/spatialSampling/2.0\">\n" +
-"       <sos:spatialFilter>\n" +
-"             <fes:Intersects>\n" +
-"                    <fes:ValueReference>sams:shape</fes:ValueReference>\n" +
-"                    <gml:Envelope srsName=\"urn:ogc:def:crs:EPSG::4326\">\n" +
-"                           <gml:lowerCorner>50.5 -116</gml:lowerCorner>\n" +
-"                           <gml:upperCorner>51.6 -114.3</gml:upperCorner>\n" +
-"                    </gml:Envelope>\n" +
-"             </fes:Intersects>\n" +
-"       </sos:spatialFilter>\n" +
-"</sos:GetFeatureOfInterest>\n";
+		"<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
+		"<sos:GetFeatureOfInterest  service=\"SOS\" version=\"2.0.0\" xmlns:sos=\"http://www.opengis.net/sos/2.0\" xmlns:fes=\"http://www.opengis.net/fes/2.0\" xmlns:gml=\"http://www.opengis.net/gml/3.2\" xmlns:sams=\"http://www.opengis.net/spatialSampling/2.0\">\n" +
+		"       <sos:spatialFilter>\n" +
+		"             <fes:Intersects>\n" +
+		"                    <fes:ValueReference>sams:shape</fes:ValueReference>\n" +
+		"                    <gml:Envelope srsName=\"urn:ogc:def:crs:EPSG::4326\">\n" +
+		"                           <gml:lowerCorner>50.5 -116</gml:lowerCorner>\n" +
+		"                           <gml:upperCorner>51.6 -114.3</gml:upperCorner>\n" +
+		"                    </gml:Envelope>\n" +
+		"             </fes:Intersects>\n" +
+		"       </sos:spatialFilter>\n" +
+		"</sos:GetFeatureOfInterest>\n";
 
 	public static final String SINGLE_FEATURE_OF_INTEREST =
-"<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
-"<sos:GetFeatureOfInterest  service=\"SOS\" version=\"2.0.0\" xmlns:sos=\"http://www.opengis.net/sos/2.0\">\n" +
-"       <sos:featureOfInterest>ab.mon.45</sos:featureOfInterest>\n" +
-"</sos:GetFeatureOfInterest>\n";
+		"<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
+		"<sos:GetFeatureOfInterest  service=\"SOS\" version=\"2.0.0\" xmlns:sos=\"http://www.opengis.net/sos/2.0\">\n" +
+		"       <sos:featureOfInterest>ab.mon.45</sos:featureOfInterest>\n" +
+		"</sos:GetFeatureOfInterest>\n";
 	
 	public static final String MULTIPLE_FEATURE_OF_INTEREST =
-"<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
-"<sos:GetFeatureOfInterest  service=\"SOS\" version=\"2.0.0\" xmlns:sos=\"http://www.opengis.net/sos/2.0\">\n" +
-"       <sos:featureOfInterest>ab.mon.45</sos:featureOfInterest>\n" +
-"       <sos:featureOfInterest>ab.mon.46</sos:featureOfInterest>\n" +
-"       <sos:featureOfInterest>ab.mon.47</sos:featureOfInterest>\n" +
-"       <sos:featureOfInterest>ab.mon.48</sos:featureOfInterest>\n" +
-"</sos:GetFeatureOfInterest>\n";
+		"<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
+		"<sos:GetFeatureOfInterest  service=\"SOS\" version=\"2.0.0\" xmlns:sos=\"http://www.opengis.net/sos/2.0\">\n" +
+		"       <sos:featureOfInterest>ab.mon.45</sos:featureOfInterest>\n" +
+		"       <sos:featureOfInterest>ab.mon.46</sos:featureOfInterest>\n" +
+		"       <sos:featureOfInterest>ab.mon.47</sos:featureOfInterest>\n" +
+		"       <sos:featureOfInterest>ab.mon.48</sos:featureOfInterest>\n" +
+		"</sos:GetFeatureOfInterest>\n";
 	
-public static final String GET_OBSERVATION_1 =
-"<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
-"<sos:GetObservation\n" +
-"       service=\"SOS\" version=\"2.0.0\"\n" +
-"       xmlns:sos=\"http://www.opengis.net/sos/2.0\"\n" +
-"       xmlns:fes=\"http://www.opengis.net/fes/2.0\"\n" +
-"       xmlns:gml=\"http://www.opengis.net/gml/3.2\"\n" +
-"       xmlns:swe=\"http://www.opengis.net/swe/2.0\"\n" +
-"       xmlns:swes=\"http://www.opengis.net/swes/2.0\"\n" +
-"       xmlns:xlink=\"http://www.w3.org/1999/xlink\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"http://www.opengis.net/sos/2.0 http://schemas.opengis.net/sos/2.0/sos.xsd http://www.opengis.net/gml/3.2\n" +
-"http://schemas.opengis.net/gml/3.2.1/gml.xsd\">\n" +
-"  <sos:offering>GW_LEVEL</sos:offering>\n" +
-"  <sos:observedProperty>urn:ogc:def:phenomenon:OGC:1.0.30:groundwaterlevel</sos:observedProperty>\n" +
-"   <sos:featureOfInterest>ab.mon.45</sos:featureOfInterest>\n" +
-"</sos:GetObservation>";
+	public static final String GET_OBSERVATION_1 =
+		"<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
+		"<sos:GetObservation\n" +
+		"       service=\"SOS\" version=\"2.0.0\"\n" +
+		"       xmlns:sos=\"http://www.opengis.net/sos/2.0\"\n" +
+		"       xmlns:fes=\"http://www.opengis.net/fes/2.0\"\n" +
+		"       xmlns:gml=\"http://www.opengis.net/gml/3.2\"\n" +
+		"       xmlns:swe=\"http://www.opengis.net/swe/2.0\"\n" +
+		"       xmlns:swes=\"http://www.opengis.net/swes/2.0\"\n" +
+		"       xmlns:xlink=\"http://www.w3.org/1999/xlink\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"http://www.opengis.net/sos/2.0 http://schemas.opengis.net/sos/2.0/sos.xsd http://www.opengis.net/gml/3.2\n" +
+		"http://schemas.opengis.net/gml/3.2.1/gml.xsd\">\n" +
+		"  <sos:offering>GW_LEVEL</sos:offering>\n" +
+		"  <sos:observedProperty>urn:ogc:def:phenomenon:OGC:1.0.30:groundwaterlevel</sos:observedProperty>\n" +
+		"   <sos:featureOfInterest>ab.mon.45</sos:featureOfInterest>\n" +
+		"</sos:GetObservation>";
 
-public static final String GET_OBSERVATION_3 =
-"<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
-"<sos:GetObservation\n" +
-"       service=\"SOS\" version=\"2.0.0\"\n" +
-"       xmlns:sos=\"http://www.opengis.net/sos/2.0\"\n" +
-"       xmlns:fes=\"http://www.opengis.net/fes/2.0\"\n" +
-"       xmlns:gml=\"http://www.opengis.net/gml/3.2\"\n" +
-"       xmlns:swe=\"http://www.opengis.net/swe/2.0\"\n" +
-"       xmlns:swes=\"http://www.opengis.net/swes/2.0\"\n" +
-"       xmlns:xlink=\"http://www.w3.org/1999/xlink\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"http://www.opengis.net/sos/2.0 http://schemas.opengis.net/sos/2.0/sos.xsd http://www.opengis.net/gml/3.2\n" +
-"http://schemas.opengis.net/gml/3.2.1/gml.xsd\">\n" +
-"  <sos:offering>GW_LEVEL</sos:offering>\n" +
-"  <sos:observedProperty>urn:ogc:def:phenomenon:OGC:1.0.30:groundwaterlevel</sos:observedProperty>\n" +
-"   <sos:featureOfInterest>ab.mon.42</sos:featureOfInterest>\n" +
-"   <sos:featureOfInterest>ab.mon.43</sos:featureOfInterest>\n" +
-"   <sos:featureOfInterest>ab.mon.44</sos:featureOfInterest>\n" +
-"</sos:GetObservation>";
+	public static final String GET_OBSERVATION_3 =
+		"<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
+		"<sos:GetObservation\n" +
+		"       service=\"SOS\" version=\"2.0.0\"\n" +
+		"       xmlns:sos=\"http://www.opengis.net/sos/2.0\"\n" +
+		"       xmlns:fes=\"http://www.opengis.net/fes/2.0\"\n" +
+		"       xmlns:gml=\"http://www.opengis.net/gml/3.2\"\n" +
+		"       xmlns:swe=\"http://www.opengis.net/swe/2.0\"\n" +
+		"       xmlns:swes=\"http://www.opengis.net/swes/2.0\"\n" +
+		"       xmlns:xlink=\"http://www.w3.org/1999/xlink\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"http://www.opengis.net/sos/2.0 http://schemas.opengis.net/sos/2.0/sos.xsd http://www.opengis.net/gml/3.2\n" +
+		"http://schemas.opengis.net/gml/3.2.1/gml.xsd\">\n" +
+		"  <sos:offering>GW_LEVEL</sos:offering>\n" +
+		"  <sos:observedProperty>urn:ogc:def:phenomenon:OGC:1.0.30:groundwaterlevel</sos:observedProperty>\n" +
+		"   <sos:featureOfInterest>ab.mon.42</sos:featureOfInterest>\n" +
+		"   <sos:featureOfInterest>ab.mon.43</sos:featureOfInterest>\n" +
+		"   <sos:featureOfInterest>ab.mon.44</sos:featureOfInterest>\n" +
+		"</sos:GetObservation>";
 	
 	private SOSService victim;
 	
