@@ -10,16 +10,11 @@
 	xmlns:gml="http://www.opengis.net/gml" 
 	xmlns:gwml="http://www.nrcan.gc.ca/xml/gwml/1"
 	
-	xmlns:sos="http://www.opengis.net/sos/2.0" 
 	xmlns:gml32="http://www.opengis.net/gml/3.2"
-	xmlns:swes="http://www.opengis.net/swes/2.0" 
 	xmlns:om="http://www.opengis.net/om/2.0"
-	xmlns:sf="http://www.opengis.net/sampling/2.0" 
 	xmlns:xlink="http://www.w3.org/1999/xlink"
-	xmlns:sams="http://www.opengis.net/samplingSpatial/2.0" 
-	xmlns:x="urn:gin:include:1.0"
 		
-	exclude-result-prefixes="ngwmn "
+	exclude-result-prefixes="ngwmn gml32 xalan om "
 	
 	
 	xmlns:xalan="http://xml.apache.org/xalan"
