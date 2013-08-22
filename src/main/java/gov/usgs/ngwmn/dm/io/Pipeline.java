@@ -12,6 +12,8 @@ import java.util.concurrent.ExecutionException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.io.ByteStreams;
+
 public class Pipeline implements Flow {
 	protected final transient Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -90,6 +92,7 @@ public class Pipeline implements Flow {
 			try {
 				OutputStream os = oss.begin();
 				logger.debug("began oss={}, oss.source={}", oss, oss.getSource());
+				// TODO ct = ByteStreams.copy(is, os);
 				ct = invoker.invoke(is,os);
 				if (logger.isDebugEnabled()) {
 					Object oss_source = oss.getSource();

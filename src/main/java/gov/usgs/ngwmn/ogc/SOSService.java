@@ -1,11 +1,7 @@
-package gov.usgs.ngwmn.sos;
+package gov.usgs.ngwmn.ogc;
 
 import gov.usgs.ngwmn.NotImplementedException;
-import gov.usgs.ngwmn.dm.io.TeeInputStream;
-import gov.usgs.ngwmn.dm.io.transform.XSLHelper;
 
-import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -13,11 +9,7 @@ import java.text.MessageFormat;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerException;
 import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
-import javax.xml.transform.stream.StreamSource;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,8 +19,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import com.google.common.io.CountingInputStream;
-import com.google.common.io.CountingOutputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -44,15 +34,13 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 @Controller
-public class SOSService {
+public class SOSService extends OGCService {
 
 	public static final String FEATURE_PREFIX = "VW_GWDP_GEOSERVER";
 	public static final String BOUNDING_BOX_PREFIX = "om:featureOfInterest/*/sams:shape";
-
+	
 	static private Logger logger = LoggerFactory.getLogger(SOSService.class);
 
-	private String baseURL;
-	
 	@RequestMapping(params={"REQUEST=GetCapabilities"})
 	public void getCapabilities(
 			OutputStream out
@@ -95,11 +83,11 @@ public class SOSService {
 	{
 		// Implement by fetching from self-URL for raw data, passing thru wml1.9 to wml2 transform
 		
-		String baseURL = "http" + "://" + request.getLocalName() + ":" + request.getLocalPort() + "/" + request.getContextPath();
+		String thisServletURL = "http" + "://" + request.getLocalName() + ":" + request.getLocalPort() + "/" + request.getContextPath();
 		
 		SiteID site = SiteID.fromFid(featureOfInterest);
 		
-		Waterlevel19DataSource source = new Waterlevel19DataSource(baseURL, site.agency, site.site);
+		Waterlevel19DataSource source = new Waterlevel19DataSource(thisServletURL, site.agency, site.site);
 		
 		try {
 			InputStream is = source.getStream();
@@ -124,6 +112,7 @@ public class SOSService {
 	}
 		
 	// TODO Make param names case-insensitive (might require use of filter)
+	// See http://stackoverflow.com/questions/12684183/case-insensitive-mapping-for-spring-mvc-requestmapping-annotations
 	
 	// GetFeatureOfInterest
 	// implement on the back of geoserver
@@ -138,7 +127,7 @@ public class SOSService {
 			)
 		throws Exception
 	{
-		GeoserverFeatureSource featureSource = new GeoserverFeatureSource(getBaseURL());
+		GeoserverFeatureSource featureSource = new GeoserverFeatureSource(getGeoserverURL());
 		
 		logger.info("GetFeatureOfInterest");
 		
@@ -181,6 +170,9 @@ public class SOSService {
 		}
 		
 		// TODO It seems that geoserver may not accept the two filters in conjunction
+		if (spatialFilter != null && featureOfInterest != null) {
+			logger.warn("Sending geoserver a WFS request with both spatial and FOI filters");
+		}
 		
 		try {
 			InputStream is = featureSource.getStream();
@@ -200,92 +192,6 @@ public class SOSService {
 			featureSource.close();
 		}
 	}
-	
-	public static void copyThroughTransform(InputStream is, OutputStream os,
-			String xformName) throws IOException, TransformerException {
-		XSLHelper xslHelper = new XSLHelper();
-		xslHelper.setTransform(xformName);
-		
-		CountingInputStream countingIs = null;
-		TeeInputStream teeIs = null;
-		CountingOutputStream countingOs = null;
-		
-		if (logger.isDebugEnabled()) {
-			countingIs = new CountingInputStream(is);
-			is = countingIs;
-			
-			countingOs = new CountingOutputStream(os);
-			os = countingOs;
-		}
-		
-		if (logger.isTraceEnabled()) {
-			File tOut = File.createTempFile("geoserver",".xml");
-			logger.info("Saving a copy of geo-output to {}", tOut);
-			FileOutputStream fos = new FileOutputStream(tOut);
-			teeIs = new TeeInputStream(is, fos, true);
-			is = teeIs;
-		}
-		
-		Transformer t = xslHelper.getTemplates().newTransformer();
-		StreamResult result = new StreamResult(os);
-		StreamSource source = new StreamSource(is);	
-
-		t.transform(source, result);
-		
-		if (countingIs != null) {
-			logger.debug("Processed {} bytes of input", countingIs.getCount());
-		}
-		if (countingOs != null) {
-			logger.debug("Got {} bytes of output", countingOs.getCount());
-		}
-	}
-
-	public String getBaseURL() {
-		return baseURL;
-	}
-
-	public void setBaseURL(String baseURL) {
-		this.baseURL = baseURL;
-		logger.info("Will use base URL {}", this.baseURL);
-	}
-	
-	public static class SiteID {
-		public final String agency;
-		public final String site;
-		
-		// fid is like VW_GWDP_GEOSERVER.NJGS.2288614
-		// site id is like NJGS:2288614
-		// (agency:site)
-
-		public SiteID(String agency, String site) {
-			super();
-			this.agency = agency;
-			this.site = site;
-		}
-		
-		public String getFid() {
-			return FEATURE_PREFIX + "." + agency + "." + site;
-		}
-		
-		public String toString() {
-			return agency + ":" + site;
-		}
-		
-		public static SiteID fromFid(String fid) {
-			String[] parts = fid.split("\\.");
-			// Check first part
-			if ( ! FEATURE_PREFIX.equals(parts[0])) {
-				throw new IllegalArgumentException("Expected " + FEATURE_PREFIX + ", got " + parts[0]);
-			}
-			return new SiteID(parts[1], parts[2]);
-		}
-		
-		public static SiteID fromID(String siteId) {
-			String[] parts = siteId.split(":");
-			return new SiteID(parts[0], parts[1]);
-		}
-	}
-	
 
 	// GetDataAvailability
 	// later
