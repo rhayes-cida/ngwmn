@@ -133,8 +133,9 @@ Transform the existing Cocoon waterlevel output to validating WaterML 2.0.
 			<om:procedure xlink:href="{.//om:procedure/@xlink:href}" />
 			
 			<om:observedProperty xlink:href="urn:ogc:def:property:OGC:GroundWaterLevel"/>
+			<xsl:variable name="foi-href"><xsl:value-of select=".//om:featureOfInterest/@xlink:href"/></xsl:variable>
 			
-			<om:featureOfInterest xlink:title="{.//om:featureOfInterest/@xlink:title}" xlink:href="{encode-for-uri(.//om:featureOfInterest/@xlink:href)}">
+			<om:featureOfInterest xlink:title="{.//om:featureOfInterest/@xlink:title}" xlink:href="{$foi-href}">
 				<!--
 				<wml2:MonitoringPoint gml:id="{generate-id((.//om:parameter//gml-unversioned:Point)[1])}">
 				 	<sf:sampledFeature xlink:href="{.//gmd:identificationInfo/@xlink:href}"/>
