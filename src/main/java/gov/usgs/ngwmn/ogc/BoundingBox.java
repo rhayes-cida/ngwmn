@@ -1,4 +1,4 @@
-package gov.usgs.ngwmn.sos;
+package gov.usgs.ngwmn.ogc;
 
 import java.util.Arrays;
 

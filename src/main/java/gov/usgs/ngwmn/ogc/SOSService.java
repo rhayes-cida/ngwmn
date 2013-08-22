@@ -1,11 +1,7 @@
-package gov.usgs.ngwmn.sos;
+package gov.usgs.ngwmn.ogc;
 
 import gov.usgs.ngwmn.NotImplementedException;
-import gov.usgs.ngwmn.dm.io.TeeInputStream;
-import gov.usgs.ngwmn.dm.io.transform.XSLHelper;
 
-import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -13,11 +9,7 @@ import java.text.MessageFormat;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerException;
 import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
-import javax.xml.transform.stream.StreamSource;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,8 +19,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import com.google.common.io.CountingInputStream;
-import com.google.common.io.CountingOutputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -44,15 +34,13 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 @Controller
-public class SOSService {
+public class SOSService extends OGCService {
 
 	public static final String FEATURE_PREFIX = "VW_GWDP_GEOSERVER";
 	public static final String BOUNDING_BOX_PREFIX = "om:featureOfInterest/*/sams:shape";
 	
 	static private Logger logger = LoggerFactory.getLogger(SOSService.class);
 
-	private String geoserverURL;
-	
 	@RequestMapping(params={"REQUEST=GetCapabilities"})
 	public void getCapabilities(
 			OutputStream out
@@ -124,6 +112,7 @@ public class SOSService {
 	}
 		
 	// TODO Make param names case-insensitive (might require use of filter)
+	// See http://stackoverflow.com/questions/12684183/case-insensitive-mapping-for-spring-mvc-requestmapping-annotations
 	
 	// GetFeatureOfInterest
 	// implement on the back of geoserver
@@ -203,92 +192,6 @@ public class SOSService {
 			featureSource.close();
 		}
 	}
-	
-	public static void copyThroughTransform(InputStream is, OutputStream os,
-			String xformName) throws IOException, TransformerException {
-		XSLHelper xslHelper = new XSLHelper();
-		xslHelper.setTransform(xformName);
-		
-		CountingInputStream countingIs = null;
-		TeeInputStream teeIs = null;
-		CountingOutputStream countingOs = null;
-		
-		if (logger.isDebugEnabled()) {
-			countingIs = new CountingInputStream(is);
-			is = countingIs;
-			
-			countingOs = new CountingOutputStream(os);
-			os = countingOs;
-		}
-		
-		if (logger.isTraceEnabled()) {
-			File tOut = File.createTempFile("geoserver",".xml");
-			logger.info("Saving a copy of geo-output to {}", tOut);
-			FileOutputStream fos = new FileOutputStream(tOut);
-			teeIs = new TeeInputStream(is, fos, true);
-			is = teeIs;
-		}
-		
-		Transformer t = xslHelper.getTemplates().newTransformer();
-		StreamResult result = new StreamResult(os);
-		StreamSource source = new StreamSource(is);	
-
-		t.transform(source, result);
-		
-		if (countingIs != null) {
-			logger.debug("Processed {} bytes of input", countingIs.getCount());
-		}
-		if (countingOs != null) {
-			logger.debug("Got {} bytes of output", countingOs.getCount());
-		}
-	}
-
-	public String getGeoserverURL() {
-		return geoserverURL;
-	}
-
-	public void setGeoserverURL(String gsURL) {
-		this.geoserverURL = gsURL;
-		logger.info("Will use geoserver URL {}", this.geoserverURL);
-	}
-	
-	public static class SiteID {
-		public final String agency;
-		public final String site;
-		
-		// fid is like VW_GWDP_GEOSERVER.NJGS.2288614
-		// site id is like NJGS:2288614
-		// (agency:site)
-
-		public SiteID(String agency, String site) {
-			super();
-			this.agency = agency;
-			this.site = site;
-		}
-		
-		public String getFid() {
-			return FEATURE_PREFIX + "." + agency + "." + site;
-		}
-		
-		public String toString() {
-			return agency + ":" + site;
-		}
-		
-		public static SiteID fromFid(String fid) {
-			String[] parts = fid.split("\\.");
-			// Check first part
-			if ( ! FEATURE_PREFIX.equals(parts[0])) {
-				throw new IllegalArgumentException("Expected " + FEATURE_PREFIX + ", got " + parts[0]);
-			}
-			return new SiteID(parts[1], parts[2]);
-		}
-		
-		public static SiteID fromID(String siteId) {
-			String[] parts = siteId.split(":");
-			return new SiteID(parts[0], parts[1]);
-		}
-	}
-	
 
 	// GetDataAvailability
 	// later
