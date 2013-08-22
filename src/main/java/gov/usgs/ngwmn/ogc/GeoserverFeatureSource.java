@@ -1,4 +1,4 @@
-package gov.usgs.ngwmn.sos;
+package gov.usgs.ngwmn.ogc;
 
 import java.io.Closeable;
 import java.io.IOException;

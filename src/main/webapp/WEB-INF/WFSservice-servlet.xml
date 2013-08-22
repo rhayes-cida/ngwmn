@@ -14,7 +14,7 @@
 
     <mvc:annotation-driven  />
     
-	<bean id="SOSservice" class="gov.usgs.ngwmn.ogc.SOSService">
+	<bean id="WFSservice" class="gov.usgs.ngwmn.ogc.WFSService">
 		<property name="geoserverURL" ref="geoserver-proxy-forward-url"/>
 	</bean>
 </beans>

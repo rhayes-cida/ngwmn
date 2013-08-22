@@ -1,7 +1,9 @@
-package gov.usgs.ngwmn.sos;
+package gov.usgs.ngwmn.ogc;
 
 import static org.junit.Assert.*;
-import gov.usgs.ngwmn.sos.SOSService.XMLParameterExtractor;
+import gov.usgs.ngwmn.ogc.BoundingBox;
+import gov.usgs.ngwmn.ogc.SOSService;
+import gov.usgs.ngwmn.ogc.SOSService.XMLParameterExtractor;
 
 import java.io.ByteArrayInputStream;
 import java.util.Arrays;
@@ -18,6 +20,7 @@ import org.xml.sax.SAXParseException;
 /**
  *
  * @author Bill Blondeau <wblondeau@usgs.gov>
+ * @author Roger Hayes <rhayes@usgs.gov>
  */
 public class SOSServiceXMLExtractorTest {
 	
